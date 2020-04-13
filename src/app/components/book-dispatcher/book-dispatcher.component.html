@@ -1,0 +1,6 @@
+<ng-container [ngSwitch]="(books | async)[0].kind">
+  <app-book-titles *ngSwitchCase="'title'"></app-book-titles>
+  <p *ngSwitchDefault>
+    Not sure how to display this book part called, sorry!
+  </p>
+</ng-container>

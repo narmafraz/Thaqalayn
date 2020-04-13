@@ -1,8 +1,15 @@
 
 export interface BookTitle {
-  type: 'title';
+  kind: 'title';
   index: string;
-  title: string;
+  data: BookTitleData;
 }
 
-type Book = BookTitle;
+export interface BookTitleData {
+  titles: {
+    en: string,
+    ar: string
+  };
+}
+
+export type Book = BookTitle;

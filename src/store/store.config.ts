@@ -3,9 +3,10 @@ import { NgxsDevtoolsOptions } from '@ngxs/devtools-plugin/src/symbols';
 import { NgxsLoggerPluginOptions } from '@ngxs/logger-plugin/src/symbols';
 import { NgxsConfig } from '@ngxs/store/src/symbols';
 import { AuthStateModule } from './auth/auth.state';
+import { BooksState } from './books/books.state';
 import { DashboardStateModule, DashboardStates } from './dashboard';
 
-export const STATES_MODULES = [AuthStateModule, DashboardStateModule, ...DashboardStates];
+export const STATES_MODULES = [BooksState, AuthStateModule, DashboardStateModule, ...DashboardStates];
 
 export const OPTIONS_CONFIG: Partial<NgxsConfig> = {
   /**

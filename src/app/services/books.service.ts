@@ -11,6 +11,7 @@ export class BooksService {
 
   private static readonly apiVersion = 'api/v1/';
   private static readonly booksUrl = environment.apiBaseUrl + BooksService.apiVersion + 'books';
+  private static readonly bookpartsUrl = environment.apiBaseUrl + BooksService.apiVersion + 'bookparts';
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -21,7 +22,7 @@ export class BooksService {
   }
 
   getPart(index: string): Observable<Book> {
-    return this.http.get<Book>(`${BooksService.booksUrl}/${index}`);
+    return this.http.get<Book>(`${BooksService.bookpartsUrl}/${index}`);
   }
 
   constructor(private http: HttpClient) { }

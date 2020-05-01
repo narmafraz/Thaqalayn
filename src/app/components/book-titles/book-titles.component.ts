@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BookTitle } from '@app/models/book';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable } from 'rxjs';
 
@@ -13,9 +13,9 @@ export class BookTitlesComponent implements OnInit {
 
   @Select(BooksState.getTitles) books: Observable<BookTitle[]>;
 
-  constructor() { }
+  constructor(private store: Store) {
+  }
 
   ngOnInit(): void {
   }
-
 }

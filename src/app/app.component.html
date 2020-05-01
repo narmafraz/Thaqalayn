@@ -1,2 +1,16 @@
-
-<router-outlet></router-outlet>
+<div id="site">
+  <div id="header">
+    <a href="#changeme"><div id="banner" class="bannerTop">Thaqalayn</div></a>
+  </div>
+  <div id="main">
+    <div id="mainc">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+  <div id="footer">
+    <a routerLink="/about">About</a> |
+    <a routerLink="/news">News</a> |
+    <a routerLink="/contact">Contact</a> |
+    <a routerLink="/support">Support</a>
+  </div>
+</div>

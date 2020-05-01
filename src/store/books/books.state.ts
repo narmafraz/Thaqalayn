@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Book, BookTitle } from '@app/models';
 import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { RouterState } from '@store/router/router.state';
 import { tap } from 'rxjs/operators';
 import { BooksAction, LoadBookPart, LoadBookTitles } from './books.actions';
 
@@ -34,6 +35,23 @@ export class BooksState {
   @Selector()
   public static getParts(state: BooksStateModel) {
     return state.parts;
+  }
+
+  @Selector()
+  public static getPartByIndex(state: BooksStateModel) {
+    return (index: string) => {
+      if (!state.parts) {
+        return undefined;
+      }
+
+      return state.parts[index];
+    };
+  }
+
+  @Selector([BooksState.getPartByIndex, RouterState.getBookPartIndex])
+  public static getCurrentNavigatedPart(state: BooksStateModel, partByIndex: ((index: string) => Book),
+                                        routerIndex: string) {
+    return partByIndex(routerIndex);
   }
 
   @Action(LoadBookTitles)

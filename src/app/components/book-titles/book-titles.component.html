@@ -1,4 +1,6 @@
-<p>book-titles works!</p>
-<ol>
-  <li *ngFor="let book of books | async"><a [routerLink]="book.index">{{book.data.titles.en}}</a></li>
-</ol>
+<p>The two weighty things at your fingertips!</p>
+<div class="books">
+  <ol>
+    <li *ngFor="let book of books | async"><a [routerLink]="book.index">{{book.data.titles.en}}</a></li>
+  </ol>
+</div>

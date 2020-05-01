@@ -11,10 +11,12 @@ import { Observable } from 'rxjs';
 })
 export class BookDispatcherComponent implements OnInit {
 
-  @Select(BooksState.getParts) books: Observable<{ [index: string]: Book }>;
+  @Select(BooksState.getCurrentNavigatedPart) book$: Observable<Book>;
 
-  constructor() { }
+  index: any;
 
+  constructor() {
+  }
   ngOnInit(): void {
   }
 

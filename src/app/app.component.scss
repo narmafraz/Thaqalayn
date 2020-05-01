@@ -1,0 +1,73 @@
+#site {
+  display: flex;
+  background: url(../assets/bg_small.png);
+  background-position: center top;
+	width: 100%;
+	overflow: auto;
+  min-height: 100%;
+  flex-flow: column;
+}
+
+#header {
+  background-image: url(../assets/banner_small.png);
+  height: 70px;
+	width: 100%;
+}
+
+#header a {
+  height: 100%;
+}
+
+#banner {
+  width: 40%;
+  height: 100%;
+}
+
+.bannerTop {
+	background-image: url(../assets/just-logo_small.png);
+	background-repeat: no-repeat;
+	background-position: 30%;
+  background-size: auto 70%;
+  color: white;
+  font-size: xxx-large;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+a {
+	text-decoration: none;
+	/* color: #75A1A1; */
+	color: #5F9999;
+}
+
+a:hover { text-decoration: underline; }
+
+.nounderline:hover { text-decoration: none; }
+
+#main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+#mainc {
+  min-width: 70%;
+}
+
+#footer {
+  text-align: center;
+	background-image: url(../assets/banner_small.png);
+	background-repeat: repeat-x;
+  width: 100%;
+  margin-top: 10px;
+  font-size: 20px;
+  padding-top: 4px;
+	font-family: "C&L", Helvetica, Verdana, Arial;
+	color: #fff;
+	height: 30px;
+}
+
+#footer a{
+	color: #fff;
+	text-decoration: none;
+}

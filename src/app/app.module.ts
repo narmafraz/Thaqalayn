@@ -6,6 +6,7 @@ import { NgxsStoreModule } from '@store/store.module';
 import { AppComponent } from './app.component';
 import { BookDispatcherComponent } from './components/book-dispatcher/book-dispatcher.component';
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { ChapterListComponent } from './components/chapter-list/chapter-list.com
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    NgxsStoreModule
+    NgxsStoreModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

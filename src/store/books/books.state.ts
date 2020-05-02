@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Book, BookTitle } from '@app/models';
+import { Book, ChapterList } from '@app/models';
 import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
 import { BooksAction, LoadBookPart, LoadBookTitles } from './books.actions';
 
 export interface BooksStateModel {
-  titles: BookTitle[];
+  titles: ChapterList[];
   parts: { [index: string]: Book };
 }
 

@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { BookTitle } from '@app/models';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChapterList } from '@app/models';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -7,12 +7,9 @@ import { BookTitle } from '@app/models';
   templateUrl: './chapter-list.component.html',
   styleUrls: ['./chapter-list.component.scss']
 })
-export class ChapterListComponent implements OnInit {
-  @Input() book: BookTitle;
+export class ChapterListComponent {
+  @Input() book: ChapterList;
 
   constructor() { }
-
-  ngOnInit(): void {
-  }
 
 }

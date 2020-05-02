@@ -1,5 +1,11 @@
-<p>The two weighty things at your fingertips!</p>
-<div class="books">
+<div *ngIf="book.data.titles" class="content">
+  <div class="titles">
+    <h2>{{book.data.titles.en}}</h2>
+    <h2 class="arabic">{{book.data.titles.ar}}</h2>
+  </div>
+  <p>{{book.data.descriptions.en}}</p>
+</div>
+<div class="content">
   <ol>
     <li *ngFor="let chapter of book.data.chapters">
       <a [routerLink]="'/books/' + chapter.index">{{chapter.names.en}}</a>

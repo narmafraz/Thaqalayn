@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Book, BookTitle } from '@app/models';
+import { Book, ChapterList } from '@app/models';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 
@@ -17,8 +17,8 @@ export class BooksService {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
-  getTitles(): Observable<BookTitle[]> {
-    return this.http.get<BookTitle[]>(BooksService.booksUrl);
+  getTitles(): Observable<ChapterList[]> {
+    return this.http.get<ChapterList[]>(BooksService.booksUrl);
   }
 
   getPart(index: string): Observable<Book> {

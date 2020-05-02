@@ -1,0 +1,20 @@
+.content {
+  display: flex;
+	background-color: rgba(255, 255, 255, 0.5);
+	border-radius: 5px;
+	color: #666;
+	margin-top: 15px;
+  padding: 10px;
+  flex-direction: column;
+}
+
+.titles {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.arabic {
+  direction: rtl;
+  text-align: justify;
+}

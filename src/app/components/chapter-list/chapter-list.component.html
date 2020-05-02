@@ -1,0 +1,8 @@
+<p>The two weighty things at your fingertips!</p>
+<div class="books">
+  <ol>
+    <li *ngFor="let chapter of book.data.chapters">
+      <a [routerLink]="'/books/' + chapter.index">{{chapter.names.en}}</a>
+    </li>
+  </ol>
+</div>

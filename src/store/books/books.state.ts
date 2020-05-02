@@ -51,7 +51,8 @@ export class BooksState {
   @Selector([BooksState.getPartByIndex, RouterState.getBookPartIndex])
   public static getCurrentNavigatedPart(state: BooksStateModel, partByIndex: ((index: string) => Book),
                                         routerIndex: string) {
-    return partByIndex(routerIndex);
+    const index = routerIndex ?  routerIndex : 'books';
+    return partByIndex(index);
   }
 
   @Action(LoadBookTitles)

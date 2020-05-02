@@ -5,13 +5,13 @@ import { AppRoutingModule } from '@app/routing/app-routing.module';
 import { NgxsStoreModule } from '@store/store.module';
 import { AppComponent } from './app.component';
 import { BookDispatcherComponent } from './components/book-dispatcher/book-dispatcher.component';
-import { BookTitlesComponent } from './components/book-titles/book-titles.component';
+import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    BookTitlesComponent,
-    BookDispatcherComponent
+    BookDispatcherComponent,
+    ChapterListComponent
   ],
   imports: [
     BrowserModule,

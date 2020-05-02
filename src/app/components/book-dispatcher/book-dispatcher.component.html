@@ -1,7 +1,7 @@
-<ng-container *ngIf="book$ | async" [ngSwitch]="(book$ | async).kind">
-  <app-book-titles *ngSwitchCase="'title'"></app-book-titles>
+<ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
+  <app-chapter-list *ngSwitchCase="'chapter_list'" [book]="book"></app-chapter-list>
   <p *ngSwitchDefault>
     Not sure how to display this book part called, sorry!
   </p>
 </ng-container>
-<p>{{book$ | async | json}}</p>
+<!-- <p>{{book$ | async | json}}</p> -->

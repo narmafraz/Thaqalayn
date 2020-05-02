@@ -6,10 +6,13 @@ export interface BookTitle {
 }
 
 export interface BookTitleData {
-  titles: {
-    en: string,
-    ar: string
-  };
+  chapters: {
+    index: string,
+    names: {
+      en: string,
+      ar: string
+    }
+  }[];
 }
 
 export type Book = BookTitle;

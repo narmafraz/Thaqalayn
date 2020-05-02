@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+          "type": "chrome",
+          "request": "launch",
+          "name": "Launch Chrome",
+          "url": "http://localhost:4200",
+          "webRoot": "${workspaceFolder}"
+        },
+        {
             "name": "Launch index.html",
             "type": "firefox",
             "request": "launch",
@@ -12,11 +19,11 @@
             "file": "${workspaceFolder}/index.html"
         },
         {
-            "name": "Launch localhost",
+            "name": "Launch localhost Firefox",
             "type": "firefox",
             "request": "launch",
             "reAttach": true,
-            "url": "http://localhost:4200/index.html",
+            "url": "http://localhost:4200/",
             "webRoot": "${workspaceFolder}"
         },
         {

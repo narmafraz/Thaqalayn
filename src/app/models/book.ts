@@ -6,6 +6,12 @@ export interface Chapter {
     en: string,
     ar: string
   };
+  verseCount: number;
+  verseStartIndex: number;
+  order: number;
+  rukus: number;
+  verse_type: string;
+  sajda_type: string;
 }
 
 export interface ChapterList {

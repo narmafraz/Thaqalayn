@@ -30,8 +30,8 @@ export class ChapterListDataSource extends DataSource<Chapter> {
 
     return merge(...dataMutations).pipe(
       withLatestFrom(this.data),
-      map(x => {
-      return this.getPagedData(this.getSortedData([...x[1]]));
+      map(([, data]) => {
+      return this.getPagedData(this.getSortedData(data));
     }));
   }
 
@@ -58,12 +58,13 @@ export class ChapterListDataSource extends DataSource<Chapter> {
       return data;
     }
 
-    return data.sort((a, b) => {
+    return [...data].sort((a, b) => {
       const isAsc = this.sort.direction === 'asc';
       switch (this.sort.active) {
         case 'name.en': return compare(a.names.en, b.names.en, isAsc);
         case 'name.ar': return compare(a.names.ar, b.names.ar, isAsc);
         case 'index': return compare(+a.index, +b.index, isAsc);
+        case 'verseCount': return compare(+a.verseCount, +b.verseCount, isAsc);
         default: return 0;
       }
     });

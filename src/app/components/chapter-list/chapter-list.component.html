@@ -17,6 +17,12 @@
       </ng-container>
 
       <!-- Name Column -->
+      <ng-container matColumnDef="badges">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let row">{{row.verse_type}} {{row.sajda_type}}</td>
+      </ng-container>
+
+      <!-- Name Column -->
       <ng-container matColumnDef="name.en">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
         <td mat-cell *matCellDef="let row">{{row.names.en}}</td>
@@ -26,6 +32,18 @@
       <ng-container matColumnDef="name.ar">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
         <td mat-cell *matCellDef="let row">{{row.names.ar}}</td>
+      </ng-container>
+
+      <!-- verseCount Column -->
+      <ng-container matColumnDef="verseCount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>verses</th>
+        <td mat-cell *matCellDef="let row">{{row.verseCount}}</td>
+      </ng-container>
+
+      <!-- verseCount Column -->
+      <ng-container matColumnDef="verseStartIndex">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+        <td mat-cell *matCellDef="let row">{{row.verseStartIndex + 1}} to {{row.verseStartIndex + 1 + row.verseCount}}</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

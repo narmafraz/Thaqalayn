@@ -1,14 +1,42 @@
-<div *ngIf="book.data.titles" class="content">
-  <div class="titles">
-    <h2>{{book.data.titles.en}}</h2>
-    <h2 class="arabic">{{book.data.titles.ar}}</h2>
+<ng-container *ngIf="(book$ | async) as book">
+  <div *ngIf="book.data.titles" class="content">
+    <div class="titles">
+      <h2>{{book.data.titles.en}}</h2>
+      <h2 class="arabic">{{book.data.titles.ar}}</h2>
+    </div>
+    <p>{{book.data.descriptions.en}}</p>
   </div>
-  <p>{{book.data.descriptions.en}}</p>
-</div>
+</ng-container>
 <div class="content">
-  <ol>
+  <div class="mat-elevation-z8">
+    <table mat-table class="full-width-table" matSort aria-label="Elements">
+      <!-- Id Column -->
+      <ng-container matColumnDef="index">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>
+        <td mat-cell *matCellDef="let row">{{row.index}}</td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name.en">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+        <td mat-cell *matCellDef="let row">{{row.names.en}}</td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name.ar">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+        <td mat-cell *matCellDef="let row">{{row.names.ar}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row [routerLink]="'/books/' + row.index" *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+  </div>
+
+  <!-- <ol>
     <li *ngFor="let chapter of book.data.chapters">
       <a [routerLink]="'/books/' + chapter.index">{{chapter.names.en}}</a>
     </li>
-  </ol>
+  </ol> -->
 </div>

@@ -1,5 +1,13 @@
 import { MultiLingualText } from './text';
 
+export interface Chapter {
+  index: string;
+  names: {
+    en: string,
+    ar: string
+  };
+}
+
 export interface ChapterList {
   kind: 'title';
   index: string;
@@ -9,13 +17,7 @@ export interface ChapterList {
 export interface ChapterListData {
   titles: MultiLingualText;
   descriptions: MultiLingualText;
-  chapters: {
-    index: string,
-    names: {
-      en: string,
-      ar: string
-    }
-  }[];
+  chapters: Chapter[];
 }
 
 export type Book = ChapterList;

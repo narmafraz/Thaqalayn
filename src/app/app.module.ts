@@ -10,12 +10,14 @@ import { NgxsStoreModule } from '@store/store.module';
 import { AppComponent } from './app.component';
 import { BookDispatcherComponent } from './components/book-dispatcher/book-dispatcher.component';
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
+import { AboutComponent } from './components/about/about.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BookDispatcherComponent,
-    ChapterListComponent
+    ChapterListComponent,
+    AboutComponent
   ],
   imports: [
     BrowserModule,

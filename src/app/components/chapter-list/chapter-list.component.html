@@ -22,8 +22,8 @@
         <td mat-cell *matCellDef="let row">
           <img *ngIf="row.verse_type === 'Meccan'" class="badge" [title]="row.verse_type" src="../assets/kaaba-mecca.svg">
           <img *ngIf="row.verse_type === 'Medinan'" class="badge" [title]="row.verse_type" src="../assets/medina.svg">
-          <img *ngIf="row.sajda_type === 'recommended'" class="badge" [title]="row.sajda_type + ' sajda'" src="../assets/prostration32.png">
-          <img *ngIf="row.sajda_type === 'obligatory'" class="badge mat-elevation-z2" [title]="row.sajda_type + ' sajda'" src="../assets/prostration32.png">
+          <img *ngIf="row.sajda_type === 'recommended'" class="badge" [title]="row.sajda_type + ' sajda'" src="../assets/prostration-rec.svg">
+          <img *ngIf="row.sajda_type === 'obligatory'" class="badge" [title]="row.sajda_type + ' sajda'" src="../assets/prostration.svg">
         </td>
       </ng-container>
 

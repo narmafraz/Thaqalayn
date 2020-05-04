@@ -29,7 +29,7 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
     // Set columns to display dynamically based on what we get from server
     this.displayedColumns$ = this.book$.pipe(
       map(book => {
-        const columns = []; // , 'name.en', 'name.ar', 'verse_count', 'verse_start_index'];
+        const columns = [];
         if (!book || !book.data || !book.data.chapters) { return columns; }
         if (book.index !== 'books') { columns.push('index'); }
         if (book.data.chapters.some(x => x.verse_type)) { columns.push('badges'); }

@@ -15,7 +15,7 @@ export interface Verse {
 }
 
 export interface Chapter {
-  index: number;
+  index: string;
   path: string;
   names: {
     en: string,

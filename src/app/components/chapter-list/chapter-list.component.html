@@ -9,7 +9,7 @@
 </ng-container>
 <div class="content">
   <div class="mat-elevation-z8">
-    <table mat-table class="full-width-table" matSort aria-label="Elements">
+    <table *ngIf="(displayedColumns$ | async) as displayedColumns" mat-table class="full-width-table" matSort aria-label="Elements">
       <!-- Id Column -->
       <ng-container matColumnDef="index">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>#</th>

@@ -1,13 +1,28 @@
 import { MultiLingualText } from './text';
 
+export interface Translation {
+  name: string;
+  text: string;
+  lang: string;
+}
+
+export interface Verse {
+  index: number;
+  path: string;
+  text: string;
+  sajda_type: string;
+  translations: Translation[];
+}
+
 export interface Chapter {
-  index: string;
+  index: number;
+  path: string;
   names: {
     en: string,
     ar: string
   };
-  verseCount: number;
-  verseStartIndex: number;
+  verse_count: number;
+  verse_start_index: number;
   order: number;
   rukus: number;
   verse_type: string;

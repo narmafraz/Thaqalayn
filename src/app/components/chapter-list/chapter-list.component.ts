@@ -20,7 +20,7 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
   dataSource: ChapterListDataSource;
 
     /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
-  displayedColumns = ['index', 'badges', 'name.en', 'name.ar', 'verseCount', 'verseStartIndex'];
+  displayedColumns = ['index', 'badges', 'name.en', 'name.ar', 'verse_count', 'verse_start_index'];
 
   constructor() { }
   ngOnInit() {

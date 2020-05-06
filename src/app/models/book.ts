@@ -27,15 +27,28 @@ export interface Chapter {
   rukus: number;
   verse_type: string;
   sajda_type: string;
+  verses: Verse[];
 }
 
 export interface ChapterList {
-  kind: 'title';
+  kind: 'chapter_list';
   index: string;
   data: ChapterListData;
 }
 
 export interface ChapterListData {
+  titles: MultiLingualText;
+  descriptions: MultiLingualText;
+  chapters: Chapter[];
+}
+
+export interface ChapterContent {
+  kind: 'verse_list';
+  index: string;
+  data: ChapterContentData;
+}
+
+export interface ChapterContentData {
   titles: MultiLingualText;
   descriptions: MultiLingualText;
   chapters: Chapter[];

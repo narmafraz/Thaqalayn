@@ -11,13 +11,15 @@ import { AppComponent } from './app.component';
 import { BookDispatcherComponent } from './components/book-dispatcher/book-dispatcher.component';
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
 import { AboutComponent } from './components/about/about.component';
+import { ChapterContentComponent } from './components/chapter-content/chapter-content.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     BookDispatcherComponent,
     ChapterListComponent,
-    AboutComponent
+    AboutComponent,
+    ChapterContentComponent
   ],
   imports: [
     BrowserModule,

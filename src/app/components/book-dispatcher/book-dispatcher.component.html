@@ -1,5 +1,6 @@
 <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
   <app-chapter-list *ngSwitchCase="'chapter_list'" [book$]="book$"></app-chapter-list>
+  <app-chapter-content *ngSwitchCase="'verse_list'" [book$]="book$"></app-chapter-content>
   <p *ngSwitchDefault>
     Not sure how to display this book part called, sorry!
   </p>

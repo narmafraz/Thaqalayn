@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { BookDispatcherComponent } from '@app/components/book-dispatcher/book-dispatcher.component';
 import { BookPartResolver } from './book-part-resolver';
 import { BookTitlesResolver } from './book-titles-resolver';
@@ -13,8 +13,15 @@ const routes: Routes = [
   // { path: 'contact', component: ContactComponent },
 ];
 
+const routerConfig: ExtraOptions = {
+  useHash: true,
+  scrollPositionRestoration: 'enabled',
+  anchorScrolling: 'enabled',
+  onSameUrlNavigation: 'reload',
+};
+
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {useHash: true})],
+  imports: [RouterModule.forRoot(routes, routerConfig)],
   exports: [RouterModule],
   providers: [
     BookTitlesResolver,

@@ -3,7 +3,8 @@
   <mat-card *ngFor="let verse of book.data.verses">
     <mat-card-title>
       <div class="titles">
-        <h3>{{verse.index}}</h3>
+        <h3 [id]="'id' + verse.index">{{verse.index}}</h3>
+        <a [routerLink]="" [fragment]="'id' + verse.index"><mat-icon>link</mat-icon></a>
       </div>
     </mat-card-title>
     <mat-card-content>

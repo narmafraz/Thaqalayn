@@ -1,9 +1,11 @@
+import { Injectable } from '@angular/core';
 import { RouterNavigation } from '@ngxs/router-plugin';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { BookPartIndexChanged, SortChanged } from './router.actions';
 
 export interface RouterStateModel {
   index: string;
+  fragment: string;
   sort: string;
 }
 
@@ -20,9 +22,11 @@ nextAction returns Observable<Action>
   name: 'myrouter',
   defaults: {
     index: undefined,
+    fragment: undefined,
     sort: undefined
   }
 })
+@Injectable()
 export class RouterState {
 
   @Selector()
@@ -30,9 +34,24 @@ export class RouterState {
     return state.index;
   }
 
+  @Selector()
+  public static getUrlFragment(state: RouterStateModel) {
+    return state.fragment;
+  }
+
   @Action(RouterNavigation)
   changeRoute(context: StateContext<RouterStateModel>, action: RouterNavigation) {
     console.log('MyRouterState.RouterNavigation=', action);
+  }
+
+  @Action(RouterNavigation)
+  fragmentChanged(context: StateContext<RouterStateModel>, action: RouterNavigation) {
+    const routerValue = action.routerState.root.fragment;
+    const storeValue = context.getState().fragment;
+    if(routerValue !== storeValue) {
+      console.log('Fragment changed to=', routerValue, action);
+      context.patchState({fragment: routerValue});
+    }
   }
 
   @Action(RouterNavigation)

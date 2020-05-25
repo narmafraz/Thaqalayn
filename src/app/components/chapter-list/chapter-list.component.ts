@@ -3,7 +3,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { Chapter, ChapterList } from '@app/models';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 import { ChapterListDataSource } from './chapter-list-data-source';
 
 @Component({
@@ -24,7 +24,9 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
 
   constructor() { }
   ngOnInit() {
-    this.dataSource = new ChapterListDataSource(this.book$.pipe(map(x => x.data.chapters)));
+    this.dataSource = new ChapterListDataSource(this.book$.pipe(
+      filter(x => x !== undefined),
+      map(x => x.data.chapters)));
 
     // Set columns to display dynamically based on what we get from server
     this.displayedColumns$ = this.book$.pipe(

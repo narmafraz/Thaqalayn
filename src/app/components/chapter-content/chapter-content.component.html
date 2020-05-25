@@ -1,10 +1,17 @@
-<p>chapter-content works!</p>
 <ng-container *ngIf="(book$ | async) as book">
-  <div *ngIf="book.data.titles" class="content">
-    <div class="titles">
-      <h2>{{book.data.titles.en}}</h2>
-      <h2 class="arabic">{{book.data.titles.ar}}</h2>
-    </div>
-    <p *ngIf="book.data.descriptions">{{book.data.descriptions.en}}</p>
-  </div>
+  <div class="suraHeaderFrame"><div class="suraHeaderText">{{book.data.titles.ar}}</div></div>
+  <mat-card *ngFor="let verse of book.data.verses">
+    <mat-card-title>
+      <div class="titles">
+        <h3>{{verse.index}}</h3>
+      </div>
+    </mat-card-title>
+    <mat-card-content>
+      <div class="cat">
+        <p class="translation arabic">{{verse.translations[0].text}}</p>
+        <p class="verseText arabic">{{verse.text}}</p>
+      </div>
+    </mat-card-content>
+    <mat-card-footer></mat-card-footer>
+  </mat-card>
 </ng-container>

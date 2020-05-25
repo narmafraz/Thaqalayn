@@ -1,4 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+	font-family: "Akzidenz";
+	src: local("Akzidenz"), url("assets/fonts/akzidenz-grotesk-light.ttf");
+}
+
+@font-face {
+	font-family: "Akzidenz Roman";
+	src: local("Akzidenz Roman"), url("assets/fonts/akzidenz-grotesk-roman.ttf");
+}
+
+@font-face {
+	font-family: "C&L";
+	src: local("C&L"), url("assets/fonts/cl.ttf");
+}
+
+@font-face {
+	font-family: "Akzidenz";
+	font-weight: bold;
+	src: local("Akzidenz"), url("assets/fonts/akzidenz-grotesk-bold.ttf");
+}
+@font-face {
+  font-family: 'KFGQPC_Naskh';
+  src: url('assets/fonts/KFC_naskh.eot');
+  src: local('KFGQPC Uthman Taha Naskh'), url('assets/fonts/KFC_naskh.otf') format('opentype');
+}
 
 html, body {
   margin:0;
@@ -9,5 +34,12 @@ html, body {
   line-height:1.5;
 }
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+.arabic {
+  direction: rtl;
+  text-align: justify;
+  font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
+  font-size: 1.15em;
+  font-weight: normal;
+  line-height:2.35em;
+}
+

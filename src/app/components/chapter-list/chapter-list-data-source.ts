@@ -61,8 +61,8 @@ export class ChapterListDataSource extends DataSource<Chapter> {
     return [...data].sort((a, b) => {
       const isAsc = this.sort.direction === 'asc';
       switch (this.sort.active) {
-        case 'name.en': return compare(a.names.en, b.names.en, isAsc);
-        case 'name.ar': return compare(a.names.ar, b.names.ar, isAsc);
+        case 'name.en': return compare(a.titles.en, b.titles.en, isAsc);
+        case 'name.ar': return compare(a.titles.ar, b.titles.ar, isAsc);
         case 'index': return compare(+a.index, +b.index, isAsc);
         case 'verse_count': return compare(+a.verse_count, +b.verse_count, isAsc);
         default: return 0;

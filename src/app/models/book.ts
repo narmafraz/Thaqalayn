@@ -17,7 +17,11 @@ export interface Verse {
 export interface Chapter {
   index: string;
   path: string;
-  names: {
+  titles: {
+    en: string,
+    ar: string
+  };
+  descriptions: {
     en: string,
     ar: string
   };
@@ -28,6 +32,7 @@ export interface Chapter {
   verse_type: string;
   sajda_type: string;
   verses: Verse[];
+  chapters: Chapter[];
 }
 
 export interface ChapterList {
@@ -45,13 +50,7 @@ export interface ChapterListData {
 export interface ChapterContent {
   kind: 'verse_list';
   index: string;
-  data: ChapterContentData;
-}
-
-export interface ChapterContentData {
-  titles: MultiLingualText;
-  descriptions: MultiLingualText;
-  chapters: Chapter[];
+  data: Chapter;
 }
 
 export type Book = ChapterList;

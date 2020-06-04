@@ -13,6 +13,13 @@
         <p class="verseText arabic">{{verse.text}}</p>
       </div>
     </mat-card-content>
-    <mat-card-footer></mat-card-footer>
+    <mat-card-footer>
+      <div class="ref">
+        <div>Reference</div>
+        <div>{{book.data.titles.en}} {{verse.index}}</div>
+        <div>In-book Reference</div>
+        <div>{{book.data.titles.en}} {{verse.index}}</div>
+      </div>
+    </mat-card-footer>
   </mat-card>
 </ng-container>

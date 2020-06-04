@@ -22,26 +22,37 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns$: Observable<string[]> = of([]);
 
-  constructor() { }
   ngOnInit() {
     this.dataSource = new ChapterListDataSource(this.book$.pipe(
       filter(x => x !== undefined),
       map(x => x.data.chapters)));
 
     // Set columns to display dynamically based on what we get from server
-    this.displayedColumns$ = this.book$.pipe(
-      map(book => {
-        const columns = [];
-        if (!book || !book.data || !book.data.chapters) { return columns; }
-        if (book.index !== 'books') { columns.push('index'); }
-        if (book.data.chapters.some(x => x.verse_type)) { columns.push('badges'); }
-        columns.push('name.en');
-        columns.push('name.ar');
-        if (book.data.chapters.some(x => x.verse_count)) { columns.push('verse_count'); }
-        if (book.data.chapters.some(x => x.verse_start_index)) { columns.push('verse_start_index'); }
+    this.displayedColumns$ = this.book$.pipe(map(this.selectApplicableColumnsBasedOnBook()));
+  }
+
+  private selectApplicableColumnsBasedOnBook(): (value: ChapterList, index: number) => string[] {
+    return book => {
+      const columns = [];
+      if (!book || !book.data || !book.data.chapters) {
         return columns;
-      })
-    );
+      }
+      if (book.index !== 'books') {
+        columns.push('index');
+      }
+      if (book.data.chapters.some(x => x.verse_type)) {
+        columns.push('badges');
+      }
+      columns.push('name.en');
+      columns.push('name.ar');
+      if (book.data.chapters.some(x => x.verse_count)) {
+        columns.push('verse_count');
+      }
+      if (book.data.chapters.some(x => x.verse_start_index)) {
+        columns.push('verse_start_index');
+      }
+      return columns;
+    };
   }
 
   ngAfterViewInit() {

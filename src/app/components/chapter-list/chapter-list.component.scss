@@ -22,6 +22,14 @@
   background: transparent;
 }
 
+.center {
+  text-align: center;
+}
+
+.mat-cell {
+  padding: 10px 10px 10px 0;
+}
+
 .mat-row:nth-child(even) {
   background-color:rgba(255, 255, 255, 0.6);
 }

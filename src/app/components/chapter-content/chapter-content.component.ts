@@ -1,6 +1,6 @@
 import { ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { ChapterContent } from '@app/models';
+import { Chapter, ChapterContent, Verse } from '@app/models';
 import { Select } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
 import { Observable } from 'rxjs';
@@ -26,6 +26,18 @@ export class ChapterContentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+  }
+
+  getInBookReference(chapter: Chapter, verse: Verse): string {
+    let result = '';
+
+    chapter.crumbs.forEach(crumb => {
+      result += crumb.indexed_titles.en + ' ';
+    });
+
+    result += verse.part_type + ' ' + verse.local_index;
+
+    return result;
   }
 
 }

@@ -1,5 +1,5 @@
 <ng-container *ngIf="(book$ | async) as book">
-  <div *ngIf="book.data.titles" class="content">
+  <div *ngIf="book.data.titles" class="content description">
     <div class="titles">
       <h2>{{book.data.titles.en}}</h2>
       <h2 class="arabic">{{book.data.titles.ar}}</h2>

@@ -25,12 +25,9 @@
   background: transparent;
 }
 
-.center {
-  text-align: center;
-}
-
-.mat-cell {
-  padding: 10px 10px 10px 0;
+.mat-row:hover {
+  color:#84B8B8;
+  cursor: pointer;
 }
 
 .mat-row:nth-child(even) {
@@ -39,6 +36,20 @@
 
 .mat-row:nth-child(odd) {
   background-color:rgba(255, 255, 255, 0.4);
+}
+
+.mat-cell {
+  padding: 10px 10px 10px 0;
+  color: inherit;
+}
+
+// Not working! TODO fix
+.center-header>div {
+  justify-content: center;
+}
+
+.center {
+  text-align: center;
 }
 
 .badge {

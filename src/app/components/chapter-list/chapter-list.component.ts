@@ -45,11 +45,13 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
       }
       columns.push('name.en');
       columns.push('name.ar');
-      if (book.data.chapters.some(x => x.verse_count)) {
-        columns.push('verse_count');
-      }
       if (book.data.chapters.some(x => x.verse_start_index)) {
         columns.push('verse_start_index');
+        columns.push('verse_to_index');
+        columns.push('verse_end_index');
+      }
+      if (book.data.chapters.some(x => x.verse_count)) {
+        columns.push('verse_count');
       }
       return columns;
     };

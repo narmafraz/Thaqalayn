@@ -10,24 +10,22 @@
 
 #header {
   background-image: url(../assets/banner_small.png);
-  display: flex;
-  justify-content: center;
-  height: 70px;
+  height: 100px;
 	width: 100%;
 }
 
-#banner {
-  height: 100%;
-  min-width: 70%;
-  display: flex;
-  align-items: center;
+#header div {
+  padding-left: 7%;
 }
 
 .bannerTop {
+  height: 70px;
+  display: flex;
+  align-items: center;
   color: white;
   font-size: xxx-large;
-  text-align: right;
   text-transform: uppercase;
+  cursor: pointer;
 }
 
 a {
@@ -40,13 +38,24 @@ a:hover { text-decoration: underline; }
 
 .nounderline:hover { text-decoration: none; }
 
-#main {
+.crumbs{
+  height: 30px;
+  font-size: 13px;
+  color: #fff;
+  background-color: rgba(251, 250, 248, 0.2);
+  padding: 3px 0px 5px 5px;
+}
+
+.crumbs a {color: #fff; }
+.crumbs a:visited { color: #eee; }
+
+.main {
   flex: 1;
   display: flex;
   justify-content: center;
 }
 
-#mainc {
+.mainc {
   min-width: 70%;
   max-width: 98%;
 }

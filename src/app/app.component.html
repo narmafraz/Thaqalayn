@@ -1,9 +1,15 @@
 <div id="site">
   <div id="header">
-    <div id="banner" class="bannerTop" routerLink="/books"><img height="70%" src="../assets/just-logo_small.png"> Thaqalayn</div>
+      <div class="bannerTop" routerLink="/"><img height="70%" src="../assets/just-logo_small.png"> Thaqalayn</div>
+      <div class="crumbs">
+        <ng-container *ngIf="(book$ | async) as book">
+          <a routerLink="/">Home</a>
+          <ng-container *ngFor="let crumb of book.data.crumbs"> » <a [routerLink]="crumb.path">{{crumb.titles.en}}</a></ng-container>
+        </ng-container>
+      </div>
   </div>
-  <div id="main">
-    <div id="mainc">
+  <div class="main">
+    <div class="mainc">
       <router-outlet></router-outlet>
     </div>
   </div>

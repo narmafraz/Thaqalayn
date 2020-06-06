@@ -43,13 +43,7 @@ export interface Chapter {
 export interface ChapterList {
   kind: 'chapter_list';
   index: string;
-  data: ChapterListData;
-}
-
-export interface ChapterListData {
-  titles: MultiLingualText;
-  descriptions: MultiLingualText;
-  chapters: Chapter[];
+  data: Chapter;
 }
 
 export interface ChapterContent {

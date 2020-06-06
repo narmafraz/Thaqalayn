@@ -1,0 +1,7 @@
+<div *ngIf="book.titles" class="content description mat-elevation-z2">
+  <div class="titles">
+    <h2>{{book.titles.en}}</h2>
+    <h2 class="arabic">{{book.titles.ar}}</h2>
+  </div>
+  <p *ngIf="book.descriptions">{{book.descriptions.en}}</p>
+</div>

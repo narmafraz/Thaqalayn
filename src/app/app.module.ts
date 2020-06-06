@@ -14,6 +14,7 @@ import { AboutComponent } from './components/about/about.component';
 import { BookDispatcherComponent } from './components/book-dispatcher/book-dispatcher.component';
 import { ChapterContentComponent } from './components/chapter-content/chapter-content.component';
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
+import { BookTitlesComponent } from './components/book-titles/book-titles.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { ChapterListComponent } from './components/chapter-list/chapter-list.com
     BookDispatcherComponent,
     ChapterListComponent,
     AboutComponent,
-    ChapterContentComponent
+    ChapterContentComponent,
+    BookTitlesComponent
   ],
   imports: [
     BrowserModule,

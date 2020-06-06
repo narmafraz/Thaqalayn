@@ -1,12 +1,5 @@
 <ng-container *ngIf="(book$ | async) as book">
-  <div *ngIf="book.data.titles" class="content description">
-    <div class="titles">
-      <h2>{{book.data.titles.en}}</h2>
-      <h2 class="arabic">{{book.data.titles.ar}}</h2>
-    </div>
-    <p *ngIf="book.data.descriptions">{{book.data.descriptions.en}}</p>
-  </div>
-</ng-container>
+  <app-book-titles [book]="book.data"></app-book-titles>
 <div class="content">
   <div class="mat-elevation-z8">
     <table *ngIf="(displayedColumns$ | async) as displayedColumns" mat-table class="full-width-table" matSort aria-label="Elements">

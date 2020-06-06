@@ -1,5 +1,6 @@
 <ng-container *ngIf="(book$ | async) as book">
-  <div class="suraHeaderFrame"><div class="suraHeaderText">{{book.data.titles.ar}}</div></div>
+  <!-- <div class="suraHeaderFrame"><div class="suraHeaderText">{{book.data.titles.ar}}</div></div> -->
+  <app-book-titles [book]="book.data"></app-book-titles>
   <mat-card *ngFor="let verse of book.data.verses">
     <mat-card-title>
       <div class="titles">

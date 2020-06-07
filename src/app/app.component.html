@@ -1,12 +1,7 @@
 <div id="site">
   <div id="header">
       <div class="bannerTop" routerLink="/"><img height="70%" src="../assets/just-logo_small.png"> Thaqalayn</div>
-      <div class="crumbs">
-        <ng-container *ngIf="(book$ | async) as book">
-          <a routerLink="/">Home</a>
-          <ng-container *ngFor="let crumb of book.data.crumbs"> » <a [routerLink]="crumb.path">{{crumb.titles.en}}</a></ng-container>
-        </ng-container>
-      </div>
+      <div class="crumbs"><app-breadcrumbs></app-breadcrumbs></div>
   </div>
   <div class="main">
     <div class="mainc">

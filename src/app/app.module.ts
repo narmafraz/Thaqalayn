@@ -15,6 +15,7 @@ import { BookDispatcherComponent } from './components/book-dispatcher/book-dispa
 import { ChapterContentComponent } from './components/chapter-content/chapter-content.component';
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
 import { BookTitlesComponent } from './components/book-titles/book-titles.component';
+import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { BookTitlesComponent } from './components/book-titles/book-titles.compon
     ChapterListComponent,
     AboutComponent,
     ChapterContentComponent,
-    BookTitlesComponent
+    BookTitlesComponent,
+    BreadcrumbsComponent
   ],
   imports: [
     BrowserModule,

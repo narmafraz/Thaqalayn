@@ -1,5 +1,4 @@
 <ng-container *ngIf="(book$ | async) as book">
-  <!-- <div class="suraHeaderFrame"><div class="suraHeaderText">{{book.data.titles.ar}}</div></div> -->
   <app-book-titles [book]="book.data"></app-book-titles>
   <mat-card *ngFor="let verse of book.data.verses">
     <mat-card-title>
@@ -9,8 +8,8 @@
     </mat-card-title>
     <mat-card-content>
       <div class="cat">
-        <p class="translation">{{verse.translations[0].text}}</p>
-        <p class="verseText arabic">{{verse.text}}</p>
+        <p class="translation" [innerHTML]="verse.translations[0].text"></p>
+        <p class="verseText arabic" [innerHTML]="verse.text"></p>
       </div>
     </mat-card-content>
     <mat-card-footer>

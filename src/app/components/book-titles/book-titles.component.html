@@ -1,7 +1,11 @@
-<div *ngIf="book.titles" class="content description mat-elevation-z2">
-  <div class="titles">
-    <h2 [innerHTML]="book.titles.en"></h2>
-    <h2 class="arabic" [innerHTML]="book.titles.ar"></h2>
+<div *ngIf="titles || verse" class="content description mat-elevation-z2">
+  <div class="titles" *ngIf="titles">
+    <h2 [innerHTML]="titles.en"></h2>
+    <h2 class="arabic" [innerHTML]="titles.ar"></h2>
   </div>
-  <p *ngIf="book.descriptions" [innerHTML]="book.descriptions.en"></p>
+  <div class="titles" *ngIf="verse">
+    <h2 [innerHTML]="verse.translations && verse.translations[0].text"></h2>
+    <h2 class="arabic" [innerHTML]="verse.text"></h2>
+  </div>
+  <p *ngIf="descriptions" [innerHTML]="descriptions.en"></p>
 </div>

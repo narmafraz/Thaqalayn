@@ -1,25 +1,28 @@
 <ng-container *ngIf="(book$ | async) as book">
-  <app-book-titles [book]="book.data"></app-book-titles>
-  <mat-card *ngFor="let verse of book.data.verses">
-    <mat-card-title>
-      <div class="titles">
-        <a [id]="'h' + verse.local_index" style="visibility: hidden"></a>
-      </div>
-    </mat-card-title>
-    <mat-card-content>
-      <div class="cat">
-        <p class="translation" [innerHTML]="verse.translations[0].text"></p>
-        <p class="verseText arabic" [innerHTML]="verse.text"></p>
-      </div>
-    </mat-card-content>
-    <mat-card-footer>
-      <div class="ref" *ngIf="book.data.crumbs">
-        <div class="refLink"><a [routerLink]="" [fragment]="'h' + verse.local_index"><mat-icon>link</mat-icon></a></div>
-        <div>Reference</div>
-        <div>{{book.data.crumbs[0].titles.en}} {{verse.index}}</div>
-        <div>In-book Reference</div>
-        <div>{{getInBookReference(book.data, verse)}}</div>
-      </div>
-    </mat-card-footer>
-  </mat-card>
+  <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions"></app-book-titles>
+  <ng-container *ngFor="let verse of book.data.verses">
+    <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse"></app-book-titles>
+    <mat-card *ngIf="verse.part_type === 'Hadith'">
+      <mat-card-title>
+        <div class="titles">
+          <a [id]="'h' + verse.local_index" style="visibility: hidden"></a>
+        </div>
+      </mat-card-title>
+      <mat-card-content>
+        <div class="cat">
+          <p class="translation" [innerHTML]="verse.translations[0].text"></p>
+          <p class="verseText arabic" [innerHTML]="verse.text"></p>
+        </div>
+      </mat-card-content>
+      <mat-card-footer>
+        <div class="ref" *ngIf="book.data.crumbs">
+          <div class="refLink"><a [routerLink]="" [fragment]="'h' + verse.local_index"><mat-icon>link</mat-icon></a></div>
+          <div>Reference</div>
+          <div>{{book.data.crumbs[0].titles.en}} {{verse.index}}</div>
+          <div>In-book Reference</div>
+          <div>{{getInBookReference(book.data, verse)}}</div>
+        </div>
+      </mat-card-footer>
+    </mat-card>
+  </ng-container>
 </ng-container>

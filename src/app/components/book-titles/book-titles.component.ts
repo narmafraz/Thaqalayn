@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { Chapter } from '@app/models';
+import { MultiLingualText, Verse } from '@app/models';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -8,7 +8,9 @@ import { Chapter } from '@app/models';
   styleUrls: ['./book-titles.component.scss']
 })
 export class BookTitlesComponent implements OnInit {
-  @Input() book: Chapter;
+  @Input() titles: MultiLingualText;
+  @Input() descriptions: MultiLingualText;
+  @Input() verse: Verse;
 
   constructor() { }
 

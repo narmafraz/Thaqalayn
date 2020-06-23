@@ -16,6 +16,7 @@ import { ChapterContentComponent } from './components/chapter-content/chapter-co
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
 import { BookTitlesComponent } from './components/book-titles/book-titles.component';
 import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
+import { VerseContentComponent } from './components/verse-content/verse-content.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.compo
     AboutComponent,
     ChapterContentComponent,
     BookTitlesComponent,
-    BreadcrumbsComponent
+    BreadcrumbsComponent,
+    VerseContentComponent
   ],
   imports: [
     BrowserModule,

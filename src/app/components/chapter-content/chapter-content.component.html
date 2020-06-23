@@ -2,7 +2,7 @@
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions"></app-book-titles>
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse"></app-book-titles>
-    <mat-card *ngIf="verse.part_type === 'Hadith'">
+    <mat-card *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'">
       <mat-card-title>
         <div class="titles">
           <a [id]="'h' + verse.local_index" style="visibility: hidden"></a>

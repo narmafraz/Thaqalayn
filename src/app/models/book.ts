@@ -52,4 +52,10 @@ export interface ChapterContent {
   data: Chapter;
 }
 
-export type Book = ChapterList;
+export interface VerseContent {
+  kind: 'verse_content';
+  index: string;
+  data: Verse;
+}
+
+export type Book = ChapterList | ChapterContent | VerseContent;

@@ -32,7 +32,7 @@ export interface Chapter {
   verse_start_index: number;
   order: number;
   rukus: number;
-  verse_type: string;
+  reveal_type: string;
   sajda_type: string;
   verses: Verse[];
   chapters: Chapter[];

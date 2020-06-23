@@ -40,7 +40,7 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
       if (book.index !== 'books') {
         columns.push('index');
       }
-      if (book.data.chapters.some(x => x.verse_type)) {
+      if (book.data.chapters.some(x => x.reveal_type)) {
         columns.push('badges');
       }
       columns.push('name.en');

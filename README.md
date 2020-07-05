@@ -1,5 +1,7 @@
 # Thaqalayn
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e2409c3a-1066-43de-993f-adade270c8bb/deploy-status)](https://app.netlify.com/sites/thaqalayn/deploys)
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.1.
 
 ## To Improve

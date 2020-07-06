@@ -40,16 +40,11 @@ export class RouterState {
   }
 
   @Action(RouterNavigation)
-  changeRoute(context: StateContext<RouterStateModel>, action: RouterNavigation) {
-    console.log('MyRouterState.RouterNavigation=', action);
-  }
-
-  @Action(RouterNavigation)
   fragmentChanged(context: StateContext<RouterStateModel>, action: RouterNavigation) {
     const routerValue = action.routerState.root.fragment;
     const storeValue = context.getState().fragment;
     if(routerValue !== storeValue) {
-      console.log('Fragment changed to=', routerValue, action);
+      // console.log('Fragment changed to=', routerValue, action);
       context.patchState({fragment: routerValue});
     }
   }

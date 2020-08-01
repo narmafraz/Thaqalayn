@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://thaqalayn.herokuapp.com/'
+  apiBaseUrl: 'https://thaqalayndata.netlify.app/'
 };

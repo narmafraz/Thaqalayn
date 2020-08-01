@@ -4,7 +4,7 @@ import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
 import { tap } from 'rxjs/operators';
-import { BooksAction, LoadBookPart, LoadBookTitles } from './books.actions';
+import { BooksAction, LoadBookPart } from './books.actions';
 
 export interface BooksStateModel {
   titles: ChapterList[];
@@ -53,17 +53,6 @@ export class BooksState {
                                         routerIndex: string) {
     const index = routerIndex ?  routerIndex : 'books';
     return partByIndex(index);
-  }
-
-  @Action(LoadBookTitles)
-  public loadTitles(ctx: StateContext<BooksStateModel>) {
-    return this.booksService.getTitles().pipe(
-      tap(loadedTitles =>
-        ctx.patchState(
-        {
-          titles: loadedTitles
-        }
-      )));
   }
 
   @Action(LoadBookPart)

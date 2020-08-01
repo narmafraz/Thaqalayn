@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Book, ChapterList } from '@app/models';
+import { Book } from '@app/models';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 
@@ -9,20 +9,15 @@ import { Observable } from 'rxjs';
 })
 export class BooksService {
 
-  private static readonly apiVersion = 'api/v1/';
-  private static readonly booksUrl = environment.apiBaseUrl + BooksService.apiVersion + 'books';
-  private static readonly bookpartsUrl = environment.apiBaseUrl + BooksService.apiVersion + 'bookparts';
+  private static readonly bookpartsUrl = environment.apiBaseUrl + 'books';
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
-  getTitles(): Observable<ChapterList[]> {
-    return this.http.get<ChapterList[]>(BooksService.booksUrl);
-  }
 
   getPart(index: string): Observable<Book> {
-    return this.http.get<Book>(`${BooksService.bookpartsUrl}/${index}`);
+    return this.http.get<Book>(`${BooksService.bookpartsUrl}/${index.replace(/:/g, '/')}.json`);
   }
 
   constructor(private http: HttpClient) { }

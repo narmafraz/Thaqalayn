@@ -3,10 +3,6 @@ export class BooksAction {
   constructor(public payload: string) { }
 }
 
-export class LoadBookTitles {
-  public static readonly type = '[Books] Load titles';
-}
-
 export class LoadBookPart {
   public static readonly type = '[Books] Load part';
   constructor(public payload: string) { }

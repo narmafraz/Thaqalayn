@@ -1,4 +1,4 @@
 <ng-container *ngIf="(book$ | async) as book">
-  <a routerLink="/">Home</a>
-  <ng-container *ngFor="let crumb of book.data.crumbs"> » <a [routerLink]="crumb.path" [innerHTML]="crumb.titles.en"></a></ng-container>
+  <a routerLink="/" queryParamsHandling="preserve">Home</a>
+  <ng-container *ngFor="let crumb of book.data.crumbs"> » <a [routerLink]="crumb.path" queryParamsHandling="preserve" [innerHTML]="crumb.titles.en"></a></ng-container>
 </ng-container>

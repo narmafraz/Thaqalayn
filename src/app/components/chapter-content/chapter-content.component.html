@@ -1,4 +1,13 @@
 <ng-container *ngIf="(book$ | async) as book">
+  <form>
+    <mat-form-field>
+      <mat-label>Choose translation</mat-label>
+      <mat-select name="translation" (selectionChange)="selectedTranslation($event.value)" [ngModel]="translation$ | async">
+        <mat-option *ngFor="let translation of book.data.verse_translations" [value]="translation.id">
+          {{translation.lang | expandLanguage}}: {{translation.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </form>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions"></app-book-titles>
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse"></app-book-titles>
@@ -10,13 +19,15 @@
       </mat-card-title>
       <mat-card-content>
         <div class="cat">
-          <p class="translation" [innerHTML]="verse.translations[0].text"></p>
-          <p class="verseText arabic" [innerHTML]="verse.text"></p>
+          <div><p *ngFor="let trr of verse.translations[(translation$ | async)]" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trr"></p></div>
+          <div><p *ngFor="let txt of verse.text" class="verseText arabic" [innerHTML]="txt"></p></div>
         </div>
       </mat-card-content>
       <mat-card-footer>
         <div class="ref" *ngIf="book.data.crumbs">
-          <div class="refLink"><a [routerLink]="" [fragment]="'h' + verse.local_index"><mat-icon>link</mat-icon></a></div>
+          <div class="refLink"><a [routerLink]="" queryParamsHandling="preserve" [fragment]="'h' + verse.local_index">
+              <mat-icon>link</mat-icon>
+            </a></div>
           <div>Reference</div>
           <div>{{book.data.crumbs[0].titles.en}} {{verse.index}}</div>
           <div>In-book Reference</div>

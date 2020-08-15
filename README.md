@@ -8,6 +8,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 1. Column headings are not aligned with the hadith index/count numbers
 1. Heading tooltip
+1. Comment section
 
 ## Development server
 

@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://thaqalayndata.netlify.app/'
+  apiBaseUrl: 'http://localhost:8888/'
 };
 
 /*

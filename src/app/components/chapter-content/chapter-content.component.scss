@@ -23,14 +23,23 @@ mat-card {
 
 .translation {
   padding-left:15px;
+  padding-right:15px;
 	padding-top: 10px;
-  width: 47%;
 }
 
 .verseText {
   padding-right: 15px;
-	padding-top: 7px;
-  width: 47%;
+  padding-left: 15px;
+	padding-top: 10px;
+}
+
+.faText {
+  direction: rtl;
+  text-align: justify;
+  font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
+  font-size: 1.3em;
+  font-weight: normal;
+  line-height:2.35em;
 }
 
 .ref {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MultiLingualText, Verse } from '@app/models';
 
 @Component({
@@ -7,14 +7,15 @@ import { MultiLingualText, Verse } from '@app/models';
   templateUrl: './book-titles.component.html',
   styleUrls: ['./book-titles.component.scss']
 })
-export class BookTitlesComponent implements OnInit {
+export class BookTitlesComponent {
   @Input() titles: MultiLingualText;
   @Input() descriptions: MultiLingualText;
   @Input() verse: Verse;
 
   constructor() { }
 
-  ngOnInit(): void {
+  getTranslations(verse: Verse): string[] {
+    return verse.translations['fa.makarem']; // TODO FIXME
   }
 
 }

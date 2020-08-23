@@ -20,6 +20,8 @@ import { ChapterContentComponent } from './components/chapter-content/chapter-co
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
 import { VerseContentComponent } from './components/verse-content/verse-content.component';
 import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
+import { VerseTextComponent } from './components/verse-text/verse-text.component';
+import { TranslationSelectionComponent } from './components/translation-selection/translation-selection.component';
 
 @NgModule({
   declarations: [
@@ -31,7 +33,9 @@ import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
     BookTitlesComponent,
     BreadcrumbsComponent,
     VerseContentComponent,
-    ExpandLanguagePipe
+    ExpandLanguagePipe,
+    VerseTextComponent,
+    TranslationSelectionComponent
   ],
   imports: [
     BrowserModule,

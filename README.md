@@ -4,7 +4,41 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.1.
 
-## To Improve
+## Data Aspiration
+
+The goal is to host all primary sources of AhlulBayt Ahadith:
+
+### Al-Kutub Al-Arb'ah- the Four books
+
+1. Kitab al-Kafi of Kulayni (divided into Usul al-Kafi, Furu al-Kafi and Rawdat al-Kafi)
+1. Man La Yahduruhu al-Faqih of Shaikh Saduq
+1. Tahdhib al-Ahkam of Shaikh Tusi
+1. al-Istibsar of Shaikh Tusi
+
+### Primary Hadith Collection
+
+(Primary Hadith books are those books which are collected, compiled and written by author or their students themselves).
+
+1. The Book of Sulaym ibn Qays by Sulaym ibn Qays
+1. Kitab ul Momin by Hussain bin Saeed Ahwazi
+1. al-Mahasin by Ahmad b. Muhammad al-Barqi [Wikidata]
+1. Al-Amali by Shaikh Tusi
+1. Al-Amali of Shaikh Saduq
+1. Al Tawheed (Saduq) [Wikidata] of Shaikh Saduq
+1. Uyun Akhbar al-Ridha by Shaykh Saduq
+1. Tuhaf al-Uqul by Ibn Shuba Harrani [Wikidata]
+1. Al-Amali by Shaikh Mufid
+1. Nahj al-Balaghah by Al-Sharif al-Radi
+1. Khasais of Al Aemmah by Al-Sharif al-Radi
+1. Daim al-Islam by Al-Qadi al-Nu'man
+1. Al-Ihtijaj by Abu Mansur Ahmad Tabrisi [Wikidata]
+1. Kamil al-Ziyarat by Ibn Qulawayh
+1. Al Saqib Fi al-Manâqib by Ibn Hamaza Tusi
+1. Basâ'ir al-darajât by Sheikh Al-Safar al-Qummi [Wikidata]
+1. Al Ghaybah by Muhammad Ibn Ibrahim Ibn Jafar al-Numani
+1. Al Ghaybah of Al Tusi by Shaykh Tusi
+
+## Improvements
 
 1. Column headings are not aligned with the hadith index/count numbers
 1. Heading tooltip

@@ -3,7 +3,6 @@
   <app-chapter-content *ngSwitchCase="'verse_list'" [book$]="book$"></app-chapter-content>
   <app-verse-content *ngSwitchCase="'verse_content'" [book$]="book$"></app-verse-content>
   <p *ngSwitchDefault>
-    Not sure how to display this book part called, sorry!
+    Not sure how to display this book part, sorry!
   </p>
 </ng-container>
-<!-- <p>{{book$ | async | json}}</p> -->

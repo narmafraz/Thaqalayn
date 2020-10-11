@@ -11,11 +11,4 @@ export class BookTitlesComponent {
   @Input() titles: MultiLingualText;
   @Input() descriptions: MultiLingualText;
   @Input() verse: Verse;
-
-  constructor() { }
-
-  getTranslations(verse: Verse): string[] {
-    return verse.translations['fa.makarem']; // TODO FIXME
-  }
-
 }

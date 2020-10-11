@@ -4,8 +4,7 @@
     <h2 class="arabic" [innerHTML]="titles.ar"></h2>
   </div>
   <div class="titles" *ngIf="verse">
-    <h2 *ngFor="let translation of getTranslations(verse)" [innerHTML]="translation"></h2>
-    <h2 *ngFor="let txt of verse.text" class="arabic" [innerHTML]="txt"></h2>
+    <app-verse-text [verse]="verse"></app-verse-text>
   </div>
   <p *ngIf="descriptions" [innerHTML]="descriptions.en"></p>
 </div>

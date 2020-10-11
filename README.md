@@ -43,6 +43,7 @@ The goal is to host all primary sources of AhlulBayt Ahadith:
 1. Column headings are not aligned with the hadith index/count numbers
 1. Heading tooltip
 1. Comment section
+1. SubChapters in chapter-list component, so that we can for example show that Al-Kafi Volume 4 Book 3's chapters 106 to 115 belong to "Chapters on Hunting" and chapters 213 onwards belong to a subchapter on "Chapters on Ziyarat" rather than its own volume! Some suggestions [here](https://stackoverflow.com/questions/52217179/angular-material-mat-table-row-grouping) for grouping rows but that makes sorting complicated, so not sure if and how we should fix this.
 
 ## Development server
 

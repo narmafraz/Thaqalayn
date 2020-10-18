@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { AboutComponent } from '@app/components/about/about.component';
 import { BookDispatcherComponent } from '@app/components/book-dispatcher/book-dispatcher.component';
+import { SupportComponent } from '@app/components/support/support.component';
 import { BookPartResolver } from './book-part-resolver';
 import { BookTitlesResolver } from './book-titles-resolver';
 
@@ -11,6 +12,7 @@ const routes: Routes = [
   { path: 'books', component: BookDispatcherComponent, resolve: { titles: BookTitlesResolver } },
   { path: 'books/:index', component: BookDispatcherComponent, resolve: { titles: BookPartResolver } },
   { path: 'about', component: AboutComponent },
+  { path: 'support', component: SupportComponent },
   // { path: 'contact', component: ContactComponent },
 ];
 

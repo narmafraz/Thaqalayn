@@ -23,6 +23,7 @@ import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
 import { VerseTextComponent } from './components/verse-text/verse-text.component';
 import { TranslationSelectionComponent } from './components/translation-selection/translation-selection.component';
 import { SupportComponent } from './components/support/support.component';
+import { DownloadComponent } from './components/download/download.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { SupportComponent } from './components/support/support.component';
     ExpandLanguagePipe,
     VerseTextComponent,
     TranslationSelectionComponent,
-    SupportComponent
+    SupportComponent,
+    DownloadComponent
   ],
   imports: [
     BrowserModule,

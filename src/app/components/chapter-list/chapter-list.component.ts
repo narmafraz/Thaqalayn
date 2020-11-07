@@ -1,9 +1,10 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { MediaObserver } from '@angular/flex-layout';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { Chapter, ChapterList } from '@app/models';
 import { Observable, of } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, startWith, withLatestFrom } from 'rxjs/operators';
 import { ChapterListDataSource } from './chapter-list-data-source';
 
 @Component({
@@ -15,6 +16,8 @@ import { ChapterListDataSource } from './chapter-list-data-source';
 export class ChapterListComponent implements AfterViewInit, OnInit {
   @Input() book$: Observable<ChapterList>;
 
+  SMALL_SCREEN_ALIAS = 'xs';
+
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<Chapter>;
   dataSource: ChapterListDataSource;
@@ -22,20 +25,38 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns$: Observable<string[]> = of([]);
 
-  ngOnInit() {
-    this.dataSource = new ChapterListDataSource(this.book$.pipe(
-      filter(x => x !== undefined),
-      map(x => x.data.chapters)));
+  mqAlias$: Observable<string>;
 
-    // Set columns to display dynamically based on what we get from server
-    this.displayedColumns$ = this.book$.pipe(map(this.selectApplicableColumnsBasedOnBook()));
+  constructor(private mediaObserver: MediaObserver,
+              private changeDetectorRefs: ChangeDetectorRef) {
+    this.mqAlias$ = mediaObserver.asObservable().pipe(
+      map(m => m.map(c => c.mqAlias).find(a => a !== undefined)),
+      distinctUntilChanged()
+    );
   }
 
-  private selectApplicableColumnsBasedOnBook(): (value: ChapterList, index: number) => string[] {
-    return book => {
+  ngOnInit() {
+    const bookChapters = this.book$.pipe(
+      filter(x => x !== undefined),
+      map(x => x.data.chapters));
+    this.dataSource = new ChapterListDataSource(bookChapters);
+
+    // Set columns to display dynamically based on what we get from server
+    this.displayedColumns$ = this.mqAlias$.pipe(
+      startWith(this.SMALL_SCREEN_ALIAS),
+      withLatestFrom(this.book$),
+      map(this.selectApplicableColumnsBasedOnBook())
+    );
+  }
+
+  private selectApplicableColumnsBasedOnBook(): (value: [string, ChapterList], index: number) => string[] {
+    return ([mqAlias, book]) => {
       const columns = [];
       if (!book || !book.data || !book.data.chapters) {
         return columns;
+      }
+      if (mqAlias === this.SMALL_SCREEN_ALIAS) {
+        return ['octrta']; // one column to rule them all
       }
       if (book.index !== 'books') {
         columns.push('index');

@@ -7,8 +7,8 @@
       <ng-container matColumnDef="octrta">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let row">
-          <div class="onerow spacing">
-            <div>{{row.part_type}} {{row.local_index}}</div>
+          <div class="txtrow">
+            <!-- <div>{{row.part_type}} {{row.local_index}}</div> -->
             <div class="arabic" [innerHTML]="row.titles.ar"></div>
             <div [innerHTML]="row.titles.en"></div>
           </div>

@@ -7,6 +7,19 @@
   flex-direction: column;
 }
 
+.txtrow {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 1em;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: center;
+
+  &>* {
+    // flex-basis: 30%;
+  }
+}
+
 .full-width-table {
   width: 100%;
 }

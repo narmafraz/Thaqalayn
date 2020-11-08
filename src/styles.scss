@@ -55,3 +55,7 @@ html, body {
 .iTxt {
   font-style: italic;
 }
+
+.spacing>*+* {
+  margin-top: var(--spacer, 2rem);
+}

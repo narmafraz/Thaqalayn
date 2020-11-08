@@ -8,7 +8,51 @@
 }
 
 .infobox {
-  padding: 5px;
-  margin: 5px;
-  border-style: solid;
+  --md-default-fg-color: hsla(0, 0%, 0%, 0.87);
+--md-default-fg-color--light: hsla(0, 0%, 0%, 0.54);
+--md-default-fg-color--lighter: hsla(0, 0%, 0%, 0.32);
+--md-default-fg-color--lightest: hsla(0, 0%, 0%, 0.07);
+--md-default-bg-color: hsla(0, 0%, 100%, 1);
+--md-default-bg-color--light: hsla(0, 0%, 100%, 0.7);
+--md-default-bg-color--lighter: hsla(0, 0%, 100%, 0.3);
+--md-default-bg-color--lightest: hsla(0, 0%, 100%, 0.12);
+ margin:1.5625em 0;
+ padding:0 .6rem;
+ overflow:hidden;
+ color:var(--md-default-fg-color);
+ page-break-inside:avoid;
+ background-color:var(--md-default-bg-color);
+ border-left:.2rem solid #448aff;
+ border-radius:.1rem;
+ box-shadow:0 .2rem .5rem rgba(0,0,0,.05),0 0 .05rem rgba(0,0,0,.1);
+ border-color: #00c853;
+}
+
+.infobox-title {
+  background-color: rgba(0,200,83,.1);
+border-color: #00c853;
+position:relative;
+margin:0 -0.6rem 0 -0.8rem;
+padding:.4rem .6rem .4rem 2rem;
+font-weight:700;
+border-left:.2rem solid #448aff
+
+}
+
+.infobox-title::before {
+  --md-default-icon-info: url("data:image/svg+xml;charset=utf-8,<?xml version='1.0' encoding='UTF-8'?><!DOCTYPE svg PUBLIC '-//W3C//DTD SVG 1.1//EN' 'http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd'><svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' version='1.1' id='mdi-information' width='24' height='24' viewBox='0 0 24 24'><path d='M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z'/></svg>");
+  background-color:#00c853;
+  -webkit-mask-image:var(--md-default-icon-info);
+  mask-image:var(--md-default-icon-info);
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+  -webkit-mask-size:contain;
+  mask-size:contain;
+
+  position:absolute;
+  left:.6rem;
+  width:1rem;
+  height:1rem;
+  content:"";
+
 }

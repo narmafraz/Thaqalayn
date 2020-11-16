@@ -1,9 +1,9 @@
 <div *ngIf="titles || verse" class="content description mat-elevation-z2">
-  <div class="titles" *ngIf="titles">
-    <h2 [innerHTML]="titles.en"></h2>
+  <div class="textrow titlerow" *ngIf="titles">
     <h2 class="arabic" [innerHTML]="titles.ar"></h2>
+    <h2 [innerHTML]="titles.en"></h2>
   </div>
-  <div class="titles" *ngIf="verse">
+  <div *ngIf="verse">
     <app-verse-text [verse]="verse"></app-verse-text>
   </div>
   <p *ngIf="descriptions" [innerHTML]="descriptions.en"></p>

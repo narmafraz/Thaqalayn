@@ -1,4 +1,4 @@
-<div class="cat">
-  <div><p *ngFor="let trt of verse.translations[(translation$ | async)]" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p></div>
+<div class="textrow">
   <div><p *ngFor="let txt of verse.text" class="verseText arabic" [innerHTML]="txt"></p></div>
+  <div><p *ngFor="let trt of verse.translations[(translation$ | async)]" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p></div>
 </div>

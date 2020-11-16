@@ -38,13 +38,17 @@ html, body {
   box-sizing: inherit;
 }
 
-.arabic {
+h2.arabic, .arabic {
   direction: rtl;
   text-align: justify;
   font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
   font-size: 1.5em;
   font-weight: normal;
   line-height: 2.35rem;
+}
+
+h2.arabic {
+  text-align: center;
 }
 
 .ibTxt {
@@ -62,4 +66,31 @@ html, body {
 
 .spacing>*+* {
   margin-top: var(--spacer, 2rem);
+}
+
+.textrow {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 1em;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.titlerow {
+  align-items: center;
+  justify-content: space-around;
+
+  &>* {
+    text-align: center;
+  }
+}
+
+@media (min-width:600px) {
+  .textrow {
+    flex-wrap: unset;
+    justify-content: space-between;
+  }
+  .titlerow>* {
+    text-align: justify;
+  }
 }

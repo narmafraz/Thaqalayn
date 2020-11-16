@@ -30,17 +30,21 @@ html, body {
   padding:0;
   height: 100%;
   font-family: "Akzidenz Roman", Helvetica, Arial, sans-serif;
-  // font-size: 14px;
   line-height:1.5;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 .arabic {
   direction: rtl;
   text-align: justify;
   font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
-  font-size: 1.3rem;
+  font-size: 1.5em;
   font-weight: normal;
-  line-height:2.35em;
+  line-height: 2.35rem;
 }
 
 .ibTxt {

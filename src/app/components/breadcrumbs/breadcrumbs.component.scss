@@ -1,2 +1,14 @@
 a {color: #fff; }
 a:visited { color: #eee; }
+.crumb-holder{
+  overflow-x: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+}
+.crumb-holder::-webkit-scrollbar { /* WebKit */
+  width: 0;
+  height: 0;
+}
+.crumb-holder div{
+ white-space: nowrap; /* this rule is important*/
+}

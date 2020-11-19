@@ -40,15 +40,14 @@ html, body {
 
 h2.arabic, .arabic {
   direction: rtl;
-  text-align: justify;
   font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
   font-size: 1.5em;
   font-weight: normal;
   line-height: 2.35rem;
 }
 
-h2.arabic {
-  text-align: center;
+.arabic {
+  text-align: justify;
 }
 
 .ibTxt {

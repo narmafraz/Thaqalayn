@@ -1,10 +1,10 @@
-<form class="settings">
+<div class="settings">
   <mat-icon>settings</mat-icon>
   <mat-form-field>
     <mat-label>Choose translation</mat-label>
     <mat-select name="translation" (selectionChange)="selectedTranslation($event.value)" [ngModel]="translation$ | async">
-      <mat-option *ngFor="let translation of translations" [value]="translation.id">
+      <mat-option *ngFor="let translation of (translations$ | async)" [value]="translation.id">
         {{translation.lang | expandLanguage}}: {{translation.name}}</mat-option>
     </mat-select>
   </mat-form-field>
-</form>
+</div>

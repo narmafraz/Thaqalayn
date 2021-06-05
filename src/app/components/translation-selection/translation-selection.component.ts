@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Translation } from '@app/models';
 import { Navigate } from '@ngxs/router-plugin';
 import { Select, Store } from '@ngxs/store';
@@ -13,8 +13,7 @@ import { Observable } from 'rxjs';
 })
 export class TranslationSelectionComponent {
   @Select(BooksState.getTranslationIfInBookOrDefault) translation$: Observable<string>;
-
-  @Input() translations: Translation[];
+  @Select(BooksState.getBookTranslations) translations$: Observable<Translation[]>;
 
   constructor(private store: Store) {
   }

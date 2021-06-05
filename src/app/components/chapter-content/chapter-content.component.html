@@ -1,5 +1,5 @@
 <ng-container *ngIf="(book$ | async) as book">
-  <app-translation-selection [translations]="book.data.verse_translations"></app-translation-selection>
+  <app-translation-selection></app-translation-selection>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions"></app-book-titles>
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse"></app-book-titles>

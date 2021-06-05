@@ -1,4 +1,5 @@
-<form>
+<form class="settings">
+  <mat-icon>settings</mat-icon>
   <mat-form-field>
     <mat-label>Choose translation</mat-label>
     <mat-select name="translation" (selectionChange)="selectedTranslation($event.value)" [ngModel]="translation$ | async">

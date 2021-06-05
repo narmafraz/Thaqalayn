@@ -1,5 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+# https://github.com/microsoft/vscode/issues/105191#issuecomment-698662938
+debug.log
+
 # compiled output
 /dist
 /tmp

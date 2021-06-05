@@ -12,6 +12,12 @@ export interface Crumb {
   path: string;
 }
 
+export interface Navigation {
+  prev: Crumb;
+  next: Crumb;
+  up: Crumb;
+}
+
 export interface Verse {
   index: number;
   local_index: number;
@@ -38,6 +44,7 @@ export interface Chapter {
   chapters: Chapter[];
   part_type: string;
   crumbs: Crumb[];
+  nav: Navigation;
   verse_translations: Translation[];
   default_verse_translation_ids: Record<string, string>;
 }
@@ -64,6 +71,10 @@ export type Book = ChapterList | ChapterContent | VerseContent;
 
 export function getVerseTranslations(book: Book): Translation[] {
   return book.data && book.kind !== 'verse_content' && book.data.verse_translations;
+}
+
+export function getChapter(book: Book): Chapter {
+  return book.data && book.kind !== 'verse_content' && book.data;
 }
 
 export function getDefaultVerseTranslationIds(book: Book): Record<string, string> {

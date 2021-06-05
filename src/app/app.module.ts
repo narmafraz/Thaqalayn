@@ -1,6 +1,7 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -18,12 +19,14 @@ import { BookTitlesComponent } from './components/book-titles/book-titles.compon
 import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.component';
 import { ChapterContentComponent } from './components/chapter-content/chapter-content.component';
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
-import { VerseContentComponent } from './components/verse-content/verse-content.component';
-import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
-import { VerseTextComponent } from './components/verse-text/verse-text.component';
-import { TranslationSelectionComponent } from './components/translation-selection/translation-selection.component';
-import { SupportComponent } from './components/support/support.component';
 import { DownloadComponent } from './components/download/download.component';
+import { SettingsComponent } from './components/settings/settings.component';
+import { SupportComponent } from './components/support/support.component';
+import { TranslationSelectionComponent } from './components/translation-selection/translation-selection.component';
+import { VerseContentComponent } from './components/verse-content/verse-content.component';
+import { VerseTextComponent } from './components/verse-text/verse-text.component';
+import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @NgModule({
   declarations: [
@@ -39,7 +42,8 @@ import { DownloadComponent } from './components/download/download.component';
     VerseTextComponent,
     TranslationSelectionComponent,
     SupportComponent,
-    DownloadComponent
+    DownloadComponent,
+    SettingsComponent
   ],
   imports: [
     BrowserModule,
@@ -53,7 +57,9 @@ import { DownloadComponent } from './components/download/download.component';
     MatCardModule,
     MatIconModule,
     MatSelectModule,
+    MatButtonModule,
     FormsModule,
+    MatTooltipModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

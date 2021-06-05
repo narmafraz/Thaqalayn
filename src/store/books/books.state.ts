@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Book, ChapterList, getDefaultVerseTranslationIds, getVerseTranslations, Translation } from '@app/models';
+import { Book, ChapterList, getDefaultVerseTranslationIds, getVerseTranslations, Translation, getChapter, Navigation } from '@app/models';
 import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
@@ -86,6 +86,15 @@ export class BooksState {
       return verseTranslations;
     }
     return [];
+  }
+
+  @Selector([BooksState.getCurrentNavigatedPart])
+  public static getBookNavigation(state: BooksStateModel, book: Book): Navigation {
+    const chapter = getChapter(book);
+    if (chapter && chapter.nav) {
+      return chapter.nav;
+    }
+    return undefined;
   }
 
   @Selector([BooksState.getTranslationIfInBookOrDefault])

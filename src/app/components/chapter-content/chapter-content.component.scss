@@ -30,11 +30,27 @@ mat-card {
   overflow: auto;
   border: 0px solid;
   display: grid;
-  grid-template-columns: minmax(10px, auto) minmax(100px, auto) 1fr;
+  grid-template-columns: minmax(10px, auto) minmax(100px, auto) auto 1fr;
   column-gap: 0.5em;
 }
 
 .refLink {
   grid-row: 1 / span 2;
   align-self: center;
+}
+
+.related {
+  grid-row: 1 / span 2;
+  grid-column-start: 4;
+  margin-left: 1.2em;
+}
+
+.perRel {
+  display: block;
+}
+
+.relLinks {
+  margin-left: 2px;
+  margin-right: 2px;
+  display: inline list-item;
 }

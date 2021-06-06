@@ -26,6 +26,7 @@ export interface Verse {
   sajda_type: string;
   translations: Record<string, string[]>;
   part_type: string;
+  relations: Record<string, string[]>;
 }
 
 export interface Chapter {

@@ -88,6 +88,9 @@ h2.arabic, .arabic {
   .textrow {
     flex-wrap: unset;
     justify-content: space-between;
+    &>* {
+      max-width: 50%;
+    }
   }
   .titlerow>* {
     text-align: justify;

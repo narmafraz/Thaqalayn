@@ -21,15 +21,17 @@
           <div>{{book.data.crumbs[0].titles.en}} {{verse.index}}</div>
           <div>In-book Reference</div>
           <div>{{getInBookReference(book.data, verse)}}</div>
-          <div class="related" *ngIf="verse.relations as relations">
-            <div *ngFor="let relation of relations | keyvalue" class="perRel">
-              <strong>{{relation.key}}</strong>:
-              <a *ngFor="let rLink of relation.value" class="relLinks"
-                [routerLink]="splitOnLastColon(rLink)[0]"
-                queryParamsHandling="preserve"
-                [fragment]="'h' + splitOnLastColon(rLink)[1]"
-                >{{ removeBookPrefix(rLink) | titlecase}}</a>
-            </div>
+          <div class="related">
+            <ng-container *ngIf="verse.relations as relations">
+              <div *ngFor="let relation of relations | keyvalue" class="perRel">
+                <strong>{{relation.key}}</strong>:
+                <a *ngFor="let rLink of relation.value" class="relLinks"
+                  [routerLink]="splitOnLastColon(rLink)[0]"
+                  queryParamsHandling="preserve"
+                  [fragment]="'h' + splitOnLastColon(rLink)[1]"
+                  >{{ removeBookPrefix(rLink) | titlecase}}</a>
+              </div>
+            </ng-container>
           </div>
         </div>
       </mat-card-footer>

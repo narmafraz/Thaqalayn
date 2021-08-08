@@ -18,6 +18,17 @@ export interface Navigation {
   up: Crumb;
 }
 
+export interface SpecialText {
+  kind: string;
+  path: string;
+  text: string;
+}
+
+export interface NarratorChain {
+  parts: SpecialText[];
+  text: string;
+}
+
 export interface Verse {
   index: number;
   local_index: number;
@@ -27,6 +38,7 @@ export interface Verse {
   translations: Record<string, string[]>;
   part_type: string;
   relations: Record<string, string[]>;
+  narrator_chain: NarratorChain;
 }
 
 export interface Chapter {

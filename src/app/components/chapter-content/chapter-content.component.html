@@ -25,11 +25,7 @@
             <ng-container *ngIf="verse.relations as relations">
               <div *ngFor="let relation of relations | keyvalue" class="perRel">
                 <strong>{{relation.key}}</strong>:
-                <a *ngFor="let rLink of relation.value" class="relLinks"
-                  [routerLink]="splitOnLastColon(rLink)[0]"
-                  queryParamsHandling="preserve"
-                  [fragment]="'h' + splitOnLastColon(rLink)[1]"
-                  >{{ removeBookPrefix(rLink) | titlecase}}</a>
+                <app-path-link *ngFor="let rLink of relation.value" class="relLinks" [path]="rLink"></app-path-link>
               </div>
             </ng-container>
           </div>

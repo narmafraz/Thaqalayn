@@ -1,6 +1,6 @@
 #site {
   display: flex;
-  background: url(../assets/bg_small.png);
+  background: url(/assets/bg_small.png);
   background-position: center top;
 	width: 100%;
 	overflow: auto;
@@ -9,7 +9,7 @@
 }
 
 #header {
-  background-image: url(../assets/banner_small.png);
+  background-image: url(/assets/banner_small.png);
   height: 100px;
 	width: 100%;
 }
@@ -55,7 +55,7 @@ a:hover { text-decoration: underline; }
 
 #footer {
   text-align: center;
-	background-image: url(../assets/banner_small.png);
+	background-image: url(/assets/banner_small.png);
 	background-repeat: repeat-x;
   width: 100%;
   margin-top: 10px;

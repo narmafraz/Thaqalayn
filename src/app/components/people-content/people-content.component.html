@@ -1,0 +1,21 @@
+<ng-container *ngIf="(narrator$ | async) as narrator">
+  <mat-card>
+    <mat-card-title>
+      <div class="titles">
+        <h1>{{narrator.titles['ar']}}</h1>
+      </div>
+    </mat-card-title>
+    <mat-card-content>
+      <h2>Narrated Ahadith</h2>
+      <ol>
+        <li *ngFor="let path of sortBy(narrator.verse_paths)"><a
+          [routerLink]="splitOnLastColon(path)[0]"
+          queryParamsHandling="preserve"
+          [fragment]="'h' + splitOnLastColon(path)[1]"
+          >{{ removeBookPrefix(path) | titlecase}}</a></li>
+      </ol>
+      <h2>Co-Narartors</h2>
+    </mat-card-content>
+  </mat-card>
+
+</ng-container>

@@ -27,6 +27,8 @@ import { VerseContentComponent } from './components/verse-content/verse-content.
 import { VerseTextComponent } from './components/verse-text/verse-text.component';
 import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PeopleListComponent } from './components/people-list/people-list.component';
+import { PeopleContentComponent } from './components/people-content/people-content.component';
 
 @NgModule({
   declarations: [
@@ -43,7 +45,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     TranslationSelectionComponent,
     SupportComponent,
     DownloadComponent,
-    SettingsComponent
+    SettingsComponent,
+    PeopleListComponent,
+    PeopleContentComponent
   ],
   imports: [
     BrowserModule,

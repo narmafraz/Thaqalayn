@@ -1,0 +1,5 @@
+<div>
+  <ul>
+    <li *ngFor="let item of (narrators$ | async) | keyvalue : null">{{item.key}} - <a [routerLink]="'/people/narrators/' + item.key">{{item.value}}</a></li>
+  </ul>
+</div>

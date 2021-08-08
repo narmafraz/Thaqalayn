@@ -5,7 +5,7 @@
   <mat-card-content>
     <div>
       <ol>
-        <li *ngFor="let item of (narrators$ | async) | keyvalue : null"><a class="arabic" [routerLink]="'/people/narrators/' + item.key">{{item.value}}</a></li>
+        <li *ngFor="let item of (narrators$ | async) | keyvalue : keyAscOrder"><a class="arabic" [routerLink]="'/people/narrators/' + item.key">{{item.value}}</a></li>
       </ol>
     </div>
   </mat-card-content>

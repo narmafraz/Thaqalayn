@@ -1,5 +1,14 @@
-<div>
-  <ul>
-    <li *ngFor="let item of (narrators$ | async) | keyvalue : null">{{item.key}} - <a [routerLink]="'/people/narrators/' + item.key">{{item.value}}</a></li>
-  </ul>
-</div>
+<mat-card>
+  <mat-card-title>
+    <h1>Narrators</h1>
+  </mat-card-title>
+  <mat-card-content>
+    <div>
+      <ol>
+        <li *ngFor="let item of (narrators$ | async) | keyvalue : null"><a class="arabic" [routerLink]="'/people/narrators/' + item.key">{{item.value}}</a></li>
+      </ol>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+

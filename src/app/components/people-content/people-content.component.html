@@ -2,7 +2,7 @@
   <mat-card>
     <mat-card-title>
       <div class="titles">
-        <h1>{{narrator.titles['ar']}}</h1>
+        <h1 class="arabic">{{narrator.titles['ar']}}</h1>
       </div>
     </mat-card-title>
     <mat-card-content>
@@ -12,7 +12,17 @@
       </ol>
       <h2>Co-Narartors</h2>
       <ol>
-        <li></li>
+        <li *ngFor="let subchain of narrator.subchains | keyvalue : sortByNumberOfNarrators">
+          <span *ngIf="(narratorIndex$ | async) as narratorIndex" class="arabic">
+            <ng-container *ngFor="let narrator_id of subchain.value.narrator_ids; let isLast=last">
+              <a [routerLink]="'/people/narrators/' + narrator_id">{{narratorIndex[narrator_id]}}</a>
+              {{isLast ? '' : '&#10229;'}}
+            </ng-container>
+          </span>
+          <ol>
+            <li *ngFor="let path of subchain.value.verse_paths"><app-path-link [path]="path"></app-path-link></li>
+          </ol>
+        </li>
       </ol>
     </mat-card-content>
   </mat-card>

@@ -11,6 +11,6 @@ import { Observable } from 'rxjs';
 })
 export class PeopleListComponent {
 
-  @Select(BooksState.getCurrentNavigatedNarrator) narrators$: Observable<Record<number, string>>;
+  @Select(BooksState.getNarratorIndex) narrators$: Observable<Record<number, string>>;
 
 }

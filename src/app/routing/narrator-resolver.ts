@@ -10,6 +10,7 @@ export class NarratorResolver implements Resolve<Observable<NarratorWrapper>> {
   constructor(private store: Store) {}
 
   resolve(route: ActivatedRouteSnapshot) {
+    this.store.dispatch(new LoadNarrator('index'));
     return this.store.dispatch(new LoadNarrator(route.paramMap.get('index')));
   }
 }

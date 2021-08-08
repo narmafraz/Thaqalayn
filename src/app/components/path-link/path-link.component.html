@@ -1,0 +1,4 @@
+<a [routerLink]="splitOnLastColon(path)[0]"
+queryParamsHandling="preserve"
+[fragment]="'h' + splitOnLastColon(path)[1]"
+>{{ removeBookPrefix(path) | titlecase}}</a>

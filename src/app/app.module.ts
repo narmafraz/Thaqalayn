@@ -29,6 +29,7 @@ import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PeopleListComponent } from './components/people-list/people-list.component';
 import { PeopleContentComponent } from './components/people-content/people-content.component';
+import { PathLinkComponent } from './components/path-link/path-link.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { PeopleContentComponent } from './components/people-content/people-conte
     DownloadComponent,
     SettingsComponent,
     PeopleListComponent,
-    PeopleContentComponent
+    PeopleContentComponent,
+    PathLinkComponent
   ],
   imports: [
     BrowserModule,

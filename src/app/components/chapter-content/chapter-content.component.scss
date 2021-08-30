@@ -28,6 +28,7 @@ mat-card {
   padding-right: 5px;
   padding-bottom: 10px;
   overflow: auto;
+  align-items: center;
   border: 0px solid;
   display: grid;
   grid-template-columns: minmax(10px, auto) minmax(100px, auto) auto 1fr;
@@ -43,6 +44,7 @@ mat-card {
   grid-row: 1 / span 2;
   grid-column-start: 4;
   margin-left: 1.2em;
+  word-break: break-all;
 }
 
 .perRel {

@@ -1,8 +1,15 @@
-<ng-container *ngIf="(book$ | async) as book">
-  <div class="crumb-holder">
-    <div>
-      <a routerLink="/" queryParamsHandling="preserve">Home</a>
-      <ng-container *ngFor="let crumb of book.data.crumbs"> » <a [routerLink]="crumb.path" queryParamsHandling="preserve" [innerHTML]="crumb.titles.en"></a></ng-container>
-    </div>
+<div class="crumb-holder">
+  <div>
+    <a routerLink="/" queryParamsHandling="preserve">Home</a>
+    <ng-container *ngIf="(book$ | async) as book">
+      <ng-container *ngFor="let crumb of book.data.crumbs"> » <a [routerLink]="crumb.path"
+          queryParamsHandling="preserve" [innerHTML]="crumb.titles.en"></a></ng-container>
+    </ng-container>
+    <ng-container *ngIf="(narrator$ | async) as narrator">
+      <ng-container *ngIf="narrator.titles">
+        » <a routerLink="/people/narrators/index" queryParamsHandling="preserve">Narrators</a>
+        » <a [routerLink]="narrator.path" queryParamsHandling="preserve" [innerHTML]="narrator.titles.ar"></a>
+      </ng-container>
+    </ng-container>
   </div>
-</ng-container>
+</div>

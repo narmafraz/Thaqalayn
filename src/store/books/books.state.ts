@@ -75,7 +75,7 @@ export class BooksState {
 
   @Selector([BooksState.getNarratorByIndex, RouterState.getBookPartIndex])
   public static getCurrentNavigatedNarrator(state: BooksStateModel, narratorByIndex: ((index: string) => NarratorWrapper),
-                                        routerIndex: string) {
+                                            routerIndex: string) {
     const index = routerIndex ?  routerIndex : 'people';
     return narratorByIndex(index).data;
   }

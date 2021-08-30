@@ -9,11 +9,11 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 export class PathLinkComponent {
   @Input() path: string;
   splitOnLastColon(path: string): string[] {
-    const index = path.lastIndexOf(":");
+    const index = path.lastIndexOf(':');
     if (index < 0) {
-      return [path, ""];
+      return [path, ''];
     }
-    return [path.slice(0, index), path.slice(index+1)];
+    return [path.slice(0, index), path.slice(index + 1)];
   }
 
   removeBookPrefix(path: string): string {

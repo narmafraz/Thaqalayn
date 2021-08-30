@@ -1,16 +1,16 @@
 import { MultiLingualText } from './text';
 
 export interface ChainVerses {
-	narrator_ids: number[];
-	verse_paths: string[];
+  narrator_ids: number[];
+  verse_paths: string[];
 }
 export interface Narrator {
   index: string;
   path: string;
   titles: MultiLingualText;
   descriptions: MultiLingualText;
-	verse_paths: string[];
-	subchains: Record<string, ChainVerses>;
+  verse_paths: string[];
+  subchains: Record<string, ChainVerses>;
 }
 
 export interface NarratorList {

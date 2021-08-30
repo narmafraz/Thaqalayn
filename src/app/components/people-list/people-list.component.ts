@@ -14,9 +14,9 @@ export class PeopleListComponent {
 
   @Select(BooksState.getNarratorIndex) narrators$: Observable<Record<number, string>>;
 
-  keyAscOrder = (a: KeyValue<number,string>, b: KeyValue<number,string>): number => {
-    const an = +a.key
-    const bn = +b.key
+  keyAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
+    const an = +a.key;
+    const bn = +b.key;
     return an > bn ? 1 : (bn > an ? -1 : 0);
   }
 

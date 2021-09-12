@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { Book, Narrator } from '@app/models';
 import { Select } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
+import { PeopleState } from '@store/people/people.state';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -12,5 +13,5 @@ import { Observable } from 'rxjs';
 })
 export class BreadcrumbsComponent {
   @Select(BooksState.getCurrentNavigatedPart) book$: Observable<Book>;
-  @Select(BooksState.getCurrentNavigatedNarrator) narrator$: Observable<Narrator>;
+  @Select(PeopleState.getCurrentNavigatedNarrator) narrator$: Observable<Narrator>;
 }

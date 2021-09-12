@@ -1,23 +1,23 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Book } from '@app/models';
+import { NarratorWrapper } from '@app/models';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BooksService {
+export class PeopleService {
 
-  private static readonly bookpartsUrl = environment.apiBaseUrl + 'books';
+  private static readonly narratorsUrl = environment.apiBaseUrl + 'people/narrators';
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   };
 
 
-  getPart(index: string): Observable<Book> {
-    return this.http.get<Book>(`${BooksService.bookpartsUrl}/${index.replace(/:/g, '/')}.json`);
+  getNarrator(index: string): Observable<NarratorWrapper> {
+    return this.http.get<NarratorWrapper>(`${PeopleService.narratorsUrl}/${index}.json`);
   }
 
   constructor(private http: HttpClient) { }

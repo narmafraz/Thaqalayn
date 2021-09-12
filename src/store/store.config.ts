@@ -5,9 +5,10 @@ import { NgxsConfig } from '@ngxs/store/src/symbols';
 import { AuthStateModule } from './auth/auth.state';
 import { BooksState } from './books/books.state';
 import { DashboardStateModule, DashboardStates } from './dashboard';
+import { PeopleState } from './people/people.state';
 import { RouterState } from './router/router.state';
 
-export const STATES_MODULES = [RouterState, BooksState, AuthStateModule, DashboardStateModule, ...DashboardStates];
+export const STATES_MODULES = [RouterState, BooksState, PeopleState, AuthStateModule, DashboardStateModule, ...DashboardStates];
 
 export const OPTIONS_CONFIG: Partial<NgxsConfig> = {
   /**

@@ -13,10 +13,19 @@ export interface Narrator {
   subchains: Record<string, ChainVerses>;
 }
 
+export interface NarratorMetadata {
+  index: string;
+  titles: MultiLingualText;
+  narrations: number;
+  narrated_from: number;
+  narrated_to: number;
+  conarrators: number;
+}
+
 export interface NarratorList {
   kind: 'person_list';
   index: string;
-  data: Record<number, string>;
+  data: Record<number, NarratorMetadata>;
 }
 
 export interface NarratorContent {

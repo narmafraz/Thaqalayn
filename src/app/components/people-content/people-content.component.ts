@@ -1,8 +1,8 @@
 import { KeyValue } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ChainVerses, Narrator } from '@app/models';
+import { ChainVerses, Narrator, NarratorMetadata } from '@app/models';
 import { Select } from '@ngxs/store';
-import { BooksState } from '@store/books/books.state';
+import { PeopleState } from '@store/people/people.state';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -13,8 +13,8 @@ import { Observable } from 'rxjs';
 })
 export class PeopleContentComponent {
 
-  @Select(BooksState.getCurrentNavigatedNarrator) narrator$: Observable<Narrator>;
-  @Select(BooksState.getNarratorIndex) narratorIndex$: Observable<Record<number, string>>;
+  @Select(PeopleState.getCurrentNavigatedNarrator) narrator$: Observable<Narrator>;
+  @Select(PeopleState.getEnrichedNarratorIndex) narratorIndex$: Observable<Record<number, NarratorMetadata>>;
 
   sortBy(lst) {
     return [...lst].sort((a, b) => a > b ? 1 : a === b ? 0 : -1);

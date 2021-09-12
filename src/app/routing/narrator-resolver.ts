@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
 import { NarratorWrapper } from '@app/models';
 import { Store } from '@ngxs/store';
-import { LoadNarrator } from '@store/books/books.actions';
+import { LoadNarrator } from '@store/people/people.actions';
 import { Observable } from 'rxjs';
 
 @Injectable()

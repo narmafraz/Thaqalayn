@@ -1,23 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Book, ChapterList, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, NarratorWrapper, Navigation, Translation } from '@app/models';
+import { Book, ChapterList, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation } from '@app/models';
 import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
 import { tap } from 'rxjs/operators';
-import { BooksAction, LoadBookPart, LoadNarrator } from './books.actions';
+import { LoadBookPart } from './books.actions';
 
 export interface BooksStateModel {
   titles: ChapterList[];
   parts: { [index: string]: Book };
-  narrators: { [index: string]: NarratorWrapper };
 }
 
 @State<BooksStateModel>({
   name: 'books',
   defaults: {
     titles: [],
-    parts: {},
-    narrators: {}
+    parts: {}
   }
 })
 @Injectable()
@@ -50,34 +48,11 @@ export class BooksState {
     };
   }
 
-  @Selector()
-  public static getNarratorByIndex(state: BooksStateModel) {
-    return (index: string) => {
-      if (!state.narrators) {
-        return undefined;
-      }
-
-      return state.narrators[index];
-    };
-  }
-
   @Selector([BooksState.getPartByIndex, RouterState.getBookPartIndex])
   public static getCurrentNavigatedPart(state: BooksStateModel, partByIndex: ((index: string) => Book),
                                         routerIndex: string) {
     const index = routerIndex ?  routerIndex : 'books';
     return partByIndex(index);
-  }
-
-  @Selector([BooksState.getNarratorByIndex])
-  public static getNarratorIndex(state: BooksStateModel, narratorByIndex: ((index: string) => NarratorWrapper)) {
-    return narratorByIndex('people').data;
-  }
-
-  @Selector([BooksState.getNarratorByIndex, RouterState.getBookPartIndex])
-  public static getCurrentNavigatedNarrator(state: BooksStateModel, narratorByIndex: ((index: string) => NarratorWrapper),
-                                            routerIndex: string) {
-    const index = routerIndex ?  routerIndex : 'people';
-    return narratorByIndex(index).data;
   }
 
   @Selector([BooksState.getCurrentNavigatedPart, RouterState.getLanguage, RouterState.getTranslation])
@@ -144,23 +119,4 @@ export class BooksState {
       }));
   }
 
-  @Action(LoadNarrator)
-  public loadNarrator(ctx: StateContext<BooksStateModel>, action: LoadNarrator) {
-    return this.booksService.getNarrator(action.payload).pipe(
-      tap(loaded => {
-        const state = ctx.getState();
-        return ctx.patchState({
-          narrators: {
-            ...state.narrators,
-            [loaded.index]: loaded
-          }});
-      }));
-  }
-
-  @Action(BooksAction)
-  public add(ctx: StateContext<BooksStateModel>, { payload }: BooksAction) {
-    // const stateModel = ctx.getState();
-    // stateModel.items = [...stateModel.items, payload];
-    // ctx.setState(stateModel);
-  }
 }

@@ -3,7 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { MediaObserver } from '@angular/flex-layout';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource } from '@angular/material/table';
 import { NarratorMetadata } from '@app/models';
 import { Select } from '@ngxs/store';
 import { PeopleState } from '@store/people/people.state';
@@ -26,9 +26,7 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatTable) table: MatTable<NarratorMetadata>;
-  @ViewChild('filterInput') input: ElementRef;
-  // dataSource: PeopleListDataSource;
+  @ViewChild('filterInput') filterInput: ElementRef;
   dataSource: MatTableDataSource<NarratorMetadata>;
   subscriptions: Subscription[] = [];
 
@@ -52,8 +50,6 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // this.dataSource = new PeopleListDataSource(people);
-
     // Set columns to display dynamically based on what we get from server
     this.displayedColumns$ = this.mqAlias$.pipe(
       startWith(this.SMALL_SCREEN_ALIAS),
@@ -64,6 +60,12 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'name.ar': return item.titles.ar;
+        default: return item[property];
+      }
+    };
     this.dataSource.sort = this.sort;
 
     const subscription = this.narrators$.pipe(
@@ -73,8 +75,8 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
     this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
-    // server-side search
-    const s2 = fromEvent(this.input.nativeElement, 'keyup')
+    // debounced search
+    const s2 = fromEvent(this.filterInput.nativeElement, 'keyup')
       .pipe(
         debounceTime(150),
         distinctUntilChanged(),

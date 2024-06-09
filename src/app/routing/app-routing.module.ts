@@ -32,12 +32,6 @@ const routerConfig: ExtraOptions = {
     anchorScrolling: 'enabled',
     onSameUrlNavigation: 'reload',
     relativeLinkResolution: 'legacy'
-}{
-    useHash: true,
-    scrollPositionRestoration: 'enabled',
-    anchorScrolling: 'enabled',
-    onSameUrlNavigation: 'reload',
-    relativeLinkResolution: 'legacy'
 };
 
 @NgModule({

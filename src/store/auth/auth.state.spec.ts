@@ -1,12 +1,12 @@
 import { NgxsModule, Store } from '@ngxs/store';
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { AuthenticationStateModel, AuthStateModule } from './auth.state';
 import { SetAuthData } from './auth.actions';
 
 describe('[TEST]: AuthStore', () => {
   let store: Store;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgxsModule.forRoot([AuthStateModule])]
     })

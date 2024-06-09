@@ -1,12 +1,12 @@
 import { NgxsModule, Store } from '@ngxs/store';
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { PersonStateModel, UserState } from './user.state';
 import { SetUser } from './user.actions';
 
 describe('[TEST]: User state', () => {
   let store: Store;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgxsModule.forRoot([UserState])]
     })

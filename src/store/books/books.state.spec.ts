@@ -1,11 +1,11 @@
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { NgxsModule, Store } from '@ngxs/store';
 import { BooksState, BooksStateModel } from './books.state';
 import { BooksAction } from './books.actions';
 
 describe('Books store', () => {
   let store: Store;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgxsModule.forRoot([BooksState])]
     }).compileComponents();

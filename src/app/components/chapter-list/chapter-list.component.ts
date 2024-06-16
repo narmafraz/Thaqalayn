@@ -1,5 +1,5 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { MediaObserver } from '@angular/flex-layout';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { Chapter, ChapterList } from '@app/models';
@@ -16,7 +16,7 @@ import { ChapterListDataSource } from './chapter-list-data-source';
 export class ChapterListComponent implements AfterViewInit, OnInit {
   @Input() book$: Observable<ChapterList>;
 
-  SMALL_SCREEN_ALIAS = 'xs';
+  readonly SMALL_SCREEN_ALIAS = 'xs';
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<Chapter>;
@@ -27,60 +27,78 @@ export class ChapterListComponent implements AfterViewInit, OnInit {
 
   mqAlias$: Observable<string>;
 
-  constructor(private mediaObserver: MediaObserver,
+  constructor(private breakpointObserver: BreakpointObserver,
               private changeDetectorRefs: ChangeDetectorRef) {
-    this.mqAlias$ = mediaObserver.asObservable().pipe(
-      map(m => m.map(c => c.mqAlias).find(a => a !== undefined)),
-      distinctUntilChanged()
-    );
+    this.mqAlias$ = this.breakpointObserver.observe([
+        Breakpoints.XSmall,
+        Breakpoints.Small,
+        Breakpoints.Medium,
+        Breakpoints.Large,
+        Breakpoints.XLarge
+      ])
+      .pipe(
+        map(result => this.getScreenSizeAlias(result.breakpoints)),
+        distinctUntilChanged()
+      );
   }
 
   ngOnInit() {
-    const bookChapters = this.book$.pipe(
-      filter(x => x !== undefined),
-      map(x => x.data.chapters));
-    this.dataSource = new ChapterListDataSource(bookChapters);
+    const bookChapters$ = this.book$.pipe(
+      filter((book): book is ChapterList => book !== undefined),
+      map(book => book.data.chapters)
+    );
+    this.dataSource = new ChapterListDataSource(bookChapters$);
 
-    // Set columns to display dynamically based on what we get from server
+    // Set columns to display dynamically based on what we get from the server
     this.displayedColumns$ = this.mqAlias$.pipe(
       startWith(this.SMALL_SCREEN_ALIAS),
       withLatestFrom(this.book$),
-      map(this.selectApplicableColumnsBasedOnBook())
+      map(([mqAlias, book]) => this.selectApplicableColumns(mqAlias, book))
     );
   }
 
-  private selectApplicableColumnsBasedOnBook(): (value: [string, ChapterList], index: number) => string[] {
-    return ([mqAlias, book]) => {
-      const columns = [];
-      if (!book || !book.data || !book.data.chapters) {
-        return columns;
-      }
-      if (mqAlias === this.SMALL_SCREEN_ALIAS) {
-        return ['octrta']; // one column to rule them all
-      }
-      if (book.index !== 'books') {
-        columns.push('index');
-      }
-      if (book.data.chapters.some(x => x.reveal_type)) {
-        columns.push('badges');
-      }
-      columns.push('name.en');
-      columns.push('name.ar');
-      if (book.data.chapters.some(x => x.verse_start_index)) {
-        columns.push('verse_start_index');
-        columns.push('verse_to_index');
-        columns.push('verse_end_index');
-      }
-      if (book.data.chapters.some(x => x.verse_count)) {
-        columns.push('verse_count');
-      }
+  private getScreenSizeAlias(breakpoints: { [key: string]: boolean }): string {
+    if (breakpoints[Breakpoints.XSmall]) {
+      return 'xs';
+    } else if (breakpoints[Breakpoints.Small]) {
+      return 'sm';
+    } else if (breakpoints[Breakpoints.Medium]) {
+      return 'md';
+    } else if (breakpoints[Breakpoints.Large]) {
+      return 'lg';
+    } else if (breakpoints[Breakpoints.XLarge]) {
+      return 'xl';
+    } else {
+      return 'unknown';
+    }
+  }
+
+  private selectApplicableColumns(mqAlias: string, book: ChapterList): string[] {
+    const columns: string[] = [];
+    if (!book || !book.data || !book.data.chapters) {
       return columns;
-    };
+    }
+    if (mqAlias === this.SMALL_SCREEN_ALIAS) {
+      return ['octrta']; // one column to rule them all
+    }
+    if (book.index !== 'books') {
+      columns.push('index');
+    }
+    if (book.data.chapters.some(chapter => chapter.reveal_type)) {
+      columns.push('badges');
+    }
+    columns.push('name.en', 'name.ar');
+    if (book.data.chapters.some(chapter => chapter.verse_start_index)) {
+      columns.push('verse_start_index', 'verse_to_index', 'verse_end_index');
+    }
+    if (book.data.chapters.some(chapter => chapter.verse_count)) {
+      columns.push('verse_count');
+    }
+    return columns;
   }
 
   ngAfterViewInit() {
     this.dataSource.sort = this.sort;
     this.table.dataSource = this.dataSource;
   }
-
 }

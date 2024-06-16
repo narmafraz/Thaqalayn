@@ -1,13 +1,13 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { KeyValue } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MediaObserver } from '@angular/flex-layout';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NarratorMetadata } from '@app/models';
 import { Select } from '@ngxs/store';
 import { PeopleState } from '@store/people/people.state';
-import { fromEvent, Observable, of, Subscription } from 'rxjs';
+import { Observable, Subscription, fromEvent, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
 import { MultiLingualText } from './../../models/text';
 
@@ -21,7 +21,7 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @Select(PeopleState.getEnrichedNarratorsList) narrators$: Observable<NarratorMetadata[]>;
 
-  SMALL_SCREEN_ALIAS = 'xs';
+  readonly SMALL_SCREEN_ALIAS = 'xs';
   filterValue = '';
 
   @ViewChild(MatSort) sort: MatSort;
@@ -37,11 +37,19 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   narratorsTitles: MultiLingualText;
 
-  constructor(private mediaObserver: MediaObserver, private changeDetectorRefs: ChangeDetectorRef) {
-    this.mqAlias$ = mediaObserver.asObservable().pipe(
-      map(m => m.map(c => c.mqAlias).find(a => a !== undefined)),
-      distinctUntilChanged()
-    );
+  constructor(private breakpointObserver: BreakpointObserver,
+              private changeDetectorRefs: ChangeDetectorRef) {
+    this.mqAlias$ = this.breakpointObserver.observe([
+        Breakpoints.XSmall,
+        Breakpoints.Small,
+        Breakpoints.Medium,
+        Breakpoints.Large,
+        Breakpoints.XLarge
+      ])
+      .pipe(
+        map(result => this.getScreenSizeAlias(result.breakpoints)),
+        distinctUntilChanged()
+      );
     this.narratorsTitles = {
       ar: 'الرواة',
       en: 'Narrators'
@@ -91,6 +99,22 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+  }
+
+  private getScreenSizeAlias(breakpoints: { [key: string]: boolean }): string {
+    if (breakpoints[Breakpoints.XSmall]) {
+      return 'xs';
+    } else if (breakpoints[Breakpoints.Small]) {
+      return 'sm';
+    } else if (breakpoints[Breakpoints.Medium]) {
+      return 'md';
+    } else if (breakpoints[Breakpoints.Large]) {
+      return 'lg';
+    } else if (breakpoints[Breakpoints.XLarge]) {
+      return 'xl';
+    } else {
+      return 'unknown';
+    }
   }
 
   private selectApplicableColumnsBasedOnBook(): (value: [string, NarratorMetadata[]], index: number) => string[] {

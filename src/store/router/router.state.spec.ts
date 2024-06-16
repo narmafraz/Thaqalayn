@@ -1,11 +1,11 @@
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { NgxsModule, Store } from '@ngxs/store';
 import { RouterState, RouterStateModel } from './router.state';
 import { RouterAction } from './router.actions';
 
 describe('Router store', () => {
   let store: Store;
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgxsModule.forRoot([RouterState])]
     }).compileComponents();

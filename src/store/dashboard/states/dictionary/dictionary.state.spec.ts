@@ -1,5 +1,5 @@
 import { NgxsModule, Store } from '@ngxs/store';
-import { async, TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { DictionaryState, DictionaryStateModel } from './dictionary.state';
 import { DictionaryReset, SetDictionaryData } from './dictionary.actions';
 
@@ -27,7 +27,7 @@ const data = [
 describe('[TEST]: Dictionary state', () => {
   let store: Store;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgxsModule.forRoot([DictionaryState])]
     })

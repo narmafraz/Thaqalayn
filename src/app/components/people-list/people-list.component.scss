@@ -36,24 +36,24 @@
   padding: 10px 100px;
 }
 
-.mat-table {
+.mat-mdc-table {
   background: transparent;
 }
 
-.mat-row:hover {
+.mat-mdc-row:hover {
   color:#84B8B8;
   cursor: pointer;
 }
 
-.mat-row:nth-child(even) {
+.mat-mdc-row:nth-child(even) {
   background-color:rgba(255, 255, 255, 0.6);
 }
 
-.mat-row:nth-child(odd) {
+.mat-mdc-row:nth-child(odd) {
   background-color:rgba(255, 255, 255, 0.4);
 }
 
-.mat-cell {
+.mat-mdc-cell {
   padding: 10px 10px 10px 0;
   color: inherit;
 }

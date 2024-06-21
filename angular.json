@@ -132,8 +132,9 @@
       }
     }
   },
-  "defaultProject": "Thaqalayn",
   "cli": {
-    "defaultCollection": "@ngxs/schematics"
+    "schematicCollections": [
+      "@ngxs/schematics"
+    ]
   }
 }

@@ -72,18 +72,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "Thaqalayn:build"
+            "buildTarget": "Thaqalayn:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "Thaqalayn:build:production"
+              "buildTarget": "Thaqalayn:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "Thaqalayn:build"
+            "buildTarget": "Thaqalayn:build"
           }
         },
         "test": {

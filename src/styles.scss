@@ -39,7 +39,7 @@ html, body {
 }
 
 h2.arabic, .arabic {
-  direction: rtl;
+  direction: rtl !important;
   font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
   font-size: 1.5em;
   font-weight: normal;

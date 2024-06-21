@@ -6,7 +6,7 @@
 
       <ng-container matColumnDef="octrta">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let row">
+        <td mat-cell *matCellDef="let row" dir="rtl">
           <div class="textrow titlerow">
             <!-- <div>{{row.part_type}} {{row.local_index}}</div> -->
             <div class="arabic" [innerHTML]="row.titles.ar"></div>
@@ -41,7 +41,7 @@
       <!-- Name Column -->
       <ng-container matColumnDef="name.ar">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
-        <td mat-cell *matCellDef="let row" class="arabic" [innerHTML]="row.titles.ar"></td>
+        <td mat-cell *matCellDef="let row" class="arabic" dir="rtl" [innerHTML]="row.titles.ar"></td>
       </ng-container>
 
       <!-- verse_start_index Column -->

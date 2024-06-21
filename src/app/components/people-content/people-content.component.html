@@ -13,7 +13,7 @@
       <h2>Co-Narartors</h2>
       <ol>
         <li *ngFor="let subchain of narrator.subchains | keyvalue : sortByNumberOfNarrators">
-          <span *ngIf="(narratorIndex$ | async) as narratorIndex" class="arabic">
+          <span *ngIf="(narratorIndex$ | async) as narratorIndex" class="arabic" dir="rtl">
             <ng-container *ngFor="let narrator_id of subchain.value.narrator_ids; let isLast=last">
               <a [routerLink]="'/people/narrators/' + narrator_id">{{narratorIndex[narrator_id] ? narratorIndex[narrator_id].titles.ar : narrator_id}}</a>
               {{isLast ? '' : '&#10229;'}}

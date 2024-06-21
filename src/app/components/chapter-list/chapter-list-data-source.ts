@@ -1,8 +1,8 @@
 import { DataSource } from '@angular/cdk/collections';
 import { MatSort } from '@angular/material/sort';
 import { Chapter } from '@app/models';
-import { merge, Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 /**
  * Data source for the TableSample view. This class should
@@ -11,8 +11,12 @@ import { map, withLatestFrom } from 'rxjs/operators';
  */
 export class ChapterListDataSource extends DataSource<Chapter> {
   sort: MatSort;
+  private dataSubject = new BehaviorSubject<Chapter[]>([]);
+
   constructor(private data: Observable<Chapter[]>) {
     super();
+    // Subscribe to the data Observable to keep the dataSubject updated
+    this.data.subscribe(data => this.dataSubject.next(data));
   }
 
   /**
@@ -21,22 +25,19 @@ export class ChapterListDataSource extends DataSource<Chapter> {
    * @returns A stream of the items to be rendered.
    */
   connect(): Observable<Chapter[]> {
-    // Combine everything that affects the rendered data into one update
-    // stream for the data-table to consume.
-    const dataMutations = [
-      this.data,
-      this.sort.sortChange
-    ];
+    // Subscribe to sort changes and trigger updates
+    this.sort.sortChange.subscribe(() => {
+      this.dataSubject.next(this.getSortedData(this.dataSubject.getValue()));
+    });
 
-    return merge(...dataMutations).pipe(
-      withLatestFrom(this.data),
-      map(([, data]) => {
-      return this.getPagedData(this.getSortedData(data));
-    }));
+    // Return the dataSubject as the data stream for the table
+    return this.dataSubject.asObservable().pipe(
+      map(data => this.getPagedData(this.getSortedData(data)))
+    );
   }
 
   /**
-   *  Called when the table is being destroyed. Use this function, to clean up
+   * Called when the table is being destroyed. Use this function to clean up
    * any open connections or free any held resources that were set up during connect.
    */
   disconnect() {}

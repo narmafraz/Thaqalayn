@@ -22,22 +22,22 @@ export interface BooksStateModel {
 export class BooksState {
   constructor(private booksService: BooksService) {}
 
-  @Selector()
+  @Selector([BooksState])
   public static getState(state: BooksStateModel) {
     return state;
   }
 
-  @Selector()
+  @Selector([BooksState])
   public static getTitles(state: BooksStateModel) {
     return state.titles;
   }
 
-  @Selector()
+  @Selector([BooksState])
   public static getParts(state: BooksStateModel) {
     return state.parts;
   }
 
-  @Selector()
+  @Selector([BooksState])
   public static getPartByIndex(state: BooksStateModel) {
     return (index: string) => {
       if (!state.parts) {
@@ -48,14 +48,15 @@ export class BooksState {
     };
   }
 
-  @Selector([BooksState.getPartByIndex, RouterState.getBookPartIndex])
+  @Selector([BooksState, BooksState.getPartByIndex, RouterState.getBookPartIndex])
   public static getCurrentNavigatedPart(state: BooksStateModel, partByIndex: ((index: string) => Book),
                                         routerIndex: string) {
     const index = routerIndex ?  routerIndex : 'books';
+
     return partByIndex(index);
   }
 
-  @Selector([BooksState.getCurrentNavigatedPart, RouterState.getLanguage, RouterState.getTranslation])
+  @Selector([BooksState, BooksState.getCurrentNavigatedPart, RouterState.getLanguage, RouterState.getTranslation])
   public static getTranslationIfInBookOrDefault(state: BooksStateModel, book: Book, language: string, translation: string): string {
     const verseTranslations = getVerseTranslations(book);
     if (verseTranslations) {
@@ -79,7 +80,7 @@ export class BooksState {
     return undefined;
   }
 
-  @Selector([BooksState.getCurrentNavigatedPart])
+  @Selector([BooksState, BooksState.getCurrentNavigatedPart])
   public static getBookTranslations(state: BooksStateModel, book: Book): Translation[] {
     const verseTranslations = getVerseTranslations(book);
     if (verseTranslations) {
@@ -88,7 +89,7 @@ export class BooksState {
     return [];
   }
 
-  @Selector([BooksState.getCurrentNavigatedPart])
+  @Selector([BooksState, BooksState.getCurrentNavigatedPart])
   public static getBookNavigation(state: BooksStateModel, book: Book): Navigation {
     const chapter = getChapter(book);
     if (chapter && chapter.nav) {
@@ -97,7 +98,7 @@ export class BooksState {
     return undefined;
   }
 
-  @Selector([BooksState.getTranslationIfInBookOrDefault])
+  @Selector([BooksState, BooksState.getTranslationIfInBookOrDefault])
   public static getTranslationClass(state: BooksStateModel, translation: string): string {
     if (!translation) { return undefined; }
 

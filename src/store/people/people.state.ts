@@ -20,12 +20,12 @@ export interface PeopleStateModel {
 export class PeopleState {
   constructor(private peopleService: PeopleService) { }
 
-  @Selector()
+  @Selector([PeopleState])
   public static getState(state: PeopleStateModel) {
     return state;
   }
 
-  @Selector()
+  @Selector([PeopleState])
   public static getNarratorByIndex(state: PeopleStateModel) {
     return (index: string) => {
       if (!state.narrators) {
@@ -36,12 +36,12 @@ export class PeopleState {
     };
   }
 
-  @Selector([PeopleState.getNarratorByIndex])
+  @Selector([PeopleState, PeopleState.getNarratorByIndex])
   public static getNarratorIndex(state: PeopleStateModel, narratorByIndex: ((index: string) => NarratorWrapper)) {
     return narratorByIndex('people').data;
   }
 
-  @Selector([PeopleState.getNarratorIndex])
+  @Selector([PeopleState, PeopleState.getNarratorIndex])
   public static getEnrichedNarratorIndex(state: PeopleStateModel, narratorIndex: Record<number, NarratorMetadata>) {
     const result = {};
     Object.entries(narratorIndex).forEach(([key, value]) => {
@@ -53,12 +53,12 @@ export class PeopleState {
     return result;
   }
 
-  @Selector([PeopleState.getEnrichedNarratorIndex])
+  @Selector([PeopleState, PeopleState.getEnrichedNarratorIndex])
   public static getEnrichedNarratorsList(state: PeopleStateModel, narratorIndex: Record<number, NarratorMetadata>) {
     return Object.values(narratorIndex);
   }
 
-  @Selector([PeopleState.getNarratorByIndex, RouterState.getBookPartIndex])
+  @Selector([PeopleState, PeopleState.getNarratorByIndex, RouterState.getBookPartIndex])
   public static getCurrentNavigatedNarrator(state: PeopleStateModel, narratorByIndex: ((index: string) => NarratorWrapper),
                                             routerIndex: string) {
     const index = routerIndex ?  routerIndex : 'people';

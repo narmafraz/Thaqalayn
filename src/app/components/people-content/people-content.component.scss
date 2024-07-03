@@ -1,12 +1,22 @@
 mat-mdc-card {
   background-color: rgba(255, 255, 255, 0.5);
-	border-radius: 10px;
-	margin: 15px 3px 10px 3px;
-  color: rgba(0,0,0,.87);
+  border-radius: 10px;
+  margin: 15px 3px 10px 3px;
+  color: rgba(0, 0, 0, .87);
 }
 
 h1 {
-  text-align:center;
+  text-align: center;
   font-size: max(1.6em, 3vw);
   line-height: 5vw;
+}
+
+.example-viewport {
+  height: 60vh; /* Adjust as needed */
+  width: 100%;
+  border: 1px solid black;
+}
+
+table {
+  width: 100%;
 }

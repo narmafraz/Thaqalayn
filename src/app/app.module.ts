@@ -1,3 +1,4 @@
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -33,38 +34,45 @@ import { VerseContentComponent } from './components/verse-content/verse-content.
 import { VerseTextComponent } from './components/verse-text/verse-text.component';
 import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
 
-@NgModule({ declarations: [
-        AppComponent,
-        BookDispatcherComponent,
-        ChapterListComponent,
-        AboutComponent,
-        ChapterContentComponent,
-        BookTitlesComponent,
-        BreadcrumbsComponent,
-        VerseContentComponent,
-        ExpandLanguagePipe,
-        VerseTextComponent,
-        TranslationSelectionComponent,
-        SupportComponent,
-        DownloadComponent,
-        SettingsComponent,
-        PeopleListComponent,
-        PeopleContentComponent,
-        PathLinkComponent
-    ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        AppRoutingModule,
-        NgxsStoreModule,
-        BrowserAnimationsModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatSortModule,
-        MatCardModule,
-        MatIconModule,
-        MatSelectModule,
-        MatButtonModule,
-        FormsModule,
-        MatTooltipModule,
-        MatFormFieldModule,
-        MatInputModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+@NgModule({
+  declarations: [
+    AppComponent,
+    BookDispatcherComponent,
+    ChapterListComponent,
+    AboutComponent,
+    ChapterContentComponent,
+    BookTitlesComponent,
+    BreadcrumbsComponent,
+    VerseContentComponent,
+    ExpandLanguagePipe,
+    VerseTextComponent,
+    TranslationSelectionComponent,
+    SupportComponent,
+    DownloadComponent,
+    SettingsComponent,
+    PeopleListComponent,
+    PeopleContentComponent,
+    PathLinkComponent
+  ],
+  bootstrap: [AppComponent],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    NgxsStoreModule,
+    BrowserAnimationsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatCardModule,
+    MatIconModule,
+    MatSelectModule,
+    MatButtonModule,
+    FormsModule,
+    MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
+    ScrollingModule
+  ],
+  providers: [provideHttpClient(withInterceptorsFromDi())]
+})
 export class AppModule { }

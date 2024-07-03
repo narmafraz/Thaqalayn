@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { NarratorMetadata, NarratorWrapper } from '@app/models';
+import { Narrator, NarratorMetadata, NarratorWrapper } from '@app/models';
 import { PeopleService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
@@ -60,9 +60,11 @@ export class PeopleState {
 
   @Selector([PeopleState, PeopleState.getNarratorByIndex, RouterState.getBookPartIndex])
   public static getCurrentNavigatedNarrator(state: PeopleStateModel, narratorByIndex: ((index: string) => NarratorWrapper),
-                                            routerIndex: string) {
+                                            routerIndex: string): Narrator {
     const index = routerIndex ?  routerIndex : 'people';
-    return narratorByIndex(index).data;
+
+    const narrator = narratorByIndex(index);
+    return <Narrator> (narrator ? narrator.data : undefined);
   }
 
   @Action(LoadNarrator)

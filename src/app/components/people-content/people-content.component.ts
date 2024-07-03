@@ -29,7 +29,7 @@ export class PeopleContentComponent implements OnInit {
     this.narrator$.subscribe(narrator => {
       if (narrator) {
         this.versePathsDataSource.data = this.sortBy(narrator.verse_paths).map(path => ({ path }));
-        const subchainsData = Object.entries(narrator.subchains).map(([key, value]) => ({ key, value }));
+        const subchainsData = Object.entries(narrator.subchains).map(([key, value]) => ({ key, value })).sort(this.sortByNumberOfNarrators);
         console.log('Subchains Data:', subchainsData); // Log the data
         this.subchainsDataSource.data = subchainsData;
       }
@@ -53,5 +53,9 @@ export class PeopleContentComponent implements OnInit {
   getni(subchain) {
     console.log('getni', subchain);
     return subchain.value.narrator_ids;
+  }
+  getit(e) {
+    console.log('getit', e);
+    return e;
   }
 }

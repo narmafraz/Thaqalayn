@@ -1,16 +1,20 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot } from '@angular/router';
-import { NarratorWrapper } from '@app/models';
+import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { LoadNarrator } from '@store/people/people.actions';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 
-@Injectable()
-export class NarratorResolver  {
+@Injectable({
+  providedIn: 'root'
+})
+export class NarratorResolver implements Resolve<any> {
   constructor(private store: Store) {}
 
-  resolve(route: ActivatedRouteSnapshot) {
-    this.store.dispatch(new LoadNarrator('index'));
-    return this.store.dispatch(new LoadNarrator(route.paramMap.get('index')));
+  resolve(route: ActivatedRouteSnapshot): Observable<any> {
+    const index = route.paramMap.get('index');
+    return forkJoin([
+      this.store.dispatch(new LoadNarrator('index')),
+      this.store.dispatch(new LoadNarrator(index))
+    ]);
   }
 }

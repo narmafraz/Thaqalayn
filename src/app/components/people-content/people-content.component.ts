@@ -1,7 +1,9 @@
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { KeyValue } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { MatTableDataSource } from '@angular/material/table';
 import { ChainVerses, Narrator, NarratorMetadata } from '@app/models';
-import { Select } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { PeopleState } from '@store/people/people.state';
 import { Observable } from 'rxjs';
 
@@ -11,19 +13,39 @@ import { Observable } from 'rxjs';
   templateUrl: './people-content.component.html',
   styleUrls: ['./people-content.component.scss']
 })
-export class PeopleContentComponent {
+export class PeopleContentComponent implements OnInit {
+  narrator$: Observable<Narrator> = inject(Store).select(PeopleState.getCurrentNavigatedNarrator);
+  narratorIndex$: Observable<Record<number, NarratorMetadata>> = inject(Store).select(PeopleState.getEnrichedNarratorIndex);
 
-  @Select(PeopleState.getCurrentNavigatedNarrator) narrator$: Observable<Narrator>;
-  @Select(PeopleState.getEnrichedNarratorIndex) narratorIndex$: Observable<Record<number, NarratorMetadata>>;
+  versePathsDataSource: MatTableDataSource<any> = new MatTableDataSource();
+  subchainsDataSource: MatTableDataSource<KeyValue<string, ChainVerses>> = new MatTableDataSource();
+  displayedColumnsPaths = ['path'];
+  displayedColumnsSubchains = ['subchain'];
 
-  sortBy(lst) {
-    return [...lst].sort((a, b) => a > b ? 1 : a === b ? 0 : -1);
+  @ViewChild('versePathsViewport') versePathsViewport: CdkVirtualScrollViewport;
+  @ViewChild('subchainsViewport') subchainsViewport: CdkVirtualScrollViewport;
+
+  ngOnInit() {
+    this.narrator$.subscribe(narrator => {
+      if (narrator) {
+        this.versePathsDataSource.data = this.sortBy(narrator.verse_paths).map(path => ({ path }));
+        const subchainsData = Object.entries(narrator.subchains).map(([key, value]) => ({ key, value })).sort(this.sortByNumberOfNarrators);
+        this.subchainsDataSource.data = subchainsData;
+      }
+    });
+  }
+  applyFilter(event: Event, dataSource: MatTableDataSource<any>) {
+    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    dataSource.filter = filterValue;
+  }
+
+  sortBy(lst: any[]) {
+    return [...lst].sort((a, b) => (a > b ? 1 : a === b ? 0 : -1));
   }
 
   sortByNumberOfNarrators = (a: KeyValue<string, ChainVerses>, b: KeyValue<string, ChainVerses>): number => {
     const an = a.value.narrator_ids ? a.value.narrator_ids.length : 0;
     const bn = b.value.narrator_ids ? b.value.narrator_ids.length : 0;
-    return (an > bn) ? 1 : (bn > an ? -1 : 0);
-  }
-
+    return an > bn ? 1 : bn > an ? -1 : 0;
+  };
 }

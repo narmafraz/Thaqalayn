@@ -7,24 +7,58 @@
     </mat-card-title>
     <mat-card-content>
       <h2>Narrated Ahadith</h2>
-      <ol>
-        <li *ngFor="let path of sortBy(narrator.verse_paths)"><app-path-link [path]="path"></app-path-link> </li>
-      </ol>
-      <h2>Co-Narartors</h2>
-      <ol>
-        <li *ngFor="let subchain of narrator.subchains | keyvalue : sortByNumberOfNarrators">
-          <span *ngIf="(narratorIndex$ | async) as narratorIndex" class="arabic" dir="rtl">
-            <ng-container *ngFor="let narrator_id of subchain.value.narrator_ids; let isLast=last">
-              <a [routerLink]="'/people/narrators/' + narrator_id">{{narratorIndex[narrator_id] ? narratorIndex[narrator_id].titles.ar : narrator_id}}</a>
-              {{isLast ? '' : '&#10229;'}}
+      <mat-form-field>
+        <mat-label>Search Ahadith</mat-label>
+        <input matInput (keyup)="applyFilter($event, versePathsDataSource)" placeholder="Ex. Hadith text">
+      </mat-form-field>
+      <cdk-virtual-scroll-viewport itemSize="50" class="example-viewport" #versePathsViewport>
+        <table mat-table [dataSource]="versePathsDataSource" class="mat-elevation-z8">
+
+          <!-- Path Column -->
+          <ng-container matColumnDef="path">
+            <th mat-header-cell *matHeaderCellDef> Path </th>
+            <td mat-cell *matCellDef="let element"> <app-path-link [path]="element.path"></app-path-link> </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumnsPaths"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumnsPaths;"></tr>
+        </table>
+      </cdk-virtual-scroll-viewport>
+
+      <h2>Co-Narrators</h2>
+      <mat-form-field>
+        <mat-label>Search Co-Narrators</mat-label>
+        <input matInput (keyup)="applyFilter($event, subchainsDataSource)" placeholder="Ex. Narrator name">
+      </mat-form-field>
+      <ng-container *ngIf="(narratorIndex$ | async) as narratorIndex">
+      <cdk-virtual-scroll-viewport itemSize="50" class="example-viewport" #subchainsViewport>
+        <table mat-table [dataSource]="subchainsDataSource" class="mat-elevation-z8">
+
+          <!-- Subchain Column -->
+          <ng-container matColumnDef="subchain">
+            <th mat-header-cell *matHeaderCellDef> Subchain </th>
+            <td mat-cell *matCellDef="let subchain">
+              <span class="arabic" dir="rtl">
+                    <ng-container *ngFor="let narrator_id of subchain.value.narrator_ids; let isLast=last">
+                      <a [routerLink]="['/people/narrators/' + narrator_id]">
+                        {{narratorIndex[narrator_id] ? narratorIndex[narrator_id].titles.ar : narrator_id}}
+                      </a>
+                      {{isLast ? '' : '&#10229;'}}
+                    </ng-container>
+                    <ol>
+                      <li *ngFor="let path of subchain.value.verse_paths">
+                        <app-path-link [path]="path"></app-path-link>
+                      </li>
+                    </ol>
+                </span>
+              </td>
             </ng-container>
-          </span>
-          <ol>
-            <li *ngFor="let path of subchain.value.verse_paths"><app-path-link [path]="path"></app-path-link></li>
-          </ol>
-        </li>
-      </ol>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumnsSubchains"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsSubchains;"></tr>
+      </table>
+    </cdk-virtual-scroll-viewport>
+  </ng-container>
     </mat-card-content>
   </mat-card>
-
 </ng-container>

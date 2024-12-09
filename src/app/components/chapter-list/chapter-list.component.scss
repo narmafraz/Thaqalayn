@@ -2,9 +2,13 @@
   display: flex;
 	border-radius: 5px;
 	color: #666;
-	margin-top: 15px;
-  padding: 10px;
   flex-direction: column;
+  margin-top: 15px;
+  padding: 10px;
+}
+
+.full-width-table {
+  width: 100%;
 }
 
 .txtrow {
@@ -18,10 +22,6 @@
   &>* {
     text-align: center;
   }
-}
-
-.full-width-table {
-  width: 100%;
 }
 
 .mat-mdc-table {

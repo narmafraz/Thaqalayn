@@ -1,8 +1,8 @@
 import { DataSource } from '@angular/cdk/collections';
 import { MatSort } from '@angular/material/sort';
 import { Chapter } from '@app/models';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 /**
  * Data source for the TableSample view. This class should
@@ -25,15 +25,31 @@ export class ChapterListDataSource extends DataSource<Chapter> {
    * @returns A stream of the items to be rendered.
    */
   connect(): Observable<Chapter[]> {
-    // Subscribe to sort changes and trigger updates
-    this.sort.sortChange.subscribe(() => {
-      this.dataSubject.next(this.getSortedData(this.dataSubject.getValue()));
-    });
+    try {
+      // Ensure sort is defined before subscribing
+      if (!this.sort) {
+        console.warn('Sort is not initialized in data source');
+        return this.dataSubject.asObservable();
+      }
 
-    // Return the dataSubject as the data stream for the table
-    return this.dataSubject.asObservable().pipe(
-      map(data => this.getPagedData(this.getSortedData(data)))
-    );
+      // Subscribe to sort changes and trigger updates
+      this.sort.sortChange.subscribe(() => {
+        const currentData = this.dataSubject.getValue();
+        this.dataSubject.next(this.getSortedData(currentData));
+      });
+
+      // Return the dataSubject as the data stream for the table
+      return this.dataSubject.asObservable().pipe(
+        map(data => this.getPagedData(this.getSortedData(data))),
+        catchError(err => {
+          console.error('Error in data source connect', err);
+          return of([]);
+        })
+      );
+    } catch (err) {
+      console.error('Unexpected error in data source connect', err);
+      return of([]);
+    }
   }
 
   /**

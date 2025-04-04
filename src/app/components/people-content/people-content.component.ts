@@ -158,4 +158,8 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
     const bn = b.value.narrator_ids ? b.value.narrator_ids.length : 0;
     return bn - an; // Sort in descending order
   };
+
+  sortVersePathsByLength() {
+    this.versePathsDataSource.data = this.versePathsDataSource.data.sort((a, b) => a.path.length - b.path.length);
+  }
 }

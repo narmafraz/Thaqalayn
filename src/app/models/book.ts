@@ -13,9 +13,9 @@ export interface Crumb {
 }
 
 export interface Navigation {
-  prev: Crumb;
-  next: Crumb;
-  up: Crumb;
+  prev: string;
+  next: string;
+  up: string;
 }
 
 export interface SpecialText {
@@ -56,9 +56,9 @@ export interface Chapter {
   verses: Verse[];
   chapters: Chapter[];
   part_type: string;
-  crumbs: Crumb[];
+  
   nav: Navigation;
-  verse_translations: Translation[];
+  verse_translations: string[];
   default_verse_translation_ids: Record<string, string>;
 }
 
@@ -82,7 +82,7 @@ export interface VerseContent {
 
 export type Book = ChapterList | ChapterContent | VerseContent;
 
-export function getVerseTranslations(book: Book): Translation[] {
+export function getVerseTranslations(book: Book): string[] {
   return book.data && book.kind !== 'verse_content' && book.data.verse_translations;
 }
 

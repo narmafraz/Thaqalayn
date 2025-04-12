@@ -1,15 +1,15 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { KeyValue } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NarratorMetadata } from '@app/models';
-import { Select } from '@ngxs/store';
 import { PeopleState } from '@store/people/people.state';
 import { Observable, Subscription, fromEvent, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
 import { MultiLingualText } from './../../models/text';
+import { Store } from '@ngxs/store';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -19,7 +19,7 @@ import { MultiLingualText } from './../../models/text';
 })
 export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
-  @Select(PeopleState.getEnrichedNarratorsList) narrators$: Observable<NarratorMetadata[]>;
+  narrators$: Observable<NarratorMetadata[]> = inject(Store).select(PeopleState.getEnrichedNarratorsList);
 
   readonly SMALL_SCREEN_ALIAS = 'xs';
   filterValue = '';
@@ -37,7 +37,8 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   narratorsTitles: MultiLingualText;
 
-  constructor(private breakpointObserver: BreakpointObserver,
+  constructor(private store: Store,
+              private breakpointObserver: BreakpointObserver,
               private changeDetectorRefs: ChangeDetectorRef) {
     this.mqAlias$ = this.breakpointObserver.observe([
         Breakpoints.XSmall,

@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Book, Narrator } from '@app/models';
-import { Select } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
 import { Observable } from 'rxjs';
@@ -12,6 +12,9 @@ import { Observable } from 'rxjs';
   styleUrls: ['./breadcrumbs.component.scss']
 })
 export class BreadcrumbsComponent {
-  @Select(BooksState.getCurrentNavigatedPart) book$: Observable<Book>;
-  @Select(PeopleState.getCurrentNavigatedNarrator) narrator$: Observable<Narrator>;
+  book$: Observable<Book> = inject(Store).select(BooksState.getCurrentNavigatedPart);
+  narrator$: Observable<Narrator> = inject(Store).select(PeopleState.getCurrentNavigatedNarrator);
+
+  constructor(private store: Store) {
+  }
 }

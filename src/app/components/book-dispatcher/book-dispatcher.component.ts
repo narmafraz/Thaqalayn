@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Book } from '@app/models';
-import { Select } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable } from 'rxjs';
 
@@ -12,8 +12,8 @@ import { Observable } from 'rxjs';
 })
 export class BookDispatcherComponent {
 
-  @Select(BooksState.getCurrentNavigatedPart) book$: Observable<Book>;
+  book$: Observable<Book> = inject(Store).select(BooksState.getCurrentNavigatedPart);
 
-  constructor() {
+  constructor(private store: Store) {
   }
 }

@@ -1,7 +1,7 @@
 import { ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
 import { Chapter, ChapterContent, Verse } from '@app/models';
-import { Select } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RouterState } from '@store/router/router.state';
 import { Observable } from 'rxjs';
@@ -13,12 +13,12 @@ import { Observable } from 'rxjs';
   styleUrls: ['./chapter-content.component.scss'],
 })
 export class ChapterContentComponent {
-  @Select(RouterState.getUrlFragment) fragment$: Observable<string>;
-  @Select(BooksState.getTranslationIfInBookOrDefault) translation$: Observable<string>;
+  fragment$: Observable<string> = inject(Store).select(RouterState.getUrlFragment);
+  translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);
 
   @Input() book$: Observable<ChapterContent>;
 
-  constructor(private viewportScroller: ViewportScroller) {
+  constructor(private store: Store, private viewportScroller: ViewportScroller) {
     this.fragment$.subscribe(fragment => {
       setTimeout(() => {
           this.viewportScroller.scrollToAnchor(fragment);

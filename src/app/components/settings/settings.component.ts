@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Navigation } from '@app/models';
-import { Navigate } from '@ngxs/router-plugin';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable } from 'rxjs';
 
@@ -12,5 +11,8 @@ import { Observable } from 'rxjs';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent {
-  @Select(BooksState.getBookNavigation) nav$: Observable<Navigation>;
+  nav$: Observable<Navigation> = inject(Store).select(BooksState.getBookNavigation);
+
+  constructor(private store: Store) {
+  }
 }

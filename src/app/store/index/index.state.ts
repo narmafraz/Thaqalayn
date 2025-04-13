@@ -29,7 +29,14 @@ export class IndexState implements NgxsOnInit {
     // Dispatch for Arabic index on initialization.
     ctx.dispatch(new LoadIndex('ar'));
   }
-
+  
+  @Selector()
+  static getBookForLanguage(state: IndexStateModel) {
+    return (language: string): IndexedTitles => {
+      return state.books[language];
+    };
+  }
+  
   @Action(LoadIndex)
   loadIndex(ctx: StateContext<IndexStateModel>, action: LoadIndex) {
     return this.http.get<Record<string, IndexedTitles>>(`/index/books.${action.language}.json`).pipe(

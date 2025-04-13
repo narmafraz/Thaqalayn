@@ -30,8 +30,11 @@ export class ChapterContentComponent {
   getInBookReference(chapter: Chapter, verse: Verse): string {
     let result = '';
 
-    chapter.crumbs.forEach(crumb => {
-      result += crumb.indexed_titles.en + ' ';
+    // Replace chapter.crumbs with crumbs$ observable subscription
+    this.crumbs$.subscribe(crumbs => {
+      crumbs.forEach(crumb => {
+        result += crumb.indexed_titles.en + ' ';
+      });
     });
 
     result += verse.part_type + ' ' + verse.local_index;

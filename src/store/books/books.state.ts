@@ -123,10 +123,19 @@ export class BooksState {
       if (!arEntry && !langEntry) {
         break;
       }
+
+      const indexed_titles = {};
+      indexed_titles['ar'] = arEntry ? arEntry.part_type + ' ' + arEntry.local_index : '';
+      indexed_titles[language] = langEntry ? langEntry.part_type + ' ' + langEntry.local_index : '';
+
+      const titles = {};
+      titles['ar'] = arEntry ? arEntry.title : '';
+      titles[language] = langEntry ? langEntry.title : '';
+
       crumbs.unshift({
         path: path,
-        arabic: arEntry ? arEntry.title : '',
-        language: langEntry ? langEntry.title : ''
+        indexed_titles: indexed_titles,
+        titles: titles
       });
       const lastColon = path.lastIndexOf(':');
       if (lastColon === -1) {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { RouterNavigation } from '@ngxs/router-plugin';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { BookPartIndexChanged, SortChanged } from './router.actions';
+import { LoadIndex } from '@store/index/index.actions';
 
 export interface RouterStateModel {
   index: string;
@@ -79,6 +80,7 @@ export class RouterState {
     const storeLanguage = context.getState().language;
     if (routerLanguage && routerLanguage.toLowerCase() !== storeLanguage) {
       context.patchState({language: routerLanguage.toLowerCase()});
+      context.dispatch(new LoadIndex(routerLanguage.toLowerCase()));
     }
   }
 

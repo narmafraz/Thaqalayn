@@ -8,6 +8,7 @@ import { Store } from '@ngxs/store';
 import { RouterState } from '../router/router.state';
 
 export interface IndexedTitleEntry {
+  local_index: number;
   part_type: string;
   title: string;
 }
@@ -31,6 +32,7 @@ export class IndexState implements NgxsOnInit {
   constructor(private http: HttpClient, private store: Store) {}
 
   ngxsOnInit(ctx: StateContext<IndexStateModel>) {
+    ctx.dispatch(new LoadIndex('ar'));
     const lang = this.store.selectSnapshot(RouterState.getLanguage);
     ctx.dispatch(new LoadIndex(lang));
   }

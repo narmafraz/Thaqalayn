@@ -42,7 +42,7 @@ export class IndexState implements NgxsOnInit {
     return this.http.get<Record<string, IndexedTitles>>(`/index/books.${action.language}.json`).pipe(
       tap((booksData) => {
         const currentBooks = ctx.getState().books;
-        ctx.patchState({ books: { ...currentBooks, [action.language]: booksData } });
+        ctx.patchState({ books: { ...currentBooks, [action.language]: booksData } as Record<string, IndexedTitles> });
       })
     );
   }

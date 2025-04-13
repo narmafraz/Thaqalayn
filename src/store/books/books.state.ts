@@ -61,7 +61,7 @@ export class BooksState {
     const verseTranslations = getVerseTranslations(book);
     if (verseTranslations) {
         // Return selected translation if it exists on the verse
-        if (translation && verseTranslations.some(x => x.id === translation)) {
+        if (translation && verseTranslations.some(x => x === translation)) {
           return translation;
         }
         // Otherwise return default based on language
@@ -72,7 +72,7 @@ export class BooksState {
         // Otherwise return the first one that matches the language
         const translationMatchingLanguage = verseTranslations.find(x => x.lang === language);
         if (translationMatchingLanguage) {
-          return translationMatchingLanguage.id;
+          return translationMatchingLanguage;
         }
         // Otherwise just return the first in the list
         return verseTranslations[0].id;
@@ -81,7 +81,7 @@ export class BooksState {
   }
 
   @Selector([BooksState, BooksState.getCurrentNavigatedPart])
-  public static getBookTranslations(state: BooksStateModel, book: Book): Translation[] {
+  public static getBookTranslations(state: BooksStateModel, book: Book): string[] {
     const verseTranslations = getVerseTranslations(book);
     if (verseTranslations) {
       return verseTranslations;

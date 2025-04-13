@@ -5,6 +5,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
 import { tap } from 'rxjs/operators';
 import { LoadBookPart } from './books.actions';
+import { IndexState, IndexedTitles } from '@app/store/index/index.state';
 
 export interface BooksStateModel {
   titles: ChapterList[];

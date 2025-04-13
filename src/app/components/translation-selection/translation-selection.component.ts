@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 })
 export class TranslationSelectionComponent {
   translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);
-  translations$: Observable<Translation[]> = inject(Store).select(BooksState.getBookTranslations);
+  translations$: Observable<string[]> = inject(Store).select(BooksState.getBookTranslations);
 
   constructor(private store: Store) {
   }

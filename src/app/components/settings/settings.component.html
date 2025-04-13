@@ -4,16 +4,16 @@
 
   <div class="nav-buttons" *ngIf="(nav$ | async) as nav">
     <a mat-icon-button aria-label="Navigate to the previous chapter"
-      *ngIf="nav.prev" [routerLink]="nav.prev.path" queryParamsHandling="preserve">
-      <mat-icon [matTooltip]="nav.prev.titles.en">navigate_before</mat-icon>
+      *ngIf="nav.prev" [routerLink]="nav.prev" queryParamsHandling="preserve">
+      <mat-icon [matTooltip]="getPathTitle(nav.prev)">navigate_before</mat-icon>
     </a>
     <a mat-icon-button aria-label="Navigate to the parent"
-      *ngIf="nav.up" [routerLink]="nav.up.path" queryParamsHandling="preserve">
-      <mat-icon [matTooltip]="nav.up.titles.en">keyboard_arrow_up</mat-icon>
+      *ngIf="nav.up" [routerLink]="nav.up" queryParamsHandling="preserve">
+      <mat-icon [matTooltip]="getPathTitle(nav.up)">keyboard_arrow_up</mat-icon>
     </a>
     <a mat-icon-button aria-label="Navigate to the next chapter"
-      *ngIf="nav.next" [routerLink]="nav.next.path" queryParamsHandling="preserve">
-      <mat-icon [matTooltip]="nav.next.titles.en">navigate_next</mat-icon>
+      *ngIf="nav.next" [routerLink]="nav.next" queryParamsHandling="preserve">
+      <mat-icon [matTooltip]="getPathTitle(nav.next)">navigate_next</mat-icon>
     </a>
   </div>
 </div>

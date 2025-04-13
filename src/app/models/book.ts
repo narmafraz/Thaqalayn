@@ -56,7 +56,6 @@ export interface Chapter {
   verses: Verse[];
   chapters: Chapter[];
   part_type: string;
-  
   nav: Navigation;
   verse_translations: string[];
   default_verse_translation_ids: Record<string, string>;

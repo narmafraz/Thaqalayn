@@ -26,19 +26,16 @@ export class IndexState implements NgxsOnInit {
   constructor(private http: HttpClient) {}
 
   ngxsOnInit(ctx: StateContext<IndexStateModel>) {
-    // Dispatch with default language 'en'
-    ctx.dispatch(new LoadIndex('en'));
+    // Dispatch for Arabic index on initialization.
+    ctx.dispatch(new LoadIndex('ar'));
   }
 
   @Action(LoadIndex)
   loadIndex(ctx: StateContext<IndexStateModel>, action: LoadIndex) {
-    const { language } = action;
-    return forkJoin({
-      booksAr: this.http.get<Record<string, IndexedTitles>>('/index/books.ar.json'),
-      booksLocalized: this.http.get<Record<string, IndexedTitles>>(`/index/books.${language}.json`)
-    }).pipe(
-      tap(({ booksAr, booksLocalized }) => {
-        ctx.patchState({ books: { ar: booksAr, [language]: booksLocalized } });
+    return this.http.get<Record<string, IndexedTitles>>(`/index/books.${action.language}.json`).pipe(
+      tap((booksData) => {
+        const currentBooks = ctx.getState().books;
+        ctx.patchState({ books: { ...currentBooks, [action.language]: booksData } });
       })
     );
   }

@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core';
 import { forkJoin, tap } from 'rxjs';
 import { LoadIndex } from './index.actions';
 import { environment } from '@env/environment';
+import { Store } from '@ngxs/store';
+import { RouterState } from '../router/router.state';
 
 export interface IndexedTitleEntry {
   part_type: string;
@@ -26,11 +28,11 @@ export interface IndexStateModel {
 export class IndexState implements NgxsOnInit {
   private static readonly indexUrl = environment.apiBaseUrl + 'index';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private store: Store) {}
 
   ngxsOnInit(ctx: StateContext<IndexStateModel>) {
-    // Dispatch for Arabic index on initialization.
-    ctx.dispatch(new LoadIndex('ar'));
+    const lang = this.store.selectSnapshot(RouterState.getLanguage);
+    ctx.dispatch(new LoadIndex(lang));
   }
 
   @Selector()

@@ -70,12 +70,12 @@ export class BooksState {
           return defaultVerseTranslationIds[language];
         }
         // Otherwise return the first one that matches the language
-        const translationMatchingLanguage = verseTranslations.find(x => x.lang === language);
+        const translationMatchingLanguage = verseTranslations.find(x => x.split('.')[0] === language);
         if (translationMatchingLanguage) {
           return translationMatchingLanguage;
         }
         // Otherwise just return the first in the list
-        return verseTranslations[0].id;
+        return verseTranslations[0];
     }
     return undefined;
   }

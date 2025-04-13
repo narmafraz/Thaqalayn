@@ -1,4 +1,4 @@
-import { State, Action, StateContext, NgxsOnInit } from '@ngxs/store';
+import { State, Action, StateContext, NgxsOnInit, Selector } from '@ngxs/store';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, tap } from 'rxjs';
@@ -29,14 +29,14 @@ export class IndexState implements NgxsOnInit {
     // Dispatch for Arabic index on initialization.
     ctx.dispatch(new LoadIndex('ar'));
   }
-  
+
   @Selector()
   static getBookForLanguage(state: IndexStateModel) {
     return (language: string): IndexedTitles => {
       return state.books[language];
     };
   }
-  
+
   @Action(LoadIndex)
   loadIndex(ctx: StateContext<IndexStateModel>, action: LoadIndex) {
     return this.http.get<Record<string, IndexedTitles>>(`/index/books.${action.language}.json`).pipe(

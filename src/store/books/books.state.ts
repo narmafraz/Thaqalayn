@@ -125,8 +125,8 @@ export class BooksState {
       }
 
       const indexed_titles = {};
-      indexed_titles['ar'] = arEntry ? arEntry.part_type ?? '' + ' ' + arEntry.local_index ?? '' : '';
-      indexed_titles[language] = langEntry ? langEntry.part_type ?? '' + ' ' + langEntry.local_index ?? '' : '';
+      indexed_titles['ar'] = arEntry ? ((arEntry.part_type ?? '') + ' ' + (arEntry.local_index ?? '')) : '';
+      indexed_titles[language] = langEntry ? ((langEntry.part_type ?? '') + ' ' + (langEntry.local_index ?? '')) : '';
 
       const titles = {};
       titles['ar'] = arEntry ? arEntry.title : '';

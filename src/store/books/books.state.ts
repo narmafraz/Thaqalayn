@@ -107,6 +107,35 @@ export class BooksState {
     return lang + 'Text';
   }
 
+  @Selector([BooksState, BooksState.getCurrentNavigatedPart, RouterState.getLanguage, IndexState.getBookForLanguage])
+  public static getCurrentNavigatedCrumbs(state: BooksStateModel, currentPart: Book, language: string, getBookForLanguage: (lang: string) => IndexedTitles): any[] {
+    if (!currentPart) return [];
+    const chapter = getChapter(currentPart);
+    if (!chapter) return [];
+    let path = chapter.path;
+    const crumbs = [];
+    const arIndex = getBookForLanguage('ar');
+    const langIndex = getBookForLanguage(language);
+    while (path) {
+      const arEntry = arIndex ? arIndex[path] : undefined;
+      const langEntry = langIndex ? langIndex[path] : undefined;
+      if (!arEntry && !langEntry) {
+        break;
+      }
+      crumbs.unshift({
+        path: path,
+        arabic: arEntry ? arEntry.title : '',
+        language: langEntry ? langEntry.title : ''
+      });
+      const lastColon = path.lastIndexOf(':');
+      if (lastColon === -1) {
+        break;
+      }
+      path = path.substring(0, lastColon);
+    }
+    return crumbs;
+  }
+
   @Action(LoadBookPart)
   public loadPart(ctx: StateContext<BooksStateModel>, action: LoadBookPart) {
     return this.booksService.getPart(action.payload).pipe(

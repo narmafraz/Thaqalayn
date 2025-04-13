@@ -16,7 +16,7 @@ export class ChapterContentComponent {
   fragment$: Observable<string> = inject(Store).select(RouterState.getUrlFragment);
   translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);
   crumbs$: Observable<Crumb[]> = inject(Store).select(BooksState.getCurrentNavigatedCrumbs);
-  
+
   @Input() book$: Observable<ChapterContent>;
 
   constructor(private store: Store, private viewportScroller: ViewportScroller) {
@@ -27,14 +27,11 @@ export class ChapterContentComponent {
     });
   }
 
-  getInBookReference(chapter: Chapter, verse: Verse): string {
+  getInBookReference(crumbs: Crumb[], verse: Verse): string {
     let result = '';
 
-    // Replace chapter.crumbs with crumbs$ observable subscription
-    this.crumbs$.subscribe(crumbs => {
-      crumbs.forEach(crumb => {
-        result += crumb.indexed_titles.en + ' ';
-      });
+    crumbs.forEach(crumb => {
+      result += crumb.indexed_titles.en + ' ';
     });
 
     result += verse.part_type + ' ' + verse.local_index;
@@ -42,4 +39,10 @@ export class ChapterContentComponent {
     return result;
   }
 
+  getBookName(crumbs: Crumb[]): string {
+    if (crumbs.length > 0) {
+      return crumbs[0].titles.en;
+    }
+    return '';
+  }
 }

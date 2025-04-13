@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, tap } from 'rxjs';
 import { LoadIndex } from './index.actions';
+import { environment } from '@env/environment';
 
 export interface IndexedTitleEntry {
   part_type: string;
@@ -23,6 +24,8 @@ export interface IndexStateModel {
 })
 @Injectable()
 export class IndexState implements NgxsOnInit {
+  private static readonly indexUrl = environment.apiBaseUrl + 'index';
+
   constructor(private http: HttpClient) {}
 
   ngxsOnInit(ctx: StateContext<IndexStateModel>) {
@@ -39,7 +42,7 @@ export class IndexState implements NgxsOnInit {
 
   @Action(LoadIndex)
   loadIndex(ctx: StateContext<IndexStateModel>, action: LoadIndex) {
-    return this.http.get<Record<string, IndexedTitles>>(`/index/books.${action.language}.json`).pipe(
+    return this.http.get<Record<string, IndexedTitles>>(`${IndexState.indexUrl}/books.${action.language}.json`).pipe(
       tap((booksData) => {
         const currentBooks = ctx.getState().books;
         ctx.patchState({ books: { ...currentBooks, [action.language]: booksData } as Record<string, IndexedTitles> });

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Book, ChapterList, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation } from '@app/models';
+import { Book, ChapterList, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation } from '@app/models';
 import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { IndexedTitles, IndexState } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
 import { tap } from 'rxjs/operators';
 import { LoadBookPart } from './books.actions';
-import { IndexState, IndexedTitles } from '@app/store/index/index.state';
 
 export interface BooksStateModel {
   titles: ChapterList[];

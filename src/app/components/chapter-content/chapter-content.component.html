@@ -13,14 +13,14 @@
         <app-verse-text [verse]="verse"></app-verse-text>
       </mat-card-content>
       <mat-card-footer>
-        <div class="ref" *ngIf="book.data.crumbs">
+        <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
           <div class="refLink"><a [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index">
               <mat-icon>link</mat-icon>
             </a></div>
           <div>Reference</div>
-          <div>{{book.data.crumbs[0].titles.en}} {{verse.index}}</div>
+          <div>{{getBookName(crumbs)}} {{verse.index}}</div>
           <div>In-book Reference</div>
-          <div>{{getInBookReference(book.data, verse)}}</div>
+          <div>{{getInBookReference(crumbs, verse)}}</div>
           <div class="related">
             <ng-container *ngIf="verse.relations as relations">
               <div *ngFor="let relation of relations | keyvalue" class="perRel">

@@ -16,6 +16,4 @@ export class VerseTextComponent {
 
   @Input() verse: Verse;
 
-  constructor(private store: Store) {
-  }
 }

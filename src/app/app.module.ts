@@ -78,3 +78,5 @@ import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
   providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppModule { }
+
+// TODO: Consider migrating to Standalone Components for future modernisation.

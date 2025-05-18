@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Book } from '@app/models';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
@@ -20,5 +20,5 @@ export class BooksService {
     return this.http.get<Book>(`${BooksService.bookpartsUrl}/${index.replace(/:/g, '/')}.json`);
   }
 
-  constructor(private http: HttpClient) { }
+  private http = inject(HttpClient);
 }

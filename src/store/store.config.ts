@@ -3,13 +3,11 @@ import { NgxsDevtoolsOptions } from '@ngxs/devtools-plugin/src/symbols';
 import { NgxsLoggerPluginOptions } from '@ngxs/logger-plugin/src/symbols';
 import { NgxsConfig } from '@ngxs/store/src/symbols';
 import { IndexState } from '@store/index/index.state';
-import { AuthStateModule } from './auth/auth.state';
 import { BooksState } from './books/books.state';
-import { DashboardStateModule, DashboardStates } from './dashboard';
 import { PeopleState } from './people/people.state';
 import { RouterState } from './router/router.state';
 
-export const STATES_MODULES = [RouterState, BooksState, IndexState, PeopleState, AuthStateModule, DashboardStateModule, ...DashboardStates];
+export const STATES_MODULES = [RouterState, BooksState, IndexState, PeopleState];
 
 export const OPTIONS_CONFIG: Partial<NgxsConfig> = {
   /**

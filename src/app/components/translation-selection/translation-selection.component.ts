@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Translation } from '@app/models';
 import { Navigate } from '@ngxs/router-plugin';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable } from 'rxjs';
 
@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 })
 export class TranslationSelectionComponent {
   translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);
-  translations$: Observable<string[]> = inject(Store).select(BooksState.getBookTranslations);
+  translations$: Observable<Translation[]> = inject(Store).select(BooksState.getBookTranslations);
 
   constructor(private store: Store) {
   }

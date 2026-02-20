@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Book, ChapterList, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation } from '@app/models';
+import { Book, ChapterList, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation } from '@app/models';
 import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { IndexedTitles, IndexState } from '@store/index/index.state';
@@ -81,11 +81,11 @@ export class BooksState {
     return undefined;
   }
 
-  @Selector([BooksState, BooksState.getCurrentNavigatedPart])
-  public static getBookTranslations(state: BooksStateModel, book: Book): string[] {
+  @Selector([BooksState, BooksState.getCurrentNavigatedPart, IndexState.getTranslations])
+  public static getBookTranslations(state: BooksStateModel, book: Book, translations: Record<string, Translation>): Translation[] {
     const verseTranslations = getVerseTranslations(book);
     if (verseTranslations) {
-      return verseTranslations;
+      return verseTranslations.map(id => translations[id] || { id, lang: id.split('.')[0], name: id });
     }
     return [];
   }

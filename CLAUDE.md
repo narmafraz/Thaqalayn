@@ -106,6 +106,7 @@ Components are organized by feature in `src/app/components/`:
 ### API Integration
 - **Development**: Expects local API at `http://localhost:8888/` (configured in `src/environments/environment.ts`)
 - **Production**: Uses `https://thaqalayndata.netlify.app/` (configured in `src/environments/environment.prod.ts`)
+- **Production App URL**: `https://thaqalayn.netlify.app/` (auto-deployed on push)
 - API returns JSON files with book/chapter/verse data
 
 ## Important Notes
@@ -122,8 +123,11 @@ The `npm start` script includes `NODE_OPTIONS=--openssl-legacy-provider` to supp
 Book parts are identified by colon-separated indices (e.g., "1:2:3") which map to API paths like "books/1/2/3.json". The `BooksService.getPart()` method handles this conversion.
 
 ### Translation System
-- Translations are language-specific and book-specific
-- Default translation IDs are stored per language in each chapter
+- Each chapter's `verse_translations` field contains an array of translation IDs (e.g., `["en.qarai", "en.sarwar"]`)
+- Translation metadata (id, lang, name) is stored centrally in `index/translations.json` on the data server
+- `IndexState` loads `index/translations.json` once on app init via `LoadTranslations` action
+- `BooksState.getBookTranslations` joins the chapter's translation IDs with the central index to produce `Translation[]` objects for display
+- The `translation-selection` component displays translator names (e.g., "English: Ali Quli Qarai") and uses the translation ID as the `mat-option` value
 - The `getTranslationIfInBookOrDefault` selector in BooksState determines which translation to display based on:
   1. User-selected translation (if available in current book)
   2. Default translation for selected language

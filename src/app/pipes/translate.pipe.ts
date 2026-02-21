@@ -15,7 +15,7 @@ export class TranslatePipe implements PipeTransform {
 
   transform(key: string): string {
     const currentLang = this.getCurrentLang();
-    if (key === this.cachedKey && currentLang === this.cachedLang) {
+    if (key === this.cachedKey && currentLang === this.cachedLang && this.cachedValue !== key) {
       return this.cachedValue;
     }
     this.cachedKey = key;

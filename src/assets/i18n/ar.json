@@ -1,76 +1,93 @@
 {
   "app": {
-    "title": "\u0627\u0644\u062b\u0642\u0644\u064a\u0646",
-    "skipToContent": "\u0627\u0646\u062a\u0642\u0644 \u0625\u0644\u0649 \u0627\u0644\u0645\u062d\u062a\u0648\u0649"
+    "title": "الثقلين",
+    "skipToContent": "انتقل إلى المحتوى"
   },
   "nav": {
-    "home": "\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629",
-    "books": "\u0627\u0644\u0643\u062a\u0628",
-    "narrators": "\u0627\u0644\u0631\u0648\u0627\u0629",
-    "about": "\u062d\u0648\u0644",
-    "download": "\u062a\u062d\u0645\u064a\u0644",
-    "support": "\u062f\u0639\u0645",
-    "news": "\u0623\u062e\u0628\u0627\u0631"
+    "home": "الرئيسية",
+    "books": "الكتب",
+    "narrators": "الرواة",
+    "about": "حول",
+    "download": "تحميل",
+    "support": "دعم",
+    "news": "أخبار",
+    "previous": "السابق",
+    "next": "التالي",
+    "navigatePrevious": "انتقل إلى الباب السابق",
+    "navigateNext": "انتقل إلى الباب التالي",
+    "navigateParent": "انتقل إلى الأعلى",
+    "hadithNavigation": "تصفح الحديث"
   },
   "book": {
-    "reference": "\u0627\u0644\u0645\u0631\u062c\u0639",
-    "inBookReference": "\u0627\u0644\u0645\u0631\u062c\u0639 \u0641\u064a \u0627\u0644\u0643\u062a\u0627\u0628",
-    "relatedVerses": "\u0627\u0644\u0622\u064a\u0627\u062a \u0630\u0627\u062a \u0627\u0644\u0635\u0644\u0629",
-    "chapter": "\u0628\u0627\u0628",
-    "hadith": "\u062d\u062f\u064a\u062b",
-    "verse": "\u0622\u064a\u0629",
-    "viewInChapter": "\u0639\u0631\u0636 \u0641\u064a \u0633\u064a\u0627\u0642 \u0627\u0644\u0628\u0627\u0628",
-    "shareHadith": "\u0645\u0634\u0627\u0631\u0643\u0629 \u0647\u0630\u0627 \u0627\u0644\u062d\u062f\u064a\u062b",
-    "copyLink": "\u0646\u0633\u062e \u0627\u0644\u0631\u0627\u0628\u0637",
-    "linkCopied": "\u062a\u0645 \u0646\u0633\u062e \u0627\u0644\u0631\u0627\u0628\u0637!",
-    "grading": "\u0627\u0644\u062a\u0635\u0646\u064a\u0641",
-    "source": "\u0627\u0644\u0645\u0635\u062f\u0631"
+    "reference": "المرجع",
+    "inBookReference": "المرجع في الكتاب",
+    "relatedVerses": "الآيات ذات الصلة",
+    "chapter": "باب",
+    "hadith": "حديث",
+    "verse": "آية",
+    "viewInChapter": "عرض في سياق الباب",
+    "shareHadith": "مشاركة هذا الحديث",
+    "share": "مشاركة",
+    "copyLink": "نسخ الرابط",
+    "linkCopied": "تم نسخ الرابط!",
+    "grading": "التصنيف",
+    "source": "المصدر",
+    "viewSource": "عرض المصدر الأصلي",
+    "verified": "موثق",
+    "verifiedFrom": "موثق من",
+    "sourceWord": "مصدر",
+    "sourcesWord": "مصادر",
+    "unverified": "غير موثق"
   },
   "narrator": {
-    "narratedAhadith": "\u0627\u0644\u0623\u062d\u0627\u062f\u064a\u062b \u0627\u0644\u0645\u0631\u0648\u064a\u0629",
-    "coNarrators": "\u0627\u0644\u0631\u0648\u0627\u0629 \u0627\u0644\u0645\u0634\u062a\u0631\u0643\u0648\u0646",
-    "searchAhadith": "\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u0623\u062d\u0627\u062f\u064a\u062b",
-    "searchCoNarrators": "\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u0631\u0648\u0627\u0629 \u0627\u0644\u0645\u0634\u062a\u0631\u0643\u064a\u0646",
-    "searchNarrators": "\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u0631\u0648\u0627\u0629",
-    "searchByPath": "\u0628\u062d\u062b \u0628\u0627\u0644\u0645\u0633\u0627\u0631...",
-    "searchNarratorsPlaceholder": "\u0628\u062d\u062b \u0641\u064a \u0627\u0644\u0631\u0648\u0627\u0629...",
-    "sortByLength": "\u062a\u0631\u062a\u064a\u0628 \u062d\u0633\u0628 \u0627\u0644\u0637\u0648\u0644",
-    "narrations": "\u0639\u062f\u062f \u0627\u0644\u0631\u0648\u0627\u064a\u0627\u062a",
-    "narratedFrom": "\u0639\u062f\u062f \u0645\u0646 \u0631\u0648\u0649 \u0639\u0646\u0647\u0645",
-    "narratedTo": "\u0639\u062f\u062f \u0645\u0646 \u0631\u0648\u0649 \u0644\u0647\u0645",
-    "conarratorCount": "\u0639\u062f\u062f \u0627\u0644\u0631\u0648\u0627\u0629 \u0627\u0644\u0645\u0634\u062a\u0631\u0643\u064a\u0646"
+    "narratedAhadith": "الأحاديث المروية",
+    "coNarrators": "الرواة المشتركون",
+    "searchAhadith": "بحث في الأحاديث",
+    "searchCoNarrators": "بحث في الرواة المشتركين",
+    "searchNarrators": "بحث في الرواة",
+    "searchByPath": "بحث بالمسار...",
+    "searchNarratorsPlaceholder": "بحث في الرواة...",
+    "sortByLength": "ترتيب حسب الطول",
+    "narrations": "عدد الروايات",
+    "narratedFrom": "عدد من روى عنهم",
+    "narratedTo": "عدد من روى لهم",
+    "conarratorCount": "عدد الرواة المشتركين"
   },
   "search": {
-    "filter": "\u062a\u0635\u0641\u064a\u0629",
-    "search": "\u0628\u062d\u062b",
-    "noResults": "\u0644\u0645 \u064a\u062a\u0645 \u0627\u0644\u0639\u062b\u0648\u0631 \u0639\u0644\u0649 \u0646\u062a\u0627\u0626\u062c"
+    "filter": "تصفية",
+    "search": "بحث",
+    "searchBooksAndChapters": "بحث في الكتب والأبواب...",
+    "clearSearch": "مسح البحث",
+    "noResults": "لم يتم العثور على نتائج",
+    "noResultsFor": "لم يتم العثور على نتائج لـ"
   },
   "translation": {
-    "selectTranslation": "\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u062a\u0631\u062c\u0645\u0629",
-    "language": "\u0627\u0644\u0644\u063a\u0629"
+    "selectTranslation": "اختيار الترجمة",
+    "language": "اللغة"
   },
   "common": {
-    "loading": "\u062c\u0627\u0631\u064a \u0627\u0644\u062a\u062d\u0645\u064a\u0644...",
-    "error": "\u062d\u062f\u062b \u062e\u0637\u0623",
-    "retry": "\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0645\u062d\u0627\u0648\u0644\u0629",
-    "name": "\u0627\u0644\u0627\u0633\u0645",
-    "count": "\u0627\u0644\u0639\u062f\u062f",
-    "start": "\u0627\u0644\u0628\u062f\u0627\u064a\u0629",
-    "end": "\u0627\u0644\u0646\u0647\u0627\u064a\u0629",
-    "to": "\u0625\u0644\u0649",
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ",
+    "retry": "إعادة المحاولة",
+    "name": "الاسم",
+    "count": "العدد",
+    "start": "البداية",
+    "end": "النهاية",
+    "to": "إلى",
     "number": "#",
-    "verses": "\u0622\u064a\u0627\u062a",
-    "selectPage": "\u0627\u062e\u062a\u064a\u0627\u0631 \u0627\u0644\u0635\u0641\u062d\u0629",
-    "clear": "\u0645\u0633\u062d"
+    "verses": "آيات",
+    "selectPage": "اختيار الصفحة",
+    "clear": "مسح",
+    "bookNavigation": "تصفح الكتب"
   },
   "breadcrumb": {
-    "home": "\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629"
+    "home": "الرئيسية"
   },
   "language": {
-    "picker": "\u0627\u0644\u0644\u063a\u0629",
+    "picker": "اللغة",
     "en": "English",
-    "ar": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
-    "fa": "\u0641\u0627\u0631\u0633\u06cc",
-    "fr": "Fran\u00e7ais"
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
   }
 }

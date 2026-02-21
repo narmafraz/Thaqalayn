@@ -10,7 +10,13 @@
     "about": "About",
     "download": "Download",
     "support": "Support",
-    "news": "News"
+    "news": "News",
+    "previous": "Previous",
+    "next": "Next",
+    "navigatePrevious": "Navigate to the previous chapter",
+    "navigateNext": "Navigate to the next chapter",
+    "navigateParent": "Navigate to the parent",
+    "hadithNavigation": "Hadith navigation"
   },
   "book": {
     "reference": "Reference",
@@ -21,10 +27,17 @@
     "verse": "Verse",
     "viewInChapter": "View in chapter context",
     "shareHadith": "Share this hadith",
+    "share": "Share",
     "copyLink": "Copy link",
     "linkCopied": "Link copied!",
     "grading": "Grading",
-    "source": "Source"
+    "source": "Source",
+    "viewSource": "View original source",
+    "verified": "Verified",
+    "verifiedFrom": "Verified from",
+    "sourceWord": "source",
+    "sourcesWord": "sources",
+    "unverified": "Unverified"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",
@@ -43,7 +56,10 @@
   "search": {
     "filter": "Filter",
     "search": "Search",
-    "noResults": "No results found"
+    "searchBooksAndChapters": "Search books and chapters...",
+    "clearSearch": "Clear search",
+    "noResults": "No results found",
+    "noResultsFor": "No results found for"
   },
   "translation": {
     "selectTranslation": "Select Translation",
@@ -61,7 +77,8 @@
     "number": "#",
     "verses": "verses",
     "selectPage": "Select page",
-    "clear": "Clear"
+    "clear": "Clear",
+    "bookNavigation": "Book navigation"
   },
   "breadcrumb": {
     "home": "Home"

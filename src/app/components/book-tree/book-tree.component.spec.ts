@@ -7,7 +7,9 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgxsModule } from '@ngxs/store';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BookTreeComponent } from './book-tree.component';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
 
 describe('BookTreeComponent', () => {
   let component: BookTreeComponent;
@@ -23,8 +25,9 @@ describe('BookTreeComponent', () => {
         MatInputModule,
         NoopAnimationsModule,
         RouterTestingModule,
+        HttpClientTestingModule,
       ],
-      declarations: [BookTreeComponent],
+      declarations: [BookTreeComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   }));

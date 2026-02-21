@@ -44,12 +44,23 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onLanguageChange(lang: string): void {
     this.i18n.setLanguage(lang);
+    // Update ?lang= query param so URL is shareable with language preference
+    this.router.navigate([], {
+      queryParams: { lang },
+      queryParamsHandling: 'merge',
+    });
   }
 
   ngOnInit(): void {
     this.subscriptions.push(
       this.i18n.isRtl$.subscribe(isRtl => {
         document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+      })
+    );
+
+    this.subscriptions.push(
+      this.i18n.currentLang$.subscribe(lang => {
+        document.documentElement.lang = lang;
       })
     );
 

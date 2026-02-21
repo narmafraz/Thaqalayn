@@ -4,18 +4,18 @@
     <input matInput
            [(ngModel)]="searchQuery"
            (ngModelChange)="onSearchChange()"
-           placeholder="Search books and chapters..."
-           aria-label="Search books and chapters">
+           [placeholder]="'search.searchBooksAndChapters' | translate"
+           [attr.aria-label]="'search.searchBooksAndChapters' | translate">
     <button *ngIf="searchQuery"
             matSuffix
             mat-icon-button
-            aria-label="Clear search"
+            [attr.aria-label]="'search.clearSearch' | translate"
             (click)="clearSearch()">
       <mat-icon>close</mat-icon>
     </button>
   </mat-form-field>
 
-  <div class="tree-wrapper" role="tree" aria-label="Book navigation">
+  <div class="tree-wrapper" role="tree" [attr.aria-label]="'common.bookNavigation' | translate">
     <div *ngFor="let node of visibleNodes"
          class="tree-node"
          role="treeitem"
@@ -43,7 +43,7 @@
     </div>
 
     <div *ngIf="visibleNodes.length === 0 && searchQuery" class="no-results">
-      No results found for "{{ searchQuery }}"
+      {{ 'search.noResultsFor' | translate }} "{{ searchQuery }}"
     </div>
   </div>
 </div>

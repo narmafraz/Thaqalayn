@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "ثقلین",
+    "skipToContent": "رفتن به محتوا"
+  },
+  "nav": {
+    "home": "صفحه اصلی",
+    "books": "کتاب‌ها",
+    "narrators": "راویان",
+    "about": "درباره",
+    "download": "دانلود",
+    "support": "پشتیبانی",
+    "news": "اخبار",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "navigatePrevious": "رفتن به باب قبلی",
+    "navigateNext": "رفتن به باب بعدی",
+    "navigateParent": "رفتن به بالا",
+    "hadithNavigation": "پیمایش حدیث"
+  },
+  "book": {
+    "reference": "مرجع",
+    "inBookReference": "مرجع در کتاب",
+    "relatedVerses": "آیات مرتبط",
+    "chapter": "باب",
+    "hadith": "حدیث",
+    "verse": "آیه",
+    "viewInChapter": "مشاهده در متن باب",
+    "shareHadith": "اشتراک‌گذاری این حدیث",
+    "share": "اشتراک‌گذاری",
+    "copyLink": "کپی لینک",
+    "linkCopied": "لینک کپی شد!",
+    "grading": "درجه‌بندی",
+    "source": "منبع",
+    "viewSource": "مشاهده منبع اصلی",
+    "verified": "تأیید شده",
+    "verifiedFrom": "تأیید شده از",
+    "sourceWord": "منبع",
+    "sourcesWord": "منابع",
+    "unverified": "تأیید نشده"
+  },
+  "narrator": {
+    "narratedAhadith": "احادیث روایت شده",
+    "coNarrators": "هم‌راویان",
+    "searchAhadith": "جستجوی احادیث",
+    "searchCoNarrators": "جستجوی هم‌راویان",
+    "searchNarrators": "جستجوی راویان",
+    "searchByPath": "جستجو بر اساس مسیر...",
+    "searchNarratorsPlaceholder": "جستجوی راویان...",
+    "sortByLength": "مرتب‌سازی بر اساس طول",
+    "narrations": "تعداد روایات",
+    "narratedFrom": "تعداد افرادی که از آنها روایت کرده",
+    "narratedTo": "تعداد افرادی که برای آنها روایت کرده",
+    "conarratorCount": "تعداد هم‌راویان"
+  },
+  "search": {
+    "filter": "فیلتر",
+    "search": "جستجو",
+    "searchBooksAndChapters": "جستجو در کتاب‌ها و باب‌ها...",
+    "clearSearch": "پاک کردن جستجو",
+    "noResults": "نتیجه‌ای یافت نشد",
+    "noResultsFor": "نتیجه‌ای یافت نشد برای"
+  },
+  "translation": {
+    "selectTranslation": "انتخاب ترجمه",
+    "language": "زبان"
+  },
+  "common": {
+    "loading": "در حال بارگذاری...",
+    "error": "خطایی رخ داد",
+    "retry": "تلاش مجدد",
+    "name": "نام",
+    "count": "تعداد",
+    "start": "شروع",
+    "end": "پایان",
+    "to": "تا",
+    "number": "#",
+    "verses": "آیات",
+    "selectPage": "انتخاب صفحه",
+    "clear": "پاک کردن",
+    "bookNavigation": "پیمایش کتاب‌ها"
+  },
+  "breadcrumb": {
+    "home": "صفحه اصلی"
+  },
+  "language": {
+    "picker": "زبان",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  }
+}

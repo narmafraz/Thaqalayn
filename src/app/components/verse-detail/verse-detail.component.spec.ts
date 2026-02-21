@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NgxsModule } from '@ngxs/store';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { of } from 'rxjs';
 
 import { VerseDetailComponent } from './verse-detail.component';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
 import { VerseDetail } from '@app/models';
 
 describe('VerseDetailComponent', () => {
@@ -40,10 +42,11 @@ describe('VerseDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [VerseDetailComponent],
+      declarations: [VerseDetailComponent, TranslatePipe],
       imports: [
         NgxsModule.forRoot([]),
         RouterTestingModule,
+        HttpClientTestingModule,
         MatCardModule,
         MatIconModule,
         MatButtonModule,

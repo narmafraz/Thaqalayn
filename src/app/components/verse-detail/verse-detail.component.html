@@ -40,7 +40,7 @@
 
         <!-- Gradings -->
         <div class="gradings-section" *ngIf="book.data.gradings">
-          <h3>Grading</h3>
+          <h3>{{ 'book.grading' | translate }}</h3>
           <div class="grading-badges">
             <span *ngFor="let grading of book.data.gradings | keyvalue"
                   [class]="'grading-badge ' + getGradingClass(grading.value)"
@@ -67,15 +67,15 @@
         <div class="validation-section" *ngIf="book.data.cross_validation as cv">
           <div class="validation-badge" [class.verified]="cv.status === 'verified'" [class.unverified]="cv.status !== 'verified'">
             <mat-icon>{{ cv.status === 'verified' ? 'verified' : 'help_outline' }}</mat-icon>
-            <span *ngIf="cv.status === 'verified'">Verified from {{ cv.sources.length }} source{{ cv.sources.length > 1 ? 's' : '' }}</span>
-            <span *ngIf="cv.status !== 'verified'">Unverified</span>
+            <span *ngIf="cv.status === 'verified'">{{ 'book.verifiedFrom' | translate }} {{ cv.sources.length }} {{ cv.sources.length > 1 ? ('book.sourcesWord' | translate) : ('book.sourceWord' | translate) }}</span>
+            <span *ngIf="cv.status !== 'verified'">{{ 'book.unverified' | translate }}</span>
           </div>
         </div>
 
         <!-- Source URL -->
         <div class="source-section" *ngIf="book.data.source_url">
           <a [href]="book.data.source_url" target="_blank" rel="noopener noreferrer" class="source-link">
-            <mat-icon>open_in_new</mat-icon> View original source
+            <mat-icon>open_in_new</mat-icon> {{ 'book.viewSource' | translate }}
           </a>
         </div>
       </mat-card-content>
@@ -83,26 +83,26 @@
       <mat-card-actions>
         <button mat-button (click)="shareHadith(book.index)" class="share-btn">
           <mat-icon>share</mat-icon>
-          <span>{{ linkCopied ? 'Link copied!' : 'Share' }}</span>
+          <span>{{ linkCopied ? ('book.linkCopied' | translate) : ('book.share' | translate) }}</span>
         </button>
         <a mat-button
            [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
            [fragment]="'h' + book.data.verse.local_index"
            queryParamsHandling="preserve">
           <mat-icon>menu_book</mat-icon>
-          View in chapter context
+          {{ 'book.viewInChapter' | translate }}
         </a>
       </mat-card-actions>
     </mat-card>
 
     <!-- Prev/Next Navigation -->
-    <nav class="hadith-nav" aria-label="Hadith navigation">
+    <nav class="hadith-nav" [attr.aria-label]="'nav.hadithNavigation' | translate">
       <a *ngIf="book.data.nav.prev"
          [routerLink]="['/books', getNavRouterLink(book.data.nav.prev)]"
          queryParamsHandling="preserve"
          class="nav-prev"
          mat-button>
-        <mat-icon>chevron_left</mat-icon> Previous
+        <mat-icon>chevron_left</mat-icon> {{ 'nav.previous' | translate }}
       </a>
       <span *ngIf="!book.data.nav.prev"></span>
       <a *ngIf="book.data.nav.next"
@@ -110,7 +110,7 @@
          queryParamsHandling="preserve"
          class="nav-next"
          mat-button>
-        Next <mat-icon>chevron_right</mat-icon>
+        {{ 'nav.next' | translate }} <mat-icon>chevron_right</mat-icon>
       </a>
     </nav>
   </div>

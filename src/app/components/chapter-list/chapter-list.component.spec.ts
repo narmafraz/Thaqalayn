@@ -4,8 +4,10 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { ChapterListComponent } from './chapter-list.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 describe('ChapterListComponent', () => {
   let component: ChapterListComponent;
@@ -18,8 +20,9 @@ describe('ChapterListComponent', () => {
         MatTableModule,
         NoopAnimationsModule,
         RouterTestingModule,
+        HttpClientTestingModule,
       ],
-      declarations: [ChapterListComponent],
+      declarations: [ChapterListComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   }));

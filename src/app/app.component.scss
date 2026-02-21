@@ -50,8 +50,12 @@
   cursor: pointer;
 }
 
-.lang-picker {
+.header-search {
   margin-inline-start: auto;
+}
+
+.lang-picker {
+  margin-inline-start: 12px;
   width: 120px;
   font-size: 14px;
   text-transform: none;

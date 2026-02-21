@@ -1,0 +1,45 @@
+<div class="search-bar-wrapper">
+  <div class="search-input-container">
+    <mat-icon class="search-icon">search</mat-icon>
+    <input
+      #searchInput
+      type="text"
+      [placeholder]="'search.searchBooksAndChapters' | translate"
+      [value]="searchValue"
+      (input)="onSearchInput($any($event.target).value)"
+      (keydown.enter)="onSearchSubmit()"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      [attr.aria-label]="'search.search' | translate"
+      autocomplete="off">
+    <button
+      *ngIf="searchValue"
+      class="clear-btn"
+      (mousedown)="clearSearch()"
+      [attr.aria-label]="'search.clearSearch' | translate">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="search-dropdown" *ngIf="showDropdown" role="listbox">
+    <div *ngIf="(loading$ | async)" class="dropdown-loading">
+      <mat-spinner diameter="20"></mat-spinner>
+    </div>
+    <ng-container *ngIf="(results$ | async) as results">
+      <div
+        *ngFor="let result of results | slice:0:8"
+        class="dropdown-item"
+        role="option"
+        (mousedown)="selectResult(result)">
+        <div class="result-title">{{ result.title || result.titleAr }}</div>
+        <div class="result-meta">{{ result.bookName }}</div>
+      </div>
+      <div *ngIf="results.length === 0 && !(loading$ | async)" class="dropdown-empty">
+        {{ 'search.noResults' | translate }}
+      </div>
+      <div *ngIf="results.length > 8" class="dropdown-more" (mousedown)="onSearchSubmit()">
+        {{ 'search.search' | translate }}...
+      </div>
+    </ng-container>
+  </div>
+</div>

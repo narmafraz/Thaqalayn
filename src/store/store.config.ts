@@ -6,8 +6,9 @@ import { IndexState } from '@store/index/index.state';
 import { BooksState } from './books/books.state';
 import { PeopleState } from './people/people.state';
 import { RouterState } from './router/router.state';
+import { SearchState } from './search/search.state';
 
-export const STATES_MODULES = [RouterState, BooksState, IndexState, PeopleState];
+export const STATES_MODULES = [RouterState, BooksState, IndexState, PeopleState, SearchState];
 
 export const OPTIONS_CONFIG: Partial<NgxsConfig> = {
   /**

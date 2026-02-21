@@ -1,0 +1,35 @@
+<div class="search-results-container">
+  <h1>{{ 'search.search' | translate }}</h1>
+
+  <div *ngIf="(loading$ | async)" class="loading-container">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+
+  <div *ngIf="(error$ | async) as error" class="error-message">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error }}</span>
+  </div>
+
+  <ng-container *ngIf="(results$ | async) as results">
+    <p *ngIf="(query$ | async) as query" class="results-summary">
+      <span *ngIf="results.length > 0">{{ results.length }} results for "{{ query }}"</span>
+      <span *ngIf="results.length === 0 && !(loading$ | async)">{{ 'search.noResultsFor' | translate }} "{{ query }}"</span>
+    </p>
+
+    <div class="results-list">
+      <mat-card
+        *ngFor="let result of results"
+        appearance="outlined"
+        class="result-card"
+        [routerLink]="['/books', getBookPath(result)]"
+        queryParamsHandling="preserve">
+        <mat-card-content>
+          <div class="result-title">{{ result.title }}</div>
+          <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
+          <div class="result-book">{{ result.bookName }}</div>
+          <div class="result-path">{{ result.path }}</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </ng-container>
+</div>

@@ -8,7 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "npx playwright test",
-    "e2e:headed": "npx playwright test --headed"
+    "e2e:headed": "npx playwright test --headed",
+    "generate-sitemap": "node scripts/generate-sitemap.js"
   },
   "private": true,
   "dependencies": {

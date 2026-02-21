@@ -51,7 +51,15 @@
     "narrations": "Number of narrations",
     "narratedFrom": "Number of people narrated from",
     "narratedTo": "Number of people narrated to",
-    "conarratorCount": "Number of co-narrators"
+    "conarratorCount": "Number of co-narrators",
+    "biography": "Biography",
+    "era": "Era",
+    "reliability": "Reliability",
+    "birthDate": "Born",
+    "deathDate": "Died",
+    "teachers": "Teachers",
+    "students": "Students",
+    "source": "Source"
   },
   "search": {
     "filter": "Filter",

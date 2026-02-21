@@ -51,7 +51,15 @@
     "narrations": "عدد الروايات",
     "narratedFrom": "عدد من روى عنهم",
     "narratedTo": "عدد من روى لهم",
-    "conarratorCount": "عدد الرواة المشتركين"
+    "conarratorCount": "عدد الرواة المشتركين",
+    "biography": "السيرة الذاتية",
+    "era": "العصر",
+    "reliability": "الوثاقة",
+    "birthDate": "الولادة",
+    "deathDate": "الوفاة",
+    "teachers": "المشايخ",
+    "students": "التلاميذ",
+    "source": "المصدر"
   },
   "search": {
     "filter": "تصفية",

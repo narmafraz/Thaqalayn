@@ -25,6 +25,7 @@ interface TitleDocument {
   providedIn: 'root'
 })
 export class SearchService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Orama's internal types are excessively deep
   private titlesDb: any = null;
   private titlesLoaded = false;
   private titlesLoading: Promise<void> | null = null;
@@ -81,15 +82,18 @@ export class SearchService {
       properties: ['title', 'titleAr', 'partType']
     });
 
-    return results.hits.map(hit => ({
-      path: (hit.document as TitleDocument).path,
-      title: (hit.document as TitleDocument).title,
-      titleAr: (hit.document as TitleDocument).titleAr,
-      snippet: '',
-      bookName: (hit.document as TitleDocument).bookName,
-      kind: 'title' as const,
-      score: hit.score
-    }));
+    return results.hits.map(hit => {
+      const doc = hit.document as unknown as TitleDocument;
+      return {
+        path: doc.path,
+        title: doc.title,
+        titleAr: doc.titleAr,
+        snippet: '',
+        bookName: doc.bookName,
+        kind: 'title' as const,
+        score: hit.score
+      };
+    });
   }
 
   private normalizeArabic(text: string): string {

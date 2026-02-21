@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Book, ChapterList, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation } from '@app/models';
+import { Book, ChapterList, Crumb, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation } from '@app/models';
 import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { IndexedTitles, IndexState } from '@store/index/index.state';
@@ -136,7 +136,7 @@ export class BooksState {
   }
 
   @Selector([BooksState, BooksState.getCurrentNavigatedPart, RouterState.getLanguage, IndexState.getBookForLanguage])
-  public static getCurrentNavigatedCrumbs(state: BooksStateModel, currentPart: Book, language: string, getBookForLanguage: (lang: string) => IndexedTitles): any[] {
+  public static getCurrentNavigatedCrumbs(state: BooksStateModel, currentPart: Book, language: string, getBookForLanguage: (lang: string) => IndexedTitles): Crumb[] {
     if (!currentPart) return [];
     const chapter = getChapter(currentPart);
     if (!chapter) return [];

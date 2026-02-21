@@ -135,5 +135,20 @@
     "ar": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
     "fa": "\u0641\u0627\u0631\u0633\u06cc",
     "fr": "Fran\u00e7ais"
+  },
+  "settings": {
+    "toggleDarkMode": "Toggle dark mode",
+    "increaseFont": "Increase font size",
+    "decreaseFont": "Decrease font size",
+    "resetFont": "Reset font size",
+    "keyboardShortcuts": "Keyboard Shortcuts",
+    "shortcutNextChapter": "Next chapter",
+    "shortcutPrevChapter": "Previous chapter",
+    "shortcutParent": "Go to parent",
+    "shortcutSearch": "Focus search",
+    "shortcutDarkMode": "Toggle dark mode",
+    "shortcutHelp": "Show shortcuts",
+    "shortcutClose": "Close / unfocus",
+    "pressEscToClose": "Press Esc to close"
   }
 }

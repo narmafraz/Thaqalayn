@@ -1,12 +1,13 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Book, getChapter, Narrator } from '@app/models';
-import { I18nService, SeoService } from '@app/services';
+import { I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
 import { Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
+import { ThemeMode } from '@app/services/theme.service';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,6 +36,9 @@ export class AppComponent implements OnInit, OnDestroy {
   ];
 
   currentLang$: Observable<string>;
+  theme$: Observable<ThemeMode>;
+  fontSize$: Observable<number>;
+  helpVisible$: Observable<boolean>;
 
   private static readonly STATIC_TITLES: Record<string, string> = {
     '/about': 'About',
@@ -48,8 +52,13 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private store: Store,
     private i18n: I18nService,
+    private themeService: ThemeService,
+    private keyboard: KeyboardShortcutService,
   ) {
     this.currentLang$ = this.i18n.currentLang$;
+    this.theme$ = this.themeService.theme$;
+    this.fontSize$ = this.themeService.fontSize$;
+    this.helpVisible$ = this.keyboard.helpVisible$;
   }
 
   onLanguageChange(lang: string): void {
@@ -59,6 +68,26 @@ export class AppComponent implements OnInit, OnDestroy {
       queryParams: { lang },
       queryParamsHandling: 'merge',
     });
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+
+  increaseFontSize(): void {
+    this.themeService.increaseFontSize();
+  }
+
+  decreaseFontSize(): void {
+    this.themeService.decreaseFontSize();
+  }
+
+  resetFontSize(): void {
+    this.themeService.resetFontSize();
+  }
+
+  dismissHelp(): void {
+    this.keyboard.dismissHelp();
   }
 
   ngOnInit(): void {

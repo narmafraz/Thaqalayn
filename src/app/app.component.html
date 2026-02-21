@@ -4,6 +4,17 @@
       <div class="bannerTop" routerLink="/">
         <img height="70%" src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
         <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
+
+        <div class="font-controls" (click)="$event.stopPropagation()" *ngIf="fontSize$ | async as fontSize">
+          <button (click)="decreaseFontSize()" [attr.aria-label]="'settings.decreaseFont' | translate" [disabled]="fontSize <= 75">A-</button>
+          <button (click)="resetFontSize()" [attr.aria-label]="'settings.resetFont' | translate">A</button>
+          <button (click)="increaseFontSize()" [attr.aria-label]="'settings.increaseFont' | translate" [disabled]="fontSize >= 150">A+</button>
+        </div>
+
+        <button class="theme-toggle" (click)="toggleTheme(); $event.stopPropagation()" [attr.aria-label]="'settings.toggleDarkMode' | translate">
+          <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+
         <mat-select
           class="lang-picker"
           [value]="currentLang$ | async"
@@ -26,4 +37,21 @@
     <a routerLink="/support">{{ 'nav.support' | translate }}</a> |
     <a routerLink="/about">{{ 'nav.about' | translate }}</a>
   </footer>
+</div>
+
+<!-- Keyboard shortcuts help overlay -->
+<div class="keyboard-help-overlay" *ngIf="helpVisible$ | async" (click)="dismissHelp()">
+  <div class="keyboard-help-panel" (click)="$event.stopPropagation()">
+    <h3>{{ 'settings.keyboardShortcuts' | translate }}</h3>
+    <ul class="shortcut-list">
+      <li><span>{{ 'settings.shortcutNextChapter' | translate }}</span> <kbd>j</kbd></li>
+      <li><span>{{ 'settings.shortcutPrevChapter' | translate }}</span> <kbd>k</kbd></li>
+      <li><span>{{ 'settings.shortcutParent' | translate }}</span> <kbd>u</kbd></li>
+      <li><span>{{ 'settings.shortcutSearch' | translate }}</span> <kbd>/</kbd></li>
+      <li><span>{{ 'settings.shortcutDarkMode' | translate }}</span> <kbd>d</kbd></li>
+      <li><span>{{ 'settings.shortcutHelp' | translate }}</span> <kbd>?</kbd></li>
+      <li><span>{{ 'settings.shortcutClose' | translate }}</span> <kbd>Esc</kbd></li>
+    </ul>
+    <div class="keyboard-help-dismiss">{{ 'settings.pressEscToClose' | translate }}</div>
+  </div>
 </div>

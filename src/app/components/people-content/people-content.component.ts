@@ -25,7 +25,7 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
 
   private store = inject(Store);
 
-  versePathsDataSource: MatTableDataSource<any> = new MatTableDataSource();
+  versePathsDataSource: MatTableDataSource<{ path: string }> = new MatTableDataSource();
   subchainsDataSource: MatTableDataSource<KeyValue<string, ChainVerses>> = new MatTableDataSource();
   displayedColumnsPaths = ['path'];
   displayedColumnsSubchains = ['subchain'];
@@ -56,7 +56,7 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
       debounceTime(300),
       distinctUntilChanged()
     ).subscribe(filterValue => {
-      this.subchainsDataSource.filterPredicate = (data: any, filter: string) => {
+      this.subchainsDataSource.filterPredicate = (data: KeyValue<string, ChainVerses>, filter: string) => {
         if (!filter) return true;
 
         // Normalize Arabic text for better matching
@@ -130,7 +130,7 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter(event: Event, _dataSource: MatTableDataSource<any>) {
+  applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value.trim();
     this.filterSubject.next(filterValue);
   }
@@ -156,7 +156,7 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
     this.displayedSubchains = [...this.displayedSubchains, ...nextBatch];
   }
 
-  sortBy(lst: any[]) {
+  sortBy(lst: string[]) {
     return [...lst].sort((a, b) => (a > b ? 1 : a === b ? 0 : -1));
   }
 

@@ -1,14 +1,17 @@
 <ng-container *ngIf="(book$ | async) as book">
   <div class="verse-detail-container">
 
-    <!-- Chapter context link -->
-    <div class="chapter-context">
-      <a [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
-         queryParamsHandling="preserve"
-         class="chapter-link">
-        <mat-icon>arrow_upward</mat-icon>
-        <span *ngIf="book.data.chapter_title?.en">{{ book.data.chapter_title.en }}</span>
-      </a>
+    <!-- Chapter context link and translation selector -->
+    <div class="verse-detail-header">
+      <div class="chapter-context">
+        <a [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
+           queryParamsHandling="preserve"
+           class="chapter-link">
+          <mat-icon>arrow_upward</mat-icon>
+          <span *ngIf="book.data.chapter_title?.en">{{ book.data.chapter_title.en }}</span>
+        </a>
+      </div>
+      <app-translation-selection></app-translation-selection>
     </div>
 
     <!-- Main hadith card -->

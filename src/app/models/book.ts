@@ -103,7 +103,14 @@ export interface VerseDetail {
 export type Book = ChapterList | ChapterContent | VerseContent | VerseDetail;
 
 export function getVerseTranslations(book: Book): string[] {
-  return book && book.data && (book.kind === 'chapter_list' || book.kind === 'verse_list') && book.data.verse_translations;
+  if (!book || !book.data) return undefined;
+  if (book.kind === 'chapter_list' || book.kind === 'verse_list') {
+    return book.data.verse_translations;
+  }
+  if (book.kind === 'verse_detail' && book.data.verse && book.data.verse.translations) {
+    return Object.keys(book.data.verse.translations);
+  }
+  return undefined;
 }
 
 export function getChapter(book: Book): Chapter {

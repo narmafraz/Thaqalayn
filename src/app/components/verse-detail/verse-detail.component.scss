@@ -4,9 +4,16 @@
   padding: 16px;
 }
 
-.chapter-context {
+.verse-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
+.chapter-context {
   .chapter-link {
     display: inline-flex;
     align-items: center;

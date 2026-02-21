@@ -52,3 +52,7 @@ Thumbs.db
 # Angular
 .angular/
 .aider*
+
+# Playwright
+/test-results/
+/playwright-report/

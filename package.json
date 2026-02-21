@@ -7,7 +7,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "npx playwright test",
+    "e2e:headed": "npx playwright test --headed"
   },
   "private": true,
   "dependencies": {
@@ -34,7 +35,9 @@
     "@angular/cli": "~18.2.21",
     "@angular/compiler-cli": "~18.2.14",
     "@angular/language-service": "~18.2.14",
+    "@axe-core/playwright": "^4.11.1",
     "@ngxs/schematics": "0.0.1-alpha.5",
+    "@playwright/test": "^1.58.2",
     "@types/jasmine": "~5.1.4",
     "@types/jasminewd2": "~2.0.13",
     "@types/node": "^20.14.7",

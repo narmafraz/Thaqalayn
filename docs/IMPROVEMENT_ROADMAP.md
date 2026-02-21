@@ -1,8 +1,41 @@
 # Thaqalayn Ecosystem: Comprehensive Improvement Roadmap
 
-> **Date:** 2026-02-15
+> **Date:** 2026-02-21 (updated)
 > **Scope:** ThaqalaynDataGenerator (Python) | ThaqalaynData (JSON API) | Thaqalayn (Angular 18 UI)
 > **Primary Goal:** Serve all 4 major Shia hadith books with multi-language translations, accessible to users and developers
+
+---
+
+## Current Sprint: Foundation Work (February 2026)
+
+**Team assignments and immediate priorities:**
+
+### UIdev -- Frontend Stabilization
+1. Migrate TSLint to ESLint (`ng add @angular-eslint/schematics`, remove tslint + codelyzer)
+2. Remove Protractor, add Playwright for E2E (already available as MCP tool)
+3. Fix broken unit tests (books.state.spec.ts, router.state.spec.ts, app.component.spec.ts)
+4. Add HTTP error handling (ErrorInterceptor, loading/error states in NGXS stores)
+5. Audit and fix any npm audit vulnerabilities
+
+### DataGen -- Generator Improvements
+1. Data optimization: remove `narrator_chain.text` from output (30 MB savings, 1-line change)
+2. Data optimization: replace `getCombinations()` with full-chains + pairs only (60 MB savings)
+3. Refactor global error accumulation into `ProcessingReport` class
+4. Add type hints to all public functions
+5. Run and fix any failing tests
+
+### DataGatherer -- Source Data Research
+1. Survey existing raw data in `ThaqalaynDataGenerator/app/raw/`
+2. Identify which of the remaining 3 Four Books have accessible source data
+3. Research HubeAli.com, Al-Islam.org, Noor Digital Library for Man La Yahduruhu al-Faqih
+4. Document findings and source quality/format for each book
+5. Begin trial scraping of highest-priority available source
+
+### Architect -- Documentation & Planning
+1. Update ARCHITECTURE.md with technology assessment (done)
+2. Validate that current tech choices remain appropriate (done)
+3. Create prioritized work plan for the team (done -- this section)
+4. Monitor team progress and unblock issues
 
 ---
 

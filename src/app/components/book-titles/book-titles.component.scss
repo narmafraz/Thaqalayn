@@ -1,11 +1,15 @@
 .description {
-	background-color: rgba(255, 255, 255, 0.5);
+	background-color: var(--card-bg, rgba(255, 255, 255, 0.5));
+}
+
+:host-context(body.dark-theme) .description {
+  background-color: var(--card-bg);
 }
 
 .content {
   display: flex;
 	border-radius: 5px;
-	color: #666;
+	color: var(--text-secondary, #666);
 	margin-top: 15px;
   padding: 10px;
   flex-direction: column;

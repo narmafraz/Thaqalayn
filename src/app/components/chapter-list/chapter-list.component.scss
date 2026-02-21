@@ -1,7 +1,7 @@
 .content {
   display: flex;
 	border-radius: 5px;
-	color: #666;
+	color: var(--text-secondary, #666);
   flex-direction: column;
   margin-top: 15px;
   padding: 10px;
@@ -34,11 +34,19 @@
 }
 
 .mat-mdc-row:nth-child(even) {
-  background-color:rgba(255, 255, 255, 0.6);
+  background-color: var(--table-stripe, rgba(255, 255, 255, 0.6));
 }
 
 .mat-mdc-row:nth-child(odd) {
-  background-color:rgba(255, 255, 255, 0.4);
+  background-color: var(--table-stripe, rgba(255, 255, 255, 0.4));
+}
+
+:host-context(body.dark-theme) .mat-mdc-row:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+:host-context(body.dark-theme) .mat-mdc-row:nth-child(odd) {
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 // Not working! TODO fix

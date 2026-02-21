@@ -1,7 +1,7 @@
 .content {
   display: flex;
   border-radius: 5px;
-  color: #666;
+  color: var(--text-secondary, #666);
   margin-top: 15px;
   padding: 10px;
   flex-direction: column;
@@ -10,7 +10,7 @@
 section {
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
 
   &:last-child {
     border-bottom: none;
@@ -29,7 +29,7 @@ section {
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color, #e0e0e0);
   border-radius: 8px;
 }
 
@@ -46,7 +46,7 @@ section {
   }
 
   mat-icon {
-    color: #673ab7;
+    color: var(--link-color, #673ab7);
     flex-shrink: 0;
   }
 }
@@ -58,7 +58,7 @@ section {
 
 .progress-title {
   font-size: 12px;
-  color: #999;
+  color: var(--text-muted, #999);
 }
 
 .bookmark-title {
@@ -68,20 +68,20 @@ section {
 
 .bookmark-arabic {
   font-size: 16px;
-  color: #333;
+  color: var(--text-primary, #333);
   font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
 }
 
 .bookmark-path {
   font-size: 11px;
-  color: #999;
+  color: var(--text-muted, #999);
   font-family: monospace;
 }
 
 .empty-state {
   text-align: center;
   padding: 32px;
-  color: #999;
+  color: var(--text-muted, #999);
 }
 
 .empty-icon {

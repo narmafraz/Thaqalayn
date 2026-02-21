@@ -18,10 +18,18 @@
 
 .install-banner {
   background-color: #e8eaf6;
-  color: #333;
+  color: var(--text-primary, #333);
 }
 
 .update-banner {
   background-color: #fff3e0;
-  color: #333;
+  color: var(--text-primary, #333);
+}
+
+:host-context(body.dark-theme) .install-banner {
+  background-color: #1a2040;
+}
+
+:host-context(body.dark-theme) .update-banner {
+  background-color: #2a2010;
 }

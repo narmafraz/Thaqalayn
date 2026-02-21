@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Translation Switching', () => {
   test('should display translation selector on chapter pages', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Translation selection component should be visible
@@ -11,7 +11,7 @@ test.describe('Translation Switching', () => {
   });
 
   test('should show available translations in dropdown', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click the translation dropdown to open it
@@ -31,7 +31,7 @@ test.describe('Translation Switching', () => {
   });
 
   test('should change displayed translation when switching', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Get current translation text
@@ -62,7 +62,7 @@ test.describe('Translation Switching', () => {
   });
 
   test('should preserve translation selection via query params', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Open translation dropdown and select a specific option

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Cross-References', () => {
   test('should display Mentions section on Al-Kafi chapters with Quran references', async ({ page }) => {
     // al-kafi:1:2:1 is known to have a verse that mentions Quran 9:122
-    await page.goto('/#/books/al-kafi:1:2:1?lang=en');
+    await page.goto('/books/al-kafi:1:2:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Wait for content to load
@@ -20,7 +20,7 @@ test.describe('Cross-References', () => {
   });
 
   test('should have clickable cross-reference links to other books', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:2:1?lang=en');
+    await page.goto('/books/al-kafi:1:2:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const cards = page.locator('mat-card');
@@ -33,7 +33,7 @@ test.describe('Cross-References', () => {
   });
 
   test('should navigate when clicking a cross-reference link', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:2:1?lang=en');
+    await page.goto('/books/al-kafi:1:2:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const cards = page.locator('mat-card');
@@ -56,7 +56,7 @@ test.describe('Cross-References', () => {
 
   test('should display Mentioned In section on Quran verses referenced by Al-Kafi', async ({ page }) => {
     // Quran surah 1 (Al-Fatiha) verse 1 has a "Mentioned In" reference to Al-Kafi
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const cards = page.locator('mat-card');

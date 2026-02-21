@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Prev/Next Navigation', () => {
   test('should show navigation buttons on chapter pages', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Settings bar with navigation buttons should be visible
@@ -15,7 +15,7 @@ test.describe('Prev/Next Navigation', () => {
   });
 
   test('should navigate to next surah with next button', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click the next navigation button (navigate_next icon)
@@ -34,7 +34,7 @@ test.describe('Prev/Next Navigation', () => {
   });
 
   test('should navigate to previous surah with prev button', async ({ page }) => {
-    await page.goto('/#/books/quran:2?lang=en');
+    await page.goto('/books/quran:2?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click the previous navigation button
@@ -50,7 +50,7 @@ test.describe('Prev/Next Navigation', () => {
   });
 
   test('should navigate up to parent with up button', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click the up navigation button
@@ -67,7 +67,7 @@ test.describe('Prev/Next Navigation', () => {
 
   test('should not show prev button on first chapter', async ({ page }) => {
     // First surah should not have a prev button
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const prevButton = page.locator('a[aria-label="Navigate to the previous chapter"]').first();
@@ -77,7 +77,7 @@ test.describe('Prev/Next Navigation', () => {
 
   test('Al-Kafi prev/next navigation', async ({ page }) => {
     // Use al-kafi:1:2:1 which is known to have nav buttons
-    await page.goto('/#/books/al-kafi:1:2:1?lang=en');
+    await page.goto('/books/al-kafi:1:2:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Wait for content to render

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Book Navigation', () => {
   test('should navigate from homepage into Al-Kafi volumes', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click on Al-Kafi row in the book list table
@@ -27,7 +27,7 @@ test.describe('Book Navigation', () => {
 
   test('should drill down Al-Kafi: Volume -> Book -> Chapter', async ({ page }) => {
     // Start at Al-Kafi volumes
-    await page.goto('/#/books/al-kafi?lang=en');
+    await page.goto('/books/al-kafi?lang=en');
     await page.waitForLoadState('networkidle');
 
     const table = page.locator('table.full-width-table');
@@ -53,7 +53,7 @@ test.describe('Book Navigation', () => {
   });
 
   test('should navigate into Quran surahs', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click on Quran row

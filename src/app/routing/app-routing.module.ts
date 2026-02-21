@@ -27,7 +27,7 @@ const routes: Routes = [
 ];
 
 const routerConfig: ExtraOptions = {
-    useHash: true,
+    useHash: false,
     scrollPositionRestoration: 'enabled',
     anchorScrolling: 'enabled',
     onSameUrlNavigation: 'reload'

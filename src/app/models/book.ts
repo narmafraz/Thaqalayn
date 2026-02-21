@@ -82,13 +82,13 @@ export interface VerseContent {
 export type Book = ChapterList | ChapterContent | VerseContent;
 
 export function getVerseTranslations(book: Book): string[] {
-  return book.data && book.kind !== 'verse_content' && book.data.verse_translations;
+  return book && book.data && book.kind !== 'verse_content' && book.data.verse_translations;
 }
 
 export function getChapter(book: Book): Chapter {
-  return book.data && book.kind !== 'verse_content' && book.data;
+  return book && book.data && book.kind !== 'verse_content' && book.data;
 }
 
 export function getDefaultVerseTranslationIds(book: Book): Record<string, string> {
-  return book.data && book.kind !== 'verse_content' && book.data.default_verse_translation_ids;
+  return book && book.data && book.kind !== 'verse_content' && book.data.default_verse_translation_ids;
 }

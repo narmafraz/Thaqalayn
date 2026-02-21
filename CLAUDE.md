@@ -23,13 +23,28 @@ ng build --configuration=production  # Production build
 
 ### Testing
 ```bash
-ng test                  # Run unit tests via Karma
-ng e2e                   # Run end-to-end tests via Protractor
+# Unit tests (Karma/Jasmine) — 19 specs across 15 files
+# On Windows without Chrome installed, set CHROME_BIN to Brave:
+CHROME_BIN="/c/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe" npx ng test --watch=false --browsers=ChromeHeadless
+
+# E2E tests (Playwright) — 78 tests across 12 spec files
+# IMPORTANT: Must run from within the Thaqalayn directory, not from root
+npx playwright test                    # Run all E2E tests (headless)
+npx playwright test --headed           # Run with visible browser
+npx playwright test --list             # List all tests without running
+npx playwright test accessibility      # Run only accessibility tests
+npx playwright test --reporter=html    # Generate HTML report
 ```
+
+**Testing gotchas:**
+- `ng test` requires a Chromium-based browser. If Chrome is not installed, set `CHROME_BIN` to Brave or Edge.
+- Playwright tests target the **production** site (`https://thaqalayn.netlify.app/`) by default (see `playwright.config.ts`). To test locally, change `baseURL`.
+- Running `npx playwright test` from the root `scripture/` directory fails with "two different versions of @playwright/test" error. Always `cd` into `Thaqalayn/` first.
+- Playwright uses only Chromium by default (single project in config). Add Firefox/WebKit projects to `playwright.config.ts` for cross-browser testing.
 
 ### Linting
 ```bash
-ng lint                  # Run TSLint
+ng lint                  # Run ESLint (migrated from TSLint)
 ```
 
 ### Code Generation
@@ -118,6 +133,40 @@ The `npm start` script includes `NODE_OPTIONS=--openssl-legacy-provider` to supp
 1. Column headings alignment with hadith index/count numbers
 2. Heading tooltips needed
 3. Sub-chapters should be grouped in chapter-list component for better organization
+
+### Known Accessibility Issues (from QA_REPORT.md)
+These are tracked in the axe-core accessibility test suite (`e2e/tests/accessibility.spec.ts`) as `KNOWN_ISSUE_RULES_TO_SKIP`:
+- **H2** No semantic landmark roles (`<main>`, `<nav>`, `<header>`, `<footer>`) — `landmark-one-main`, `region`
+- **H3** No "Skip to content" link
+- **M1** Arabic text lacks `lang="ar"` attributes (screen readers mispronounce)
+- **M2** Logo image missing `alt` text — `image-alt`
+- **M3** Empty `<h2>` on homepage
+- **M4** 7 links without accessible names on Quran page — `link-name`
+- **M5** No `<h1>` heading on any page — `page-has-heading-one`
+- Narrator sort headers lack accessible names — `aria-command-name`
+
+As issues are fixed, remove the corresponding rule from `KNOWN_ISSUE_RULES_TO_SKIP` in `accessibility.spec.ts` so the test enforces the fix going forward.
+
+### E2E Test Structure
+Tests live in `e2e/tests/` and use Playwright with `@axe-core/playwright` for accessibility:
+```
+e2e/tests/
+├── accessibility.spec.ts        # 19 tests — axe-core WCAG 2.1 AA audits
+├── al-kafi-reading.spec.ts      # 6 tests — hadith display, narrator chains
+├── book-navigation.spec.ts      # 3 tests — navigate between books
+├── breadcrumbs.spec.ts          # 5 tests — breadcrumb rendering
+├── cross-references.spec.ts     # 4 tests — Quran/Kafi cross-references
+├── deep-linking.spec.ts         # 10 tests — direct URL access
+├── homepage.spec.ts             # 3 tests — homepage loading
+├── narrator-pages.spec.ts       # 8 tests — narrator list and detail
+├── no-console-errors.spec.ts    # 5 tests — no JS errors on pages
+├── prev-next-navigation.spec.ts # 6 tests — prev/next arrows
+├── quran-reading.spec.ts        # 5 tests — Quran verse display
+└── translation-switching.spec.ts# 4 tests — translation selector
+```
+
+### Routing Gotcha
+`/#/people/narrators` (without `/index`) redirects to the books page instead of showing the narrator list. Only `/#/people/narrators/index` works correctly. This is a known bug (L1 in QA report).
 
 ### Path Structure
 Book parts are identified by colon-separated indices (e.g., "1:2:3") which map to API paths like "books/1/2/3.json". The `BooksService.getPart()` method handles this conversion.

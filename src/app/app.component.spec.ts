@@ -3,13 +3,16 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { NgxsModule } from '@ngxs/store';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatSelectModule } from '@angular/material/select';
 import { AppComponent } from './app.component';
+import { TranslatePipe } from './pipes/translate.pipe';
 
 describe('AppComponent', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule, NgxsModule.forRoot([]), HttpClientTestingModule],
-      declarations: [AppComponent],
+      imports: [RouterTestingModule, NgxsModule.forRoot([]), HttpClientTestingModule, BrowserAnimationsModule, MatSelectModule],
+      declarations: [AppComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
   }));

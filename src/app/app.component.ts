@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Book, getChapter, Narrator } from '@app/models';
-import { SeoService } from '@app/services';
+import { I18nService, SeoService } from '@app/services';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -18,6 +18,15 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'Thaqalayn';
   private subscriptions: Subscription[] = [];
 
+  languages = [
+    { code: 'en', name: 'English' },
+    { code: 'ar', name: 'العربية' },
+    { code: 'fa', name: 'فارسی' },
+    { code: 'fr', name: 'Français' },
+  ];
+
+  currentLang$: Observable<string>;
+
   private static readonly STATIC_TITLES: Record<string, string> = {
     '/about': 'About',
     '/download': 'Download',
@@ -28,9 +37,22 @@ export class AppComponent implements OnInit, OnDestroy {
     private seo: SeoService,
     private router: Router,
     private store: Store,
-  ) {}
+    private i18n: I18nService,
+  ) {
+    this.currentLang$ = this.i18n.currentLang$;
+  }
+
+  onLanguageChange(lang: string): void {
+    this.i18n.setLanguage(lang);
+  }
 
   ngOnInit(): void {
+    this.subscriptions.push(
+      this.i18n.isRtl$.subscribe(isRtl => {
+        document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+      })
+    );
+
     // Handle legacy hash-based URLs (redirect #/books/quran:1 to /books/quran:1)
     if (window.location.hash.startsWith('#/')) {
       const newPath = window.location.hash.substring(1);

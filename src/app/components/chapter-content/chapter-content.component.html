@@ -26,9 +26,9 @@
               <mat-icon>open_in_new</mat-icon>
             </a>
           </div>
-          <div>Reference</div>
+          <div>{{ 'book.reference' | translate }}</div>
           <div>{{getBookName(crumbs)}} {{verse.index}}</div>
-          <div>In-book Reference</div>
+          <div>{{ 'book.inBookReference' | translate }}</div>
           <div>{{getInBookReference(crumbs, verse)}}</div>
           <div class="related">
             <ng-container *ngIf="verse.relations as relations">

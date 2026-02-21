@@ -34,6 +34,11 @@
   padding-left: 7%;
 }
 
+:host-context([dir="rtl"]) #header > * {
+  padding-left: 0;
+  padding-right: 7%;
+}
+
 .bannerTop {
   height: 70px;
   display: flex;
@@ -42,6 +47,15 @@
   font-size: 4rem;
   font-size: clamp(3rem, calc(5vw + 1rem), 4.5rem);
   text-transform: uppercase;
+  cursor: pointer;
+}
+
+.lang-picker {
+  margin-inline-start: auto;
+  width: 120px;
+  font-size: 14px;
+  text-transform: none;
+  color: #fff;
   cursor: pointer;
 }
 
@@ -61,6 +75,15 @@ a:hover { text-decoration: underline; }
   color: #fff;
   background-color: rgba(251, 250, 248, 0.2);
   padding: 3px 0px 5px 5px;
+}
+
+:host-context([dir="rtl"]) .crumbs {
+  padding: 3px 5px 5px 0px;
+}
+
+:host-context([dir="rtl"]) .skip-link {
+  left: auto;
+  right: 0;
 }
 
 .main {

@@ -5,17 +5,17 @@
 
   <!-- Narrated Ahadith Section -->
   <section class="narrated-section">
-    <h2>Narrated Ahadith</h2>
+    <h2>{{ 'narrator.narratedAhadith' | translate }}</h2>
 
     <div class="search-box">
       <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Search Ahadith</mat-label>
-        <input matInput (keyup)="applyFilter($event, versePathsDataSource)" placeholder="Search by path...">
+        <mat-label>{{ 'narrator.searchAhadith' | translate }}</mat-label>
+        <input matInput (keyup)="applyFilter($event, versePathsDataSource)" [placeholder]="'narrator.searchByPath' | translate">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
 
-    <button mat-button (click)="sortVersePathsByLength()">Sort by Length</button>
+    <button mat-button (click)="sortVersePathsByLength()">{{ 'narrator.sortByLength' | translate }}</button>
 
     <cdk-virtual-scroll-viewport #versePathsViewport itemSize="50" class="viewport">
       <mat-table [dataSource]="versePathsDataSource">
@@ -32,12 +32,12 @@
 
   <!-- Co-Narrators Section -->
   <section class="conarrators-section">
-    <h2>Co-Narrators</h2>
+    <h2>{{ 'narrator.coNarrators' | translate }}</h2>
 
     <div class="search-box">
       <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Search Co-Narrators</mat-label>
-        <input matInput (keyup)="applyFilter($event, subchainsDataSource)" placeholder="Search narrators...">
+        <mat-label>{{ 'narrator.searchCoNarrators' | translate }}</mat-label>
+        <input matInput (keyup)="applyFilter($event, subchainsDataSource)" [placeholder]="'narrator.searchNarratorsPlaceholder' | translate">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
     </div>
@@ -52,11 +52,11 @@
                   <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
                     {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}
                   </a>
-                  <span *ngIf="!isLast" class="arrow">⟵</span>
+                  <span *ngIf="!isLast" class="arrow">&#x27F5;</span>
                 </ng-container>
               </div>
               <div class="verse-count" *ngIf="element.value.verse_paths">
-                ({{element.value.verse_paths.length}} verses)
+                ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
               </div>
               <ol>
                 <li *ngFor="let path of element.value.verse_paths">
@@ -77,7 +77,7 @@
       [pageSize]="pageSize"
       [pageSizeOptions]="[10, 25, 50, 100]"
       (page)="loadNextPage()"
-      aria-label="Select page">
+      [attr.aria-label]="'common.selectPage' | translate">
     </mat-paginator>
   </section>
 </div>

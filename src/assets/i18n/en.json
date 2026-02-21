@@ -30,7 +30,10 @@
     "narratedAhadith": "Narrated Ahadith",
     "coNarrators": "Co-Narrators",
     "searchAhadith": "Search Ahadith",
+    "searchCoNarrators": "Search Co-Narrators",
     "searchNarrators": "Search narrators",
+    "searchByPath": "Search by path...",
+    "searchNarratorsPlaceholder": "Search narrators...",
     "sortByLength": "Sort by Length",
     "narrations": "Number of narrations",
     "narratedFrom": "Number of people narrated from",
@@ -54,7 +57,11 @@
     "count": "Count",
     "start": "Start",
     "end": "End",
-    "to": "to"
+    "to": "to",
+    "number": "#",
+    "verses": "verses",
+    "selectPage": "Select page",
+    "clear": "Clear"
   },
   "breadcrumb": {
     "home": "Home"

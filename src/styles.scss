@@ -96,3 +96,18 @@ h1.arabic, h2.arabic, .arabic {
     text-align: justify;
   }
 }
+
+/* RTL layout support */
+[dir="rtl"] .textrow {
+  flex-direction: row;
+}
+
+/* Language picker theming in header */
+.lang-picker.mat-mdc-select {
+  .mat-mdc-select-value {
+    color: #fff;
+  }
+  .mat-mdc-select-arrow {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}

@@ -92,6 +92,13 @@ The Thaqalayn production site is **functional and usable**. All key pages load, 
 - These appear to be timing/race conditions in the NGXS state management.
 - **Assigned to:** UIdev
 
+#### M7: Quran Breadcrumbs Missing (Data Bug)
+- All Quran pages (e.g., `/#/books/quran:1`) show only "Home" in breadcrumbs -- missing "Quran > Al-Fatiha" trail.
+- Al-Kafi breadcrumbs work correctly (full 5-level hierarchy).
+- **Root cause:** `index/books.en.json` and `index/books.ar.json` contain 2,368 Al-Kafi entries but **zero Quran entries**. The breadcrumb builder (`BooksState.getCurrentNavigatedCrumbs`) relies on this index. Confirmed by UIdev that frontend logic is correct.
+- **Fix:** DataGen must update index generation (`lib_index.py`) to include Quran paths.
+- **Assigned to:** DataGen
+
 ### LOW Severity
 
 #### L1: Narrator Route Without `/index` Redirects to Books Page
@@ -256,8 +263,11 @@ The following axe-core rules are skipped in tests (documented, not fixed yet):
 
 | Issue | Resolution | Commit |
 |-------|-----------|--------|
-| H1: NGXS race condition errors | Fixed null guards in selectors | `2da87fa` (UIdev) |
-| M6: Console errors on navigation | Fixed along with H1 | `2da87fa` (UIdev) |
+| H1: NGXS race condition errors | Fixed null guards in selectors | `2da87fa` (UIdev, local only -- not deployed) |
+| M6: Console errors on navigation | Fixed along with H1 | `2da87fa` (UIdev, local only -- not deployed) |
+| H2: No landmark roles | Added `<main>`, `<nav>`, `<header>`, skip link | UIdev (local, Task #44) |
+| H3: No skip navigation link | Added skip-to-content link | UIdev (local, Task #44) |
+| L3: Static page title | Added dynamic titles | UIdev (local, Task #45) |
 
 ### Phase 1 Definition of Done
 

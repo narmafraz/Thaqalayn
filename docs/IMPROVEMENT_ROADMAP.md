@@ -6,60 +6,76 @@
 
 ---
 
-## Current Sprint: Test Coverage First (February 2026)
+## Current Work: Phased Approach (February 2026)
 
-> **Principle:** Establish solid test coverage across all projects BEFORE making major changes or refactoring. Tests are the safety net that catches regressions when we later optimize data, upgrade Angular, or add new books.
+> **Principle:** Establish solid test coverage FIRST, then clean up, then add features. No major refactoring or optimization until tests are in place as a regression safety net.
 
-**Team assignments and immediate priorities:**
+### Phase 1: Test Coverage (NOW -- must complete before Phase 2)
 
-### UIdev -- E2E Tests for Frontend (PRIMARY FOCUS)
-Write Playwright end-to-end tests covering all key user flows. These tests run against the live Angular app + data server and verify that real users can navigate, read, and interact with the app.
+#### UIdev -- Fix Tests + E2E Tests
 
-**Critical E2E test scenarios:**
+**Step 1: Fix broken unit tests (BLOCKING -- prevents all other tests from running)**
+
+The Angular test suite has TypeScript compilation errors that prevent ANY tests from executing:
+- `books.state.spec.ts` -- imports non-existent `BooksAction`, uses wrong `items` state shape
+- `router.state.spec.ts` -- imports non-existent `RouterAction`, uses wrong state shape and `getState` selector
+- `app.component.spec.ts` -- expects old template content (`.content span` with "Thaqalayn app is running!")
+
+These must be fixed or deleted first so the rest of the test suite can run.
+
+**Step 2: E2E tests with Playwright**
+
+Write end-to-end tests covering all key user flows:
 1. Homepage loads and displays book list (Quran, Al-Kafi)
-2. Navigate to Quran surah (e.g., `/#/books/quran:1`) -- verify Arabic text, translation, verse count
-3. Navigate to Al-Kafi chapter (e.g., `/#/books/al-kafi:1:1:1`) -- verify hadith text, narrator chains
-4. Breadcrumb navigation -- verify crumbs display correctly and clicking navigates properly
+2. Navigate to Quran surah (`/#/books/quran:1`) -- verify Arabic text, translation, verse count
+3. Navigate to Al-Kafi chapter (`/#/books/al-kafi:1:1:1`) -- verify hadith text, narrator chains
+4. Breadcrumb navigation -- verify crumbs display and clicking navigates correctly
 5. Prev/Next chapter navigation -- verify buttons work and URL updates
 6. Language/translation switching -- verify dropdown changes displayed text
-7. Narrator page (e.g., `/#/people/narrators/1`) -- verify narrator name, hadith list, co-narrators
+7. Narrator page (`/#/people/narrators/1`) -- verify name, hadith list, co-narrators
 8. Narrator index page (`/#/people/narrators/index`) -- verify table loads and is searchable
-9. Deep linking -- navigate directly to a specific verse URL and verify content renders
+9. Deep linking -- navigate directly to a specific verse URL, verify content renders
 10. Cross-references -- verify "Mentions" / "Mentioned In" links resolve correctly
 
-**Also fix existing broken unit tests:**
-- `books.state.spec.ts` -- references non-existent `BooksAction` and wrong state shape
-- `router.state.spec.ts` -- references non-existent `RouterAction`
-- `app.component.spec.ts` -- expects old template content
+#### DataGen -- Fix Failing Tests + Data Validation Tests
 
-### DataGen -- Data Validation Tests (PRIMARY FOCUS)
-Write tests that validate the generated output in ThaqalaynData. These tests read the actual JSON files and verify schema compliance, content integrity, and cross-reference consistency.
+**Step 1: Fix any failing existing tests**
 
-**Critical data validation tests:**
-1. **Schema validation:** Every JSON file has `index`, `kind`, `data` wrapper. `kind` is one of `chapter_list`, `verse_list`, `person_content`, `person_list`
-2. **Content integrity:** All text fields are valid UTF-8, no escaped Unicode (`\u0627` vs actual Arabic chars), no empty/null text arrays
-3. **Verse counts:** `verse_count` in chapter_list files matches actual number of verses in child files
-4. **Cross-references:** All paths in `relations` fields resolve to existing JSON files
-5. **Narrator chain consistency:** Every `narrator_chain.parts` entry with `kind: "narrator"` has a valid `path` that resolves to an existing narrator file
-6. **Narrator index integrity:** All narrator IDs in `people/narrators/index.json` have corresponding detail files
-7. **Navigation links:** All `nav.prev`, `nav.next`, `nav.up` paths resolve to existing files
-8. **Path format:** All paths follow `/books/{book}:{segments}` or `/people/narrators/{id}` format
-9. **Quran completeness:** 114 surahs, 6236 total verses
-10. **Al-Kafi completeness:** 8 volumes, 15281 total hadiths
+Generator currently has 91 passing tests. Ensure no regressions and verify all tests pass cleanly.
 
-**Also improve existing unit test coverage:**
-- Add tests for `quran.py`, `kafi.py`, `kafi_sarwar.py` parsers
-- Add tests for `link_quran_kafi.py` cross-referencing
-- Snapshot tests comparing generated output against known-good samples
+**Step 2: Data validation tests against ThaqalaynData output**
 
-### DataGatherer -- Source Data Research (continues)
-1. Continue researching sources for missing books
-2. Document findings in task log
+New test files in `ThaqalaynDataGenerator/tests/`:
+- `test_data_schema.py` -- JSON wrapper format (`index`, `kind`, `data`), valid `kind` values, per-kind schema
+- `test_data_integrity.py` -- Quran completeness (114 surahs, 6236 verses), Al-Kafi completeness (8 volumes, 15281 hadiths), UTF-8 integrity, verse count consistency, narrator index coverage
+- `test_data_crossrefs.py` -- Narrator chain paths resolve, relation paths resolve, navigation links resolve, verse paths in narrator files resolve
 
-### Architect -- Coordination
-1. Update roadmap to reflect test-first priority (this update)
-2. Coordinate UIdev and DataGen on test scope
-3. Monitor progress and unblock issues
+**Step 3: Parser unit tests**
+
+Add tests for `quran.py`, `kafi.py`, `kafi_sarwar.py`, `link_quran_kafi.py`. Snapshot tests comparing generated output against known-good samples.
+
+### Phase 2: Cleanup & Modernization (AFTER Phase 1 tests exist)
+
+#### UIdev
+1. Migrate TSLint to ESLint (`ng add @angular-eslint/schematics`, remove tslint + codelyzer)
+2. Remove Protractor (e2e/ directory, protractor.conf.js, devDependency)
+3. Fix npm audit vulnerabilities
+4. Add HTTP error handling (ErrorInterceptor, loading/error states)
+
+#### DataGen
+1. Data optimization: remove `narrator_chain.text` (30 MB savings, 1-line change)
+2. Data optimization: replace `getCombinations()` with full-chains + pairs (60 MB savings)
+3. Refactor global error accumulation into `ProcessingReport` class
+
+### Phase 3: Features & Expansion (AFTER Phase 2)
+1. PWA support (`ng add @angular/pwa`)
+2. Search (Orama + static split indexes)
+3. New book parsers (Man La Yahduruhu al-Faqih first)
+4. Angular 19 upgrade + standalone components migration
+
+### DataGatherer -- Source Data Research (continues across all phases)
+1. Research sources for remaining 3 hadith books
+2. Document findings and begin trial scraping
 
 ---
 

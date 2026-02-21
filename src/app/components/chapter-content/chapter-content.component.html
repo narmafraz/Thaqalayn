@@ -14,9 +14,18 @@
       </mat-card-content>
       <mat-card-footer>
         <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
-          <div class="refLink"><a [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index" [attr.aria-label]="'Link to verse ' + verse.local_index">
+          <div class="refLink">
+            <a [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index" [attr.aria-label]="'Link to verse ' + verse.local_index">
               <mat-icon>link</mat-icon>
-            </a></div>
+            </a>
+            <a [routerLink]="['/books', book.index + ':' + verse.local_index]"
+               queryParamsHandling="preserve"
+               [attr.aria-label]="'View ' + verse.part_type + ' ' + verse.local_index + ' details'"
+               class="verse-detail-link"
+               matTooltip="View hadith details">
+              <mat-icon>open_in_new</mat-icon>
+            </a>
+          </div>
           <div>Reference</div>
           <div>{{getBookName(crumbs)}} {{verse.index}}</div>
           <div>In-book Reference</div>

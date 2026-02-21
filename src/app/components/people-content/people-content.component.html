@@ -1,6 +1,6 @@
 <div class="container" *ngIf="narrator$ | async as narrator">
   <div class="titles">
-    <h1 class="arabic">{{narrator.titles.ar}}</h1>
+    <h1 class="arabic" lang="ar">{{narrator.titles.ar}}</h1>
   </div>
 
   <!-- Narrated Ahadith Section -->
@@ -47,7 +47,7 @@
         <ng-container matColumnDef="subchain">
           <mat-cell *matCellDef="let element">
             <div class="subchain-container">
-              <div class="subchain-text arabic" dir="rtl">
+              <div class="subchain-text arabic" dir="rtl" lang="ar">
                 <ng-container *ngFor="let narrator_id of element.value.narrator_ids; let isLast = last">
                   <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
                     {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}

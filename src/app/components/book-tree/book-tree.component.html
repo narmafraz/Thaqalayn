@@ -38,7 +38,7 @@
          (click)="navigate(node); $event.preventDefault()">
         <span *ngIf="node.partType" class="part-type">{{ node.partType }}</span>
         <span *ngIf="node.titleEn" class="title-en" [innerHTML]="node.titleEn"></span>
-        <span *ngIf="node.titleAr" class="title-ar arabic" dir="rtl" [innerHTML]="node.titleAr"></span>
+        <span *ngIf="node.titleAr" class="title-ar arabic" dir="rtl" lang="ar" [innerHTML]="node.titleAr"></span>
       </a>
     </div>
 

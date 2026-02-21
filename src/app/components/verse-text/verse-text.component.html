@@ -1,5 +1,5 @@
 <div class="textrow">
-  <div>
+  <div lang="ar">
     <p class="verseText arabic" *ngIf="verse.narrator_chain">
       <ng-container *ngFor="let npart of verse.narrator_chain.parts" [ngSwitch]="npart.kind">
         <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve">{{npart.text}}</a>

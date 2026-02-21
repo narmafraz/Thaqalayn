@@ -79,16 +79,37 @@ export interface VerseContent {
   data: Verse;
 }
 
-export type Book = ChapterList | ChapterContent | VerseContent;
+export interface VerseDetailData {
+  verse: Verse;
+  chapter_path: string;
+  chapter_title: MultiLingualText;
+  nav: Navigation;
+  gradings?: Record<string, string>;
+  source_url?: string;
+  cross_validation?: {
+    status: string;
+    confidence: number;
+    sources: string[];
+  };
+  scholarly_notes?: string[];
+}
+
+export interface VerseDetail {
+  kind: 'verse_detail';
+  index: string;
+  data: VerseDetailData;
+}
+
+export type Book = ChapterList | ChapterContent | VerseContent | VerseDetail;
 
 export function getVerseTranslations(book: Book): string[] {
-  return book && book.data && book.kind !== 'verse_content' && book.data.verse_translations;
+  return book && book.data && (book.kind === 'chapter_list' || book.kind === 'verse_list') && book.data.verse_translations;
 }
 
 export function getChapter(book: Book): Chapter {
-  return book && book.data && book.kind !== 'verse_content' && book.data;
+  return book && book.data && (book.kind === 'chapter_list' || book.kind === 'verse_list') && book.data;
 }
 
 export function getDefaultVerseTranslationIds(book: Book): Record<string, string> {
-  return book && book.data && book.kind !== 'verse_content' && book.data.default_verse_translation_ids;
+  return book && book.data && (book.kind === 'chapter_list' || book.kind === 'verse_list') && book.data.default_verse_translation_ids;
 }

@@ -38,6 +38,24 @@ mat-mdc-card {
 .refLink {
   grid-row: 1 / span 2;
   align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .verse-detail-link {
+    color: #673ab7;
+    opacity: 0.6;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
 }
 
 .related {

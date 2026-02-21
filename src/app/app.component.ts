@@ -68,6 +68,20 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.store.select(BooksState.getCurrentNavigatedPart).subscribe((book: Book) => {
         if (!book) return;
+        if (book.kind === 'verse_detail') {
+          const d = book.data;
+          const translationText = d.verse.translations
+            ? Object.values(d.verse.translations)[0]?.[0]
+            : undefined;
+          this.seo.setVerseDetailPage(
+            book.index,
+            d.verse.local_index,
+            d.verse.part_type,
+            d.chapter_title?.en || '',
+            translationText
+          );
+          return;
+        }
         const chapter = getChapter(book);
         if (chapter && chapter.titles && chapter.titles.en) {
           this.seo.setBookPage(

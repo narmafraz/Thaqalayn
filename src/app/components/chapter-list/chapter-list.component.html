@@ -9,7 +9,7 @@
         <td mat-cell *matCellDef="let row" dir="rtl">
           <div class="textrow titlerow">
             <!-- <div>{{row.part_type}} {{row.local_index}}</div> -->
-            <div class="arabic" [innerHTML]="row.titles.ar"></div>
+            <div class="arabic" lang="ar" [innerHTML]="row.titles.ar"></div>
             <div [innerHTML]="row.titles.en"></div>
           </div>
         </td>
@@ -41,7 +41,7 @@
       <!-- Name Column -->
       <ng-container matColumnDef="name.ar">
         <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
-        <td mat-cell *matCellDef="let row" class="arabic" dir="rtl" [innerHTML]="row.titles.ar"></td>
+        <td mat-cell *matCellDef="let row" class="arabic" dir="rtl" lang="ar" [innerHTML]="row.titles.ar"></td>
       </ng-container>
 
       <!-- verse_start_index Column -->

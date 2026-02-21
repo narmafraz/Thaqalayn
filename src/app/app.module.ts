@@ -33,8 +33,10 @@ import { SupportComponent } from './components/support/support.component';
 import { TranslationSelectionComponent } from './components/translation-selection/translation-selection.component';
 import { VerseContentComponent } from './components/verse-content/verse-content.component';
 import { VerseTextComponent } from './components/verse-text/verse-text.component';
+import { VerseDetailComponent } from './components/verse-detail/verse-detail.component';
 import { BookTreeComponent } from './components/book-tree/book-tree.component';
 import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
+import { TranslatePipe } from './pipes/translate.pipe';
 
 @NgModule({
   declarations: [
@@ -47,6 +49,7 @@ import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
     BreadcrumbsComponent,
     VerseContentComponent,
     ExpandLanguagePipe,
+    TranslatePipe,
     VerseTextComponent,
     TranslationSelectionComponent,
     SupportComponent,
@@ -55,7 +58,8 @@ import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
     PeopleListComponent,
     PeopleContentComponent,
     PathLinkComponent,
-    BookTreeComponent
+    BookTreeComponent,
+    VerseDetailComponent
   ],
   bootstrap: [AppComponent],
   imports: [

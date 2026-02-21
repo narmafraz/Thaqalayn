@@ -104,6 +104,43 @@ export class SeoService {
     });
   }
 
+  setVerseDetailPage(
+    bookIndex: string,
+    verseIndex: number,
+    partType: string,
+    chapterTitle: string,
+    translationText?: string,
+  ): void {
+    const path = '/books/' + bookIndex;
+    const segments = bookIndex.split(':');
+    const bookSlug = segments[0];
+    const bookName = bookSlug === 'quran' ? 'Holy Quran' : bookSlug === 'al-kafi' ? 'Al-Kafi' : bookSlug;
+    const title = `${partType} ${verseIndex} - ${chapterTitle} - ${bookName}`;
+    const description = translationText
+      ? translationText.substring(0, 160) + (translationText.length > 160 ? '...' : '')
+      : `Read ${partType} ${verseIndex} from ${chapterTitle} in ${bookName} with translations on Thaqalayn.`;
+
+    this.setPageMeta({
+      title,
+      description,
+      url: BASE_URL + path,
+      type: 'article',
+      jsonLd: {
+        '@context': 'https://schema.org',
+        '@type': 'CreativeWork',
+        name: title,
+        url: BASE_URL + path,
+        description,
+        inLanguage: ['ar', 'en'],
+        isPartOf: {
+          '@type': 'Book',
+          name: bookName,
+          url: BASE_URL + '/books/' + bookSlug,
+        },
+      },
+    });
+  }
+
   setNarratorListPage(): void {
     this.setPageMeta({
       title: 'Narrators',

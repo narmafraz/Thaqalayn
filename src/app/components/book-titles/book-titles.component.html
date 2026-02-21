@@ -1,11 +1,11 @@
 <div *ngIf="titles || verse" class="content description mat-elevation-z2">
   <div class="textrow titlerow" *ngIf="titles" [ngSwitch]="headingLevel">
     <ng-container *ngSwitchCase="1">
-      <h1 *ngIf="titles.ar" class="arabic" [innerHTML]="titles.ar"></h1>
+      <h1 *ngIf="titles.ar" class="arabic" lang="ar" [innerHTML]="titles.ar"></h1>
       <h1 *ngIf="titles.en" [innerHTML]="titles.en"></h1>
     </ng-container>
     <ng-container *ngSwitchCase="2">
-      <h2 *ngIf="titles.ar" class="arabic" [innerHTML]="titles.ar"></h2>
+      <h2 *ngIf="titles.ar" class="arabic" lang="ar" [innerHTML]="titles.ar"></h2>
       <h2 *ngIf="titles.en" [innerHTML]="titles.en"></h2>
     </ng-container>
   </div>

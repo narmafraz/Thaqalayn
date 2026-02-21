@@ -1,0 +1,117 @@
+<ng-container *ngIf="(book$ | async) as book">
+  <div class="verse-detail-container">
+
+    <!-- Chapter context link -->
+    <div class="chapter-context">
+      <a [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
+         queryParamsHandling="preserve"
+         class="chapter-link">
+        <mat-icon>arrow_upward</mat-icon>
+        <span *ngIf="book.data.chapter_title?.en">{{ book.data.chapter_title.en }}</span>
+      </a>
+    </div>
+
+    <!-- Main hadith card -->
+    <mat-card appearance="outlined" class="hadith-card">
+      <mat-card-header>
+        <mat-card-title>
+          <span class="hadith-title">{{ book.data.verse.part_type }} {{ book.data.verse.local_index }}</span>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <!-- Arabic text -->
+        <div class="arabic-section" lang="ar">
+          <p *ngIf="book.data.verse.narrator_chain" class="narrator-chain arabic" dir="rtl">
+            <ng-container *ngFor="let npart of book.data.verse.narrator_chain.parts" [ngSwitch]="npart.kind">
+              <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve" class="narrator-link">{{npart.text}}</a>
+              <ng-container *ngSwitchDefault>{{npart.text}}</ng-container>
+            </ng-container>
+          </p>
+          <p *ngFor="let txt of book.data.verse.text" class="verse-arabic arabic" dir="rtl" [innerHTML]="txt"></p>
+        </div>
+
+        <!-- Translation -->
+        <div class="translation-section" *ngIf="book.data.verse.translations as translations">
+          <p *ngFor="let trt of translations[(translation$ | async)]"
+             [class]="'verse-translation ' + (translationClass$ | async)"
+             [innerHTML]="trt"></p>
+        </div>
+
+        <!-- Gradings -->
+        <div class="gradings-section" *ngIf="book.data.gradings">
+          <h3>Grading</h3>
+          <div class="grading-badges">
+            <span *ngFor="let grading of book.data.gradings | keyvalue"
+                  [class]="'grading-badge ' + getGradingClass(grading.value)"
+                  [matTooltip]="grading.key">
+              {{ grading.value }}
+              <span class="grading-scholar">({{ grading.key }})</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Relations / Cross-references -->
+        <div class="relations-section" *ngIf="book.data.verse.relations as relations">
+          <ng-container *ngFor="let relation of relations | keyvalue">
+            <div class="relation-group" *ngIf="relation.value?.length">
+              <h3>{{ relation.key }}</h3>
+              <div class="relation-links">
+                <app-path-link *ngFor="let rLink of relation.value" [path]="rLink" class="relation-link"></app-path-link>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Cross-validation -->
+        <div class="validation-section" *ngIf="book.data.cross_validation as cv">
+          <div class="validation-badge" [class.verified]="cv.status === 'verified'" [class.unverified]="cv.status !== 'verified'">
+            <mat-icon>{{ cv.status === 'verified' ? 'verified' : 'help_outline' }}</mat-icon>
+            <span *ngIf="cv.status === 'verified'">Verified from {{ cv.sources.length }} source{{ cv.sources.length > 1 ? 's' : '' }}</span>
+            <span *ngIf="cv.status !== 'verified'">Unverified</span>
+          </div>
+        </div>
+
+        <!-- Source URL -->
+        <div class="source-section" *ngIf="book.data.source_url">
+          <a [href]="book.data.source_url" target="_blank" rel="noopener noreferrer" class="source-link">
+            <mat-icon>open_in_new</mat-icon> View original source
+          </a>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button (click)="shareHadith(book.index)" class="share-btn">
+          <mat-icon>share</mat-icon>
+          <span>{{ linkCopied ? 'Link copied!' : 'Share' }}</span>
+        </button>
+        <a mat-button
+           [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
+           [fragment]="'h' + book.data.verse.local_index"
+           queryParamsHandling="preserve">
+          <mat-icon>menu_book</mat-icon>
+          View in chapter context
+        </a>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Prev/Next Navigation -->
+    <nav class="hadith-nav" aria-label="Hadith navigation">
+      <a *ngIf="book.data.nav.prev"
+         [routerLink]="['/books', getNavRouterLink(book.data.nav.prev)]"
+         queryParamsHandling="preserve"
+         class="nav-prev"
+         mat-button>
+        <mat-icon>chevron_left</mat-icon> Previous
+      </a>
+      <span *ngIf="!book.data.nav.prev"></span>
+      <a *ngIf="book.data.nav.next"
+         [routerLink]="['/books', getNavRouterLink(book.data.nav.next)]"
+         queryParamsHandling="preserve"
+         class="nav-next"
+         mat-button>
+        Next <mat-icon>chevron_right</mat-icon>
+      </a>
+    </nav>
+  </div>
+</ng-container>

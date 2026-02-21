@@ -176,3 +176,137 @@ Tracks architectural and implementation decisions made during development, inclu
 **Moving to Phase 4** with 4 agents: frontend-search, frontend-ux, data-engineer, qa-engineer
 
 ---
+
+## Phase 4 Decisions
+
+### D009: Search Engine — Orama vs Lunr.js vs Algolia (2026-02-21)
+
+**Context:** Full-text search across ~7,000+ hadith/verse titles and content.
+
+**Options considered:**
+1. **Algolia** — SaaS, excellent UX, free tier limited to 10k records. Requires API key and ongoing account.
+2. **Lunr.js** — Client-side, popular, but no active maintenance and limited non-Latin support.
+3. **Orama** — Client-side, actively maintained, built-in stemming for multiple languages, supports persistence.
+4. **MiniSearch** — Client-side, lightweight, good API but less mature Arabic support.
+
+**Decision:** Option 3 — Orama (`@orama/orama@^3.1.18`).
+
+**Rationale:**
+- Zero ongoing costs (client-side, aligns with project constraint)
+- Arabic normalization built-in (diacritics stripping, alif/ta marbuta normalization)
+- Supports persisted indexes (pre-built at data generation time)
+- Active maintenance with good TypeScript support
+- Free for any usage level
+
+---
+
+### D010: Bookmarks Storage — Dexie.js/IndexedDB vs localStorage (2026-02-21)
+
+**Context:** Bookmarks and reading progress need persistent storage.
+
+**Options considered:**
+1. **localStorage** — Simple, synchronous, 5MB limit, no querying.
+2. **Dexie.js (IndexedDB wrapper)** — Async, large storage, structured queries, table schema.
+3. **Raw IndexedDB** — No dependency but verbose API.
+4. **Firebase** — Cross-device sync but adds dependency and cost.
+
+**Decision:** Option 2 — Dexie.js (`dexie@^4.3.0`).
+
+**Rationale:**
+- IndexedDB supports large datasets without the 5MB localStorage limit
+- Dexie.js provides a clean Promise-based API with table definitions
+- Supports export/import for user data portability
+- No backend dependency (works offline, aligns with zero-cost constraint)
+- Firebase can be added later as opt-in cross-device sync (Phase 6)
+
+---
+
+### D011: Audio Recitation Source — EveryAyah.com (2026-02-21)
+
+**Context:** Need Quran audio recitation from a free, reliable CDN source.
+
+**Options considered:**
+1. **EveryAyah.com** — Free CDN, 100+ reciters, individual ayah MP3s, no API key needed.
+2. **Quran.com API** — Official, but requires API key and has rate limits.
+3. **Self-hosted** — Full control but massive storage (10+ GB) and bandwidth costs.
+
+**Decision:** Option 1 — EveryAyah.com with 4 pre-configured reciters.
+
+**Rationale:**
+- Zero cost, no API key required
+- Direct MP3 URLs (`https://everyayah.com/data/{subfolder}/{surah3}{ayah3}.mp3`)
+- Wide reciter selection (Husary, Minshawi, Abdul Basit, Alafasy initially)
+- Well-established service used by many Quran apps
+- User can select reciter; more can be added easily
+
+---
+
+### D012: PWA Strategy — Service Worker + Manual Offline Downloads (2026-02-21)
+
+**Context:** Making the app work offline for users in areas with poor connectivity.
+
+**Decision:** Dual approach:
+1. **Angular Service Worker** (`@angular/service-worker`) for automatic caching of app shell, assets, and recently visited API data
+2. **Manual download manager** using IndexedDB (via OfflineStorageService) for bulk downloading Quran and Al-Kafi complete files
+
+**Rationale:**
+- Service worker handles app shell and incremental caching automatically
+- Complete book files (Quran: 47MB, Al-Kafi: 84MB) are too large for automatic caching — user must opt-in
+- Download progress tracking gives users confidence during large downloads
+- Combines best of both: automatic for small resources, manual for bulk data
+
+---
+
+### D013: Mobile Responsive Strategy — CSS Media Queries (2026-02-21)
+
+**Context:** Making the UI work well on mobile devices.
+
+**Decision:** CSS media queries at 600px and 414px breakpoints, plus targeted component adjustments.
+
+**Key changes:**
+- Header search bar hidden on mobile (< 600px) — search accessible via route
+- Language picker compacted (80px → 60px)
+- Footer stacks vertically
+- Breadcrumbs scroll horizontally
+- Verse reference grid collapses from 4-column to 2-column
+- Banner text scales with `clamp()` for smooth responsive sizing
+
+---
+
+## Phase 4 Completion Summary (2026-02-21)
+
+**Team composition:** 4 agents (frontend-search, frontend-ux, data-engineer, qa-engineer) + team-lead for remaining tasks
+
+**Completed tasks:**
+1. **Error Handling & Resilience:** HTTP interceptor, loading/error states in NGXS, RetryLoad actions, timeout(30s)/retry(2x) on services, ErrorDisplayComponent
+2. **Full-Text Search:** Python search index generator, Orama client-side search engine, SearchBarComponent (header dropdown), SearchResultsComponent (full page), Arabic normalization
+3. **PWA Offline Support:** ngsw-config.json, PwaService (install prompt + update detection), OfflineStorageService (IndexedDB bulk downloads), DownloadComponent enhanced
+4. **Bookmarks & Reading Progress:** Dexie.js BookmarkService, BookmarksComponent (Continue Reading + Saved + Export/Import), bookmark buttons on verse cards and detail pages
+5. **Audio Recitation:** AudioService with EveryAyah.com integration, 4 reciters, play/pause per ayah, audio buttons on Quran chapter cards
+6. **Social Sharing:** `navigator.share()` on mobile, clipboard fallback on desktop, ShareService in VerseDetailComponent
+7. **Responsive Design:** Mobile breakpoints (600px, 414px), clamp() banner sizing, collapsible grids, scrollable breadcrumbs
+8. **Browser Language Detection:** `navigator.languages` fallback in I18nService, 12 supported language codes
+
+**Known issues (non-blocking):**
+- i18n translations show raw keys briefly on first load (async HTTP fetch) — resolves after ~1-3 seconds
+- `manifest.webmanifest` returns 404 on Angular dev server (works in production with proper static file serving)
+- Search index (`search/titles.json`) not yet deployed to production data server
+- "In-book Reference" shows "undefined undefined" for some breadcrumb paths — pre-existing data issue with `indexed_titles`
+
+**Team evaluation:**
+- 4-agent team was slightly over-staffed for this phase
+- Agents completed error handling, search, PWA, and bookmarks autonomously
+- Team lead filled in audio, responsive design, and browser language detection
+- Session interruption (context overflow) required manual recovery and commit organization
+
+**Git commits:**
+- `fd8eede` — Error handling infrastructure
+- `c5cad15` — PWA offline support
+- `3b004a8` — Search index generation (ThaqalaynDataGenerator)
+- `66279d4` — Full-text search with Orama
+- `10e8bbb` — Bookmarks, reading progress, social sharing
+- `c2f31ca` — Audio recitation, responsive design, browser language detection
+
+**Moving to Phase 5** — Platform Expansion (Angular 19 upgrade, Four Books parsers, additional collections)
+
+---

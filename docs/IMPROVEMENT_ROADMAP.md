@@ -244,9 +244,11 @@ Before writing parsers, identify and acquire source data for each book.
 |--------|---------|
 | **Estimated Hadiths** | ~13,590 |
 | **Volumes** | 10 |
-| **Potential Sources** | HubeAli.com, Al-Islam.org, Shia Online Library |
-| **Translations** | Fewer English translations available |
-| **Parser Complexity** | High - largest of the four books, may have different HTML structure |
+| **Potential Sources** | **PDF only** -- almuntazar.ca (Arabic), Bab Ul Qaim vols 1-3 (English) |
+| **Translations** | English for vols 1-3 only (Bab Ul Qaim Publications) |
+| **Parser Complexity** | **Very High** -- PDF extraction required (Arabic OCR/text extraction, no narrator chains in structured form, manual chapter boundary verification) |
+
+> **Research finding (Feb 2026):** No structured HTML/JSON/XML source exists online for Tahdhib al-Ahkam. All available sources are PDF format. This significantly increases parser complexity and requires a PDF parsing pipeline (PyMuPDF or pdfplumber for text extraction, followed by heuristic chapter/hadith boundary detection). Arabic-only initially; English translation available only for first 3 of 10 volumes.
 
 #### 3.1.3 al-Istibsar (by Shaikh Tusi)
 
@@ -254,9 +256,11 @@ Before writing parsers, identify and acquire source data for each book.
 |--------|---------|
 | **Estimated Hadiths** | ~5,511 |
 | **Volumes** | 4 |
-| **Potential Sources** | Same as Tahdhib (often published together) |
-| **Translations** | Very limited English translations |
-| **Parser Complexity** | Medium - shares structure patterns with Tahdhib |
+| **Potential Sources** | **PDF only** -- almuntazar.ca (Arabic), same publisher as Tahdhib |
+| **Translations** | **None available** -- Bab Ul Qaim lists 4 vols as "COMING SOON" |
+| **Parser Complexity** | **Very High** -- Same PDF extraction challenges as Tahdhib |
+
+> **Research finding (Feb 2026):** Like Tahdhib, no structured data source exists. Arabic PDF only, no English translation available. Often published alongside Tahdhib (both by Shaikh Tusi), so the same PDF parsing pipeline would serve both. Recommend deferring to a dedicated "PDF parsing pipeline" effort rather than treating as a standard parser task.
 
 ### 3.2 ThaqalaynDataGenerator - New Parsers
 

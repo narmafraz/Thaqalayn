@@ -839,6 +839,19 @@ All infrastructure remains free (Netlify static hosting, build-time computation)
 | Claude Batch API (Haiku 4.5) | https://platform.claude.com/docs/en/about-claude/pricing | $0.50/$2.50 per 1M tokens (batch) |
 | Claude Batch API (Sonnet 4.5) | Same | $1.50/$7.50 per 1M tokens (batch) |
 
+### Data Availability for Remaining Four Books
+
+> **Research finding (DataGatherer, Feb 2026):** Two of the Four Books have no structured online data.
+
+| Book | Structured Source | English Translation | Status |
+|------|------------------|-------------------|--------|
+| **Al-Kafi** | Already in system | HubeAli + Sarwar | Complete |
+| **Man La Yahduruhu al-Faqih** | ThaqalaynAPI (JSON) | Bab Ul Qaim (5 vols) | Ready for Phase 3 parser |
+| **Tahdhib al-Ahkam** | **PDF only** (almuntazar.ca) | Vols 1-3 only | Requires PDF parsing pipeline |
+| **al-Istibsar** | **PDF only** (almuntazar.ca) | **None available** | Requires PDF parsing pipeline |
+
+Tahdhib and al-Istibsar require a dedicated PDF parsing pipeline (Arabic text extraction via PyMuPDF/pdfplumber, heuristic chapter/hadith boundary detection, manual verification). This is significantly higher effort than HTML/JSON parsing and should be treated as a separate initiative outside Phase 3. See [IMPROVEMENT_ROADMAP.md](IMPROVEMENT_ROADMAP.md) Section 3.1.2-3.1.3 for updated details.
+
 ### Related Project Documents
 
 | Document | Path | Relevance |

@@ -208,6 +208,63 @@ The project is maintained by a small team (potentially one person). The architec
 
 ---
 
+## 11. Technology Assessment (February 2026)
+
+This section documents the current technology state, identifies technical debt, and assesses whether current choices remain appropriate.
+
+### Current Stack Health
+
+| Component | Current | Status | Assessment |
+|-----------|---------|--------|------------|
+| **Angular** | 18.0.4 (June 2024) | Behind by 1 major version | Angular 19 released Dec 2025. Upgrade recommended for standalone components support, improved signals, and hydration. Angular 18 enters LTS soon. |
+| **NGXS** | 18.0.0 | Aligned with Angular | Solid choice. Alternatives (NgRx Signals, built-in signals) are maturing but NGXS remains well-maintained and does not need replacement now. |
+| **Angular Material** | 18.0.4 | Aligned | Material 3 (M3) theming available in Angular 18+. Consider adopting M3 for visual refresh. |
+| **TypeScript** | 5.4.5 | Current enough | Angular 19 supports TS 5.6. Will need bump on Angular upgrade. |
+| **Python** | 3.8+ (declared) | 3.8 EOL was Oct 2024 | Bump minimum to 3.10+ for `match` statements, better typing, and continued security patches. |
+| **uv** | Latest | Excellent | Best-in-class Python package manager. Keep. |
+| **Pydantic** | v1 (via marshmallow-dataclass) | Mixed | The generator uses marshmallow-dataclass and fastapi encoders but not Pydantic v2 natively. Consider migrating models to Pydantic v2 for better performance and validation. |
+| **Netlify** | Free tier | Healthy | Still the best option for zero-cost static hosting. Bandwidth limits (100 GB/month) are generous. The 485 MB data repo is well within storage limits. |
+
+### Deprecated Tooling (Must Remove)
+
+| Tool | Replacement | Priority |
+|------|------------|----------|
+| **TSLint** (deprecated 2019) | ESLint + `@angular-eslint` | High |
+| **Protractor** (deprecated Angular 12) | Playwright (already in project as MCP) | High |
+| **codelyzer** (unmaintained) | `@angular-eslint/template` rules | High |
+| **`--openssl-legacy-provider`** | Resolve by upgrading webpack/Angular build | Medium |
+
+### Architecture Decisions Still Valid
+
+1. **Static JSON API** -- Remains the correct choice. Server-side rendering or API servers would add cost and complexity with no benefit for this use case. The static architecture means the site can survive indefinitely on Netlify's free tier.
+
+2. **Python generator as build step** -- Correct. Parsing HTML/XML is complex enough to warrant a dedicated tool, and running it once at build time is far better than running it per-request.
+
+3. **Hash-based routing** -- Still necessary for Netlify static hosting without `_redirects` file for catch-all routing. Could switch to path-based routing with Netlify redirects, but hash routing works reliably and changing it would break existing bookmarks/links.
+
+4. **NGXS for state management** -- Appropriate for the app's complexity. The app has 3-4 state slices with moderate logic. Angular Signals could eventually replace NGXS for simpler state, but there is no urgent reason to migrate.
+
+5. **NgModule-based architecture** -- The app still uses NgModules (not standalone components). The comment in `app.module.ts` notes this. Migrating to standalone components is recommended during the Angular 19 upgrade as it simplifies the module tree and enables better tree-shaking.
+
+### Data Size Concern
+
+The ThaqalaynData repo at ~485 MB is manageable but growing. The OPTIMIZATION_PLAN.md identifies ~165 MB (34%) of potential savings. The two biggest wins require only generator changes:
+- Remove `narrator_chain.text`: 30 MB savings, zero Angular impact
+- Optimize narrator subchains: 60 MB savings, minimal Angular impact
+
+These should be prioritized before adding more books, as each new book will compound the size issue.
+
+### Modernization Path (Recommended Order)
+
+1. **Remove deprecated tooling** (TSLint, Protractor, codelyzer) -- clears warnings, enables CI
+2. **Fix broken tests** -- baseline for confident changes
+3. **Data optimization** (narrator_chain.text, subchain explosion) -- 90 MB savings
+4. **Angular 19 upgrade** -- standalone components, signals, improved build
+5. **PWA support** -- `ng add @angular/pwa`, low effort, high user impact
+6. **Search** -- most-requested missing feature, requires generator + Angular work
+
+---
+
 ## Summary of Key Decisions
 
 | Decision | Rationale |

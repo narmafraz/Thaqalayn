@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { AboutComponent } from '@app/components/about/about.component';
+import { BookmarksComponent } from '@app/components/bookmarks/bookmarks.component';
 import { BookDispatcherComponent } from '@app/components/book-dispatcher/book-dispatcher.component';
 import { DownloadComponent } from '@app/components/download/download.component';
 import { PeopleContentComponent } from '@app/components/people-content/people-content.component';
@@ -22,6 +23,7 @@ const routes: Routes = [
   { path: 'people/narrators/index', component: PeopleListComponent, resolve: { titles: NarratorListResolver } },
   { path: 'people/narrators/:index', component: PeopleContentComponent, resolve: { titles: NarratorResolver } },
   { path: 'search', component: SearchResultsComponent },
+  { path: 'bookmarks', component: BookmarksComponent },
   { path: 'about', component: AboutComponent },
   { path: 'support', component: SupportComponent },
   { path: 'download', component: DownloadComponent },

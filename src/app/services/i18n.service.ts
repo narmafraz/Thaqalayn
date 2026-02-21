@@ -59,7 +59,25 @@ export class I18nService {
       return storedLang;
     }
 
+    // Auto-detect from browser language
+    const browserLang = this.detectBrowserLanguage();
+    if (browserLang) {
+      return browserLang;
+    }
+
     return 'en';
+  }
+
+  private detectBrowserLanguage(): string | null {
+    const supported = ['en', 'ar', 'fa', 'fr', 'ur', 'tr', 'id', 'bn', 'es', 'de', 'ru', 'zh'];
+    const navLangs = navigator.languages || [navigator.language];
+    for (const lang of navLangs) {
+      const code = lang.split('-')[0].toLowerCase();
+      if (supported.includes(code)) {
+        return code;
+      }
+    }
+    return null;
   }
 
   private loadStrings(lang: string): void {

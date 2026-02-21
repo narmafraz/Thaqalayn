@@ -37,6 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private static readonly STATIC_TITLES: Record<string, string> = {
     '/about': 'About',
+    '/bookmarks': 'Bookmarks',
     '/download': 'Download',
     '/support': 'Support',
   };

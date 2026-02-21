@@ -16,7 +16,8 @@
     "navigatePrevious": "انتقل إلى الباب السابق",
     "navigateNext": "انتقل إلى الباب التالي",
     "navigateParent": "انتقل إلى الأعلى",
-    "hadithNavigation": "تصفح الحديث"
+    "hadithNavigation": "تصفح الحديث",
+    "bookmarks": "الإشارات المرجعية"
   },
   "book": {
     "reference": "المرجع",
@@ -105,6 +106,28 @@
     "downloadForOffline": "تحميل",
     "remove": "حذف",
     "openSource": "مفتوح المصدر ومجاني"
+  },
+  "bookmark": {
+    "title": "الإشارات المرجعية",
+    "bookmark": "إشارة مرجعية",
+    "bookmarked": "تم الحفظ",
+    "add": "إضافة إشارة مرجعية",
+    "remove": "إزالة الإشارة المرجعية",
+    "continueReading": "متابعة القراءة",
+    "savedBookmarks": "الإشارات المرجعية المحفوظة",
+    "noBookmarks": "لا توجد إشارات مرجعية بعد. احفظ الآيات أثناء القراءة للعثور عليها هنا.",
+    "noProgress": "لا يوجد تقدم في القراءة",
+    "clearProgress": "مسح تقدم القراءة",
+    "exportImport": "تصدير / استيراد",
+    "export": "تصدير",
+    "import": "استيراد"
+  },
+  "audio": {
+    "play": "تشغيل",
+    "pause": "إيقاف",
+    "reciter": "القارئ",
+    "loading": "جاري تحميل الصوت...",
+    "error": "الصوت غير متوفر"
   },
   "language": {
     "picker": "اللغة",

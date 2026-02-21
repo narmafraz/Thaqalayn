@@ -113,3 +113,55 @@ a:hover { text-decoration: underline; }
 	color: #fff;
 	text-decoration: none;
 }
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .bannerTop {
+    font-size: 2rem;
+    padding-left: 3% !important;
+    padding-right: 3% !important;
+  }
+
+  .header-search {
+    display: none;
+  }
+
+  .lang-picker {
+    width: 80px;
+    font-size: 12px;
+  }
+
+  .main {
+    max-width: 100%;
+    min-width: auto;
+  }
+
+  #footer {
+    font-size: 14px;
+    height: auto;
+    padding: 8px 4px;
+  }
+
+  .crumbs {
+    font-size: 11px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-left: 3% !important;
+  }
+}
+
+@media (max-width: 414px) {
+  .bannerTop {
+    font-size: 1.5rem;
+
+    img {
+      height: 50% !important;
+    }
+  }
+
+  .lang-picker {
+    width: 60px;
+    font-size: 11px;
+    margin-inline-start: 4px;
+  }
+}

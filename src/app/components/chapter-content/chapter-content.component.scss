@@ -56,13 +56,55 @@ mat-mdc-card {
       height: 18px;
     }
   }
+
+  .bookmark-icon-btn,
+  .audio-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #673ab7;
+    opacity: 0.6;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .audio-icon-btn {
+    color: #1976d2;
+  }
 }
 
 .related {
   grid-row: 1 / span 2;
   grid-column-start: 4;
   margin-left: 1.2em;
-  word-break: break-all;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 600px) {
+  .ref {
+    grid-template-columns: auto 1fr;
+    gap: 4px;
+    padding-left: 8px;
+    padding-right: 4px;
+    font-size: 10px;
+  }
+
+  .related {
+    grid-row: auto;
+    grid-column: 1 / -1;
+    margin-left: 0;
+    margin-top: 4px;
+  }
 }
 
 .perRel {

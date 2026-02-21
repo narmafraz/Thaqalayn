@@ -1,3 +1,4 @@
+export * from './audio.service';
 export * from './bookmark.service';
 export * from './books.service';
 export * from './i18n.service';

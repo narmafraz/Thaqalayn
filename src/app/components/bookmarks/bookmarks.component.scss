@@ -1,0 +1,100 @@
+.content {
+  display: flex;
+  border-radius: 5px;
+  color: #666;
+  margin-top: 15px;
+  padding: 10px;
+  flex-direction: column;
+}
+
+section {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.progress-list, .bookmark-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.progress-item, .bookmark-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.progress-link, .bookmark-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  mat-icon {
+    color: #673ab7;
+    flex-shrink: 0;
+  }
+}
+
+.progress-book {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.progress-title {
+  font-size: 12px;
+  color: #999;
+}
+
+.bookmark-title {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.bookmark-arabic {
+  font-size: 16px;
+  color: #333;
+  font-family: "KFGQPC Uthman Taha Naskh", "KFGQPC_Naskh";
+}
+
+.bookmark-path {
+  font-size: 11px;
+  color: #999;
+  font-family: monospace;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  color: #999;
+}
+
+.empty-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+}
+
+.export-section {
+  .export-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+}

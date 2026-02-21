@@ -25,6 +25,17 @@
                matTooltip="View hadith details">
               <mat-icon>open_in_new</mat-icon>
             </a>
+            <button class="bookmark-icon-btn"
+                    (click)="toggleVerseBookmark(book.index, verse, crumbs)"
+                    [attr.aria-label]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
+              <mat-icon>{{ isVerseBookmarked(book.index, verse) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+            </button>
+            <button *ngIf="isQuranBook(book.index)"
+                    class="audio-icon-btn"
+                    (click)="toggleAudio(book.index, verse.local_index)"
+                    [attr.aria-label]="(audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'Pause' : 'Play') + ' audio'">
+              <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
+            </button>
           </div>
           <div>{{ 'book.reference' | translate }}</div>
           <div>{{getBookName(crumbs)}} {{verse.index}}</div>

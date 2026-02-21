@@ -35,6 +35,7 @@ import { VerseContentComponent } from './components/verse-content/verse-content.
 import { VerseTextComponent } from './components/verse-text/verse-text.component';
 import { VerseDetailComponent } from './components/verse-detail/verse-detail.component';
 import { BookTreeComponent } from './components/book-tree/book-tree.component';
+import { BookmarksComponent } from './components/bookmarks/bookmarks.component';
 import { ErrorDisplayComponent } from './components/error-display/error-display.component';
 import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
@@ -66,6 +67,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     PathLinkComponent,
     BookTreeComponent,
     VerseDetailComponent,
+    BookmarksComponent,
     ErrorDisplayComponent,
     InstallPromptComponent,
     SearchBarComponent,

@@ -16,7 +16,8 @@
     "navigatePrevious": "Navigate to the previous chapter",
     "navigateNext": "Navigate to the next chapter",
     "navigateParent": "Navigate to the parent",
-    "hadithNavigation": "Hadith navigation"
+    "hadithNavigation": "Hadith navigation",
+    "bookmarks": "Bookmarks"
   },
   "book": {
     "reference": "Reference",
@@ -105,6 +106,28 @@
     "downloadForOffline": "Download",
     "remove": "Remove",
     "openSource": "Open Source and Free"
+  },
+  "bookmark": {
+    "title": "Bookmarks",
+    "bookmark": "Bookmark",
+    "bookmarked": "Bookmarked",
+    "add": "Add bookmark",
+    "remove": "Remove bookmark",
+    "continueReading": "Continue Reading",
+    "savedBookmarks": "Saved Bookmarks",
+    "noBookmarks": "No bookmarks yet. Bookmark verses while reading to find them here.",
+    "noProgress": "No reading progress yet",
+    "clearProgress": "Clear reading progress",
+    "exportImport": "Export / Import",
+    "export": "Export",
+    "import": "Import"
+  },
+  "audio": {
+    "play": "Play",
+    "pause": "Pause",
+    "reciter": "Reciter",
+    "loading": "Loading audio...",
+    "error": "Audio unavailable"
   },
   "language": {
     "picker": "Language",

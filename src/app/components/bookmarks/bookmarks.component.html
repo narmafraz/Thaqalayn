@@ -1,0 +1,66 @@
+<div class="content mat-elevation-z8">
+  <h1>{{ 'bookmark.title' | translate }}</h1>
+
+  <!-- Continue Reading section -->
+  <section *ngIf="readingProgress.length > 0" class="continue-section">
+    <h2>{{ 'bookmark.continueReading' | translate }}</h2>
+    <div class="progress-list">
+      <div class="progress-item" *ngFor="let rp of readingProgress">
+        <div class="progress-info">
+          <a [routerLink]="getRouterLinkSegments(rp.lastPath)" queryParamsHandling="preserve" class="progress-link">
+            <mat-icon>menu_book</mat-icon>
+            <div>
+              <div class="progress-book">{{ formatBookId(rp.bookId) }}</div>
+              <div class="progress-title">{{ rp.lastTitle }}</div>
+            </div>
+          </a>
+        </div>
+        <button mat-icon-button (click)="clearProgress(rp.bookId)"
+                [attr.aria-label]="'bookmark.clearProgress' | translate">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bookmarks section -->
+  <section class="bookmarks-section">
+    <h2>{{ 'bookmark.savedBookmarks' | translate }}</h2>
+
+    <div *ngIf="bookmarks.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">bookmark_border</mat-icon>
+      <p>{{ 'bookmark.noBookmarks' | translate }}</p>
+    </div>
+
+    <div class="bookmark-list">
+      <div class="bookmark-item" *ngFor="let bm of bookmarks">
+        <a [routerLink]="getRouterLinkSegments(bm.path)" queryParamsHandling="preserve" class="bookmark-link">
+          <mat-icon>bookmark</mat-icon>
+          <div>
+            <div class="bookmark-title">{{ bm.title }}</div>
+            <div *ngIf="bm.arabicTitle" class="bookmark-arabic" dir="rtl" lang="ar">{{ bm.arabicTitle }}</div>
+            <div class="bookmark-path">{{ bm.path }}</div>
+          </div>
+        </a>
+        <button mat-icon-button (click)="removeBookmark(bm.path)"
+                [attr.aria-label]="'bookmark.remove' | translate">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Export/Import section -->
+  <section class="export-section">
+    <h2>{{ 'bookmark.exportImport' | translate }}</h2>
+    <div class="export-actions">
+      <button mat-raised-button (click)="exportBookmarks()" [disabled]="bookmarks.length === 0">
+        <mat-icon>file_download</mat-icon> {{ 'bookmark.export' | translate }}
+      </button>
+      <button mat-raised-button (click)="fileInput.click()">
+        <mat-icon>file_upload</mat-icon> {{ 'bookmark.import' | translate }}
+      </button>
+      <input #fileInput type="file" accept=".json" (change)="importBookmarks($event)" hidden>
+    </div>
+  </section>
+</div>

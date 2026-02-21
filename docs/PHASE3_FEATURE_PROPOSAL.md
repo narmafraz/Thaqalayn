@@ -25,41 +25,56 @@ Add word-by-word Arabic analysis for Quran verses, allowing users to tap/click a
 
 ### 1.2 Data Sources
 
-Four complementary open data sources provide the word-level data needed:
+Five data sources were evaluated. QUL is the recommended primary source.
 
-#### 1.2.1 Quranic Arabic Corpus (corpus.quran.com)
+#### 1.2.1 QUL -- Quranic Universal Library by Tarteel AI (RECOMMENDED)
 
-The primary source for morphological analysis. Licensed under GNU GPL, it provides morphological annotation for every word in the Quran (~77,430 tokens).
+> **DataGatherer research finding:** This is the best single source for word-by-word data.
 
-**Available data per word:**
-- **Position**: Surah:Ayah:Word index (e.g., 1:1:1)
-- **Arabic text**: The word with full diacritics
-- **Transliteration**: Buckwalter transliteration
-- **Part of speech**: N (noun), V (verb), P (particle), etc.
-- **Root**: 3-letter Arabic root (e.g., ر ح م)
-- **Lemma**: Dictionary form
-- **Morphological features**: Gender, number, case, person, voice, mood, state, derivation
-- **Dependency grammar**: Syntactic role in the ayah
+The QUL dataset provides comprehensive word-level data for the entire Quran in a ready-to-use format:
 
-**Download format:** Plain text and XML (available at corpus.quran.com/download/).
+**Available data:** 77,429 word-level entries with:
+- Arabic text with full diacritics
+- Root and lemma
+- Part-of-speech tags
+- **16 word-level translations** (including English, Urdu, and more)
+- Morphological annotations
 
-**Processing:** A build-time Python script parses the morphology file, groups by surah:ayah:word position, and generates per-surah JSON files.
+**Download format:** SQLite database and JSON. Open license.
 
-#### 1.2.2 mustafa0x/quran-morphology (GitHub)
+**Advantages over alternatives:**
+- **Single source** covers translations + morphology + roots (others require combining multiple sources)
+- **SQLite/JSON format** -- no XML parsing or API scraping needed, lowest processing effort
+- **16 translations** included -- we get multi-language word glosses without calling quran.com API
+- **Actively maintained** by Tarteel AI (qul.tarteel.ai)
 
-A cleaned-up fork of the Quranic Arabic Corpus data with corrections. Uses `quran-morphology.txt` format that maps directly to the corpus data. Useful as a cross-reference or alternative if the corpus download format changes.
+**Processing:** A build-time Python script reads the SQLite/JSON, groups by surah:ayah:word, and generates per-ayah JSON files.
 
-#### 1.2.3 Tanzil.net Word-by-Word XML
+#### 1.2.2 Quranic Arabic Corpus (corpus.quran.com) -- Alternative
 
-Tanzil provides `quran-wordbyword.xml` with pre-tokenized word-level English translations for every Quran word. This is a simpler data source than the Corpus (no morphology, just word-translation pairs) but provides the core word gloss data needed for the UI grid. Can be combined with Corpus morphology for the full picture.
+Licensed under GNU GPL, provides full morphological annotation (~77,430 tokens) including dependency grammar and syntactic roles. More detailed morphological features than QUL (gender, number, case, person, voice, mood, state, derivation). Useful as a supplement for the root exploration pages where deep grammar analysis is shown.
 
-**Download:** Available from tanzil.net/download as XML.
+**Download format:** Plain text and XML (corpus.quran.com/download/).
 
-#### 1.2.4 Quran.com API v4 (api-docs.quran.foundation)
+#### 1.2.3 mustafa0x/quran-morphology (GitHub) -- Alternative
 
-Provides word-by-word translation via REST API with `words` field parameter. Can be used to obtain pre-translated word glosses in multiple languages. The API endpoint `verses/by_chapter/{chapter_number}` accepts a `words=true` parameter and a `word_fields` parameter for morphology.
+A cleaned-up fork of the Quranic Arabic Corpus data with corrections. Uses `quran-morphology.txt` format. Useful as a cross-reference or if the Corpus download changes.
 
-**Usage:** Scrape word-by-word translations at build time (respecting rate limits), store as static JSON alongside the morphology data. This adds human-curated English word glosses without manual translation effort.
+#### 1.2.4 Tanzil.net Word-by-Word XML -- Alternative
+
+Provides `quran-wordbyword.xml` with word-level English translations. Simpler than QUL (no morphology, just word-translation pairs). Redundant if using QUL.
+
+#### 1.2.5 Quran.com API v4 (api-docs.quran.foundation) -- Alternative
+
+REST API with `words=true` parameter for word-by-word translations. Requires API scraping at build time. Redundant if using QUL (which already includes 16 translations).
+
+#### 1.2.6 MASAQ Dataset -- Alternative
+
+Academic dataset with multiple formats. Available for research use. Less practical than QUL for production use.
+
+#### 1.2.7 Hadith Word-by-Word: Not Feasible Yet
+
+> **DataGatherer finding:** No ready-made word-by-word dataset exists for hadith Arabic text. Would require running Arabic NLP tools (CAMeL, Farasa, Buckwalter morphological analyzer) on raw hadith text. This is an NLP pipeline problem, not a data source problem. **Recommend Quran-only for Phase 3/4.**
 
 ### 1.3 Proposed Schema
 
@@ -189,9 +204,9 @@ The existing `verse-text.component.html` renders `verse.text` as raw HTML string
 ### 1.5 Generator Changes
 
 New build step in `main_add.py`:
-1. `init_word_morphology()` -- Parse corpus.quran.com morphology file, generate per-surah word files
-2. `init_word_roots()` -- Aggregate root data across all words, generate root detail files
-3. `init_word_translations()` -- (Optional) Fetch word glosses from quran.com API at build time
+1. `init_word_data()` -- Load QUL SQLite/JSON, generate per-ayah word files (`words/quran/{surah}/{ayah}.json`)
+2. `init_word_roots()` -- Aggregate root data across all words, generate root index + root detail files
+3. (Optional) `enrich_word_morphology()` -- Supplement QUL data with deep morphological features from Quranic Arabic Corpus
 
 ### 1.6 Effort Estimate
 
@@ -209,12 +224,19 @@ New build step in `main_add.py`:
 
 ### 1.7 Hadith Word-by-Word (Future Extension)
 
+> **DataGatherer research confirmed:** No ready-made word-by-word dataset exists for hadith text.
+
 Word-by-word analysis for hadith text is significantly harder than Quran because:
 - No equivalent morphological corpus exists for hadith Arabic text
 - Hadith texts are much more varied (not a fixed, curated text like the Quran)
-- Would require AI-powered morphological analysis (NLP problem, not just data mapping)
+- Would require running Arabic NLP tools on raw text -- an NLP pipeline problem, not a data source problem
 
-Recommended: Start with Quran only, extend to hadith later using Claude API for morphological tagging.
+**Potential NLP tools for future hadith word analysis:**
+- **CAMeL Tools** (NYU Abu Dhabi) -- Arabic morphological analyzer and disambiguator
+- **Farasa** -- Arabic text processing toolkit (segmentation, POS tagging, NER)
+- **Buckwalter Morphological Analyzer** -- Standard Arabic morphological analysis
+
+Recommended: Quran-only for Phase 3/4. Hadith word analysis deferred until NLP pipeline is evaluated.
 
 ---
 
@@ -817,12 +839,14 @@ All infrastructure remains free (Netlify static hosting, build-time computation)
 
 ### Quran Word-by-Word
 
-| Source | URL | License | Data Format |
-|--------|-----|---------|-------------|
-| Quranic Arabic Corpus | https://corpus.quran.com/ | GNU GPL | Plain text, XML |
-| mustafa0x/quran-morphology | https://github.com/mustafa0x/quran-morphology | Open source | Text (morphology annotations) |
-| Quran.com API v4 | https://api-docs.quran.foundation/ | Free API | JSON REST |
-| QuranMorphology.com | https://quranmorphology.com/ | Open source | Web (roots, lemmas, grammar) |
+| Source | URL | License | Data Format | Recommendation |
+|--------|-----|---------|-------------|----------------|
+| **QUL (Tarteel AI)** | https://qul.tarteel.ai/ | Open | **SQLite, JSON** | **PRIMARY** |
+| Quranic Arabic Corpus | https://corpus.quran.com/ | GNU GPL | Plain text, XML | Supplement (deep morphology) |
+| mustafa0x/quran-morphology | https://github.com/mustafa0x/quran-morphology | Open source | Text | Cross-reference |
+| Quran.com API v4 | https://api-docs.quran.foundation/ | Free API | JSON REST | Redundant with QUL |
+| Tanzil.net | https://tanzil.net/download | Open | XML | Redundant with QUL |
+| MASAQ Dataset | Academic | Research | Multiple | Academic alternative |
 
 ### Narrator Biographies
 

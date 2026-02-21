@@ -18,7 +18,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #673ab7;
+    color: var(--link-color, #673ab7);
     text-decoration: none;
     font-size: 14px;
 
@@ -40,7 +40,7 @@
 
 .hadith-title {
   font-weight: 500;
-  color: #673ab7;
+  color: var(--link-color, #673ab7);
 }
 
 .arabic-section {
@@ -49,11 +49,11 @@
   .narrator-chain {
     font-size: 1.1em;
     line-height: 2;
-    color: #555;
+    color: var(--text-secondary, #555);
     margin-bottom: 12px;
 
     .narrator-link {
-      color: #673ab7;
+      color: var(--link-color, #673ab7);
       text-decoration: none;
 
       &:hover {
@@ -72,24 +72,24 @@
 .translation-section {
   margin-bottom: 24px;
   padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 
   .verse-translation {
     font-size: 1.1em;
     line-height: 1.8;
-    color: #333;
+    color: var(--text-primary, #333);
   }
 }
 
 .gradings-section {
   margin-bottom: 16px;
   padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 
   h3 {
     font-size: 14px;
     font-weight: 500;
-    color: #666;
+    color: var(--text-secondary, #666);
     margin-bottom: 8px;
   }
 
@@ -136,15 +136,33 @@
   }
 
   .grading-unknown {
-    background-color: #f5f5f5;
-    color: #616161;
+    background-color: var(--table-stripe, #f5f5f5);
+    color: var(--text-secondary, #616161);
+  }
+}
+
+:host-context(body.dark-theme) {
+  .grading-sahih {
+    background-color: rgba(46, 125, 50, 0.2);
+  }
+  .grading-hasan {
+    background-color: rgba(21, 101, 192, 0.2);
+  }
+  .grading-daif {
+    background-color: rgba(230, 81, 0, 0.2);
+  }
+  .grading-mutabar {
+    background-color: rgba(0, 105, 92, 0.2);
+  }
+  .grading-unknown {
+    background-color: rgba(255, 255, 255, 0.08);
   }
 }
 
 .relations-section {
   margin-bottom: 16px;
   padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 
   .relation-group {
     margin-bottom: 8px;
@@ -152,7 +170,7 @@
     h3 {
       font-size: 14px;
       font-weight: 500;
-      color: #666;
+      color: var(--text-secondary, #666);
       margin-bottom: 4px;
     }
 
@@ -171,7 +189,7 @@
 .validation-section {
   margin-bottom: 16px;
   padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 
   .validation-badge {
     display: inline-flex;
@@ -199,16 +217,25 @@
   }
 }
 
+:host-context(body.dark-theme) {
+  .validation-badge.verified {
+    background-color: rgba(46, 125, 50, 0.2);
+  }
+  .validation-badge.unverified {
+    background-color: rgba(230, 81, 0, 0.2);
+  }
+}
+
 .source-section {
   margin-bottom: 16px;
   padding-top: 16px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--border-color, #e0e0e0);
 
   .source-link {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: #673ab7;
+    color: var(--link-color, #673ab7);
     text-decoration: none;
     font-size: 14px;
 
@@ -239,7 +266,7 @@
   .nav-prev, .nav-next {
     display: inline-flex;
     align-items: center;
-    color: #673ab7;
+    color: var(--link-color, #673ab7);
     text-decoration: none;
   }
 }

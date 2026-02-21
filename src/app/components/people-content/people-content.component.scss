@@ -20,7 +20,7 @@
 
   .transliteration {
     font-size: 1.1rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-muted, rgba(0, 0, 0, 0.6));
     font-style: italic;
   }
 }
@@ -28,13 +28,13 @@
 .biography-section {
   margin-bottom: 2rem;
   padding: 1rem;
-  background: #fafafa;
+  background: var(--card-bg, #fafafa);
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color, #e0e0e0);
 
   h2 {
     margin-bottom: 1rem;
-    color: #333;
+    color: var(--text-primary, #333);
   }
 
   .biography-details {
@@ -49,19 +49,19 @@
 
     .bio-label {
       font-weight: 500;
-      color: #555;
+      color: var(--text-secondary, #555);
       min-width: 100px;
     }
 
     .bio-value {
-      color: #333;
+      color: var(--text-primary, #333);
     }
 
     .reliability-badge {
       padding: 2px 8px;
       border-radius: 12px;
       font-size: 0.9rem;
-      background: #f5f5f5;
+      background: var(--table-stripe, #f5f5f5);
 
       &.reliable {
         background: #e8f5e9;
@@ -73,17 +73,23 @@
   .bio-summary {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #e0e0e0;
+    border-top: 1px solid var(--border-color, #e0e0e0);
 
     p {
       line-height: 1.6;
-      color: #444;
+      color: var(--text-primary, #444);
     }
   }
 
   .bio-source {
     margin-top: 8px;
-    color: rgba(0, 0, 0, 0.5);
+    color: var(--text-muted, rgba(0, 0, 0, 0.5));
+  }
+}
+
+:host-context(body.dark-theme) {
+  .reliability-badge.reliable {
+    background: rgba(46, 125, 50, 0.2);
   }
 }
 
@@ -107,7 +113,7 @@
 .viewport {
   height: 400px;
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
   border-radius: 4px;
 }
 
@@ -129,7 +135,7 @@
 
   .verse-count {
     margin-left: 1rem;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--text-muted, rgba(0, 0, 0, 0.6));
     font-size: 0.9rem;
   }
 }
@@ -139,14 +145,14 @@
   color: inherit;
 
   &:hover {
-    color: #1976d2;
+    color: var(--link-color, #1976d2);
     text-decoration: underline;
   }
 }
 
 .arrow {
   margin: 0 0.5rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--text-muted, rgba(0, 0, 0, 0.6));
 }
 
 .path-cell {

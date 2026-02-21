@@ -11,8 +11,9 @@
 3. [Narrator Page Improvements](#3-narrator-page-improvements)
 4. [Searchable Expandable Navigation](#4-searchable-expandable-navigation)
 5. [Breadcrumb Fix (Quran)](#5-breadcrumb-fix-quran)
-6. [Implementation Priority and Dependencies](#6-implementation-priority-and-dependencies)
-7. [Appendix: Data Sources Reference](#appendix-data-sources-reference)
+6. [Arabic Text Cross-Validation](#6-arabic-text-cross-validation)
+7. [Implementation Priority and Dependencies](#7-implementation-priority-and-dependencies)
+8. [Appendix: Data Sources Reference](#appendix-data-sources-reference)
 
 ---
 
@@ -24,11 +25,11 @@ Add word-by-word Arabic analysis for Quran verses, allowing users to tap/click a
 
 ### 1.2 Data Sources
 
-Three complementary open data sources provide the word-level data needed:
+Four complementary open data sources provide the word-level data needed:
 
 #### 1.2.1 Quranic Arabic Corpus (corpus.quran.com)
 
-The primary source. Licensed under GNU GPL, it provides morphological annotation for every word in the Quran (~77,430 tokens).
+The primary source for morphological analysis. Licensed under GNU GPL, it provides morphological annotation for every word in the Quran (~77,430 tokens).
 
 **Available data per word:**
 - **Position**: Surah:Ayah:Word index (e.g., 1:1:1)
@@ -48,7 +49,13 @@ The primary source. Licensed under GNU GPL, it provides morphological annotation
 
 A cleaned-up fork of the Quranic Arabic Corpus data with corrections. Uses `quran-morphology.txt` format that maps directly to the corpus data. Useful as a cross-reference or alternative if the corpus download format changes.
 
-#### 1.2.3 Quran.com API v4 (api-docs.quran.foundation)
+#### 1.2.3 Tanzil.net Word-by-Word XML
+
+Tanzil provides `quran-wordbyword.xml` with pre-tokenized word-level English translations for every Quran word. This is a simpler data source than the Corpus (no morphology, just word-translation pairs) but provides the core word gloss data needed for the UI grid. Can be combined with Corpus morphology for the full picture.
+
+**Download:** Available from tanzil.net/download as XML.
+
+#### 1.2.4 Quran.com API v4 (api-docs.quran.foundation)
 
 Provides word-by-word translation via REST API with `words` field parameter. Can be used to obtain pre-translated word glosses in multiple languages. The API endpoint `verses/by_chapter/{chapter_number}` accepts a `words=true` parameter and a `word_fields` parameter for morphology.
 
@@ -56,38 +63,57 @@ Provides word-by-word translation via REST API with `words` field parameter. Can
 
 ### 1.3 Proposed Schema
 
-#### 1.3.1 New JSON files: `words/quran/{surah}.json`
+> **Design decision (DataGen2 assessment):** Use separate word files loaded lazily (Option B), NOT inline word data in verse files. This keeps existing verse JSON unchanged and only loads word data when the user activates word-by-word mode.
+
+#### 1.3.1 New JSON files: `words/quran/{surah}/{ayah}.json`
+
+Per-ayah granularity allows the Angular app to lazy-load word data for just the verse being viewed, rather than an entire surah at once:
 
 ```json
 {
-  "index": "words:quran:1",
+  "index": "words:quran:1:1",
   "kind": "word_list",
   "data": {
-    "words": {
-      "1:1": [
-        {
-          "position": 1,
-          "arabic": "بِسْمِ",
-          "translation": "In (the) name",
-          "transliteration": "bismi",
-          "root": "س م و",
-          "lemma": "ٱسْم",
-          "pos": "N",
-          "features": {
-            "case": "GEN",
-            "gender": "M",
-            "number": "S"
-          }
+    "words": [
+      {
+        "position": 1,
+        "arabic": "بِسْمِ",
+        "translation": "In (the) name",
+        "transliteration": "bismi",
+        "root": "س م و",
+        "lemma": "ٱسْم",
+        "pos": "N",
+        "features": {
+          "case": "GEN",
+          "gender": "M",
+          "number": "S"
         }
-      ]
-    }
+      }
+    ]
   }
 }
 ```
 
-File size estimate: ~77,430 words at ~200 bytes each = ~15 MB raw, ~3 MB gzipped.
+File count: 6,236 files (one per ayah). Total size estimate: ~77,430 words at ~200 bytes each = ~14 MB raw, ~3 MB gzipped. Individual files are tiny (1-50 words each), ideal for CDN caching.
 
-#### 1.3.2 New JSON files: `words/roots/{root}.json` (Word Exploration Pages)
+#### 1.3.2 New JSON file: `words/index/roots.json` (Root Index)
+
+A single index file mapping roots to their summary data, loaded once when entering word exploration mode:
+
+```json
+{
+  "index": "words:roots:index",
+  "kind": "root_index",
+  "data": {
+    "ر ح م": { "meaning": "mercy, compassion", "count": 339 },
+    "ع ل م": { "meaning": "knowledge", "count": 854 }
+  }
+}
+```
+
+Approximately ~1,700 unique roots. Size: ~200 KB.
+
+#### 1.3.3 New JSON files: `words/roots/{root}.json` (Root Detail Pages)
 
 ```json
 {
@@ -117,7 +143,7 @@ File size estimate: ~77,430 words at ~200 bytes each = ~15 MB raw, ~3 MB gzipped
 }
 ```
 
-Approximately ~1,700 unique roots in the Quran. File size: ~5 MB total.
+~1,700 root detail files. Total size: ~5 MB.
 
 ### 1.4 Angular Changes
 
@@ -158,7 +184,7 @@ The existing `verse-text.component.html` renders `verse.text` as raw HTML string
 
 #### 1.4.4 New Service
 
-`WordsService`: Fetches `words/quran/{surah}.json` lazily on first word-by-word view activation.
+`WordsService`: Fetches `words/quran/{surah}/{ayah}.json` lazily per-ayah when the user activates word-by-word mode on a verse. Also loads `words/index/roots.json` once for root exploration navigation.
 
 ### 1.5 Generator Changes
 
@@ -171,19 +197,22 @@ New build step in `main_add.py`:
 
 | Task | Team Member | Effort |
 |------|-------------|--------|
-| Corpus data parser | DataGen | Medium |
-| Root aggregation | DataGen | Medium |
+| Corpus data parser + Tanzil XML parser | DataGen | Medium |
+| Per-ayah file generation (6,236 files) | DataGen | Medium |
+| Root index + root detail generation | DataGen | Medium |
 | Angular word grid component | UIdev | Medium |
 | Root exploration page | UIdev | Medium |
 | Quran.com API scraper (optional) | DataGatherer | Low |
-| **Total** | | **Medium-High** |
+| **Total** | | **HIGH** |
+
+> **DataGen2 assessment:** This feature has the highest complexity of all Phase 3 proposals. It involves new data sources, a new file hierarchy, new Angular components, and new routing. **Recommended for Phase 4** unless word-by-word is a top user-facing priority.
 
 ### 1.7 Hadith Word-by-Word (Future Extension)
 
 Word-by-word analysis for hadith text is significantly harder than Quran because:
 - No equivalent morphological corpus exists for hadith Arabic text
 - Hadith texts are much more varied (not a fixed, curated text like the Quran)
-- Would require AI-powered morphological analysis (see Feature 2)
+- Would require AI-powered morphological analysis (NLP problem, not just data mapping)
 
 Recommended: Start with Quran only, extend to hadith later using Claude API for morphological tagging.
 
@@ -274,25 +303,36 @@ With prompt caching (system prompt reused across hadiths in same batch), input c
 
 ### 2.4 Proposed Schema Changes
 
-#### 2.4.1 Translation Metadata Extension
+> **DataGen2 assessment:** AI translations fit naturally into the existing translation system. The current `List[str]` storage format already supports multi-paragraph output (each paragraph as a separate string in the array). No verse/chapter schema changes needed -- only the translation metadata index needs new fields.
+
+#### 2.4.1 Translation ID Convention
+
+AI translation IDs follow the pattern `{lang}.ai-{model}`:
+- `ur.ai-haiku-4.5` -- Urdu via Claude Haiku 4.5
+- `tr.ai-sonnet-4.5` -- Turkish via Claude Sonnet 4.5
+
+This convention makes AI translations sort together in the dropdown per language, visually distinguishable from human translations (`en.hubeali`, `en.sarwar`, `en.qarai`).
+
+#### 2.4.2 Translation Metadata Extension
 
 Current `index/translations.json` stores `{ name, id, lang }`. Add:
 
 ```json
 {
-  "id": "ur.claude-haiku-4.5",
+  "id": "ur.ai-haiku-4.5",
   "name": "Urdu (AI: Claude Haiku 4.5)",
   "lang": "ur",
   "source": "ai",
   "model": "claude-haiku-4-5-20251001",
   "generated_date": "2026-02-21",
-  "base_translations": ["ar", "en.hubeali"]
+  "base_translations": ["ar", "en.hubeali"],
+  "disclaimer": "This translation was generated by AI and may contain inaccuracies. The original Arabic text is authoritative."
 }
 ```
 
-New fields: `source` ("human" or "ai"), `model` (exact model ID), `generated_date`, `base_translations` (which source texts were used as input).
+New fields: `source` ("human" or "ai"), `model` (exact model ID), `generated_date`, `base_translations` (source texts used as input), `disclaimer` (displayed to user when this translation is selected).
 
-#### 2.4.2 Translation TypeScript Interface Update
+#### 2.4.3 Translation TypeScript Interface Update
 
 ```typescript
 export interface Translation {
@@ -302,8 +342,13 @@ export interface Translation {
   source?: 'human' | 'ai';    // new
   model?: string;              // new
   generated_date?: string;     // new
+  disclaimer?: string;         // new
 }
 ```
+
+#### 2.4.4 API Call Volume
+
+~21,000 API calls per language (Quran ayat + Al-Kafi hadiths + ThaqalaynAPI hadiths). Using the Batch API, these are submitted as a single batch job that processes asynchronously with 50% cost discount.
 
 #### 2.4.3 UI Indicator
 
@@ -374,43 +419,56 @@ Al-Kafi:1:1:1:1      (meaningless to users)
 
 The `path-link` component (`path-link.component.html`) does `removeBookPrefix(path)` which strips `/books/` but still shows the numeric path. Users cannot tell which book, volume, chapter, or hadith a reference points to without clicking through.
 
-#### 3.2.2 Proposed Solution: Build-Time Breadcrumb Text
+#### 3.2.2 Options Analysis
 
-During data generation, resolve each `verse_path` in narrator files to its full human-readable breadcrumb trail using the same index data that Angular uses for breadcrumbs.
+> **DataGen2 assessment:** Three options were evaluated. Option B (client-side) is recommended.
 
-**Generator change:** After all books are processed and `index/books.en.json` is built, post-process each narrator file to add a `verse_path_titles` field:
+**Option A: Build-time pre-computed titles in narrator files (REJECTED)**
 
-```json
-{
-  "verse_paths": [
-    "/books/al-kafi:1:2:3:4",
-    "/books/quran:2:255"
-  ],
-  "verse_path_titles": {
-    "/books/al-kafi:1:2:3:4": "Al-Kafi > Vol 1 > Book of Intelligence > Chapter 2 > Hadith 4",
-    "/books/quran:2:255": "The Holy Quran > Al-Baqarah > Ayat al-Kursi"
+Add `verse_path_titles` map to each narrator JSON file, pre-computed from `index/books.en.json`. Size impact: ~19 MB additional (4,860 files x ~50 paths x ~80 chars). **Rejected** due to excessive data bloat for a display-only improvement.
+
+**Option B: Client-side resolution from IndexState (RECOMMENDED)**
+
+The Angular app already loads `index/books.{lang}.json` on init via `IndexState`. The `path-link` component resolves titles at render time by walking up the path hierarchy -- the same logic used by `getCurrentNavigatedCrumbs` in `books.state.ts`.
+
+- Zero data size increase
+- Angular-only change: create a `PathTitleService` that caches resolved titles
+- Update `path-link` component to inject `PathTitleService` and display resolved title
+
+```typescript
+// PathTitleService (new)
+@Injectable({ providedIn: 'root' })
+export class PathTitleService {
+  private cache = new Map<string, string>();
+
+  constructor(private store: Store) {}
+
+  resolveTitle(path: string): string {
+    if (this.cache.has(path)) return this.cache.get(path)!;
+    // Walk path segments via lastIndexOf(':'), look up each in IndexState
+    const title = this.buildBreadcrumbTitle(path);
+    this.cache.set(path, title);
+    return title;
   }
 }
 ```
 
-**Size impact:** ~4,860 narrator files, average ~50 paths each, ~80 chars per title = ~19 MB additional. Can be mitigated by using abbreviated titles.
+**Option C: Pre-computed path-titles lookup file (FALLBACK)**
 
-**Angular change:** Update `path-link` component to accept an optional `title` input and display it instead of the raw path when available:
+If Option B causes performance issues with virtual scrolling (hundreds of paths resolving simultaneously), generate a single `index/path-titles.json` file with all path-to-title mappings:
 
-```html
-<a [routerLink]="..." [title]="fullTitle">
-  {{ title || removeBookPrefix(path) | titlecase }}
-</a>
+```json
+{
+  "/books/al-kafi:1:2:3:4": "Al-Kafi > Vol 1 > Book of Intelligence > Ch. 2 > H. 4",
+  "/books/quran:2:255": "Quran > Al-Baqarah > 255"
+}
 ```
 
-#### 3.2.3 Alternative: Client-Side Resolution (Lighter)
+- Size: ~1.2 MB (all paths with abbreviated titles, one shared file)
+- Loaded lazily on first narrator page visit
+- Much smaller than Option A (one file vs. embedded in 4,860 narrator files)
 
-Instead of pre-computing titles, the Angular app already loads `index/books.{lang}.json` on init. The `path-link` component could resolve titles at render time by looking up each path segment in the index.
-
-**Pros:** Zero data size increase.
-**Cons:** Requires multiple index lookups per path, adds complexity to a simple display component, and may cause jank with virtual scrolling (hundreds of paths resolving simultaneously).
-
-**Recommendation:** Start with client-side resolution (zero cost) using a shared `PathTitleService` that caches lookups. If performance is inadequate, fall back to build-time pre-computation.
+**Recommendation:** Implement Option B first (zero cost, Angular-only). If performance testing shows jank with virtual scrolling, fall back to Option C.
 
 ### 3.3 Narrator Biographies
 
@@ -614,9 +672,13 @@ def test_quran_entries_in_books_index():
     assert len(quran_entries) >= 114, f"Expected 114+ Quran entries, got {len(quran_entries)}"
 ```
 
-### 5.4 Status
+### 5.4 Status -- FIXED
 
-Task #64 (in progress) is actively investigating the generator code to fix this. The fix is straightforward once the filtering bug is identified.
+**Resolved.** The root cause was found in `lib_index.py`: `update_index_files()` used a raw path instead of `get_dest_path()` for the existence check when loading existing index data. The second call (Al-Kafi) always started with an empty dict, overwriting all Quran entries. A 2-line fix resolved this.
+
+- Generator commit: `005cd49` (fix in `lib_index.py`)
+- Data commit: `12a3de17` (regenerated `index/books.en.json` with 115 Quran + 2,368 Al-Kafi entries)
+- Regression test `test_sequential_updates_preserve_all_books` added to prevent recurrence
 
 ### 5.5 Impact on Other Features
 
@@ -624,19 +686,21 @@ This fix is a **prerequisite** for Feature 4 (Searchable Expandable Navigation),
 
 ---
 
-## 6. Implementation Priority and Dependencies
+## 7. Implementation Priority and Dependencies
 
-### 6.1 Priority Order
+### 7.1 Priority Order
 
-| Priority | Feature | Effort | Impact | Dependencies |
-|----------|---------|--------|--------|-------------|
-| **1** | **Breadcrumb Fix** (Section 5) | Low | High -- broken feature | None |
-| **2** | **Searchable Navigation** (Section 4) | Medium | High -- core UX improvement | Breadcrumb fix (#1) |
-| **3** | **AI Translations** (Section 2) | Medium | High -- 10x language coverage | Schema changes from SCHEMA_PROPOSAL.md |
-| **4** | **Narrator Improvements** (Section 3) | High | Medium-High -- scholarly value | WikiShia scraper |
-| **5** | **Word-by-Word** (Section 1) | High | Medium -- learning/study tool | Corpus data processing |
+| Priority | Feature | Effort | Impact | Dependencies | Status |
+|----------|---------|--------|--------|-------------|--------|
+| **1** | **Breadcrumb Fix** (Section 5) | Low | High | None | **DONE** (commit `005cd49`) |
+| **2** | **Searchable Navigation** (Section 4) | Medium | High -- core UX improvement | Breadcrumb fix | Ready |
+| **3** | **AI Translations** (Section 2) | Medium | High -- 10x language coverage | Schema changes from SCHEMA_PROPOSAL.md | Ready |
+| **4** | **Narrator Improvements** (Section 3) | High | Medium-High -- scholarly value | WikiShia scraper | Ready |
+| **5** | **Word-by-Word** (Section 1) | **HIGH** | Medium -- learning/study tool | Corpus data processing | **Phase 4 recommended** |
 
-### 6.2 Dependency Graph
+> **Note from DataGen2:** Word-by-Word is the highest complexity feature (new data sources, new file hierarchy, new routes). Consider deferring to Phase 4 unless it is a top user-facing priority.
+
+### 7.2 Dependency Graph
 
 ```
 Breadcrumb Fix (#5)
@@ -659,28 +723,31 @@ Corpus Data Processing
 Word-by-Word (#1) ---> Root Exploration Pages
 ```
 
-### 6.3 Recommended Implementation Phases
+### 7.3 Recommended Implementation Phases
 
 #### Phase 3A: Foundation (1-2 weeks)
-- Fix breadcrumb index bug (Section 5)
+- ~~Fix breadcrumb index bug (Section 5)~~ **DONE**
 - Implement searchable navigation (Section 4)
 - Begin WikiShia scraper development (Section 3.3)
-- Begin corpus.quran.com data processing (Section 1.2)
 
 #### Phase 3B: Content Expansion (2-4 weeks)
 - Generate AI translations for 5 priority languages (Section 2)
 - Complete narrator biographies for matched narrators (Section 3.3)
 - Add narrator English transliterations (Section 3.3.5)
-- Complete word-by-word Quran display (Section 1)
+- Implement readable hadith references on narrator pages (Section 3.2)
 
 #### Phase 3C: Polish (1-2 weeks)
 - Generate AI translations for remaining 5 languages (Section 2)
-- Add root exploration pages (Section 1.3.2)
 - Add reliability filtering to narrator list (Section 3.3.4)
 - Quality review of AI translations (Section 2.5)
 - Performance testing of navigation with full dataset
 
-### 6.4 Cost Summary
+#### Phase 4 (future)
+- Word-by-word Quran display (Section 1) -- deferred due to high complexity
+- Root exploration pages (Section 1.3.3)
+- Hadith word analysis via NLP (Section 1.7)
+
+### 7.4 Cost Summary
 
 | Item | One-Time Cost |
 |------|--------------|

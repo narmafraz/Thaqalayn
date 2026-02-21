@@ -6,10 +6,11 @@ import { PeopleState } from '@store/people/people.state';
 import { Observable } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-breadcrumbs',
-  templateUrl: './breadcrumbs.component.html',
-  styleUrls: ['./breadcrumbs.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-breadcrumbs',
+    templateUrl: './breadcrumbs.component.html',
+    styleUrls: ['./breadcrumbs.component.scss'],
+    standalone: false
 })
 export class BreadcrumbsComponent {
   crumbs$: Observable<Crumb[]> = inject(Store).select(BooksState.getCurrentNavigatedCrumbs);

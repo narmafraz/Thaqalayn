@@ -3,10 +3,11 @@ import { PwaService } from '@app/services/pwa.service';
 import { Observable } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-install-prompt',
-  templateUrl: './install-prompt.component.html',
-  styleUrls: ['./install-prompt.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-install-prompt',
+    templateUrl: './install-prompt.component.html',
+    styleUrls: ['./install-prompt.component.scss'],
+    standalone: false
 })
 export class InstallPromptComponent {
 

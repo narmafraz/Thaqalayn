@@ -6,10 +6,11 @@ import { BooksState } from '@store/books/books.state';
 import { Observable } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-translation-selection',
-  templateUrl: './translation-selection.component.html',
-  styleUrls: ['./translation-selection.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-translation-selection',
+    templateUrl: './translation-selection.component.html',
+    styleUrls: ['./translation-selection.component.scss'],
+    standalone: false
 })
 export class TranslationSelectionComponent {
   translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);

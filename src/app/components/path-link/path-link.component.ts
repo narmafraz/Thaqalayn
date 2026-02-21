@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-path-link',
-  templateUrl: './path-link.component.html',
-  styleUrls: ['./path-link.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-path-link',
+    templateUrl: './path-link.component.html',
+    styleUrls: ['./path-link.component.scss'],
+    standalone: false
 })
 export class PathLinkComponent {
   @Input() path: string;

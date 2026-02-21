@@ -9,10 +9,11 @@ import { RouterState } from '@store/router/router.state';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-chapter-content',
-  templateUrl: './chapter-content.component.html',
-  styleUrls: ['./chapter-content.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-chapter-content',
+    templateUrl: './chapter-content.component.html',
+    styleUrls: ['./chapter-content.component.scss'],
+    standalone: false
 })
 export class ChapterContentComponent implements OnInit, OnDestroy {
   fragment$: Observable<string> = inject(Store).select(RouterState.getUrlFragment);

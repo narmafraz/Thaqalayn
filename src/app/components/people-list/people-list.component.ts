@@ -13,10 +13,11 @@ import { MultiLingualText } from './../../models/text';
 import { Store } from '@ngxs/store';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-people-list',
-  templateUrl: './people-list.component.html',
-  styleUrls: ['./people-list.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-people-list',
+    templateUrl: './people-list.component.html',
+    styleUrls: ['./people-list.component.scss'],
+    standalone: false
 })
 export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 

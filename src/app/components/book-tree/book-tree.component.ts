@@ -30,10 +30,11 @@ interface IndexEntry {
 }
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-book-tree',
-  templateUrl: './book-tree.component.html',
-  styleUrls: ['./book-tree.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-book-tree',
+    templateUrl: './book-tree.component.html',
+    styleUrls: ['./book-tree.component.scss'],
+    standalone: false
 })
 export class BookTreeComponent implements OnInit, OnDestroy {
   searchQuery = '';

@@ -3,10 +3,11 @@ import { Bookmark, BookmarkService, ReadingProgress } from '@app/services/bookma
 import { Subscription } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-bookmarks',
-  templateUrl: './bookmarks.component.html',
-  styleUrls: ['./bookmarks.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-bookmarks',
+    templateUrl: './bookmarks.component.html',
+    styleUrls: ['./bookmarks.component.scss'],
+    standalone: false
 })
 export class BookmarksComponent implements OnInit, OnDestroy {
 

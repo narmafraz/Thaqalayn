@@ -7,10 +7,11 @@ import { RouterState } from '@store/router/router.state';
 import { Observable } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-book-dispatcher',
-  templateUrl: './book-dispatcher.component.html',
-  styleUrls: ['./book-dispatcher.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-book-dispatcher',
+    templateUrl: './book-dispatcher.component.html',
+    styleUrls: ['./book-dispatcher.component.scss'],
+    standalone: false
 })
 export class BookDispatcherComponent {
 

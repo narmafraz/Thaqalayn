@@ -8,10 +8,11 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-search-bar',
-  templateUrl: './search-bar.component.html',
-  styleUrls: ['./search-bar.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-search-bar',
+    templateUrl: './search-bar.component.html',
+    styleUrls: ['./search-bar.component.scss'],
+    standalone: false
 })
 export class SearchBarComponent implements OnInit, OnDestroy {
   @ViewChild('searchInput') searchInput: ElementRef;

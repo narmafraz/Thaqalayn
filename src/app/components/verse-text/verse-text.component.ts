@@ -5,10 +5,11 @@ import { BooksState } from '@store/books/books.state';
 import { Observable } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-verse-text',
-  templateUrl: './verse-text.component.html',
-  styleUrls: ['./verse-text.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-verse-text',
+    templateUrl: './verse-text.component.html',
+    styleUrls: ['./verse-text.component.scss'],
+    standalone: false
 })
 export class VerseTextComponent {
   translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);

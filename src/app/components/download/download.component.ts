@@ -3,10 +3,11 @@ import { OfflineStorageService, DownloadProgress, OfflineBookMeta } from '@app/s
 import { Subscription } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-download',
-  templateUrl: './download.component.html',
-  styleUrls: ['./download.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-download',
+    templateUrl: './download.component.html',
+    styleUrls: ['./download.component.scss'],
+    standalone: false
 })
 export class DownloadComponent implements OnInit, OnDestroy {
 

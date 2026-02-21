@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 
 @Pipe({
-  name: 'expandLanguage'
+    name: 'expandLanguage',
+    standalone: false
 })
 export class ExpandLanguagePipe implements PipeTransform {
 

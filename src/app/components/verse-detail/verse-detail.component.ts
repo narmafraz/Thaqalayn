@@ -7,10 +7,11 @@ import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-verse-detail',
-  templateUrl: './verse-detail.component.html',
-  styleUrls: ['./verse-detail.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-verse-detail',
+    templateUrl: './verse-detail.component.html',
+    styleUrls: ['./verse-detail.component.scss'],
+    standalone: false
 })
 export class VerseDetailComponent implements OnInit, OnDestroy {
   @Input() book$: Observable<VerseDetail>;

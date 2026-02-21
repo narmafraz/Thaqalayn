@@ -3,8 +3,9 @@ import { I18nService } from '@app/services/i18n.service';
 import { Subscription } from 'rxjs';
 
 @Pipe({
-  name: 'translate',
-  pure: false
+    name: 'translate',
+    pure: false,
+    standalone: false
 })
 export class TranslatePipe implements PipeTransform, OnDestroy {
 

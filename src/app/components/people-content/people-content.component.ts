@@ -11,10 +11,11 @@ import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-people-content',
-  templateUrl: './people-content.component.html',
-  styleUrls: ['./people-content.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-people-content',
+    templateUrl: './people-content.component.html',
+    styleUrls: ['./people-content.component.scss'],
+    standalone: false
 })
 export class PeopleContentComponent implements OnInit, AfterViewInit {
   narrator$: Observable<Narrator> = inject(Store).select(PeopleState.getCurrentNavigatedNarrator);

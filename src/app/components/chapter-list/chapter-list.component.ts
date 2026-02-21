@@ -8,10 +8,11 @@ import { catchError, distinctUntilChanged, filter, map, startWith } from 'rxjs/o
 import { ChapterListDataSource } from './chapter-list-data-source';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-chapter-list',
-  templateUrl: './chapter-list.component.html',
-  styleUrls: ['./chapter-list.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-chapter-list',
+    templateUrl: './chapter-list.component.html',
+    styleUrls: ['./chapter-list.component.scss'],
+    standalone: false
 })
 export class ChapterListComponent implements OnInit, AfterViewInit {
   @Input() book$: Observable<ChapterList>;

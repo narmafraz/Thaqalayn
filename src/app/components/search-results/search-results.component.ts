@@ -7,10 +7,11 @@ import { SearchResult } from '@app/services/search.service';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-search-results',
-  templateUrl: './search-results.component.html',
-  styleUrls: ['./search-results.component.scss']
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-search-results',
+    templateUrl: './search-results.component.html',
+    styleUrls: ['./search-results.component.scss'],
+    standalone: false
 })
 export class SearchResultsComponent implements OnInit, OnDestroy {
   results$: Observable<SearchResult[]> = inject(Store).select(SearchState.getResults);

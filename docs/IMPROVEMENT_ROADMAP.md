@@ -6,36 +6,60 @@
 
 ---
 
-## Current Sprint: Foundation Work (February 2026)
+## Current Sprint: Test Coverage First (February 2026)
+
+> **Principle:** Establish solid test coverage across all projects BEFORE making major changes or refactoring. Tests are the safety net that catches regressions when we later optimize data, upgrade Angular, or add new books.
 
 **Team assignments and immediate priorities:**
 
-### UIdev -- Frontend Stabilization
-1. Migrate TSLint to ESLint (`ng add @angular-eslint/schematics`, remove tslint + codelyzer)
-2. Remove Protractor, add Playwright for E2E (already available as MCP tool)
-3. Fix broken unit tests (books.state.spec.ts, router.state.spec.ts, app.component.spec.ts)
-4. Add HTTP error handling (ErrorInterceptor, loading/error states in NGXS stores)
-5. Audit and fix any npm audit vulnerabilities
+### UIdev -- E2E Tests for Frontend (PRIMARY FOCUS)
+Write Playwright end-to-end tests covering all key user flows. These tests run against the live Angular app + data server and verify that real users can navigate, read, and interact with the app.
 
-### DataGen -- Generator Improvements
-1. Data optimization: remove `narrator_chain.text` from output (30 MB savings, 1-line change)
-2. Data optimization: replace `getCombinations()` with full-chains + pairs only (60 MB savings)
-3. Refactor global error accumulation into `ProcessingReport` class
-4. Add type hints to all public functions
-5. Run and fix any failing tests
+**Critical E2E test scenarios:**
+1. Homepage loads and displays book list (Quran, Al-Kafi)
+2. Navigate to Quran surah (e.g., `/#/books/quran:1`) -- verify Arabic text, translation, verse count
+3. Navigate to Al-Kafi chapter (e.g., `/#/books/al-kafi:1:1:1`) -- verify hadith text, narrator chains
+4. Breadcrumb navigation -- verify crumbs display correctly and clicking navigates properly
+5. Prev/Next chapter navigation -- verify buttons work and URL updates
+6. Language/translation switching -- verify dropdown changes displayed text
+7. Narrator page (e.g., `/#/people/narrators/1`) -- verify narrator name, hadith list, co-narrators
+8. Narrator index page (`/#/people/narrators/index`) -- verify table loads and is searchable
+9. Deep linking -- navigate directly to a specific verse URL and verify content renders
+10. Cross-references -- verify "Mentions" / "Mentioned In" links resolve correctly
 
-### DataGatherer -- Source Data Research
-1. Survey existing raw data in `ThaqalaynDataGenerator/app/raw/`
-2. Identify which of the remaining 3 Four Books have accessible source data
-3. Research HubeAli.com, Al-Islam.org, Noor Digital Library for Man La Yahduruhu al-Faqih
-4. Document findings and source quality/format for each book
-5. Begin trial scraping of highest-priority available source
+**Also fix existing broken unit tests:**
+- `books.state.spec.ts` -- references non-existent `BooksAction` and wrong state shape
+- `router.state.spec.ts` -- references non-existent `RouterAction`
+- `app.component.spec.ts` -- expects old template content
 
-### Architect -- Documentation & Planning
-1. Update ARCHITECTURE.md with technology assessment (done)
-2. Validate that current tech choices remain appropriate (done)
-3. Create prioritized work plan for the team (done -- this section)
-4. Monitor team progress and unblock issues
+### DataGen -- Data Validation Tests (PRIMARY FOCUS)
+Write tests that validate the generated output in ThaqalaynData. These tests read the actual JSON files and verify schema compliance, content integrity, and cross-reference consistency.
+
+**Critical data validation tests:**
+1. **Schema validation:** Every JSON file has `index`, `kind`, `data` wrapper. `kind` is one of `chapter_list`, `verse_list`, `person_content`, `person_list`
+2. **Content integrity:** All text fields are valid UTF-8, no escaped Unicode (`\u0627` vs actual Arabic chars), no empty/null text arrays
+3. **Verse counts:** `verse_count` in chapter_list files matches actual number of verses in child files
+4. **Cross-references:** All paths in `relations` fields resolve to existing JSON files
+5. **Narrator chain consistency:** Every `narrator_chain.parts` entry with `kind: "narrator"` has a valid `path` that resolves to an existing narrator file
+6. **Narrator index integrity:** All narrator IDs in `people/narrators/index.json` have corresponding detail files
+7. **Navigation links:** All `nav.prev`, `nav.next`, `nav.up` paths resolve to existing files
+8. **Path format:** All paths follow `/books/{book}:{segments}` or `/people/narrators/{id}` format
+9. **Quran completeness:** 114 surahs, 6236 total verses
+10. **Al-Kafi completeness:** 8 volumes, 15281 total hadiths
+
+**Also improve existing unit test coverage:**
+- Add tests for `quran.py`, `kafi.py`, `kafi_sarwar.py` parsers
+- Add tests for `link_quran_kafi.py` cross-referencing
+- Snapshot tests comparing generated output against known-good samples
+
+### DataGatherer -- Source Data Research (continues)
+1. Continue researching sources for missing books
+2. Document findings in task log
+
+### Architect -- Coordination
+1. Update roadmap to reflect test-first priority (this update)
+2. Coordinate UIdev and DataGen on test scope
+3. Monitor progress and unblock issues
 
 ---
 

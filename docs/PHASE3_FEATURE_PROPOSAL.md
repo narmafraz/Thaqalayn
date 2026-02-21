@@ -599,7 +599,7 @@ Expand/collapse icons: `[v]` = expanded, `[>]` = collapsed, `[ ]` = leaf (no chi
 
 | Feature | Implementation |
 |---------|---------------|
-| Search box | `mat-form-field` with `matInput`, debounced 200ms |
+| Search box | `mat-form-field` with `matInput`, debounced 300ms |
 | Arabic normalization | Strip tashkeel, normalize hamza/teh marbuta/alef maksura, remove tatweel |
 | Match display | Matching nodes highlighted, parent path auto-expanded |
 | Breadcrumb in results | Each match shows full path: "Al-Kafi > Vol 1 > Book of Intelligence > Ch. 2" |
@@ -624,7 +624,56 @@ This normalization is applied at build time to create a `normalized_title` field
 
 On narrow screens (`<768px`), the tree navigation appears in a slide-out drawer triggered by a hamburger menu icon, or as a bottom sheet. Uses Angular CDK `Overlay` (already available, no new dependencies).
 
-### 4.4 Implementation
+### 4.4 Design Decisions
+
+Four open questions were raised during design review. Architect recommendations:
+
+#### Q1: Replace homepage table entirely, or sidebar/drawer alongside?
+
+**Recommendation: Replace the homepage table entirely.**
+
+Rationale:
+- The current table shows only the top level (Quran, Al-Kafi). The tree shows the full hierarchy at a glance -- strictly more useful.
+- Maintaining two navigation views (table + tree) doubles the UI surface area and testing burden.
+- The tree's collapsed default state (see Q2) provides the same visual simplicity as the current table when first loaded.
+- The search box is the key new affordance. Putting it in a sidebar risks it being overlooked.
+- On mobile, a full-page tree is simpler than a table-plus-drawer combo.
+
+**Alternative considered:** A sidebar tree alongside the content area (like VS Code's explorer). Rejected because the homepage IS the navigation -- there is no "content" to show alongside it until the user selects a chapter.
+
+#### Q2: Default collapsed or show 1-2 levels expanded?
+
+**Recommendation: Default collapsed (just book names), with one exception.**
+
+- Show only top-level book names when the page loads: "The Holy Quran", "Al-Kafi", etc.
+- **Exception:** If the user navigated back to the homepage from a specific book (e.g., they were reading Al-Kafi), auto-expand that book's branch to their last visited level. This provides continuity and makes "resume reading" natural.
+- This keeps the initial view clean and fast (only ~5-10 visible nodes with current book count, ~30 with full expansion).
+- Users who want to explore expand manually; users who want to search use the search box.
+
+#### Q3: Search results: navigate immediately on click, or highlight in tree first?
+
+**Recommendation: Highlight in tree first, navigate on second click (or Enter).**
+
+- Immediate navigation on click is jarring when users are exploring search results and may want to compare multiple matches.
+- First click: scroll the tree to the matched node, highlight it, auto-expand its ancestors to show context.
+- Second click (or Enter key): navigate to the chapter/verse page.
+- This two-step interaction matches familiar patterns (file explorers, IDE search results).
+- **Mobile exception:** On touch devices, a single tap navigates immediately (no hover state available, and two taps feels sluggish on mobile).
+
+#### Q4: Keyboard navigation?
+
+**Recommendation: Yes, full keyboard support.**
+
+- Arrow Up/Down: move focus between visible tree nodes
+- Arrow Right: expand a collapsed node (or move to first child if already expanded)
+- Arrow Left: collapse an expanded node (or move to parent if already collapsed)
+- Enter: navigate to the focused node's page
+- Home/End: jump to first/last visible node
+- Type-ahead: typing characters while tree is focused filters to matching nodes (same as search box)
+
+This is standard `role="tree"` ARIA behavior and required for WCAG 2.1 AA compliance. CDK Flat Tree provides keyboard handling primitives (`cdkTreeNodeToggle`, focus management).
+
+### 4.5 Implementation
 
 | Step | Team Member | Description |
 |------|-------------|-------------|
@@ -643,11 +692,13 @@ On narrow screens (`<768px`), the tree navigation appears in a slide-out drawer 
 
 ---
 
-## 5. Breadcrumb Fix (Quran)
+## 5. Breadcrumb Fix (Quran-Specific Index Bug)
+
+> **Clarification (UIdev investigation):** Breadcrumbs are working correctly on Al-Kafi pages. The full trail `Home >> Al-Kafi >> Volume One >> ...` renders properly at all hierarchy levels. The issue was **Quran-specific** -- caused by missing Quran entries in the book index, not a component or selector bug. User may want breadcrumbs more prominent (currently 13px font size) -- this is a styling consideration, not a bug.
 
 ### 5.1 Problem
 
-Breadcrumbs are not showing on Quran pages. On `https://thaqalayn.netlify.app/#/books/quran:1`, only "Home" is displayed -- no "The Holy Quran > Al-Fatiha" trail.
+Breadcrumbs were not showing on Quran pages specifically. On `https://thaqalayn.netlify.app/#/books/quran:1`, only "Home" was displayed -- no "The Holy Quran > Al-Fatiha" trail. Al-Kafi breadcrumbs worked correctly.
 
 ### 5.2 Root Cause
 

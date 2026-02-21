@@ -1,0 +1,42 @@
+{
+  "name": "Thaqalayn",
+  "short_name": "Thaqalayn",
+  "theme_color": "#7ba7a7",
+  "background_color": "#f5f5f0",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "description": "Islamic Hadith collections - The two weighty things at your fingertips",
+  "icons": [
+    {
+      "src": "assets/just-logo_small.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/just-logo_small.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/just-logo_small.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/just-logo_small.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/just-logo_small.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/just-logo_small.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

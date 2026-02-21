@@ -41,7 +41,7 @@ export class SearchService {
 
   private async _loadTitlesIndex(): Promise<void> {
     try {
-      const url = `${environment.apiBaseUrl}search/titles.json`;
+      const url = `${environment.apiBaseUrl}index/search/titles.json`;
       const data = await this.http.get<TitleDocument[]>(url).toPromise();
 
       this.titlesDb = await create({

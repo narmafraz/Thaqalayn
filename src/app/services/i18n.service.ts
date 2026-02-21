@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 const STORAGE_KEY = 'thaqalayn-ui-lang';
@@ -13,9 +13,11 @@ export class I18nService {
 
   private strings: Record<string, unknown> = {};
   private langSubject: BehaviorSubject<string>;
+  private stringsChangedSubject = new Subject<void>();
 
   currentLang$: Observable<string>;
   isRtl$: Observable<boolean>;
+  stringsChanged$ = this.stringsChangedSubject.asObservable();
 
   constructor(private http: HttpClient) {
     const initialLang = this.detectLanguage();
@@ -84,12 +86,14 @@ export class I18nService {
     this.http.get<Record<string, unknown>>(`assets/i18n/${lang}.json`).subscribe({
       next: (data) => {
         this.strings = data;
+        this.stringsChangedSubject.next();
       },
       error: () => {
         if (lang !== 'en') {
           this.http.get<Record<string, unknown>>('assets/i18n/en.json').subscribe({
             next: (data) => {
               this.strings = data;
+              this.stringsChangedSubject.next();
             }
           });
         }

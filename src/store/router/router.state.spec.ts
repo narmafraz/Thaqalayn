@@ -1,24 +1,29 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { NgxsModule, Store } from '@ngxs/store';
 import { RouterState, RouterStateModel } from './router.state';
-import { RouterAction } from './router.actions';
 
-describe('Router store', () => {
+describe('RouterState', () => {
   let store: Store;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [NgxsModule.forRoot([RouterState])]
     }).compileComponents();
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
   }));
 
-  it('should create an action and add an item', () => {
-    const expected: RouterStateModel = {
-      items: ['item-1']
-    };
-    store.dispatch(new RouterAction('item-1'));
-    const actual = store.selectSnapshot(RouterState.getState);
-    expect(actual).toEqual(expected);
+  it('should initialize with correct defaults', () => {
+    const index = store.selectSnapshot(RouterState.getBookPartIndex);
+    expect(index).toBeUndefined();
   });
 
+  it('should default language to en', () => {
+    const language = store.selectSnapshot(RouterState.getLanguage);
+    expect(language).toBe('en');
+  });
+
+  it('should initialize translation as undefined', () => {
+    const translation = store.selectSnapshot(RouterState.getTranslation);
+    expect(translation).toBeUndefined();
+  });
 });

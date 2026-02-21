@@ -1,24 +1,29 @@
 import { TestBed, waitForAsync } from '@angular/core/testing';
 import { NgxsModule, Store } from '@ngxs/store';
 import { BooksState, BooksStateModel } from './books.state';
-import { BooksAction } from './books.actions';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
-describe('Books store', () => {
+describe('BooksState', () => {
   let store: Store;
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [NgxsModule.forRoot([BooksState])]
+      imports: [
+        NgxsModule.forRoot([BooksState]),
+        HttpClientTestingModule,
+      ]
     }).compileComponents();
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
   }));
 
-  it('should create an action and add an item', () => {
-    const expected: BooksStateModel = {
-      items: ['item-1']
-    };
-    store.dispatch(new BooksAction('item-1'));
-    const actual = store.selectSnapshot(BooksState.getState);
-    expect(actual).toEqual(expected);
+  it('should initialize with empty titles and parts', () => {
+    const state: BooksStateModel = store.selectSnapshot(BooksState.getState);
+    expect(state.titles).toEqual([]);
+    expect(state.parts).toEqual({});
   });
 
+  it('should return undefined for a non-existent part index', () => {
+    const getPartByIndex = store.selectSnapshot(BooksState.getPartByIndex);
+    expect(getPartByIndex('nonexistent')).toBeUndefined();
+  });
 });

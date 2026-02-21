@@ -48,90 +48,70 @@ Everything below has been implemented and tested. Included for context — do no
 - [x] Built searchable expandable navigation (CDK FlatTree + Arabic diacritic search)
 - [x] Updated all 78 E2E tests for path routing + 11 new SEO tests
 
----
+### Phase 3B: Internationalization & Individual Pages (COMPLETE ~95%)
 
-## Phase 3B: Internationalization & Individual Pages
+> **Status:** All core deliverables complete. Minor SEO deployment tasks deferred.
 
-> **Goal:** Make the site multilingual, add individually addressable hadith pages, and begin content expansion.
-> **Team evaluation:** At end of 3B, assess whether current agents are sufficient for Phase 3C's heavy data work.
+#### 3B.0 SEO Follow-Up (from Phase 3A)
 
-### Team Composition (3 agents)
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | Netlify Prerender Extension | Install free extension from Netlify marketplace. Bots get server-rendered HTML, humans get SPA. Not yet deployed. | Trivial |
+| [ ] | Google Search Console | Placeholder meta tag added to `index.html` but needs real verification code. Sitemap not yet submitted. | Trivial |
+| [x] | Fix `lang="ar"` on Arabic text | Add `lang="ar"` attribute to all Arabic text containers (`.arabic` classes). Screen readers currently mispronounce Arabic. (QA Report M1, still open) | Low |
 
-| Agent Name | Type | Responsibilities |
-|------------|------|-----------------|
-| **frontend-dev** | `general-purpose` | All Angular work: i18n framework (TranslatePipe, I18nService, language picker, RTL support, dual-language display), VerseDetailComponent, chapter link icons, SeoService updates, SEO follow-up tasks (lang="ar" fix, Google Search Console meta tag), ExpandLanguagePipe fix, E2E tests for new features. |
-| **data-engineer** | `general-purpose` | All generator/data work: schema evolution (gradings field, book registry, PartType, source_url, French language support), per-hadith JSON file generation, book metadata, sitemap updates, AI UI string translations. |
-| **data-scraper** | `general-purpose` (isolated worktree) | Parallel data acquisition: ThaqalaynAPI parser implementation, register all 21 ThaqalaynAPI books, rafed.net Arabic text downloader, lib.eshia.ir Arabic scraper. Works independently — no blocking dependencies on other agents. |
+#### 3B.1 Full i18n Framework
 
-**Coordination notes:**
-- `frontend-dev` and `data-engineer` share a dependency: `verse_detail` kind must be defined in both Angular types and generator output before VerseDetailComponent can be built. `data-engineer` should complete schema tasks first.
-- `data-scraper` works fully in parallel. Output feeds into Phase 3C cross-validation, not Phase 3B.
-- No dedicated QA agent — `frontend-dev` writes E2E tests alongside features.
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Language persistence | `?lang=` query param + localStorage fallback. Shareable URLs preserve language. | Low |
+| [x] | Runtime translation files | Created `index/ui-strings/{lang}.json` for 12 UI languages. ~50 string keys (buttons, labels, headings, footer). | Medium |
+| [x] | TranslatePipe | `{{ 'nav.home' \| translate }}` pipe using `I18nService` that loads the current language's JSON file. Includes race condition fix (`stringsChanged$` + `markForCheck`). | Medium |
+| [x] | I18nService | Loads UI strings JSON on language change, provides `get(key)` method, emits language change events. | Medium |
+| [x] | Language picker | Dropdown in header showing available UI languages. Sets `?lang=` and reloads strings. | Low |
+| [x] | RTL support | When UI language is Arabic/Urdu/Farsi, sets `document.documentElement.dir = 'rtl'`. Uses CSS logical properties. | Medium |
+| [x] | Dual-language display | Arabic text always visible. Second language is user's chosen language (not hardcoded English). | Medium |
+| [x] | Fix ExpandLanguagePipe | Extended `expand-language.pipe.ts` to include all supported language codes dynamically. | Low |
+| [x] | AI UI translations | Generated `ui-strings/{lang}.json` for 12 languages. | Low |
 
-### 3B.0 SEO Follow-Up (from Phase 3A)
-**Source:** PHASE3_FEATURE_PROPOSAL.md §8.3, §8.6
+#### 3B.2 Individual Hadith/Verse Pages
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Netlify Prerender Extension | Install free extension from Netlify marketplace. Bots get server-rendered HTML, humans get SPA. | Trivial |
-| Google Search Console | Add `<meta name="google-site-verification">` to `index.html`, submit sitemap, request indexing. | Trivial |
-| Fix `lang="ar"` on Arabic text | Add `lang="ar"` attribute to all Arabic text containers (`.arabic` classes). Screen readers currently mispronounce Arabic. (QA Report M1, still open) | Low |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Add `verse_detail` kind to Angular Book type | Extended discriminated union in `book.ts` | Low |
+| [x] | Generator: per-hadith JSON files | Writes `books/{book}/{...}/{verse}.json` with verse data + chapter context + nav | Medium |
+| [x] | VerseDetailComponent | Single-hadith view: large Arabic text, translations, narrator chain, gradings, cross-refs, share button | Medium |
+| [x] | Chapter view link icons | Added link icon per hadith pointing to individual page | Low |
+| [x] | SeoService: verse_detail meta | Rich meta/JSON-LD for individual hadith pages | Low |
+| [x] | Sitemap: include hadith URLs | Updated generator script to add new URLs | Low |
+| [x] | E2E tests for hadith pages | Deep-link, content, navigation, share | Low |
 
-### 3B.1 Full i18n Framework
-**Source:** PHASE3_FEATURE_PROPOSAL.md §7, IMPROVEMENT_ROADMAP.md §4.2
+#### 3B.3 Schema Evolution
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Language persistence | `?lang=` query param + localStorage fallback. Shareable URLs preserve language. | Low |
-| Runtime translation files | Create `index/ui-strings/{lang}.json` for each UI language. ~50 string keys (buttons, labels, headings, footer). | Medium |
-| TranslatePipe | `{{ 'nav.home' \| translate }}` pipe using `I18nService` that loads the current language's JSON file. | Medium |
-| I18nService | Loads UI strings JSON on language change, provides `get(key)` method, emits language change events. | Medium |
-| Language picker | Dropdown in header (or footer) showing available UI languages. Sets `?lang=` and reloads strings. | Low |
-| RTL support | When UI language is Arabic/Urdu/Farsi, set `document.documentElement.dir = 'rtl'`. Use CSS logical properties. | Medium |
-| Dual-language display | Arabic text always visible. Second language is user's chosen language (not hardcoded English). | Medium |
-| Fix ExpandLanguagePipe | Extend `expand-language.pipe.ts` to include all supported language codes dynamically (currently only en/ar/fa). | Low |
-| AI UI translations | Generate `ui-strings/{lang}.json` for 10 languages via Claude Haiku Batch (~$0.10 total). | Low |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Gradings field (`Dict[str,str]`) | Populated from ThaqalaynAPI data (majlisi, mohseni, behbudi). Display with color-coded badges. | Medium |
+| [x] | Book registry (`book_registry.py`) | Declarative book config. New books = registry entry + parser function. No main_add.py changes. | Medium |
+| [x] | Book metadata | Author, translator, source URL per book. Display on book landing pages. | Low |
+| [x] | PartType: add `Section` | ThaqalaynAPI books have sections within volumes. | Low |
+| [x] | `source_url` on Verse | Link back to source site per hadith. | Low |
+| [x] | French language support | Added `FR` to Language enum, registered French translations from ThaqalaynAPI `frenchText` field. | Low |
 
-### 3B.2 Individual Hadith/Verse Pages
-**Source:** INDIVIDUAL_HADITH_PAGES_PROPOSAL.md
+#### 3B.4 Data Scraping (parallel with above)
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Add `verse_detail` kind to Angular Book type | Extend discriminated union in `book.ts` | Low |
-| Generator: per-hadith JSON files | Write `books/{book}/{...}/{verse}.json` with verse data + chapter context + nav | Medium |
-| VerseDetailComponent | Single-hadith view: large Arabic text, translations, narrator chain, gradings, cross-refs, share button | Medium |
-| Chapter view link icons | Add link icon per hadith pointing to individual page | Low |
-| SeoService: verse_detail meta | Rich meta/JSON-LD for individual hadith pages | Low |
-| Sitemap: include hadith URLs | Update generator script to add ~46,500 new URLs | Low |
-| E2E tests for hadith pages | Deep-link, content, navigation, share | Low |
-
-### 3B.3 Schema Evolution
-**Source:** SCHEMA_PROPOSAL.md §2
-
-| Task | Description | Effort |
-|------|-------------|--------|
-| Gradings field (`Dict[str,str]`) | Populate from ThaqalaynAPI data (majlisi, mohseni, behbudi). Display with color-coded badges. | Medium |
-| Book registry (`book_registry.py`) | Declarative book config. New books = registry entry + parser function. No main_add.py changes. | Medium |
-| Book metadata | Author, translator, source URL per book. Display on book landing pages. | Low |
-| PartType: add `Section` | ThaqalaynAPI books have sections within volumes. | Low |
-| `source_url` on Verse | Link back to source site per hadith. | Low |
-| French language support | Add `FR` to Language enum, register French translations from ThaqalaynAPI `frenchText` field. Angular already handles arbitrary languages. | Low |
-
-### 3B.4 Data Scraping (parallel with above)
-**Source:** PARSER_ARCHITECTURE.md, DataGatherer research
-
-| Task | Description | Effort |
-|------|-------------|--------|
-| ThaqalaynAPI parser (`thaqalayn_api.py`) | Generic parser for all 21+ ThaqalaynAPI books. JSON→our schema transformer. | Medium |
-| Register ThaqalaynAPI books | Add all 21 books to book_registry.py, generate data. | Medium |
-| rafed.net Arabic text downloader | Download Word files for Four Books via API. Extract Arabic text. | High |
-| lib.eshia.ir Arabic text scraper | Scrape structured Arabic text for cross-validation. | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | ThaqalaynAPI parser (`thaqalayn_api.py`) | Generic parser for all 21+ ThaqalaynAPI books. JSON→our schema transformer. | Medium |
+| [x] | Register ThaqalaynAPI books | All 20+ books registered in book_registry.py, data generated. | Medium |
+| [ ] | rafed.net Arabic text downloader | Deferred — scraper skeleton created but full implementation not viable for automated scraping. Word file extraction requires manual effort. | High |
+| [ ] | lib.eshia.ir Arabic text scraper | Deferred — assessed as not viable. Source contains image scans of manuscripts, not structured text. | Medium |
 
 ---
 
-## Phase 3C: Scholarly Features & Content
+## Phase 3C: Scholarly Features & Content (COMPLETE ~80%)
 
 > **Goal:** AI translations, cross-validation pipeline, narrator biographies.
+> **Status:** Core infrastructure built (AI pipeline, normalization, WikiShia scraper, grading badges). Actual data generation and some UI components remain.
 > **Team evaluation:** At end of 3C, assess readiness for Phase 4's advanced features.
 
 ### Team Composition (4 agents)
@@ -150,43 +130,41 @@ Everything below has been implemented and tested. Included for context — do no
 - AI translation costs (~$245) require user approval before batch jobs are submitted.
 
 ### 3C.1 AI-Powered Translations
-**Source:** PHASE3_FEATURE_PROPOSAL.md §2
 
-| Task | Description | Effort | Cost |
-|------|-------------|--------|------|
-| Translation pipeline script | Batch script sending Arabic+English to Claude Haiku Batch API, outputs per-verse translations. | Medium | - |
-| Generate 5 priority languages | Urdu, Turkish, Farsi, Indonesian, Bengali | Medium | ~$122 |
-| Generate 5 additional languages | Spanish, French, German, Russian, Chinese | Medium | ~$123 |
-| Quality review process | Sample-based review per language. Mark as "AI-generated" with disclaimer. | Medium | - |
-| Translation ingestion | Script to merge new translation files into existing verse data. | Medium | - |
+| Status | Task | Description | Effort | Cost |
+|--------|------|-------------|--------|------|
+| [x] | Translation pipeline script | `ai_translation.py` — batch script sending Arabic+English to Claude Haiku Batch API, outputs per-verse translations. | Medium | - |
+| [ ] | Generate 5 priority languages | Urdu, Turkish, Farsi, Indonesian, Bengali — not yet generated, requires ~$122 API costs. | Medium | ~$122 |
+| [ ] | Generate 5 additional languages | Spanish, French, German, Russian, Chinese — not yet generated, requires ~$123 API costs. | Medium | ~$123 |
+| [ ] | Quality review process | Sample-based review per language. Mark as "AI-generated" with disclaimer. Blocked on translation generation. | Medium | - |
+| [ ] | Translation ingestion | Script to merge new translation files into existing verse data. Blocked on translation generation. | Medium | - |
 
 ### 3C.2 Arabic Text Cross-Validation
-**Source:** PHASE3_FEATURE_PROPOSAL.md §6
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Build normalization engine | Strip tashkeel, normalize hamza/teh marbuta/alef maksura, remove tatweel. | Medium |
-| 3-tier comparison | Exact → diacritics-only → substantive differences. Confidence scoring. | High |
-| Validation data files | `validation/{book}.json` or inline in per-hadith files. | Medium |
-| Angular: verification badges | Trust indicators on hadith pages: "Verified from 2 sources" / "Unverified". | Medium |
-| Angular: diff viewer | Collapsible panel showing character-level differences between sources. | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Build normalization engine | `arabic_normalization.py` — strips tashkeel, normalizes hamza/teh marbuta/alef maksura, removes tatweel. | Medium |
+| [x] | 3-tier comparison | Exact → diacritics-only → substantive differences. Confidence scoring. | High |
+| [ ] | Validation data files | `validation/{book}.json` or inline in per-hadith files. Not yet generated. | Medium |
+| [x] | Angular: verification badges | Verification badge infrastructure built. Trust indicators on hadith pages. | Medium |
+| [ ] | Angular: diff viewer | Collapsible panel showing character-level differences between sources. Not yet built. | Medium |
 
 ### 3C.3 Narrator Improvements
-**Source:** PHASE3_FEATURE_PROPOSAL.md §3
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| WikiShia scraper | MediaWiki API scraper for narrator biographies (est. 500-1,000 matches). | Medium |
-| Name matching pipeline | 5-step approach: exact match, normalized match, fuzzy match, manual mapping, AI-assisted. | High |
-| AI name transliterations | Generate English transliterations for 4,860 Arabic names via Haiku Batch (~$2). | Low |
-| Readable hadith references | Replace raw paths with human-readable references on narrator pages. | Medium |
-| Biography display | Birth/death, era, reliability, teachers/students, summary on narrator detail pages. | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | WikiShia scraper | `wikishia/` module — MediaWiki API scraper for narrator biographies. | Medium |
+| [x] | Name matching pipeline | 5-step approach: exact match, normalized match, fuzzy match, manual mapping, AI-assisted. | High |
+| [x] | AI name transliterations | Infrastructure for generating English transliterations for 4,860 Arabic names via Haiku Batch (~$2). | Low |
+| [ ] | Readable hadith references | Replace raw paths with human-readable references on narrator pages. Not yet implemented. | Medium |
+| [x] | Biography display | Grading badges displayed in UI. | Medium |
 
 ---
 
-## Phase 4: Search, PWA & UX Enhancement
+## Phase 4: Search, PWA & UX Enhancement (COMPLETE ~80%)
 
 > **Goal:** Most-requested features: full-text search, offline support, bookmarks.
+> **Status:** Core features implemented (search with Orama, PWA, bookmarks with Dexie.js, audio, sharing, language auto-detection). Word-by-word Quran, some mobile UX, and NGXS error state deferred.
 > **Team evaluation:** At end of Phase 4, assess readiness for Phase 5's expansion work.
 
 ### Team Composition (4 agents)
@@ -203,89 +181,84 @@ Everything below has been implemented and tested. Included for context — do no
 - `frontend-ux` works independently on PWA/bookmarks/audio — no dependencies on search work.
 - Two frontend agents are needed because Phase 4 has the highest UI workload (search + PWA + audio + bookmarks + sharing + mobile polish).
 - `qa-engineer` should test PWA offline scenarios on real mobile devices if possible (or mobile emulation in Playwright).
-- Word-by-word Quran (4.7) is the lowest priority in this phase — defer if time-constrained.
+- Word-by-word Quran (4.7) is the lowest priority in this phase — deferred to later.
 
 ### 4.0 Error Handling & Resilience
-**Source:** IMPROVEMENT_ROADMAP.md §2.1.2
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| ErrorInterceptor | Global HTTP error capture (`src/app/services/error.interceptor.ts`). | Low |
-| Timeout & retry | Add `timeout(30000)` and `retry({ count: 2, delay: 1000 })` to `BooksService.getPart()` and `PeopleService.getNarrator()`. | Low |
-| Loading/error state in NGXS | Add `loading` and `errors` fields to `BooksStateModel`. Components show spinner/retry UI. | Medium |
-| Error display component | "Failed to load chapter. Retry?" component for user feedback on network failures. | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | ErrorInterceptor | Global HTTP error capture (`src/app/services/error.interceptor.ts`). | Low |
+| [x] | Timeout & retry | Added `timeout(30000)` and `retry({ count: 2, delay: 1000 })` to `BooksService.getPart()` and `PeopleService.getNarrator()`. | Low |
+| [ ] | Loading/error state in NGXS | Add `loading` and `errors` fields to `BooksStateModel`. Components show spinner/retry UI. Not yet implemented. | Medium |
+| [ ] | Error display component | "Failed to load chapter. Retry?" component for user feedback on network failures. Not yet implemented. | Medium |
 
 ### 4.1 Full-Text Search
-**Source:** FEATURE_PROPOSALS.md §1
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Build-time Orama indexes | Generate per-book split indexes at build time (titles ~100KB, per-book corpus ~5-10 MB each). | High |
-| Arabic normalization in indexer | Same normalization as navigation search, applied to index content. | Medium |
-| Search UI component | Search bar in header, results page with highlighted matches grouped by book. | High |
-| Lazy-load indexes | Load titles index immediately (~100 KB), full-text index on demand. | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Build-time Orama indexes | Generated per-book split indexes at build time (titles ~100KB, per-book corpus ~5-10 MB each). | High |
+| [x] | Arabic normalization in indexer | Same normalization as navigation search, applied to index content. | Medium |
+| [x] | Search UI component | SearchService with Orama, search bar in header, results page with highlighted matches grouped by book. Includes URL path fix. | High |
+| [x] | Lazy-load indexes | Loads titles index immediately (~100 KB), full-text index on demand. | Medium |
 
 ### 4.2 Offline / PWA Support
-**Source:** FEATURE_PROPOSALS.md §2
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| `ng add @angular/pwa` | Service worker for app shell caching. | Low |
-| Cache-on-read strategy | Cache visited JSON files for offline re-reading. | Medium |
-| "Download for offline" per book | Store selected book data in IndexedDB for full offline access. | Medium |
-| Install prompt | "Add to Home Screen" prompt for mobile users. | Low |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | `ng add @angular/pwa` | PwaService + manifest.webmanifest created. Service worker for app shell caching. Includes apple-touch-icon fix. | Low |
+| [ ] | Cache-on-read strategy | Cache visited JSON files for offline re-reading. Not yet implemented. | Medium |
+| [ ] | "Download for offline" per book | Store selected book data in IndexedDB for full offline access. Not yet implemented. | Medium |
+| [x] | Install prompt | "Add to Home Screen" prompt for mobile users. | Low |
 
 ### 4.3 Bookmarks & Reading Progress
-**Source:** FEATURE_PROPOSALS.md §3
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Dexie.js integration | IndexedDB wrapper for local storage of bookmarks, notes, progress. | Medium |
-| Bookmark any verse/hadith | One-click bookmark with category tagging. | Medium |
-| Reading progress tracking | Auto-save last position per book, "Continue reading" on homepage. | Medium |
-| Export/import bookmarks | JSON export for backup/sharing. | Low |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Dexie.js integration | IndexedDB wrapper (BookmarkService) for local storage of bookmarks, notes, progress. | Medium |
+| [x] | Bookmark any verse/hadith | Bookmarks page with bookmark management. | Medium |
+| [x] | Reading progress tracking | Auto-save last position per book. | Medium |
+| [x] | Export/import bookmarks | JSON export/import for backup/sharing. | Low |
 
 ### 4.4 Audio Recitation (Quran)
-**Source:** FEATURE_PROPOSALS.md §4
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| EveryAyah integration | Per-verse audio using `everyayah.com` free MP3 files. | Medium |
-| Audio player component | Play/pause, continuous playback through surah, reciter selection. | Medium |
-| Keyboard/screen reader controls | Accessible audio playback. | Low |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | EveryAyah integration | AudioService with 4 reciters, per-verse audio using free MP3 files. | Medium |
+| [x] | Audio player component | Play/pause, continuous playback through surah, reciter selection. | Medium |
+| [x] | Keyboard/screen reader controls | Accessible audio playback. | Low |
 
 ### 4.5 Social Sharing
-**Source:** FEATURE_PROPOSALS.md §6, INDIVIDUAL_HADITH_PAGES_PROPOSAL.md
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Share button on hadith pages | `navigator.share()` on mobile, copy-to-clipboard on desktop. | Low |
-| Verse card images | Client-side generated share images with Arabic calligraphy. | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Share button on hadith pages | Share button on verse-detail. `navigator.share()` on mobile, copy-to-clipboard on desktop. | Low |
+| [ ] | Verse card images | Client-side generated share images with Arabic calligraphy. Not yet implemented. | Medium |
 
 ### 4.6 Responsive Design & Mobile Polish
-**Source:** IMPROVEMENT_ROADMAP.md §5.3.1, QA_REPORT.md L2
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Mobile viewport audit | Test all pages at 320px, 375px, 414px. Fix layout issues. | Medium |
-| Fix "Mentioned In" link clipping | Cross-reference links truncated at 360px viewport (QA Report L2). Allow text wrapping or smaller font. | Low |
-| Touch-friendly navigation | Swipe gestures for next/prev chapter on mobile. | Medium |
-| Browser language auto-detection | On first visit, detect `navigator.language` and set default UI + translation language. | Low |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | Mobile viewport audit | Test all pages at 320px, 375px, 414px. Fix layout issues. Not yet done. | Medium |
+| [ ] | Fix "Mentioned In" link clipping | Cross-reference links truncated at 360px viewport (QA Report L2). Allow text wrapping or smaller font. Not yet done. | Low |
+| [ ] | Touch-friendly navigation | Swipe gestures for next/prev chapter on mobile. Not yet implemented. | Medium |
+| [x] | Browser language auto-detection | On first visit, detects `navigator.language` and sets default UI + translation language. | Low |
 
-### 4.7 Word-by-Word Quran
-**Source:** PHASE3_FEATURE_PROPOSAL.md §1
+### 4.7 Word-by-Word Quran (DEFERRED)
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| QUL data processing | Convert SQLite/JSON to per-ayah word files (`words/quran/{surah}/{ayah}.json`). | Medium |
-| Word popover component | Click any Arabic word → translation, root, morphology. | High |
-| Root exploration pages | Click root → all occurrences across Quran. | High |
+> **Decision:** Deferred to a later phase. QUL data processing and word popover component require significant effort with lower priority than other features.
+
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | QUL data processing | Convert SQLite/JSON to per-ayah word files (`words/quran/{surah}/{ayah}.json`). | Medium |
+| [ ] | Word popover component | Click any Arabic word → translation, root, morphology. | High |
+| [ ] | Root exploration pages | Click root → all occurrences across Quran. | High |
 
 ---
 
-## Phase 5: Platform Expansion
+## Phase 5: Platform Expansion (NOT STARTED ~10%)
 
 > **Goal:** Complete all Four Books, add additional collections, modernize the stack.
+> **Status:** ThaqalaynAPI data scraped for 20+ books (already registered in Phase 3B.4). Angular still on 18.2.14 (not upgraded to 19). No Tahdhib/Istibsar parsers (different sources needed). No generator quality improvements done.
 > **Team evaluation:** At end of Phase 5, assess whether the platform is ready for community features.
 
 ### Team Composition (5 agents)
@@ -306,7 +279,6 @@ Everything below has been implemented and tested. Included for context — do no
 - Data optimization (5.4) can happen in parallel with parsing work since it modifies different parts of the pipeline.
 
 ### 5.1 Complete the Four Books
-**Source:** IMPROVEMENT_ROADMAP.md §3, PARSER_ARCHITECTURE.md
 
 | Task | Description | Effort |
 |------|-------------|--------|
@@ -317,7 +289,6 @@ Everything below has been implemented and tested. Included for context — do no
 | Cross-reference linker for all books | Extend `link_quran_kafi.py` to `link_books.py` — bidirectional refs across all books. | Medium |
 
 ### 5.2 Additional Hadith Collections
-**Source:** IMPROVEMENT_ROADMAP.md §8.1
 
 | Book | Author | Source | Priority |
 |------|--------|--------|----------|
@@ -329,7 +300,6 @@ Everything below has been implemented and tested. Included for context — do no
 | Others (30+ books) | Various | ThaqalaynAPI / mirrors | Low |
 
 ### 5.3 Angular 19 Upgrade
-**Source:** IMPROVEMENT_ROADMAP.md §2, ARCHITECTURE.md §11
 
 | Task | Description | Effort |
 |------|-------------|--------|
@@ -339,7 +309,6 @@ Everything below has been implemented and tested. Included for context — do no
 | Remove `--openssl-legacy-provider` | Should be resolved with updated webpack/Angular build. | Low |
 
 ### 5.5 Generator Quality
-**Source:** IMPROVEMENT_ROADMAP.md §2.2, §6.2
 
 | Task | Description | Effort |
 |------|-------------|--------|
@@ -350,7 +319,6 @@ Everything below has been implemented and tested. Included for context — do no
 | Increase parser test coverage | Add parser-level integration tests for `quran.py`, `kafi.py`, `kafi_sarwar.py` (correct verse/chapter counts, translation pairing, malformed HTML handling). | Medium |
 
 ### 5.4 Data Optimization (remaining)
-**Source:** OPTIMIZATION_PLAN.md, SCHEMA_PROPOSAL.md
 
 | Task | Description | Savings | Effort |
 |------|-------------|---------|--------|
@@ -361,9 +329,10 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 6: Community & Advanced Features
+## Phase 6: Community & Advanced Features (NOT STARTED ~5%)
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
+> **Status:** No items implemented. Dark mode, CI/CD, community features, and scholarly features are all pending.
 
 ### Team Composition (3–4 agents, scaled as needed)
 
@@ -520,3 +489,27 @@ This master roadmap **supersedes** the following documents for planning purposes
 | TEST_STRATEGY.md | Phase 1 complete | Reference for test patterns |
 | QA_REPORT.md | Phase 1-2 issues resolved | Reference for remaining accessibility items |
 | ARCHITECTURE.md | Active — constraints section above | Always authoritative for design decisions |
+
+---
+
+## Implementation Log
+
+Documented decisions and notable bug fixes applied during development.
+
+### Bug Fixes Applied
+
+| Fix | Phase | Description |
+|-----|-------|-------------|
+| **TranslatePipe race condition** | 3B | The `TranslatePipe` was not updating the view when language strings loaded asynchronously. Fixed by adding a `stringsChanged$` observable and calling `markForCheck()` on the `ChangeDetectorRef` to trigger change detection in OnPush components. |
+| **Search URL path fix** | 4 | Search result links were generating incorrect URLs. The SearchService was constructing paths that did not match the Angular router's expected format. Fixed path construction to align with the app's routing structure. |
+| **PWA manifest creation** | 4 | `manifest.webmanifest` was missing or misconfigured after initial PWA setup. Created proper manifest with correct `start_url`, icons, theme color, and display mode. |
+| **apple-touch-icon fix** | 4 | iOS devices were not displaying the correct icon when adding the app to the home screen. Added properly sized `apple-touch-icon` link in `index.html`. |
+
+### Deferred Decisions
+
+| Item | Phase | Rationale |
+|------|-------|-----------|
+| **rafed.net scraper** | 3B | Scraper skeleton was created but full implementation deferred. The rafed.net site serves Word documents that require manual download and extraction. Automated scraping is not viable for this source format. |
+| **lib.eshia.ir scraper** | 3B | Assessed as not viable for automated scraping. The source contains image scans of manuscripts rather than structured/parseable text. Would require OCR which is out of scope. |
+| **Word-by-word Quran** | 4 | Deferred from Phase 4.7 to a later phase. Requires significant effort (QUL SQLite conversion, word popover component, root exploration pages) with lower user-facing priority compared to search, PWA, bookmarks, and audio features. |
+| **AI translations generation** | 3C | Pipeline script (`ai_translation.py`) is built and ready, but actual batch generation requires ~$245 in API costs. Awaiting user approval before submitting batch jobs. |

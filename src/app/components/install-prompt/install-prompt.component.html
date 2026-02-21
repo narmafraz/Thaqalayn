@@ -1,0 +1,20 @@
+<!-- Install prompt banner -->
+<div class="pwa-banner install-banner" *ngIf="installable$ | async" role="status">
+  <mat-icon>get_app</mat-icon>
+  <span class="banner-text">{{ 'pwa.installPrompt' | translate }}</span>
+  <button mat-raised-button color="primary" (click)="install()">
+    {{ 'pwa.install' | translate }}
+  </button>
+</div>
+
+<!-- Update available banner -->
+<div class="pwa-banner update-banner" *ngIf="updateAvailable$ | async" role="alert">
+  <mat-icon>system_update</mat-icon>
+  <span class="banner-text">{{ 'pwa.updateAvailable' | translate }}</span>
+  <button mat-raised-button color="primary" (click)="applyUpdate()">
+    {{ 'pwa.update' | translate }}
+  </button>
+  <button mat-button (click)="dismissUpdate()">
+    {{ 'pwa.dismiss' | translate }}
+  </button>
+</div>

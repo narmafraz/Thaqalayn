@@ -91,6 +91,21 @@
   "breadcrumb": {
     "home": "الرئيسية"
   },
+  "pwa": {
+    "installPrompt": "ثبّت الثقلين للوصول السريع والقراءة بدون إنترنت",
+    "install": "تثبيت",
+    "updateAvailable": "يتوفر إصدار جديد",
+    "update": "تحديث",
+    "dismiss": "لاحقاً"
+  },
+  "download": {
+    "title": "تحميل",
+    "offlineReading": "القراءة بدون إنترنت",
+    "offlineDescription": "حمّل الكتب على جهازك للقراءة بدون اتصال بالإنترنت.",
+    "downloadForOffline": "تحميل",
+    "remove": "حذف",
+    "openSource": "مفتوح المصدر ومجاني"
+  },
   "language": {
     "picker": "اللغة",
     "en": "English",

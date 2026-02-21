@@ -1,17 +1,66 @@
 <div class="content mat-elevation-z8">
-  <h1>Open Source and Free</h1>
-  <p>All data displayed on the site is open source and you can download it by visiting the data GitHub repository: <br>
-    <a href="https://github.com/narmafraz/ThaqalaynData" target="_blank">https://github.com/narmafraz/ThaqalaynData</a>
-  </p>
-  <p>The link above contains the data per page of the site, if instead you would like the all data for one book
-    then that can be found in:
-    <a href="https://github.com/narmafraz/ThaqalaynData/books/complete" target="_blank">https://github.com/narmafraz/ThaqalaynData/books/complete</a>
-  </p>
-  <p>Also note that this data was generated from other raw data and the script used to generate it is in:
-    <a href="https://github.com/narmafraz/ThaqalaynDataGenerator" target="_blank">https://github.com/narmafraz/ThaqalaynDataGenerator</a>
-  </p>
-  <p>If this data is useful to you and you do end up creating a project using it then we would like to hear about it please!<br>
-    You can do this by contacting us through raising an issue on one of the above repositories <br>
-    and feel free to raise a Pull Request for us to link back to your project!</p>
-  <p>We hope that we can grow this data over time, hopefully with your help.</p>
+  <h1>{{ 'download.title' | translate }}</h1>
+
+  <!-- Offline Reading Section -->
+  <section class="offline-section">
+    <h2>{{ 'download.offlineReading' | translate }}</h2>
+    <p>{{ 'download.offlineDescription' | translate }}</p>
+
+    <div class="book-list">
+      <div class="book-item" *ngFor="let bookId of availableBooks">
+        <div class="book-info">
+          <mat-icon *ngIf="isDownloaded(bookId)" class="downloaded-icon">cloud_done</mat-icon>
+          <mat-icon *ngIf="!isDownloaded(bookId)" class="not-downloaded-icon">cloud_download</mat-icon>
+          <span class="book-name">{{ formatBookName(bookId) }}</span>
+        </div>
+        <div class="book-actions">
+          <mat-progress-spinner
+            *ngIf="isDownloading(bookId)"
+            diameter="24"
+            mode="indeterminate">
+          </mat-progress-spinner>
+          <button
+            *ngIf="!isDownloaded(bookId) && !isDownloading(bookId)"
+            mat-raised-button
+            color="primary"
+            (click)="downloadBook(bookId)">
+            {{ 'download.downloadForOffline' | translate }}
+          </button>
+          <span *ngIf="isDownloaded(bookId)" class="size-label">
+            {{ formatSize(downloadedBooks[0]?.sizeBytes || 0) }}
+          </span>
+          <button
+            *ngIf="isDownloaded(bookId)"
+            mat-button
+            color="warn"
+            (click)="removeBook(bookId)">
+            {{ 'download.remove' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p *ngIf="progress.status === 'error'" class="error-text">
+      {{ progress.error }}
+    </p>
+  </section>
+
+  <!-- Open Source Section -->
+  <section>
+    <h2>{{ 'download.openSource' | translate }}</h2>
+    <p>All data displayed on the site is open source and you can download it by visiting the data GitHub repository: <br>
+      <a href="https://github.com/narmafraz/ThaqalaynData" target="_blank">https://github.com/narmafraz/ThaqalaynData</a>
+    </p>
+    <p>The link above contains the data per page of the site, if instead you would like the all data for one book
+      then that can be found in:
+      <a href="https://github.com/narmafraz/ThaqalaynData/books/complete" target="_blank">https://github.com/narmafraz/ThaqalaynData/books/complete</a>
+    </p>
+    <p>Also note that this data was generated from other raw data and the script used to generate it is in:
+      <a href="https://github.com/narmafraz/ThaqalaynDataGenerator" target="_blank">https://github.com/narmafraz/ThaqalaynDataGenerator</a>
+    </p>
+    <p>If this data is useful to you and you do end up creating a project using it then we would like to hear about it please!<br>
+      You can do this by contacting us through raising an issue on one of the above repositories <br>
+      and feel free to raise a Pull Request for us to link back to your project!</p>
+    <p>We hope that we can grow this data over time, hopefully with your help.</p>
+  </section>
 </div>

@@ -1,0 +1,27 @@
+.pwa-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 4px;
+  margin: 8px 0;
+
+  mat-icon {
+    flex-shrink: 0;
+  }
+
+  .banner-text {
+    flex: 1;
+    font-size: 14px;
+  }
+}
+
+.install-banner {
+  background-color: #e8eaf6;
+  color: #333;
+}
+
+.update-banner {
+  background-color: #fff3e0;
+  color: #333;
+}

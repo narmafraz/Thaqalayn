@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { DownloadComponent } from './download.component';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
 
 describe('DownloadComponent', () => {
   let component: DownloadComponent;
@@ -8,7 +11,9 @@ describe('DownloadComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DownloadComponent ]
+      imports: [HttpClientTestingModule],
+      declarations: [DownloadComponent, TranslatePipe],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   }));

@@ -3,6 +3,7 @@
   <header id="header">
       <div class="bannerTop" routerLink="/">
         <img height="70%" src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
+        <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
         <mat-select
           class="lang-picker"
           [value]="currentLang$ | async"
@@ -17,6 +18,7 @@
   <main id="main-content" class="main">
     <router-outlet></router-outlet>
   </main>
+  <app-install-prompt></app-install-prompt>
   <footer id="footer">
     <a href="https://twitter.com/ProjThaqalayn" target="_blank">{{ 'nav.news' | translate }}</a> |
     <a routerLink="/download">{{ 'nav.download' | translate }}</a> |

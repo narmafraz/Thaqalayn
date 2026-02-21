@@ -1,6 +1,6 @@
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { NgModule, isDevMode } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -35,8 +35,14 @@ import { VerseContentComponent } from './components/verse-content/verse-content.
 import { VerseTextComponent } from './components/verse-text/verse-text.component';
 import { VerseDetailComponent } from './components/verse-detail/verse-detail.component';
 import { BookTreeComponent } from './components/book-tree/book-tree.component';
+import { ErrorDisplayComponent } from './components/error-display/error-display.component';
+import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
+import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { SearchResultsComponent } from './components/search-results/search-results.component';
 import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
 import { TranslatePipe } from './pipes/translate.pipe';
+import { ErrorInterceptor } from './services/error.interceptor';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -59,7 +65,11 @@ import { TranslatePipe } from './pipes/translate.pipe';
     PeopleContentComponent,
     PathLinkComponent,
     BookTreeComponent,
-    VerseDetailComponent
+    VerseDetailComponent,
+    ErrorDisplayComponent,
+    InstallPromptComponent,
+    SearchBarComponent,
+    SearchResultsComponent
   ],
   bootstrap: [AppComponent],
   imports: [
@@ -79,9 +89,18 @@ import { TranslatePipe } from './pipes/translate.pipe';
     MatFormFieldModule,
     MatInputModule,
     ScrollingModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ],
-  providers: [provideHttpClient(withInterceptorsFromDi())]
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    provideHttpClient(withInterceptorsFromDi())
+  ]
 })
 export class AppModule { }
 

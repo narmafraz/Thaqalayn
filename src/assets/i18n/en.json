@@ -91,6 +91,21 @@
   "breadcrumb": {
     "home": "Home"
   },
+  "pwa": {
+    "installPrompt": "Install Thaqalayn for quick access and offline reading",
+    "install": "Install",
+    "updateAvailable": "A new version is available",
+    "update": "Update",
+    "dismiss": "Later"
+  },
+  "download": {
+    "title": "Download",
+    "offlineReading": "Offline Reading",
+    "offlineDescription": "Download books to your device for offline access. Downloaded content will be available even without an internet connection.",
+    "downloadForOffline": "Download",
+    "remove": "Remove",
+    "openSource": "Open Source and Free"
+  },
   "language": {
     "picker": "Language",
     "en": "English",

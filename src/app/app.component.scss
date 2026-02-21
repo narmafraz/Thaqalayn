@@ -1,3 +1,19 @@
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #673ab7;
+  color: #fff;
+  padding: 8px 16px;
+  z-index: 100;
+  font-size: 14px;
+  text-decoration: none;
+
+  &:focus {
+    top: 0;
+  }
+}
+
 #site {
   display: flex;
   background: url(/assets/bg_small.png);
@@ -14,7 +30,7 @@
 	width: 100%;
 }
 
-#header div {
+#header > * {
   padding-left: 7%;
 }
 

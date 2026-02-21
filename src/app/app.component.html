@@ -1,15 +1,16 @@
 <div id="site">
-  <div id="header">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+  <header id="header">
       <div class="bannerTop" routerLink="/"><img height="70%" src="../assets/just-logo_small.png" alt="Thaqalayn logo"> Thaqalayn</div>
-      <div class="crumbs"><app-breadcrumbs></app-breadcrumbs></div>
-  </div>
-  <div class="main">
+      <nav class="crumbs" aria-label="Breadcrumb"><app-breadcrumbs></app-breadcrumbs></nav>
+  </header>
+  <main id="main-content" class="main">
     <router-outlet></router-outlet>
-  </div>
-  <div id="footer">
+  </main>
+  <footer id="footer">
     <a href="https://twitter.com/ProjThaqalayn" target="_blank">News</a> |
     <a routerLink="/download">Download</a> |
     <a routerLink="/support">Support</a> |
     <a routerLink="/about">About</a>
-  </div>
+  </footer>
 </div>

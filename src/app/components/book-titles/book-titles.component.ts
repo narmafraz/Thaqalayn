@@ -11,4 +11,5 @@ export class BookTitlesComponent {
   @Input() titles: MultiLingualText;
   @Input() descriptions: MultiLingualText;
   @Input() verse: Verse;
+  @Input() headingLevel: 1 | 2 = 1;
 }

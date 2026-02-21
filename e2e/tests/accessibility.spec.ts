@@ -4,18 +4,13 @@ import AxeBuilder from '@axe-core/playwright';
 // Known issues that are documented in docs/QA_REPORT.md and tracked for future fix.
 // These are excluded so the test suite passes while issues are being addressed,
 // but each exclusion is explicitly documented with its WCAG criterion.
+// FIXED: H2 landmarks (added <header>, <nav>, <main>, <footer>)
+// FIXED: M2 image-alt (added alt="Thaqalayn logo")
+// FIXED: M4 link-name (added aria-label to verse anchor links)
+// FIXED: M5 page-has-heading-one (changed titles to <h1>)
 const KNOWN_ISSUE_RULES_TO_SKIP = [
-  // H2: No landmark roles (WCAG 1.3.1, 2.4.1) - needs <main>, <nav>, <header>, <footer>
-  'landmark-one-main',
-  'region',
-  // M2: Logo image missing alt text (WCAG 1.1.1) - tracked for UIdev fix
-  'image-alt',
-  // M4: Links without accessible names (WCAG 4.1.2) - verse anchor links need aria-label
-  'link-name',
   // M3+: ARIA sort buttons without accessible names (WCAG 4.1.2) - Material table sort headers
   'aria-command-name',
-  // M5: No <h1> heading (WCAG 1.3.1) - pages use <h2> as highest level
-  'page-has-heading-one',
 ];
 
 test.describe('Accessibility - Homepage', () => {

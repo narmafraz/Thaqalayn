@@ -29,6 +29,7 @@
     "@ngxs/router-plugin": "~18.1.6",
     "@ngxs/store": "~18.1.6",
     "@orama/orama": "^3.1.18",
+    "dexie": "^4.3.0",
     "rxjs": "~7.8.1",
     "tslib": "^2.6.3",
     "zone.js": "~0.14.7"

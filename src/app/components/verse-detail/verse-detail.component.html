@@ -84,6 +84,11 @@
       </mat-card-content>
 
       <mat-card-actions>
+        <button mat-button (click)="toggleBookmark(book)" class="bookmark-btn"
+                [attr.aria-label]="isBookmarked ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
+          <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+          <span>{{ isBookmarked ? ('bookmark.bookmarked' | translate) : ('bookmark.bookmark' | translate) }}</span>
+        </button>
         <button mat-button (click)="shareHadith(book.index)" class="share-btn">
           <mat-icon>share</mat-icon>
           <span>{{ linkCopied ? ('book.linkCopied' | translate) : ('book.share' | translate) }}</span>

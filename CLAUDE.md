@@ -134,16 +134,12 @@ The `npm start` script includes `NODE_OPTIONS=--openssl-legacy-provider` to supp
 2. Heading tooltips needed
 3. Sub-chapters should be grouped in chapter-list component for better organization
 
-### Known Accessibility Issues (from QA_REPORT.md)
-These are tracked in the axe-core accessibility test suite (`e2e/tests/accessibility.spec.ts`) as `KNOWN_ISSUE_RULES_TO_SKIP`:
-- **H2** No semantic landmark roles (`<main>`, `<nav>`, `<header>`, `<footer>`) — `landmark-one-main`, `region`
-- **H3** No "Skip to content" link
-- **M1** Arabic text lacks `lang="ar"` attributes (screen readers mispronounce)
-- **M2** Logo image missing `alt` text — `image-alt`
-- **M3** Empty `<h2>` on homepage
-- **M4** 7 links without accessible names on Quran page — `link-name`
-- **M5** No `<h1>` heading on any page — `page-has-heading-one`
-- Narrator sort headers lack accessible names — `aria-command-name`
+### Accessibility
+The app uses semantic HTML5 landmarks (`<header>`, `<nav>`, `<main>`, `<footer>`) and a skip-to-content link. Page titles use `<h1>` (via `book-titles` component with `headingLevel` input). Verse reference links have `aria-label` attributes.
+
+**Remaining accessibility issues** tracked in `e2e/tests/accessibility.spec.ts` as `KNOWN_ISSUE_RULES_TO_SKIP`:
+- **M1** Arabic text lacks `lang="ar"` attributes (screen readers mispronounce) — needs `lang="ar"` on `.arabic` containers
+- Narrator sort headers lack accessible names — `aria-command-name` (Material table sort, third-party component)
 
 As issues are fixed, remove the corresponding rule from `KNOWN_ISSUE_RULES_TO_SKIP` in `accessibility.spec.ts` so the test enforces the fix going forward.
 
@@ -165,8 +161,24 @@ e2e/tests/
 └── translation-switching.spec.ts# 4 tests — translation selector
 ```
 
-### Routing Gotcha
-`/#/people/narrators` (without `/index`) redirects to the books page instead of showing the narrator list. Only `/#/people/narrators/index` works correctly. This is a known bug (L1 in QA report).
+### Routing Notes
+- `/#/people/narrators` redirects to `/#/people/narrators/index` (redirect defined in `app-routing.module.ts` line 20). This works correctly.
+- Hash-based routing (`useHash: true`) means all routes start with `/#/`. Direct URL navigation works for all routes.
+
+### NGXS Selector Race Conditions
+NGXS selectors fire immediately on subscription, before API data is loaded. This means selectors like `getCurrentNavigatedPart` return `undefined` initially. Any function that accesses `book.data` must guard with `book &&` first. The functions `getVerseTranslations()`, `getChapter()`, and `getDefaultVerseTranslationIds()` in `src/app/models/book.ts` all have these guards. Without them, ~20 TypeErrors appear in the console on every page load (non-fatal but noisy).
+
+### Dynamic Page Titles
+`app.component.ts` subscribes to `BooksState.getCurrentNavigatedPart`, `PeopleState.getCurrentNavigatedNarrator`, and router events to update `document.title` dynamically. Static pages (about, download, support) use router event matching. Book/chapter pages extract `chapter.titles.en` from the NGXS state.
+
+### Unit Test Patterns
+When writing Karma/Jasmine specs for components that use NGXS:
+- Always add `NgxsModule.forRoot([])` to the test module imports
+- Components using `HttpClient` (or services that do) need `HttpClientTestingModule`
+- Components with child custom elements need `CUSTOM_ELEMENTS_SCHEMA`
+- Components with `@Input()` observables (like `book$`) must set the input before `fixture.detectChanges()` to prevent `undefined.pipe()` errors
+- `RouterTestingModule` is needed for components using `routerLink` or `Router`
+- The `book-titles` component has a `headingLevel` input (1 or 2) controlling whether titles render as `<h1>` or `<h2>`
 
 ### Path Structure
 Book parts are identified by colon-separated indices (e.g., "1:2:3") which map to API paths like "books/1/2/3.json". The `BooksService.getPart()` method handles this conversion.

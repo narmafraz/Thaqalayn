@@ -55,6 +55,19 @@ Everything below has been implemented and tested. Included for context — do no
 > **Goal:** Make the site multilingual, add individually addressable hadith pages, and begin content expansion.
 > **Team evaluation:** At end of 3B, assess whether current agents are sufficient for Phase 3C's heavy data work.
 
+### Team Composition (3 agents)
+
+| Agent Name | Type | Responsibilities |
+|------------|------|-----------------|
+| **frontend-dev** | `general-purpose` | All Angular work: i18n framework (TranslatePipe, I18nService, language picker, RTL support, dual-language display), VerseDetailComponent, chapter link icons, SeoService updates, SEO follow-up tasks (lang="ar" fix, Google Search Console meta tag), ExpandLanguagePipe fix, E2E tests for new features. |
+| **data-engineer** | `general-purpose` | All generator/data work: schema evolution (gradings field, book registry, PartType, source_url, French language support), per-hadith JSON file generation, book metadata, sitemap updates, AI UI string translations. |
+| **data-scraper** | `general-purpose` (isolated worktree) | Parallel data acquisition: ThaqalaynAPI parser implementation, register all 21 ThaqalaynAPI books, rafed.net Arabic text downloader, lib.eshia.ir Arabic scraper. Works independently — no blocking dependencies on other agents. |
+
+**Coordination notes:**
+- `frontend-dev` and `data-engineer` share a dependency: `verse_detail` kind must be defined in both Angular types and generator output before VerseDetailComponent can be built. `data-engineer` should complete schema tasks first.
+- `data-scraper` works fully in parallel. Output feeds into Phase 3C cross-validation, not Phase 3B.
+- No dedicated QA agent — `frontend-dev` writes E2E tests alongside features.
+
 ### 3B.0 SEO Follow-Up (from Phase 3A)
 **Source:** PHASE3_FEATURE_PROPOSAL.md §8.3, §8.6
 
@@ -121,6 +134,21 @@ Everything below has been implemented and tested. Included for context — do no
 > **Goal:** AI translations, cross-validation pipeline, narrator biographies.
 > **Team evaluation:** At end of 3C, assess readiness for Phase 4's advanced features.
 
+### Team Composition (4 agents)
+
+| Agent Name | Type | Responsibilities |
+|------------|------|-----------------|
+| **frontend-dev** | `general-purpose` | Angular UI for new scholarly features: verification badges on hadith pages, diff viewer component for cross-validation, narrator biography display (birth/death, era, reliability, teachers/students), readable hadith references on narrator pages. |
+| **data-engineer** | `general-purpose` | AI translation pipeline: batch script for Claude Haiku Batch API, generate translations for 10 languages, quality review process, translation ingestion into verse data. Also builds the Arabic text normalization engine and 3-tier comparison logic for cross-validation. |
+| **researcher** | `general-purpose` (isolated worktree) | WikiShia MediaWiki API scraper for narrator biographies, 5-step name matching pipeline (exact → normalized → fuzzy → manual → AI-assisted), AI name transliterations via Haiku Batch for 4,860 Arabic names. |
+| **qa-engineer** | `general-purpose` | Regression testing: run full E2E suite after each feature merge, verify no existing tests break, write new E2E tests for cross-validation badges and narrator biography pages. Monitor console errors on new pages. |
+
+**Coordination notes:**
+- `data-engineer` must complete the normalization engine before cross-validation can produce results for `frontend-dev` to display.
+- `researcher`'s WikiShia data feeds into `frontend-dev`'s biography display — coordinate handoff mid-phase.
+- `qa-engineer` runs continuous regression; does not need to wait for feature completion to start testing partial integrations.
+- AI translation costs (~$245) require user approval before batch jobs are submitted.
+
 ### 3C.1 AI-Powered Translations
 **Source:** PHASE3_FEATURE_PROPOSAL.md §2
 
@@ -160,6 +188,22 @@ Everything below has been implemented and tested. Included for context — do no
 
 > **Goal:** Most-requested features: full-text search, offline support, bookmarks.
 > **Team evaluation:** At end of Phase 4, assess readiness for Phase 5's expansion work.
+
+### Team Composition (4 agents)
+
+| Agent Name | Type | Responsibilities |
+|------------|------|-----------------|
+| **frontend-search** | `general-purpose` | Search UI: search bar in header, results page with highlighted matches, lazy-load Orama indexes, Arabic normalization in search. Also handles error handling & resilience (ErrorInterceptor, timeout/retry, loading/error NGXS state, error display component). |
+| **frontend-ux** | `general-purpose` | PWA setup (`@angular/pwa`), cache-on-read strategy, offline per-book download, bookmarks & reading progress (Dexie.js), audio recitation (EveryAyah integration, player component), social sharing (share button, verse card images), mobile responsive polish, browser language auto-detection. |
+| **data-engineer** | `general-purpose` | Build-time search index generation: per-book Orama indexes with Arabic normalization. Word-by-word Quran data processing (QUL SQLite→JSON conversion, per-ayah word files). |
+| **qa-engineer** | `general-purpose` | Cross-browser testing of search, PWA offline mode, audio player accessibility, mobile viewport testing at 320/375/414px. Performance benchmarks for search index loading. |
+
+**Coordination notes:**
+- `frontend-search` depends on `data-engineer` completing search indexes before full integration testing.
+- `frontend-ux` works independently on PWA/bookmarks/audio — no dependencies on search work.
+- Two frontend agents are needed because Phase 4 has the highest UI workload (search + PWA + audio + bookmarks + sharing + mobile polish).
+- `qa-engineer` should test PWA offline scenarios on real mobile devices if possible (or mobile emulation in Playwright).
+- Word-by-word Quran (4.7) is the lowest priority in this phase — defer if time-constrained.
 
 ### 4.0 Error Handling & Resilience
 **Source:** IMPROVEMENT_ROADMAP.md §2.1.2
@@ -244,6 +288,23 @@ Everything below has been implemented and tested. Included for context — do no
 > **Goal:** Complete all Four Books, add additional collections, modernize the stack.
 > **Team evaluation:** At end of Phase 5, assess whether the platform is ready for community features.
 
+### Team Composition (5 agents)
+
+| Agent Name | Type | Responsibilities |
+|------------|------|-----------------|
+| **frontend-dev** | `general-purpose` | Angular 19 upgrade: standalone component migration, NgModule removal, npm vulnerability resolution, remove `--openssl-legacy-provider` hack. Verify all existing features work post-upgrade. |
+| **parser-dev-1** | `general-purpose` | Four Books parsers: Man La Yahduruhu al-Faqih (ThaqalaynAPI source), Tahdhib al-Ahkam (ghbook.ir HTML/EPUB), generalize narrator extraction from `kafi_narrators.py` into shared module. |
+| **parser-dev-2** | `general-purpose` | al-Istibsar parser (ghbook.ir HTML/EPUB), cross-reference linker for all books (`link_books.py`), generator quality tasks (externalize config, fix platform paths, DRY refactoring, type hints). |
+| **researcher** | `general-purpose` (isolated worktree) | Source acquisition for additional collections: Nahj al-Balaghah, Tuhaf al-Uqul, Al-Amali, Uyun Akhbar al-Ridha, Kamil al-Ziyarat. Evaluate ThaqalaynAPI availability and data quality for each. Register books in book_registry.py. |
+| **qa-engineer** | `general-purpose` | Full regression after Angular 19 upgrade (all 78+ E2E tests). Verify data integrity for newly parsed books: verse counts, chapter counts, translation pairing, narrator chain resolution. Data optimization validation (verse_translations extraction, Brotli compression). |
+
+**Coordination notes:**
+- `frontend-dev` should complete Angular 19 upgrade before other agents merge UI-related changes, to avoid conflicts.
+- `parser-dev-1` and `parser-dev-2` work in parallel on different books — use isolated worktrees to avoid data file conflicts.
+- `researcher` feeds book sources to parser devs mid-phase; coordinate handoff points.
+- Two parser agents are needed because Phase 5 has the heaviest data/generator workload (4+ new parsers + generalization + quality).
+- Data optimization (5.4) can happen in parallel with parsing work since it modifies different parts of the pipeline.
+
 ### 5.1 Complete the Four Books
 **Source:** IMPROVEMENT_ROADMAP.md §3, PARSER_ARCHITECTURE.md
 
@@ -304,6 +365,23 @@ Everything below has been implemented and tested. Included for context — do no
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
 
+### Team Composition (3–4 agents, scaled as needed)
+
+| Agent Name | Type | Responsibilities |
+|------------|------|-----------------|
+| **frontend-dev** | `general-purpose` | Scholarly features UI: hadith grading system with filtering, thematic tagging, comparative hadith view, tafsir integration, side-by-side translation view. UX polish: font controls, dark mode, keyboard shortcuts, sub-chapter grouping, lazy loading, OnPush migration, remove `any` types. Community features: user annotations (Dexie.js), Firebase sync, daily hadith widget, embeddable widgets. |
+| **frontend-dev-2** *(optional)* | `general-purpose` | Needed only if community features (6.4) are prioritized alongside scholarly features (6.1). Handles: discussion/commentary system, cross-device sync, mobile app (enhanced PWA / Capacitor wrapper), Angular SSG/prerendering. Can be skipped if Phase 6 is done sequentially rather than in parallel. |
+| **data-engineer** | `general-purpose` | Infrastructure: CI/CD pipeline (GitHub Actions), automated data generation pipeline, data schema validation script, JSON Schema definitions, public API documentation, versioned API paths, downloadable data packages (JSON/CSV/SQLite), REST/GraphQL API layer (Netlify Functions). Comprehensive Angular test suite (70%+ coverage target). |
+| **qa-engineer** | `general-purpose` | Full regression across all features. Performance testing for caching service, lazy loading, OnPush. Accessibility audit of new components (dark mode contrast, keyboard shortcuts). Schema validation of downloadable data packages. Client-side caching service verification. |
+
+**Coordination notes:**
+- Phase 6 is the most flexible in composition — scale from 3 to 4 agents based on priority.
+- If scholarly features (6.1) are the priority, use 3 agents (1 frontend + 1 data + 1 QA).
+- If community features (6.4) are also needed, add `frontend-dev-2` for a 4-agent team.
+- AI-assisted features (6.6: semantic search, RAG chatbot) require specialized knowledge — consider a dedicated research agent if these are prioritized.
+- Sunni collections (6.5) could use a dedicated `parser-dev` agent borrowed from the Phase 5 pattern.
+- Custom domain (6.7) is a trivial admin task — any agent can handle it.
+
 ### 6.1 Scholarly Features
 
 | Task | Source | Effort |
@@ -358,7 +436,6 @@ Everything below has been implemented and tested. Included for context — do no
 | Sunni hadith collections (Sahih Bukhari, Muslim, etc.) | IMPROVEMENT_ROADMAP.md §8.1.2 — Cross-sectarian comparative resource. Many available via sunnah.com. | High |
 
 ### 6.6 AI-Assisted Features
-
 
 | Task | Source | Effort |
 |------|--------|--------|
@@ -415,13 +492,15 @@ At the end of each phase, evaluate:
 
 ### Recommended team shapes by phase:
 
-| Phase | Frontend | Data/Generator | Research | QA |
-|-------|----------|---------------|----------|-----|
-| **3B** | 1 (i18n + hadith pages + SEO follow-up) | 1 (schema + parser + French support) | 1 (data scraping) | — |
-| **3C** | 1 (cross-validation UI + narrator UI) | 1 (translation pipeline + validation engine) | 1 (WikiShia + name matching) | 1 (regression) |
-| **4** | 2 (search UI + PWA + audio + error handling + mobile polish) | 1 (search indexes + word data) | — | 1 |
-| **5** | 1 (Angular 19 upgrade) | 2 (Four Books parsers + narrator generalization + generator quality) | 1 (source acquisition) | 1 |
-| **6** | 1-2 (community features + code quality) | 1 (data packages + API + schema validation) | — | 1 |
+| Phase | Total | Agents | Summary |
+|-------|-------|--------|---------|
+| **3B** | 3 | `frontend-dev`, `data-engineer`, `data-scraper` | i18n + hadith pages + schema + scraping |
+| **3C** | 4 | `frontend-dev`, `data-engineer`, `researcher`, `qa-engineer` | AI translations + cross-validation + narrators |
+| **4** | 4 | `frontend-search`, `frontend-ux`, `data-engineer`, `qa-engineer` | Search + PWA + audio + mobile polish |
+| **5** | 5 | `frontend-dev`, `parser-dev-1`, `parser-dev-2`, `researcher`, `qa-engineer` | Four Books + Angular 19 + additional collections |
+| **6** | 3–4 | `frontend-dev`, `frontend-dev-2`*(opt)*, `data-engineer`, `qa-engineer` | Scholarly + community + infrastructure |
+
+See the **Team Composition** section within each phase for detailed agent responsibilities and coordination notes.
 
 ---
 

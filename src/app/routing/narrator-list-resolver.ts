@@ -9,7 +9,7 @@ import { LoadNarrator } from '@store/people/people.actions';
 export class NarratorListResolver  {
   constructor(private store: Store) {}
 
-  resolve(route: ActivatedRouteSnapshot) {
+  resolve(_route: ActivatedRouteSnapshot) {
     return this.store.dispatch(new LoadNarrator('index'));
   }
 }

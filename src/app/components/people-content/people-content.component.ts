@@ -123,7 +123,7 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
     });
   }
 
-  applyFilter(event: Event, dataSource: MatTableDataSource<any>) {
+  applyFilter(event: Event, _dataSource: MatTableDataSource<any>) {
     const filterValue = (event.target as HTMLInputElement).value.trim();
     this.filterSubject.next(filterValue);
   }

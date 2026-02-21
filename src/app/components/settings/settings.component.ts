@@ -16,7 +16,7 @@ export class SettingsComponent {
   constructor(private store: Store) {
   }
 
-  getPathTitle(path: string) {
+  getPathTitle(_path: string) {
     return "todo"; // TODO fix me and also fix the tooltip
   }
 }

@@ -1,6 +1,6 @@
 import { ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
-import { Chapter, ChapterContent, Crumb, Verse } from '@app/models';
+import { ChapterContent, Crumb, Verse } from '@app/models';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RouterState } from '@store/router/router.state';

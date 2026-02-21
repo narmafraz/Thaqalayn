@@ -28,13 +28,13 @@ export class NarratorDataSource extends DataSource<any> {
     this.loadNarrators();
   }
 
-  connect(collectionViewer: CollectionViewer): Observable<any[]> {
+  connect(_collectionViewer: CollectionViewer): Observable<any[]> {
     return this.narratorSubject.asObservable().pipe(
       map(data => data.filter(item => item.path.toLowerCase().includes(this.filterValue)))
     );
   }
 
-  disconnect(collectionViewer: CollectionViewer): void {
+  disconnect(_collectionViewer: CollectionViewer): void {
     this.narratorSubject.complete();
     this.loadingSubject.complete();
   }

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Book, Crumb, Narrator } from '@app/models';
+import { Crumb, Narrator } from '@app/models';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';

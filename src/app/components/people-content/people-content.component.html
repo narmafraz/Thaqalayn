@@ -83,6 +83,6 @@
 </div>
 
 <!-- Loading Spinner -->
-<div class="loading-container" *ngIf="!(narrator$ | async)">
+<div class="loading-container" *ngIf="(narrator$ | async) === null">
   <mat-spinner></mat-spinner>
 </div>

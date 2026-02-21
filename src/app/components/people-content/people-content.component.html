@@ -1,128 +1,134 @@
-<div class="container" *ngIf="narrator$ | async as narrator">
-  <div class="titles">
-    <h1 class="arabic" lang="ar">{{narrator.titles.ar}}</h1>
-    <p class="transliteration" *ngIf="narrator.biography?.english_transliteration">
-      {{ narrator.biography.english_transliteration }}
-    </p>
+<ng-container *ngIf="(error$ | async) as error; else narratorContent">
+  <app-error-display [message]="error" (retry)="onRetry()"></app-error-display>
+</ng-container>
+
+<ng-template #narratorContent>
+  <div class="container" *ngIf="narrator$ | async as narrator">
+    <div class="titles">
+      <h1 class="arabic" lang="ar">{{narrator.titles.ar}}</h1>
+      <p class="transliteration" *ngIf="narrator.biography?.english_transliteration">
+        {{ narrator.biography.english_transliteration }}
+      </p>
+    </div>
+
+    <!-- Biography Section -->
+    <section class="biography-section" *ngIf="narrator.biography as bio">
+      <h2>{{ 'narrator.biography' | translate }}</h2>
+      <div class="biography-details">
+        <div class="bio-field" *ngIf="bio.era">
+          <span class="bio-label">{{ 'narrator.era' | translate }}:</span>
+          <span class="bio-value">{{ bio.era }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.reliability">
+          <span class="bio-label">{{ 'narrator.reliability' | translate }}:</span>
+          <span class="bio-value reliability-badge" [class.reliable]="bio.reliability?.includes('Thiqah') || bio.reliability?.includes('ثقة')">{{ bio.reliability }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.birth_date">
+          <span class="bio-label">{{ 'narrator.birthDate' | translate }}:</span>
+          <span class="bio-value">{{ bio.birth_date }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.death_date">
+          <span class="bio-label">{{ 'narrator.deathDate' | translate }}:</span>
+          <span class="bio-value">{{ bio.death_date }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.teachers?.length">
+          <span class="bio-label">{{ 'narrator.teachers' | translate }}:</span>
+          <span class="bio-value">{{ bio.teachers.join(', ') }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.students?.length">
+          <span class="bio-label">{{ 'narrator.students' | translate }}:</span>
+          <span class="bio-value">{{ bio.students.join(', ') }}</span>
+        </div>
+        <div class="bio-summary" *ngIf="bio.biography_summary">
+          <p>{{ bio.biography_summary }}</p>
+        </div>
+        <div class="bio-source" *ngIf="bio.biography_source">
+          <small>{{ 'narrator.source' | translate }}: {{ bio.biography_source }}</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Narrated Ahadith Section -->
+    <section class="narrated-section">
+      <h2>{{ 'narrator.narratedAhadith' | translate }}</h2>
+
+      <div class="search-box">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>{{ 'narrator.searchAhadith' | translate }}</mat-label>
+          <input matInput (keyup)="applyFilter($event, versePathsDataSource)" [placeholder]="'narrator.searchByPath' | translate">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <button mat-button (click)="sortVersePathsByLength()">{{ 'narrator.sortByLength' | translate }}</button>
+
+      <cdk-virtual-scroll-viewport #versePathsViewport itemSize="50" class="viewport">
+        <mat-table [dataSource]="versePathsDataSource">
+          <ng-container matColumnDef="path">
+            <mat-cell *matCellDef="let element">
+              <div class="path-cell"><app-path-link [path]="element.path"></app-path-link></div>
+            </mat-cell>
+          </ng-container>
+
+          <mat-row *matRowDef="let row; columns: displayedColumnsPaths;"></mat-row>
+        </mat-table>
+      </cdk-virtual-scroll-viewport>
+    </section>
+
+    <!-- Co-Narrators Section -->
+    <section class="conarrators-section">
+      <h2>{{ 'narrator.coNarrators' | translate }}</h2>
+
+      <div class="search-box">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>{{ 'narrator.searchCoNarrators' | translate }}</mat-label>
+          <input matInput (keyup)="applyFilter($event, subchainsDataSource)" [placeholder]="'narrator.searchNarratorsPlaceholder' | translate">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <cdk-virtual-scroll-viewport #subchainsViewport itemSize="50" class="viewport" (scrolledIndexChange)="onScroll()">
+        <mat-table [dataSource]="subchainsDataSource">
+          <ng-container matColumnDef="subchain">
+            <mat-cell *matCellDef="let element">
+              <div class="subchain-container">
+                <div class="subchain-text arabic" dir="rtl" lang="ar">
+                  <ng-container *ngFor="let narrator_id of element.value.narrator_ids; let isLast = last">
+                    <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
+                      {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}
+                    </a>
+                    <span *ngIf="!isLast" class="arrow">&#x27F5;</span>
+                  </ng-container>
+                </div>
+                <div class="verse-count" *ngIf="element.value.verse_paths">
+                  ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
+                </div>
+                <ol>
+                  <li *ngFor="let path of element.value.verse_paths">
+                    <app-path-link [path]="path"></app-path-link>
+                  </li>
+                </ol>
+              </div>
+            </mat-cell>
+          </ng-container>
+
+          <mat-row *matRowDef="let row; columns: displayedColumnsSubchains;"></mat-row>
+        </mat-table>
+      </cdk-virtual-scroll-viewport>
+
+      <!-- Pagination Controls -->
+      <mat-paginator
+        [length]="subchainsDataSource.data.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[10, 25, 50, 100]"
+        (page)="loadNextPage()"
+        [attr.aria-label]="'common.selectPage' | translate">
+      </mat-paginator>
+    </section>
   </div>
 
-  <!-- Biography Section -->
-  <section class="biography-section" *ngIf="narrator.biography as bio">
-    <h2>{{ 'narrator.biography' | translate }}</h2>
-    <div class="biography-details">
-      <div class="bio-field" *ngIf="bio.era">
-        <span class="bio-label">{{ 'narrator.era' | translate }}:</span>
-        <span class="bio-value">{{ bio.era }}</span>
-      </div>
-      <div class="bio-field" *ngIf="bio.reliability">
-        <span class="bio-label">{{ 'narrator.reliability' | translate }}:</span>
-        <span class="bio-value reliability-badge" [class.reliable]="bio.reliability?.includes('Thiqah') || bio.reliability?.includes('ثقة')">{{ bio.reliability }}</span>
-      </div>
-      <div class="bio-field" *ngIf="bio.birth_date">
-        <span class="bio-label">{{ 'narrator.birthDate' | translate }}:</span>
-        <span class="bio-value">{{ bio.birth_date }}</span>
-      </div>
-      <div class="bio-field" *ngIf="bio.death_date">
-        <span class="bio-label">{{ 'narrator.deathDate' | translate }}:</span>
-        <span class="bio-value">{{ bio.death_date }}</span>
-      </div>
-      <div class="bio-field" *ngIf="bio.teachers?.length">
-        <span class="bio-label">{{ 'narrator.teachers' | translate }}:</span>
-        <span class="bio-value">{{ bio.teachers.join(', ') }}</span>
-      </div>
-      <div class="bio-field" *ngIf="bio.students?.length">
-        <span class="bio-label">{{ 'narrator.students' | translate }}:</span>
-        <span class="bio-value">{{ bio.students.join(', ') }}</span>
-      </div>
-      <div class="bio-summary" *ngIf="bio.biography_summary">
-        <p>{{ bio.biography_summary }}</p>
-      </div>
-      <div class="bio-source" *ngIf="bio.biography_source">
-        <small>{{ 'narrator.source' | translate }}: {{ bio.biography_source }}</small>
-      </div>
-    </div>
-  </section>
-
-  <!-- Narrated Ahadith Section -->
-  <section class="narrated-section">
-    <h2>{{ 'narrator.narratedAhadith' | translate }}</h2>
-
-    <div class="search-box">
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>{{ 'narrator.searchAhadith' | translate }}</mat-label>
-        <input matInput (keyup)="applyFilter($event, versePathsDataSource)" [placeholder]="'narrator.searchByPath' | translate">
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </div>
-
-    <button mat-button (click)="sortVersePathsByLength()">{{ 'narrator.sortByLength' | translate }}</button>
-
-    <cdk-virtual-scroll-viewport #versePathsViewport itemSize="50" class="viewport">
-      <mat-table [dataSource]="versePathsDataSource">
-        <ng-container matColumnDef="path">
-          <mat-cell *matCellDef="let element">
-            <div class="path-cell"><app-path-link [path]="element.path"></app-path-link></div>
-          </mat-cell>
-        </ng-container>
-
-        <mat-row *matRowDef="let row; columns: displayedColumnsPaths;"></mat-row>
-      </mat-table>
-    </cdk-virtual-scroll-viewport>
-  </section>
-
-  <!-- Co-Narrators Section -->
-  <section class="conarrators-section">
-    <h2>{{ 'narrator.coNarrators' | translate }}</h2>
-
-    <div class="search-box">
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>{{ 'narrator.searchCoNarrators' | translate }}</mat-label>
-        <input matInput (keyup)="applyFilter($event, subchainsDataSource)" [placeholder]="'narrator.searchNarratorsPlaceholder' | translate">
-        <mat-icon matSuffix>search</mat-icon>
-      </mat-form-field>
-    </div>
-
-    <cdk-virtual-scroll-viewport #subchainsViewport itemSize="50" class="viewport" (scrolledIndexChange)="onScroll()">
-      <mat-table [dataSource]="subchainsDataSource">
-        <ng-container matColumnDef="subchain">
-          <mat-cell *matCellDef="let element">
-            <div class="subchain-container">
-              <div class="subchain-text arabic" dir="rtl" lang="ar">
-                <ng-container *ngFor="let narrator_id of element.value.narrator_ids; let isLast = last">
-                  <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
-                    {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}
-                  </a>
-                  <span *ngIf="!isLast" class="arrow">&#x27F5;</span>
-                </ng-container>
-              </div>
-              <div class="verse-count" *ngIf="element.value.verse_paths">
-                ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
-              </div>
-              <ol>
-                <li *ngFor="let path of element.value.verse_paths">
-                  <app-path-link [path]="path"></app-path-link>
-                </li>
-              </ol>
-            </div>
-          </mat-cell>
-        </ng-container>
-
-        <mat-row *matRowDef="let row; columns: displayedColumnsSubchains;"></mat-row>
-      </mat-table>
-    </cdk-virtual-scroll-viewport>
-
-    <!-- Pagination Controls -->
-    <mat-paginator
-      [length]="subchainsDataSource.data.length"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[10, 25, 50, 100]"
-      (page)="loadNextPage()"
-      [attr.aria-label]="'common.selectPage' | translate">
-    </mat-paginator>
-  </section>
-</div>
-
-<!-- Loading Spinner -->
-<div class="loading-container" *ngIf="(narrator$ | async) === null">
-  <mat-spinner></mat-spinner>
-</div>
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="(narrator$ | async) === null">
+    <mat-spinner></mat-spinner>
+  </div>
+</ng-template>

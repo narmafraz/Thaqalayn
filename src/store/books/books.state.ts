@@ -4,19 +4,24 @@ import { BooksService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { IndexedTitles, IndexState } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
-import { tap } from 'rxjs/operators';
-import { LoadBookPart } from './books.actions';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { LoadBookPart, RetryLoadBookPart } from './books.actions';
 
 export interface BooksStateModel {
   titles: ChapterList[];
   parts: { [index: string]: Book };
+  loading: { [index: string]: boolean };
+  errors: { [index: string]: string };
 }
 
 @State<BooksStateModel>({
   name: 'books',
   defaults: {
     titles: [],
-    parts: {}
+    parts: {},
+    loading: {},
+    errors: {}
   }
 })
 @Injectable()
@@ -36,6 +41,28 @@ export class BooksState {
   @Selector([BooksState])
   public static getParts(state: BooksStateModel) {
     return state.parts;
+  }
+
+  @Selector([BooksState])
+  public static getLoading(state: BooksStateModel) {
+    return state.loading;
+  }
+
+  @Selector([BooksState])
+  public static getErrors(state: BooksStateModel) {
+    return state.errors;
+  }
+
+  @Selector([BooksState, RouterState.getBookPartIndex])
+  public static getCurrentLoading(state: BooksStateModel, routerIndex: string): boolean {
+    const index = routerIndex || 'books';
+    return !!state.loading[index];
+  }
+
+  @Selector([BooksState, RouterState.getBookPartIndex])
+  public static getCurrentError(state: BooksStateModel, routerIndex: string): string {
+    const index = routerIndex || 'books';
+    return state.errors[index] || undefined;
   }
 
   @Selector([BooksState])
@@ -148,15 +175,53 @@ export class BooksState {
 
   @Action(LoadBookPart)
   public loadPart(ctx: StateContext<BooksStateModel>, action: LoadBookPart) {
+    const state = ctx.getState();
+
+    // Skip if already loaded
+    if (state.parts[action.payload]) {
+      return;
+    }
+
+    ctx.patchState({
+      loading: { ...state.loading, [action.payload]: true },
+      errors: { ...state.errors, [action.payload]: undefined }
+    });
+
     return this.booksService.getPart(action.payload).pipe(
       tap(loadedPart => {
-        const state = ctx.getState();
-        return ctx.patchState({
-          parts: {
-            ...state.parts,
-            [loadedPart.index]: loadedPart
-          }});
-      }));
+        const s = ctx.getState();
+        ctx.patchState({
+          parts: { ...s.parts, [loadedPart.index]: loadedPart },
+          loading: { ...s.loading, [action.payload]: false }
+        });
+      }),
+      catchError(error => {
+        const s = ctx.getState();
+        const message = error.status === 0
+          ? 'Network error — unable to reach the server'
+          : error.status === 404
+            ? 'Content not found'
+            : `Failed to load content (${error.status})`;
+        ctx.patchState({
+          loading: { ...s.loading, [action.payload]: false },
+          errors: { ...s.errors, [action.payload]: message }
+        });
+        return of(null);
+      })
+    );
+  }
+
+  @Action(RetryLoadBookPart)
+  public retryLoadPart(ctx: StateContext<BooksStateModel>, action: RetryLoadBookPart) {
+    const state = ctx.getState();
+    // Clear cached data and error so a fresh load occurs
+    const parts = { ...state.parts };
+    delete parts[action.payload];
+    ctx.patchState({
+      parts,
+      errors: { ...state.errors, [action.payload]: undefined }
+    });
+    return ctx.dispatch(new LoadBookPart(action.payload));
   }
 
 }

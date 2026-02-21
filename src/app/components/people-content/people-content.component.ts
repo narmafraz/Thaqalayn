@@ -5,6 +5,8 @@ import { MatTableDataSource } from '@angular/material/table';
 import { ChainVerses, Narrator, NarratorMetadata } from '@app/models';
 import { Store } from '@ngxs/store';
 import { PeopleState } from '@store/people/people.state';
+import { RetryLoadNarrator } from '@store/people/people.actions';
+import { RouterState } from '@store/router/router.state';
 import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators';
 
@@ -17,6 +19,10 @@ import { debounceTime, distinctUntilChanged, filter, map } from 'rxjs/operators'
 export class PeopleContentComponent implements OnInit, AfterViewInit {
   narrator$: Observable<Narrator> = inject(Store).select(PeopleState.getCurrentNavigatedNarrator);
   narratorIndex$: Observable<Record<number, NarratorMetadata>> = inject(Store).select(PeopleState.getEnrichedNarratorIndex);
+  loading$: Observable<boolean> = inject(Store).select(PeopleState.getCurrentLoading);
+  error$: Observable<string> = inject(Store).select(PeopleState.getCurrentError);
+
+  private store = inject(Store);
 
   versePathsDataSource: MatTableDataSource<any> = new MatTableDataSource();
   subchainsDataSource: MatTableDataSource<KeyValue<string, ChainVerses>> = new MatTableDataSource();
@@ -161,5 +167,10 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
 
   sortVersePathsByLength() {
     this.versePathsDataSource.data = this.versePathsDataSource.data.sort((a, b) => a.path.length - b.path.length);
+  }
+
+  onRetry(): void {
+    const index = this.store.selectSnapshot(RouterState.getBookPartIndex) || 'people';
+    this.store.dispatch(new RetryLoadNarrator(index));
   }
 }

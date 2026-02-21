@@ -3,17 +3,22 @@ import { Narrator, NarratorMetadata, NarratorWrapper } from '@app/models';
 import { PeopleService } from '@app/services';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { RouterState } from '@store/router/router.state';
-import { tap } from 'rxjs/operators';
-import { LoadNarrator } from './people.actions';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { LoadNarrator, RetryLoadNarrator } from './people.actions';
 
 export interface PeopleStateModel {
   narrators: { [index: string]: NarratorWrapper };
+  loading: { [index: string]: boolean };
+  errors: { [index: string]: string };
 }
 
 @State<PeopleStateModel>({
   name: 'people',
   defaults: {
-    narrators: {}
+    narrators: {},
+    loading: {},
+    errors: {}
   }
 })
 @Injectable()
@@ -23,6 +28,28 @@ export class PeopleState {
   @Selector([PeopleState])
   public static getState(state: PeopleStateModel) {
     return state;
+  }
+
+  @Selector([PeopleState])
+  public static getLoading(state: PeopleStateModel) {
+    return state.loading;
+  }
+
+  @Selector([PeopleState])
+  public static getErrors(state: PeopleStateModel) {
+    return state.errors;
+  }
+
+  @Selector([PeopleState, RouterState.getBookPartIndex])
+  public static getCurrentLoading(state: PeopleStateModel, routerIndex: string): boolean {
+    const index = routerIndex || 'people';
+    return !!state.loading[index];
+  }
+
+  @Selector([PeopleState, RouterState.getBookPartIndex])
+  public static getCurrentError(state: PeopleStateModel, routerIndex: string): string {
+    const index = routerIndex || 'people';
+    return state.errors[index] || undefined;
   }
 
   @Selector([PeopleState])
@@ -69,15 +96,52 @@ export class PeopleState {
 
   @Action(LoadNarrator)
   public loadNarrator(ctx: StateContext<PeopleStateModel>, action: LoadNarrator) {
+    const state = ctx.getState();
+
+    // Skip if already loaded
+    if (state.narrators[action.payload]) {
+      return;
+    }
+
+    ctx.patchState({
+      loading: { ...state.loading, [action.payload]: true },
+      errors: { ...state.errors, [action.payload]: undefined }
+    });
+
     return this.peopleService.getNarrator(action.payload).pipe(
       tap(loaded => {
-        const state = ctx.getState();
-        return ctx.patchState({
-          narrators: {
-            ...state.narrators,
-            [loaded.index]: loaded
-          }});
-      }));
+        const s = ctx.getState();
+        ctx.patchState({
+          narrators: { ...s.narrators, [loaded.index]: loaded },
+          loading: { ...s.loading, [action.payload]: false }
+        });
+      }),
+      catchError(error => {
+        const s = ctx.getState();
+        const message = error.status === 0
+          ? 'Network error — unable to reach the server'
+          : error.status === 404
+            ? 'Content not found'
+            : `Failed to load content (${error.status})`;
+        ctx.patchState({
+          loading: { ...s.loading, [action.payload]: false },
+          errors: { ...s.errors, [action.payload]: message }
+        });
+        return of(null);
+      })
+    );
+  }
+
+  @Action(RetryLoadNarrator)
+  public retryLoadNarrator(ctx: StateContext<PeopleStateModel>, action: RetryLoadNarrator) {
+    const state = ctx.getState();
+    const narrators = { ...state.narrators };
+    delete narrators[action.payload];
+    ctx.patchState({
+      narrators,
+      errors: { ...state.errors, [action.payload]: undefined }
+    });
+    return ctx.dispatch(new LoadNarrator(action.payload));
   }
 
 }

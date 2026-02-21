@@ -6,6 +6,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NarratorMetadata } from '@app/models';
 import { PeopleState } from '@store/people/people.state';
+import { RetryLoadNarrator } from '@store/people/people.actions';
 import { Observable, Subscription, fromEvent, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, startWith, tap, withLatestFrom } from 'rxjs/operators';
 import { MultiLingualText } from './../../models/text';
@@ -20,6 +21,8 @@ import { Store } from '@ngxs/store';
 export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   narrators$: Observable<NarratorMetadata[]> = inject(Store).select(PeopleState.getEnrichedNarratorsList);
+  loading$: Observable<boolean> = inject(Store).select(PeopleState.getCurrentLoading);
+  error$: Observable<string> = inject(Store).select(PeopleState.getCurrentError);
 
   readonly SMALL_SCREEN_ALIAS = 'xs';
   filterValue = '';
@@ -152,5 +155,9 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   nameOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {
     return a.value.localeCompare(b.value);
+  }
+
+  onRetry(): void {
+    this.store.dispatch(new RetryLoadNarrator('index'));
   }
 }

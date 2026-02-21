@@ -33,6 +33,7 @@ import { SupportComponent } from './components/support/support.component';
 import { TranslationSelectionComponent } from './components/translation-selection/translation-selection.component';
 import { VerseContentComponent } from './components/verse-content/verse-content.component';
 import { VerseTextComponent } from './components/verse-text/verse-text.component';
+import { BookTreeComponent } from './components/book-tree/book-tree.component';
 import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
 
 @NgModule({
@@ -53,7 +54,8 @@ import { ExpandLanguagePipe } from './pipes/expand-language.pipe';
     SettingsComponent,
     PeopleListComponent,
     PeopleContentComponent,
-    PathLinkComponent
+    PathLinkComponent,
+    BookTreeComponent
   ],
   bootstrap: [AppComponent],
   imports: [

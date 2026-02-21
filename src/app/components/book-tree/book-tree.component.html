@@ -1,0 +1,49 @@
+<div class="book-tree-container">
+  <mat-form-field class="search-field" appearance="outline">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput
+           [(ngModel)]="searchQuery"
+           (ngModelChange)="onSearchChange()"
+           placeholder="Search books and chapters..."
+           aria-label="Search books and chapters">
+    <button *ngIf="searchQuery"
+            matSuffix
+            mat-icon-button
+            aria-label="Clear search"
+            (click)="clearSearch()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div class="tree-wrapper" role="tree" aria-label="Book navigation">
+    <div *ngFor="let node of visibleNodes"
+         class="tree-node"
+         role="treeitem"
+         [attr.aria-expanded]="node.expandable ? isExpanded(node) : null"
+         [attr.aria-level]="node.level + 1"
+         [style.padding-left.px]="node.level * 24">
+
+      <button *ngIf="node.expandable"
+              class="toggle-btn"
+              mat-icon-button
+              (click)="toggle(node)"
+              [attr.aria-label]="isExpanded(node) ? 'Collapse ' + (node.titleEn || node.titleAr) : 'Expand ' + (node.titleEn || node.titleAr)">
+        <mat-icon>{{ isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+      </button>
+      <span *ngIf="!node.expandable" class="toggle-spacer"></span>
+
+      <a class="node-content"
+         [routerLink]="['/books', node.path.substring(7)]"
+         queryParamsHandling="preserve"
+         (click)="navigate(node); $event.preventDefault()">
+        <span *ngIf="node.partType" class="part-type">{{ node.partType }}</span>
+        <span *ngIf="node.titleEn" class="title-en" [innerHTML]="node.titleEn"></span>
+        <span *ngIf="node.titleAr" class="title-ar arabic" dir="rtl" [innerHTML]="node.titleAr"></span>
+      </a>
+    </div>
+
+    <div *ngIf="visibleNodes.length === 0 && searchQuery" class="no-results">
+      No results found for "{{ searchQuery }}"
+    </div>
+  </div>
+</div>

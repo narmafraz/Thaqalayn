@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Thaqalayn",
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "nav": {
+    "home": "Startseite",
+    "books": "B\u00fccher",
+    "narrators": "\u00dcberlieferer",
+    "about": "\u00dcber",
+    "download": "Herunterladen",
+    "support": "Unterst\u00fctzung",
+    "news": "Nachrichten",
+    "previous": "Vorherige",
+    "next": "N\u00e4chste",
+    "navigatePrevious": "Zum vorherigen Kapitel",
+    "navigateNext": "Zum n\u00e4chsten Kapitel",
+    "navigateParent": "Zur \u00fcbergeordneten Ebene",
+    "hadithNavigation": "Hadith-Navigation"
+  },
+  "book": {
+    "reference": "Referenz",
+    "inBookReference": "Referenz im Buch",
+    "relatedVerses": "Verwandte Verse",
+    "chapter": "Kapitel",
+    "hadith": "Hadith",
+    "verse": "Vers",
+    "viewInChapter": "Im Kapitelkontext anzeigen",
+    "shareHadith": "Diesen Hadith teilen",
+    "share": "Teilen",
+    "copyLink": "Link kopieren",
+    "linkCopied": "Link kopiert!",
+    "grading": "Bewertung",
+    "source": "Quelle",
+    "viewSource": "Originalquelle anzeigen",
+    "verified": "Verifiziert",
+    "verifiedFrom": "Verifiziert aus",
+    "sourceWord": "Quelle",
+    "sourcesWord": "Quellen",
+    "unverified": "Nicht verifiziert"
+  },
+  "narrator": {
+    "narratedAhadith": "\u00dcberlieferte Ahadith",
+    "coNarrators": "Mit-\u00dcberlieferer",
+    "searchAhadith": "Ahadith suchen",
+    "searchCoNarrators": "Mit-\u00dcberlieferer suchen",
+    "searchNarrators": "\u00dcberlieferer suchen",
+    "searchByPath": "Nach Pfad suchen...",
+    "searchNarratorsPlaceholder": "\u00dcberlieferer suchen...",
+    "sortByLength": "Nach L\u00e4nge sortieren",
+    "narrations": "Anzahl der \u00dcberlieferungen",
+    "narratedFrom": "Anzahl der Personen, von denen \u00fcberliefert wurde",
+    "narratedTo": "Anzahl der Personen, denen \u00fcberliefert wurde",
+    "conarratorCount": "Anzahl der Mit-\u00dcberlieferer"
+  },
+  "search": {
+    "filter": "Filter",
+    "search": "Suchen",
+    "searchBooksAndChapters": "In B\u00fcchern und Kapiteln suchen...",
+    "clearSearch": "Suche l\u00f6schen",
+    "noResults": "Keine Ergebnisse gefunden",
+    "noResultsFor": "Keine Ergebnisse gefunden f\u00fcr"
+  },
+  "translation": {
+    "selectTranslation": "\u00dcbersetzung ausw\u00e4hlen",
+    "language": "Sprache"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "retry": "Erneut versuchen",
+    "name": "Name",
+    "count": "Anzahl",
+    "start": "Anfang",
+    "end": "Ende",
+    "to": "bis",
+    "number": "#",
+    "verses": "Verse",
+    "selectPage": "Seite ausw\u00e4hlen",
+    "clear": "L\u00f6schen",
+    "bookNavigation": "Buchnavigation"
+  },
+  "breadcrumb": {
+    "home": "Startseite"
+  },
+  "language": {
+    "picker": "Sprache",
+    "en": "English",
+    "ar": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+    "fa": "\u0641\u0627\u0631\u0633\u06cc",
+    "fr": "Fran\u00e7ais"
+  }
+}

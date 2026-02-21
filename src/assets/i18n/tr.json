@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Thaqalayn",
+    "skipToContent": "İçeriğe atla"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "books": "Kitaplar",
+    "narrators": "Raviler",
+    "about": "Hakkında",
+    "download": "İndir",
+    "support": "Destek",
+    "news": "Haberler",
+    "previous": "Önceki",
+    "next": "Sonraki",
+    "navigatePrevious": "Önceki bölüme git",
+    "navigateNext": "Sonraki bölüme git",
+    "navigateParent": "Üst seviyeye git",
+    "hadithNavigation": "Hadis navigasyonu"
+  },
+  "book": {
+    "reference": "Referans",
+    "inBookReference": "Kitap içi referans",
+    "relatedVerses": "İlgili ayetler",
+    "chapter": "Bölüm",
+    "hadith": "Hadis",
+    "verse": "Ayet",
+    "viewInChapter": "Bölüm bağlamında görüntüle",
+    "shareHadith": "Bu hadisi paylaş",
+    "share": "Paylaş",
+    "copyLink": "Bağlantıyı kopyala",
+    "linkCopied": "Bağlantı kopyalandı!",
+    "grading": "Derecelendirme",
+    "source": "Kaynak",
+    "viewSource": "Orijinal kaynağı görüntüle",
+    "verified": "Doğrulanmış",
+    "verifiedFrom": "Doğrulanmış kaynak sayısı",
+    "sourceWord": "kaynak",
+    "sourcesWord": "kaynak",
+    "unverified": "Doğrulanmamış"
+  },
+  "narrator": {
+    "narratedAhadith": "Rivayet edilen hadisler",
+    "coNarrators": "Ortak raviler",
+    "searchAhadith": "Hadislerde ara",
+    "searchCoNarrators": "Ortak ravilerde ara",
+    "searchNarrators": "Ravilerde ara",
+    "searchByPath": "Yola göre ara...",
+    "searchNarratorsPlaceholder": "Ravilerde ara...",
+    "sortByLength": "Uzunluğa göre sırala",
+    "narrations": "Rivayet sayısı",
+    "narratedFrom": "Kendisinden rivayet edilen kişi sayısı",
+    "narratedTo": "Kendisine rivayet edilen kişi sayısı",
+    "conarratorCount": "Ortak ravi sayısı"
+  },
+  "search": {
+    "filter": "Filtre",
+    "search": "Ara",
+    "searchBooksAndChapters": "Kitap ve bölümlerde ara...",
+    "clearSearch": "Aramayı temizle",
+    "noResults": "Sonuç bulunamadı",
+    "noResultsFor": "Sonuç bulunamadı:"
+  },
+  "translation": {
+    "selectTranslation": "Çeviri seçin",
+    "language": "Dil"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "retry": "Tekrar dene",
+    "name": "İsim",
+    "count": "Sayı",
+    "start": "Başlangıç",
+    "end": "Bitiş",
+    "to": "-",
+    "number": "#",
+    "verses": "ayet",
+    "selectPage": "Sayfa seçin",
+    "clear": "Temizle",
+    "bookNavigation": "Kitap navigasyonu"
+  },
+  "breadcrumb": {
+    "home": "Ana Sayfa"
+  },
+  "language": {
+    "picker": "Dil",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  }
+}

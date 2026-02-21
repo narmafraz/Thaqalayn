@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "ثقلین",
+    "skipToContent": "مواد پر جائیں"
+  },
+  "nav": {
+    "home": "ہوم",
+    "books": "کتابیں",
+    "narrators": "راوی",
+    "about": "ہمارے بارے میں",
+    "download": "ڈاؤن لوڈ",
+    "support": "مدد",
+    "news": "خبریں",
+    "previous": "پچھلا",
+    "next": "اگلا",
+    "navigatePrevious": "پچھلے باب پر جائیں",
+    "navigateNext": "اگلے باب پر جائیں",
+    "navigateParent": "اوپر جائیں",
+    "hadithNavigation": "حدیث نیویگیشن"
+  },
+  "book": {
+    "reference": "حوالہ",
+    "inBookReference": "کتاب میں حوالہ",
+    "relatedVerses": "متعلقہ آیات",
+    "chapter": "باب",
+    "hadith": "حدیث",
+    "verse": "آیت",
+    "viewInChapter": "باب کے سیاق میں دیکھیں",
+    "shareHadith": "یہ حدیث شیئر کریں",
+    "share": "شیئر",
+    "copyLink": "لنک کاپی کریں",
+    "linkCopied": "لنک کاپی ہو گیا!",
+    "grading": "درجہ بندی",
+    "source": "ماخذ",
+    "viewSource": "اصل ماخذ دیکھیں",
+    "verified": "تصدیق شدہ",
+    "verifiedFrom": "تصدیق شدہ از",
+    "sourceWord": "ماخذ",
+    "sourcesWord": "ماخذات",
+    "unverified": "غیر تصدیق شدہ"
+  },
+  "narrator": {
+    "narratedAhadith": "مروی احادیث",
+    "coNarrators": "ہم راوی",
+    "searchAhadith": "احادیث تلاش کریں",
+    "searchCoNarrators": "ہم راویوں کو تلاش کریں",
+    "searchNarrators": "راویوں کو تلاش کریں",
+    "searchByPath": "راستے سے تلاش کریں...",
+    "searchNarratorsPlaceholder": "راویوں کو تلاش کریں...",
+    "sortByLength": "لمبائی کے مطابق ترتیب",
+    "narrations": "روایات کی تعداد",
+    "narratedFrom": "جن سے روایت کیا ان کی تعداد",
+    "narratedTo": "جن کو روایت کیا ان کی تعداد",
+    "conarratorCount": "ہم راویوں کی تعداد"
+  },
+  "search": {
+    "filter": "فلٹر",
+    "search": "تلاش",
+    "searchBooksAndChapters": "کتابوں اور ابواب میں تلاش کریں...",
+    "clearSearch": "تلاش صاف کریں",
+    "noResults": "کوئی نتیجہ نہیں ملا",
+    "noResultsFor": "کوئی نتیجہ نہیں ملا برائے"
+  },
+  "translation": {
+    "selectTranslation": "ترجمہ منتخب کریں",
+    "language": "زبان"
+  },
+  "common": {
+    "loading": "لوڈ ہو رہا ہے...",
+    "error": "ایک خرابی پیش آئی",
+    "retry": "دوبارہ کوشش",
+    "name": "نام",
+    "count": "تعداد",
+    "start": "شروع",
+    "end": "آخر",
+    "to": "تا",
+    "number": "#",
+    "verses": "آیات",
+    "selectPage": "صفحہ منتخب کریں",
+    "clear": "صاف",
+    "bookNavigation": "کتابوں کی نیویگیشن"
+  },
+  "breadcrumb": {
+    "home": "ہوم"
+  },
+  "language": {
+    "picker": "زبان",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  }
+}

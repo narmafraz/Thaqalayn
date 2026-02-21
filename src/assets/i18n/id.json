@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Thaqalayn",
+    "skipToContent": "Langsung ke konten"
+  },
+  "nav": {
+    "home": "Beranda",
+    "books": "Kitab",
+    "narrators": "Perawi",
+    "about": "Tentang",
+    "download": "Unduh",
+    "support": "Dukungan",
+    "news": "Berita",
+    "previous": "Sebelumnya",
+    "next": "Berikutnya",
+    "navigatePrevious": "Ke bab sebelumnya",
+    "navigateNext": "Ke bab berikutnya",
+    "navigateParent": "Ke atas",
+    "hadithNavigation": "Navigasi hadis"
+  },
+  "book": {
+    "reference": "Referensi",
+    "inBookReference": "Referensi dalam kitab",
+    "relatedVerses": "Ayat terkait",
+    "chapter": "Bab",
+    "hadith": "Hadis",
+    "verse": "Ayat",
+    "viewInChapter": "Lihat dalam konteks bab",
+    "shareHadith": "Bagikan hadis ini",
+    "share": "Bagikan",
+    "copyLink": "Salin tautan",
+    "linkCopied": "Tautan disalin!",
+    "grading": "Penilaian",
+    "source": "Sumber",
+    "viewSource": "Lihat sumber asli",
+    "verified": "Terverifikasi",
+    "verifiedFrom": "Terverifikasi dari",
+    "sourceWord": "sumber",
+    "sourcesWord": "sumber",
+    "unverified": "Belum terverifikasi"
+  },
+  "narrator": {
+    "narratedAhadith": "Hadis yang diriwayatkan",
+    "coNarrators": "Perawi bersama",
+    "searchAhadith": "Cari hadis",
+    "searchCoNarrators": "Cari perawi bersama",
+    "searchNarrators": "Cari perawi",
+    "searchByPath": "Cari berdasarkan jalur...",
+    "searchNarratorsPlaceholder": "Cari perawi...",
+    "sortByLength": "Urutkan berdasarkan panjang",
+    "narrations": "Jumlah riwayat",
+    "narratedFrom": "Jumlah orang yang diriwayatkan darinya",
+    "narratedTo": "Jumlah orang yang diriwayatkan kepadanya",
+    "conarratorCount": "Jumlah perawi bersama"
+  },
+  "search": {
+    "filter": "Filter",
+    "search": "Cari",
+    "searchBooksAndChapters": "Cari kitab dan bab...",
+    "clearSearch": "Hapus pencarian",
+    "noResults": "Tidak ada hasil ditemukan",
+    "noResultsFor": "Tidak ada hasil ditemukan untuk"
+  },
+  "translation": {
+    "selectTranslation": "Pilih terjemahan",
+    "language": "Bahasa"
+  },
+  "common": {
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "retry": "Coba lagi",
+    "name": "Nama",
+    "count": "Jumlah",
+    "start": "Mulai",
+    "end": "Akhir",
+    "to": "hingga",
+    "number": "#",
+    "verses": "ayat",
+    "selectPage": "Pilih halaman",
+    "clear": "Hapus",
+    "bookNavigation": "Navigasi kitab"
+  },
+  "breadcrumb": {
+    "home": "Beranda"
+  },
+  "language": {
+    "picker": "Bahasa",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  }
+}

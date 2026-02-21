@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "Сакалейн",
+    "skipToContent": "Перейти к содержанию"
+  },
+  "nav": {
+    "home": "Главная",
+    "books": "Книги",
+    "narrators": "Передатчики",
+    "about": "О проекте",
+    "download": "Скачать",
+    "support": "Поддержка",
+    "news": "Новости",
+    "previous": "Предыдущая",
+    "next": "Следующая",
+    "navigatePrevious": "Перейти к предыдущей главе",
+    "navigateNext": "Перейти к следующей главе",
+    "navigateParent": "Перейти наверх",
+    "hadithNavigation": "Навигация по хадисам"
+  },
+  "book": {
+    "reference": "Ссылка",
+    "inBookReference": "Ссылка в книге",
+    "relatedVerses": "Связанные аяты",
+    "chapter": "Глава",
+    "hadith": "Хадис",
+    "verse": "Аят",
+    "viewInChapter": "Посмотреть в контексте главы",
+    "shareHadith": "Поделиться этим хадисом",
+    "share": "Поделиться",
+    "copyLink": "Копировать ссылку",
+    "linkCopied": "Ссылка скопирована!",
+    "grading": "Оценка",
+    "source": "Источник",
+    "viewSource": "Посмотреть оригинальный источник",
+    "verified": "Проверено",
+    "verifiedFrom": "Проверено из",
+    "sourceWord": "источник",
+    "sourcesWord": "источников",
+    "unverified": "Не проверено"
+  },
+  "narrator": {
+    "narratedAhadith": "Переданные хадисы",
+    "coNarrators": "Со-передатчики",
+    "searchAhadith": "Поиск хадисов",
+    "searchCoNarrators": "Поиск со-передатчиков",
+    "searchNarrators": "Поиск передатчиков",
+    "searchByPath": "Поиск по пути...",
+    "searchNarratorsPlaceholder": "Поиск передатчиков...",
+    "sortByLength": "Сортировать по длине",
+    "narrations": "Количество передач",
+    "narratedFrom": "Количество тех, от кого передавал",
+    "narratedTo": "Количество тех, кому передавал",
+    "conarratorCount": "Количество со-передатчиков"
+  },
+  "search": {
+    "filter": "Фильтр",
+    "search": "Поиск",
+    "searchBooksAndChapters": "Поиск по книгам и главам...",
+    "clearSearch": "Очистить поиск",
+    "noResults": "Результатов не найдено",
+    "noResultsFor": "Результатов не найдено для"
+  },
+  "translation": {
+    "selectTranslation": "Выбрать перевод",
+    "language": "Язык"
+  },
+  "common": {
+    "loading": "Загрузка...",
+    "error": "Произошла ошибка",
+    "retry": "Повторить",
+    "name": "Имя",
+    "count": "Количество",
+    "start": "Начало",
+    "end": "Конец",
+    "to": "до",
+    "number": "#",
+    "verses": "аятов",
+    "selectPage": "Выбрать страницу",
+    "clear": "Очистить",
+    "bookNavigation": "Навигация по книгам"
+  },
+  "breadcrumb": {
+    "home": "Главная"
+  },
+  "language": {
+    "picker": "Язык",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  }
+}

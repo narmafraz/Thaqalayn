@@ -23,6 +23,14 @@ export class AppComponent implements OnInit, OnDestroy {
     { code: 'ar', name: 'العربية' },
     { code: 'fa', name: 'فارسی' },
     { code: 'fr', name: 'Français' },
+    { code: 'ur', name: 'اردو' },
+    { code: 'tr', name: 'Türkçe' },
+    { code: 'id', name: 'Bahasa Indonesia' },
+    { code: 'bn', name: 'বাংলা' },
+    { code: 'es', name: 'Español' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'ru', name: 'Русский' },
+    { code: 'zh', name: '中文' },
   ];
 
   currentLang$: Observable<string>;

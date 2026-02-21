@@ -1,0 +1,93 @@
+{
+  "app": {
+    "title": "সাকালাইন",
+    "skipToContent": "বিষয়বস্তুতে যান"
+  },
+  "nav": {
+    "home": "হোম",
+    "books": "কিতাব",
+    "narrators": "বর্ণনাকারী",
+    "about": "সম্পর্কে",
+    "download": "ডাউনলোড",
+    "support": "সাহায্য",
+    "news": "সংবাদ",
+    "previous": "পূর্ববর্তী",
+    "next": "পরবর্তী",
+    "navigatePrevious": "পূর্ববর্তী অধ্যায়ে যান",
+    "navigateNext": "পরবর্তী অধ্যায়ে যান",
+    "navigateParent": "উপরে যান",
+    "hadithNavigation": "হাদিস নেভিগেশন"
+  },
+  "book": {
+    "reference": "তথ্যসূত্র",
+    "inBookReference": "কিতাবের মধ্যে তথ্যসূত্র",
+    "relatedVerses": "সম্পর্কিত আয়াত",
+    "chapter": "অধ্যায়",
+    "hadith": "হাদিস",
+    "verse": "আয়াত",
+    "viewInChapter": "অধ্যায়ের প্রসঙ্গে দেখুন",
+    "shareHadith": "এই হাদিস শেয়ার করুন",
+    "share": "শেয়ার",
+    "copyLink": "লিংক কপি করুন",
+    "linkCopied": "লিংক কপি হয়েছে!",
+    "grading": "মান নির্ধারণ",
+    "source": "উৎস",
+    "viewSource": "মূল উৎস দেখুন",
+    "verified": "যাচাইকৃত",
+    "verifiedFrom": "যাচাইকৃত",
+    "sourceWord": "উৎস",
+    "sourcesWord": "উৎস",
+    "unverified": "অযাচাইকৃত"
+  },
+  "narrator": {
+    "narratedAhadith": "বর্ণিত হাদিস",
+    "coNarrators": "সহ-বর্ণনাকারী",
+    "searchAhadith": "হাদিস অনুসন্ধান",
+    "searchCoNarrators": "সহ-বর্ণনাকারী অনুসন্ধান",
+    "searchNarrators": "বর্ণনাকারী অনুসন্ধান",
+    "searchByPath": "পথ দিয়ে অনুসন্ধান...",
+    "searchNarratorsPlaceholder": "বর্ণনাকারী অনুসন্ধান...",
+    "sortByLength": "দৈর্ঘ্য অনুসারে সাজান",
+    "narrations": "বর্ণনার সংখ্যা",
+    "narratedFrom": "যাদের থেকে বর্ণনা করেছেন তাদের সংখ্যা",
+    "narratedTo": "যাদের কাছে বর্ণনা করেছেন তাদের সংখ্যা",
+    "conarratorCount": "সহ-বর্ণনাকারীর সংখ্যা"
+  },
+  "search": {
+    "filter": "ফিল্টার",
+    "search": "অনুসন্ধান",
+    "searchBooksAndChapters": "কিতাব ও অধ্যায়ে অনুসন্ধান...",
+    "clearSearch": "অনুসন্ধান মুছুন",
+    "noResults": "কোনো ফলাফল পাওয়া যায়নি",
+    "noResultsFor": "কোনো ফলাফল পাওয়া যায়নি এর জন্য"
+  },
+  "translation": {
+    "selectTranslation": "অনুবাদ নির্বাচন করুন",
+    "language": "ভাষা"
+  },
+  "common": {
+    "loading": "লোড হচ্ছে...",
+    "error": "একটি ত্রুটি ঘটেছে",
+    "retry": "পুনরায় চেষ্টা",
+    "name": "নাম",
+    "count": "সংখ্যা",
+    "start": "শুরু",
+    "end": "শেষ",
+    "to": "থেকে",
+    "number": "#",
+    "verses": "আয়াত",
+    "selectPage": "পৃষ্ঠা নির্বাচন",
+    "clear": "মুছুন",
+    "bookNavigation": "কিতাব নেভিগেশন"
+  },
+  "breadcrumb": {
+    "home": "হোম"
+  },
+  "language": {
+    "picker": "ভাষা",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  }
+}

@@ -413,12 +413,12 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 6.7 Mobile App
 
-| Task | Source | Effort |
-|------|--------|--------|
-| Enhanced PWA (app-like nav, home screen) | ARCHITECTURE.md §3 | Medium |
-| Capacitor wrapper (if app store needed) | ARCHITECTURE.md §3 | High |
-| Custom domain | PHASE3_FEATURE_PROPOSAL.md §8.7 | Low (~$12/yr) |
-| Angular SSG/prerendering | PHASE3_FEATURE_PROPOSAL.md §8.8 | High |
+| Status | Task | Source | Effort |
+|--------|------|--------|--------|
+| [x] | Enhanced PWA (app-like nav, home screen) | ARCHITECTURE.md §3 — Mobile bottom navigation bar with route-aware active section tracking. Fixed-position bottom nav with Home, Books, Topics, Bookmarks icons on screens <=768px. Dark mode support, safe-area-inset for notched devices. Replaces text footer on mobile. | Medium |
+| [ ] | Capacitor wrapper (if app store needed) | ARCHITECTURE.md §3 | High |
+| [ ] | Custom domain | PHASE3_FEATURE_PROPOSAL.md §8.7 | Low (~$12/yr) |
+| [ ] | Angular SSG/prerendering | PHASE3_FEATURE_PROPOSAL.md §8.8 | High |
 
 ---
 

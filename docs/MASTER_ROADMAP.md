@@ -418,7 +418,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | Enhanced PWA (app-like nav, home screen) | ARCHITECTURE.md §3 — Mobile bottom navigation bar with route-aware active section tracking. Fixed-position bottom nav with Home, Books, Topics, Bookmarks icons on screens <=768px. Dark mode support, safe-area-inset for notched devices. Replaces text footer on mobile. | Medium |
 | [ ] | Capacitor wrapper (if app store needed) | ARCHITECTURE.md §3 | High |
 | [ ] | Custom domain | PHASE3_FEATURE_PROPOSAL.md §8.7 | Low (~$12/yr) |
-| [ ] | Angular SSG/prerendering | PHASE3_FEATURE_PROPOSAL.md §8.8 | High |
+| [x] | Angular SSG/prerendering | PHASE3_FEATURE_PROPOSAL.md §8.8 — Installed `@angular/ssr`, added SSR-safe `isPlatformBrowser` guards to all services (theme, i18n, keyboard, PWA) and app component. Production-only prerendering of static routes (/, /about, /support, /download, /topics, /bookmarks, /books) with client hydration (`provideClientHydration(withEventReplay())`). | High |
 
 ---
 

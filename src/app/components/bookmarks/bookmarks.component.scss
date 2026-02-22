@@ -90,6 +90,61 @@ section {
   height: 48px;
 }
 
+.annotation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.annotation-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  border-left: 3px solid var(--note-accent, #ffc107);
+  background: var(--note-bg, #fff8e1);
+}
+
+:host-context(body.dark-theme) .annotation-item {
+  background: rgba(255, 193, 7, 0.08);
+}
+
+.annotation-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  flex: 1;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.annotation-icon {
+  color: var(--note-accent, #ffc107);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.annotation-path {
+  font-size: 11px;
+  color: var(--text-muted, #999);
+  font-family: monospace;
+  margin-bottom: 4px;
+}
+
+.annotation-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary, #333);
+  white-space: pre-wrap;
+}
+
 .export-section {
   .export-actions {
     display: flex;

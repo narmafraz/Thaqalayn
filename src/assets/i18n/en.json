@@ -140,6 +140,16 @@
     "title": "Verse of the Day",
     "readMore": "Read more"
   },
+  "annotation": {
+    "add": "Add note",
+    "edit": "Edit note",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "placeholder": "Write your personal note here...",
+    "notes": "My Notes",
+    "noNotes": "No notes yet. Add notes to verses while reading to find them here."
+  },
   "settings": {
     "toggleDarkMode": "Toggle dark mode",
     "increaseFont": "Increase font size",

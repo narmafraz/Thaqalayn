@@ -18,15 +18,30 @@ export interface ReadingProgress {
   lastVisited: Date;
 }
 
+export interface Annotation {
+  id?: number;
+  path: string;
+  bookId: string;
+  text: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 class ThaqalaynDb extends Dexie {
   bookmarks!: Table<Bookmark, number>;
   readingProgress!: Table<ReadingProgress, string>;
+  annotations!: Table<Annotation, number>;
 
   constructor() {
     super('thaqalayn-bookmarks');
     this.version(1).stores({
       bookmarks: '++id, path, bookId, createdAt',
       readingProgress: 'bookId, lastVisited',
+    });
+    this.version(2).stores({
+      bookmarks: '++id, path, bookId, createdAt',
+      readingProgress: 'bookId, lastVisited',
+      annotations: '++id, path, bookId, updatedAt',
     });
   }
 }
@@ -39,9 +54,11 @@ export class BookmarkService {
   private db: ThaqalaynDb;
   private bookmarksSubject = new BehaviorSubject<Bookmark[]>([]);
   private progressSubject = new BehaviorSubject<ReadingProgress[]>([]);
+  private annotationsSubject = new BehaviorSubject<Annotation[]>([]);
 
   bookmarks$: Observable<Bookmark[]> = this.bookmarksSubject.asObservable();
   readingProgress$: Observable<ReadingProgress[]> = this.progressSubject.asObservable();
+  annotations$: Observable<Annotation[]> = this.annotationsSubject.asObservable();
 
   constructor() {
     this.db = new ThaqalaynDb();
@@ -115,14 +132,15 @@ export class BookmarkService {
     await this.refreshProgress();
   }
 
-  /** Export all bookmarks as JSON */
+  /** Export all bookmarks and annotations as JSON */
   async exportBookmarks(): Promise<string> {
     const bookmarks = await this.getBookmarks();
     const progress = await this.getReadingProgress();
-    return JSON.stringify({ bookmarks, readingProgress: progress }, null, 2);
+    const annotations = await this.getAnnotations();
+    return JSON.stringify({ bookmarks, readingProgress: progress, annotations }, null, 2);
   }
 
-  /** Import bookmarks from JSON */
+  /** Import bookmarks and annotations from JSON */
   async importBookmarks(json: string): Promise<number> {
     const data = JSON.parse(json);
     let imported = 0;
@@ -154,14 +172,65 @@ export class BookmarkService {
       }
     }
 
+    if (data.annotations && Array.isArray(data.annotations)) {
+      for (const ann of data.annotations) {
+        const existing = await this.getAnnotation(ann.path);
+        if (!existing) {
+          await this.db.annotations.add({
+            path: ann.path,
+            bookId: ann.bookId || this.extractBookId(ann.path),
+            text: ann.text,
+            createdAt: new Date(ann.createdAt),
+            updatedAt: new Date(ann.updatedAt),
+          });
+          imported++;
+        }
+      }
+    }
+
     await this.loadAll();
     return imported;
+  }
+
+  /** Save or update an annotation for a verse */
+  async saveAnnotation(path: string, text: string): Promise<void> {
+    const existing = await this.db.annotations.where('path').equals(path).first();
+    const now = new Date();
+    if (existing) {
+      await this.db.annotations.update(existing.id!, { text, updatedAt: now });
+    } else {
+      await this.db.annotations.add({
+        path,
+        bookId: this.extractBookId(path),
+        text,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+    await this.refreshAnnotations();
+  }
+
+  /** Get annotation for a specific path */
+  async getAnnotation(path: string): Promise<Annotation | undefined> {
+    return this.db.annotations.where('path').equals(path).first();
+  }
+
+  /** Delete an annotation */
+  async deleteAnnotation(path: string): Promise<void> {
+    await this.db.annotations.where('path').equals(path).delete();
+    await this.refreshAnnotations();
+  }
+
+  /** Get all annotations */
+  async getAnnotations(): Promise<Annotation[]> {
+    return this.db.annotations.orderBy('updatedAt').reverse().toArray();
   }
 
   /** Clear all bookmarks */
   async clearAll(): Promise<void> {
     await this.db.bookmarks.clear();
     await this.db.readingProgress.clear();
+    await this.db.annotations.clear();
     await this.loadAll();
   }
 
@@ -176,6 +245,7 @@ export class BookmarkService {
   private async loadAll(): Promise<void> {
     await this.refreshBookmarks();
     await this.refreshProgress();
+    await this.refreshAnnotations();
   }
 
   private async refreshBookmarks(): Promise<void> {
@@ -186,5 +256,10 @@ export class BookmarkService {
   private async refreshProgress(): Promise<void> {
     const progress = await this.getReadingProgress();
     this.progressSubject.next(progress);
+  }
+
+  private async refreshAnnotations(): Promise<void> {
+    const annotations = await this.getAnnotations();
+    this.annotationsSubject.next(annotations);
   }
 }

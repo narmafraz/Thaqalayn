@@ -30,6 +30,11 @@
                     [attr.aria-label]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
               <mat-icon>{{ isVerseBookmarked(book.index, verse) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
             </button>
+            <button class="note-icon-btn"
+                    (click)="toggleNoteEditor(book.index, verse)"
+                    [attr.aria-label]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
+              <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
+            </button>
             <button *ngIf="isQuranBook(book.index)"
                     class="audio-icon-btn"
                     (click)="toggleAudio(book.index, verse.local_index)"
@@ -51,6 +56,32 @@
           </div>
         </div>
       </mat-card-footer>
+
+      <!-- Note display -->
+      <div class="note-display" *ngIf="hasNote(book.index, verse) && !isEditingNote(book.index, verse)">
+        <mat-icon class="note-icon">sticky_note_2</mat-icon>
+        <p class="note-text">{{ getNoteText(book.index, verse) }}</p>
+      </div>
+
+      <!-- Note editor -->
+      <div class="note-editor" *ngIf="isEditingNote(book.index, verse)">
+        <textarea [(ngModel)]="editingNoteText"
+                  [placeholder]="'annotation.placeholder' | translate"
+                  rows="3"
+                  class="note-textarea"
+                  aria-label="Personal note"></textarea>
+        <div class="note-actions">
+          <button mat-raised-button color="primary" (click)="saveNote(book.index, verse)">
+            <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
+          </button>
+          <button mat-button (click)="editingNotePath = null">
+            {{ 'annotation.cancel' | translate }}
+          </button>
+          <button mat-button color="warn" *ngIf="hasNote(book.index, verse)" (click)="deleteNote(book.index, verse)">
+            <mat-icon>delete</mat-icon> {{ 'annotation.delete' | translate }}
+          </button>
+        </div>
+      </div>
     </mat-card>
   </ng-container>
   <app-settings></app-settings>

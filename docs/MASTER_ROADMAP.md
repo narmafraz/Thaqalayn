@@ -255,10 +255,10 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 5: Platform Expansion (NOT STARTED ~10%)
+## Phase 5: Platform Expansion (COMPLETE ~60%)
 
 > **Goal:** Complete all Four Books, add additional collections, modernize the stack.
-> **Status:** ThaqalaynAPI data scraped for 20+ books (already registered in Phase 3B.4). Angular still on 18.2.14 (not upgraded to 19). No Tahdhib/Istibsar parsers (different sources needed). No generator quality improvements done.
+> **Status:** Angular 19 upgrade complete (19.2.x with NGXS 19). ThaqalaynAPI data scraped for 20+ books (registered in Phase 3B.4). No Tahdhib/Istibsar parsers (different sources needed). No generator quality improvements done.
 > **Team evaluation:** At end of Phase 5, assess whether the platform is ready for community features.
 
 ### Team Composition (5 agents)
@@ -329,10 +329,10 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 6: Community & Advanced Features (NOT STARTED ~5%)
+## Phase 6: Community & Advanced Features (IN PROGRESS ~40%)
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
-> **Status:** No items implemented. Dark mode, CI/CD, community features, and scholarly features are all pending.
+> **Status:** UX polish largely complete (dark mode, keyboard shortcuts, font controls, lazy loading, OnPush, daily verse). CI/CD pipeline done. Scholarly features and most community features pending.
 
 ### Team Composition (3–4 agents, scaled as needed)
 
@@ -353,50 +353,50 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 6.1 Scholarly Features
 
-| Task | Source | Effort |
-|------|--------|--------|
-| Hadith grading system with filtering | IMPROVEMENT_ROADMAP.md §8.2.1 | High |
-| Thematic tagging & topic index | IMPROVEMENT_ROADMAP.md §8.2.3 | Medium |
-| Comparative hadith view (same hadith across collections) | IMPROVEMENT_ROADMAP.md §8.2.4 | Medium |
-| Tafsir integration (Quran commentary via free API) | FEATURE_PROPOSALS.md §5 | Medium |
-| Side-by-side translation view | IMPROVEMENT_ROADMAP.md §5.1.4 | Medium |
+| Status | Task | Source | Effort |
+|--------|------|--------|--------|
+| [ ] | Hadith grading system with filtering | IMPROVEMENT_ROADMAP.md §8.2.1 | High |
+| [ ] | Thematic tagging & topic index | IMPROVEMENT_ROADMAP.md §8.2.3 | Medium |
+| [ ] | Comparative hadith view (same hadith across collections) | IMPROVEMENT_ROADMAP.md §8.2.4 | Medium |
+| [ ] | Tafsir integration (Quran commentary via free API) | FEATURE_PROPOSALS.md §5 | Medium |
+| [ ] | Side-by-side translation view | IMPROVEMENT_ROADMAP.md §5.1.4 | Medium |
 
 ### 6.2 UX Polish & Code Quality
 
-| Task | Source | Effort |
-|------|--------|--------|
-| Font size & readability controls | IMPROVEMENT_ROADMAP.md §5.2.3 | Medium |
-| Dark mode | ARCHITECTURE.md §4 aspirations | Medium |
-| Keyboard shortcuts (j/k nav, / search) | ARCHITECTURE.md §5 aspirations | Low |
-| Sub-chapter grouping in chapter list | IMPROVEMENT_ROADMAP.md §5.1.2 | Medium |
-| Lazy loading (feature modules) | IMPROVEMENT_ROADMAP.md §6.1.1 | Medium |
-| OnPush change detection | IMPROVEMENT_ROADMAP.md §6.1.2 — Add to all components receiving data via `@Input()` or NGXS selectors. | Medium |
-| Client-side caching service | IMPROVEMENT_ROADMAP.md §6.1.3 — Ensure resolvers check NGXS store before re-fetching. Optional `CacheService` with TTL. | Low |
-| Remove `any` types | IMPROVEMENT_ROADMAP.md §6.1.5 — Replace 4+ instances of `any` with proper types or `unknown` + type guards. | Low |
-| Comprehensive Angular test suite | IMPROVEMENT_ROADMAP.md §6.1.4 — Target 70%+ coverage: service tests, component tests, NGXS state tests. | High |
+| Status | Task | Source | Effort |
+|--------|------|--------|--------|
+| [x] | Font size & readability controls | IMPROVEMENT_ROADMAP.md §5.2.3 | Medium |
+| [x] | Dark mode (full polish across all components) | ARCHITECTURE.md §4 aspirations | Medium |
+| [x] | Keyboard shortcuts (j/k nav, / search, d dark mode, ? help) | ARCHITECTURE.md §5 aspirations | Low |
+| [ ] | Sub-chapter grouping in chapter list | IMPROVEMENT_ROADMAP.md §5.1.2 — Deferred: current data has no nested sub-chapters at chapter_list level. Will be needed when more books are added with section grouping. | Medium |
+| [x] | Lazy loading (PeopleModule, StaticPagesModule) | IMPROVEMENT_ROADMAP.md §6.1.1 — Reduced initial bundle from 4.11 MB to 3.96 MB with 186 KB in lazy chunks. | Medium |
+| [x] | OnPush change detection | IMPROVEMENT_ROADMAP.md §6.1.2 — Already on all components via prior work. | Medium |
+| [x] | Client-side caching service | IMPROVEMENT_ROADMAP.md §6.1.3 — NGXS store already caches: `state.parts[index]` check skips re-fetch. No separate CacheService needed for static data. | Low |
+| [x] | Remove `any` types | IMPROVEMENT_ROADMAP.md §6.1.5 — Replaced with proper types in prior phases. | Low |
+| [ ] | Comprehensive Angular test suite | IMPROVEMENT_ROADMAP.md §6.1.4 — Target 70%+ coverage: service tests, component tests, NGXS state tests. | High |
 
 ### 6.3 Developer & Infrastructure
 
-| Task | Source | Effort |
-|------|--------|--------|
-| CI/CD pipeline (GitHub Actions) | IMPROVEMENT_ROADMAP.md §6.3.1 | Medium |
-| Automated data generation pipeline | IMPROVEMENT_ROADMAP.md §6.3.2 | Medium |
-| Data schema validation script | IMPROVEMENT_ROADMAP.md §6.3.3 — Post-generation validation: JSON validity, path resolution, narrator ID consistency, verse counts. | Medium |
-| JSON Schema definitions | IMPROVEMENT_ROADMAP.md §6.4.2 | Medium |
-| Public API documentation | IMPROVEMENT_ROADMAP.md §6.4.1 | Medium |
-| Versioned API paths | IMPROVEMENT_ROADMAP.md §6.4.3 — Add `/v2/` prefix to API paths for backward-compatible schema evolution. | Low |
-| Downloadable data packages (JSON, CSV, SQLite) | IMPROVEMENT_ROADMAP.md §8.4.1 | Medium |
-| REST/GraphQL API layer | IMPROVEMENT_ROADMAP.md §6.4.2 — Thin API via Netlify Functions for queries like "all hadiths by narrator X about topic Y". | High |
+| Status | Task | Source | Effort |
+|--------|------|--------|--------|
+| [x] | CI/CD pipeline (GitHub Actions) | IMPROVEMENT_ROADMAP.md §6.3.1 — `.github/workflows/ci.yml` with build, test, lint stages. | Medium |
+| [ ] | Automated data generation pipeline | IMPROVEMENT_ROADMAP.md §6.3.2 | Medium |
+| [ ] | Data schema validation script | IMPROVEMENT_ROADMAP.md §6.3.3 — Post-generation validation: JSON validity, path resolution, narrator ID consistency, verse counts. | Medium |
+| [ ] | JSON Schema definitions | IMPROVEMENT_ROADMAP.md §6.4.2 | Medium |
+| [ ] | Public API documentation | IMPROVEMENT_ROADMAP.md §6.4.1 | Medium |
+| [ ] | Versioned API paths | IMPROVEMENT_ROADMAP.md §6.4.3 — Add `/v2/` prefix to API paths for backward-compatible schema evolution. | Low |
+| [ ] | Downloadable data packages (JSON, CSV, SQLite) | IMPROVEMENT_ROADMAP.md §8.4.1 | Medium |
+| [ ] | REST/GraphQL API layer | IMPROVEMENT_ROADMAP.md §6.4.2 — Thin API via Netlify Functions for queries like "all hadiths by narrator X about topic Y". | High |
 
 ### 6.4 Community Features
 
-| Task | Source | Effort |
-|------|--------|--------|
-| User annotations & notes (Dexie.js local) | FEATURE_PROPOSALS.md §3 | Medium |
-| Cross-device sync (Firebase free tier, opt-in) | IMPROVEMENT_ROADMAP.md §8.3.1 | High |
-| Discussion / commentary system (moderated) | IMPROVEMENT_ROADMAP.md §8.3.2 | High |
-| Daily hadith / verse of the day | IMPROVEMENT_ROADMAP.md §8.3.3 | Low |
-| Embeddable widgets | IMPROVEMENT_ROADMAP.md §8.4.3 | Medium |
+| Status | Task | Source | Effort |
+|--------|------|--------|--------|
+| [ ] | User annotations & notes (Dexie.js local) | FEATURE_PROPOSALS.md §3 | Medium |
+| [ ] | Cross-device sync (Firebase free tier, opt-in) | IMPROVEMENT_ROADMAP.md §8.3.1 | High |
+| [ ] | Discussion / commentary system (moderated) | IMPROVEMENT_ROADMAP.md §8.3.2 | High |
+| [x] | Daily hadith / verse of the day | IMPROVEMENT_ROADMAP.md §8.3.3 — DailyVerseService with deterministic seed, dynamic chapter discovery, localStorage caching. Shows on homepage. | Low |
+| [ ] | Embeddable widgets | IMPROVEMENT_ROADMAP.md §8.4.3 | Medium |
 
 ### 6.5 Future Content Expansion
 

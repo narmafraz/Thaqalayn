@@ -24,6 +24,9 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
 
   linkCopied = false;
   isBookmarked = false;
+  noteText = '';
+  showNoteEditor = false;
+  hasNote = false;
   private sub: Subscription | null = null;
 
   constructor(
@@ -37,6 +40,13 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       const path = '/books/' + book.index;
       this.bookmarkService.isBookmarked(path).then(result => {
         this.isBookmarked = result;
+        this.cdr.markForCheck();
+      });
+      // Load existing annotation
+      this.bookmarkService.getAnnotation(path).then(ann => {
+        this.noteText = ann?.text || '';
+        this.hasNote = !!ann;
+        this.showNoteEditor = false;
         this.cdr.markForCheck();
       });
       // Track reading progress
@@ -73,6 +83,28 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       book.data.verse.part_type + ' ' + book.data.verse.local_index;
     const arabicTitle = book.data.chapter_title?.ar;
     this.isBookmarked = await this.bookmarkService.toggleBookmark(path, title, arabicTitle);
+    this.cdr.markForCheck();
+  }
+
+  async saveNote(book: VerseDetail): Promise<void> {
+    const path = '/books/' + book.index;
+    if (this.noteText.trim()) {
+      await this.bookmarkService.saveAnnotation(path, this.noteText.trim());
+      this.hasNote = true;
+    } else {
+      await this.bookmarkService.deleteAnnotation(path);
+      this.hasNote = false;
+    }
+    this.showNoteEditor = false;
+    this.cdr.markForCheck();
+  }
+
+  async deleteNote(book: VerseDetail): Promise<void> {
+    const path = '/books/' + book.index;
+    await this.bookmarkService.deleteAnnotation(path);
+    this.noteText = '';
+    this.hasNote = false;
+    this.showNoteEditor = false;
     this.cdr.markForCheck();
   }
 

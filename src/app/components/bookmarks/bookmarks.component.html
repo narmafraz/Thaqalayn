@@ -50,11 +50,37 @@
     </div>
   </section>
 
+  <!-- My Notes section -->
+  <section class="notes-section">
+    <h2>{{ 'annotation.notes' | translate }}</h2>
+
+    <div *ngIf="annotations.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">note_add</mat-icon>
+      <p>{{ 'annotation.noNotes' | translate }}</p>
+    </div>
+
+    <div class="annotation-list">
+      <div class="annotation-item" *ngFor="let ann of annotations">
+        <a [routerLink]="getRouterLinkSegments(ann.path)" queryParamsHandling="preserve" class="annotation-link">
+          <mat-icon class="annotation-icon">sticky_note_2</mat-icon>
+          <div>
+            <div class="annotation-path">{{ ann.path }}</div>
+            <div class="annotation-text">{{ ann.text }}</div>
+          </div>
+        </a>
+        <button mat-icon-button (click)="deleteAnnotation(ann.path)"
+                [attr.aria-label]="'annotation.delete' | translate">
+          <mat-icon>delete_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- Export/Import section -->
   <section class="export-section">
     <h2>{{ 'bookmark.exportImport' | translate }}</h2>
     <div class="export-actions">
-      <button mat-raised-button (click)="exportBookmarks()" [disabled]="bookmarks.length === 0">
+      <button mat-raised-button (click)="exportBookmarks()" [disabled]="bookmarks.length === 0 && annotations.length === 0">
         <mat-icon>file_download</mat-icon> {{ 'bookmark.export' | translate }}
       </button>
       <button mat-raised-button (click)="fileInput.click()">

@@ -89,6 +89,10 @@
           <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
           <span>{{ isBookmarked ? ('bookmark.bookmarked' | translate) : ('bookmark.bookmark' | translate) }}</span>
         </button>
+        <button mat-button (click)="showNoteEditor = !showNoteEditor" class="note-btn">
+          <mat-icon>{{ hasNote ? 'edit_note' : 'note_add' }}</mat-icon>
+          <span>{{ hasNote ? ('annotation.edit' | translate) : ('annotation.add' | translate) }}</span>
+        </button>
         <button mat-button (click)="shareHadith(book.index)" class="share-btn">
           <mat-icon>share</mat-icon>
           <span>{{ linkCopied ? ('book.linkCopied' | translate) : ('book.share' | translate) }}</span>
@@ -101,6 +105,32 @@
           {{ 'book.viewInChapter' | translate }}
         </a>
       </mat-card-actions>
+
+      <!-- Note display -->
+      <div class="note-display" *ngIf="hasNote && !showNoteEditor">
+        <mat-icon class="note-icon">sticky_note_2</mat-icon>
+        <p class="note-text">{{ noteText }}</p>
+      </div>
+
+      <!-- Note editor -->
+      <div class="note-editor" *ngIf="showNoteEditor">
+        <textarea [(ngModel)]="noteText"
+                  [placeholder]="'annotation.placeholder' | translate"
+                  rows="3"
+                  class="note-textarea"
+                  aria-label="Personal note"></textarea>
+        <div class="note-actions">
+          <button mat-raised-button color="primary" (click)="saveNote(book)">
+            <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
+          </button>
+          <button mat-button (click)="showNoteEditor = false">
+            {{ 'annotation.cancel' | translate }}
+          </button>
+          <button mat-button color="warn" *ngIf="hasNote" (click)="deleteNote(book)">
+            <mat-icon>delete</mat-icon> {{ 'annotation.delete' | translate }}
+          </button>
+        </div>
+      </div>
     </mat-card>
 
     <!-- Prev/Next Navigation -->

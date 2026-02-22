@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { Bookmark, BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
+import { Annotation, Bookmark, BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -13,6 +13,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   bookmarks: Bookmark[] = [];
   readingProgress: ReadingProgress[] = [];
+  annotations: Annotation[] = [];
   private subs: Subscription[] = [];
 
   constructor(
@@ -33,6 +34,12 @@ export class BookmarksComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       })
     );
+    this.subs.push(
+      this.bookmarkService.annotations$.subscribe(ann => {
+        this.annotations = ann;
+        this.cdr.markForCheck();
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -45,6 +52,10 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   clearProgress(bookId: string): void {
     this.bookmarkService.clearReadingProgress(bookId);
+  }
+
+  deleteAnnotation(path: string): void {
+    this.bookmarkService.deleteAnnotation(path);
   }
 
   getRouterLink(path: string): string {

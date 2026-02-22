@@ -38,27 +38,27 @@ export class RouterState {
 
   @Selector()
   public static getBookPartIndex(state: RouterStateModel) {
-    return state.index;
+    return state?.index;
   }
 
   @Selector()
   public static getUrlFragment(state: RouterStateModel) {
-    return state.fragment;
+    return state?.fragment;
   }
 
   @Selector()
   public static getTranslation(state: RouterStateModel) {
-    return state.translation;
+    return state?.translation;
   }
 
   @Selector()
   public static getTranslation2(state: RouterStateModel) {
-    return state.translation2;
+    return state?.translation2;
   }
 
   @Selector()
   public static getLanguage(state: RouterStateModel) {
-    return state.language || 'en';
+    return state?.language || 'en';
   }
 
   @Action(RouterNavigation)
@@ -73,7 +73,9 @@ export class RouterState {
 
   @Action(RouterNavigation)
   bookPartIndexChanged(context: StateContext<RouterStateModel>, action: RouterNavigation) {
-    const routerIndex = action.routerState.root.firstChild.paramMap.get('index');
+    const firstChild = action.routerState.root.firstChild;
+    if (!firstChild) { return; }
+    const routerIndex = firstChild.paramMap.get('index');
     const storeIndex = context.getState().index;
     if (routerIndex !== storeIndex) {
       context.patchState({index: routerIndex});

@@ -56,19 +56,19 @@ export class BooksState {
   @Selector([BooksState, RouterState.getBookPartIndex])
   public static getCurrentLoading(state: BooksStateModel, routerIndex: string): boolean {
     const index = routerIndex || 'books';
-    return !!state.loading[index];
+    return !!state?.loading?.[index];
   }
 
   @Selector([BooksState, RouterState.getBookPartIndex])
   public static getCurrentError(state: BooksStateModel, routerIndex: string): string {
     const index = routerIndex || 'books';
-    return state.errors[index] || undefined;
+    return state?.errors?.[index] || undefined;
   }
 
   @Selector([BooksState])
   public static getPartByIndex(state: BooksStateModel) {
     return (index: string) => {
-      if (!state.parts) {
+      if (!state?.parts) {
         return undefined;
       }
 
@@ -79,8 +79,8 @@ export class BooksState {
   @Selector([BooksState, BooksState.getPartByIndex, RouterState.getBookPartIndex])
   public static getCurrentNavigatedPart(state: BooksStateModel, partByIndex: ((index: string) => Book),
                                         routerIndex: string) {
-    const index = routerIndex ?  routerIndex : 'books';
-
+    const index = routerIndex ? routerIndex : 'books';
+    if (!partByIndex) { return undefined; }
     return partByIndex(index);
   }
 

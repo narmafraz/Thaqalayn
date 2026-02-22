@@ -170,12 +170,25 @@ export class SearchService {
     }
 
     const normalizedQuery = this.normalizeArabic(query);
+    const isMultiWord = normalizedQuery.trim().split(/\s+/).length > 1;
 
-    const results = await search(this.titlesDb, {
+    // Use AND logic (threshold: 0) for multi-word queries, with OR fallback
+    let results = await search(this.titlesDb, {
       term: normalizedQuery,
       limit,
-      properties: ['en', 'ar', 'arn', 'pt']
+      properties: ['en', 'ar', 'arn', 'pt'],
+      threshold: isMultiWord ? 0 : 1,
     });
+
+    // If AND returned too few results, fall back to OR
+    if (isMultiWord && results.count < 3) {
+      results = await search(this.titlesDb, {
+        term: normalizedQuery,
+        limit,
+        properties: ['en', 'ar', 'arn', 'pt'],
+        threshold: 1,
+      });
+    }
 
     return results.hits.map(hit => {
       const doc = hit.document as unknown as TitleDocument;
@@ -196,14 +209,28 @@ export class SearchService {
     if (!this.fullTextLoaded) return [];
 
     const normalizedQuery = this.normalizeArabic(query);
+    const isMultiWord = normalizedQuery.trim().split(/\s+/).length > 1;
     const allResults: SearchResult[] = [];
+    const perBookLimit = Math.ceil(limit / this.fullTextDbs.size);
 
     for (const [, entry] of this.fullTextDbs) {
-      const results = await search(entry.db, {
+      // Use AND logic for multi-word queries, with OR fallback
+      let results = await search(entry.db, {
         term: normalizedQuery,
-        limit: Math.ceil(limit / this.fullTextDbs.size),
-        properties: ['ar', 'en', 't']
+        limit: perBookLimit,
+        properties: ['ar', 'en', 't'],
+        threshold: isMultiWord ? 0 : 1,
       });
+
+      // If AND returned nothing for this book, fall back to OR
+      if (isMultiWord && results.count === 0) {
+        results = await search(entry.db, {
+          term: normalizedQuery,
+          limit: perBookLimit,
+          properties: ['ar', 'en', 't'],
+          threshold: 1,
+        });
+      }
 
       for (const hit of results.hits) {
         const doc = hit.document as unknown as FullTextDocument;

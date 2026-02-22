@@ -16,6 +16,10 @@
             <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
           </button>
 
+          <button class="shortcuts-btn" (click)="toggleHelp(); $event.stopPropagation()" [attr.aria-label]="'settings.showKeyboardShortcuts' | translate">
+            <mat-icon>keyboard</mat-icon>
+          </button>
+
           <mat-select
             class="lang-picker"
             [value]="currentLang$ | async"

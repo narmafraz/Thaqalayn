@@ -114,6 +114,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.themeService.resetFontSize();
   }
 
+  toggleHelp(): void {
+    this.keyboard.toggleHelp();
+  }
+
   dismissHelp(): void {
     this.keyboard.dismissHelp();
   }

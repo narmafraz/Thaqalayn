@@ -81,7 +81,15 @@
     "modeTitles": "Titles",
     "modeFullText": "Full Text",
     "loadingFullText": "Loading full-text index...",
-    "hadith": "Hadith"
+    "hadith": "Hadith",
+    "tipsTitle": "Search Tips",
+    "tipMultipleWords": "Multiple words are matched individually (OR logic). Searching \"mercy knowledge\" finds content with either word.",
+    "tipArabic": "Search in Arabic or English. Arabic diacritics are ignored, so typing without tashkeel works.",
+    "tipModes": "Use \"Titles\" mode for quick chapter navigation. Switch to \"Full Text\" to search inside hadith and verse content.",
+    "tipMinChars": "Type at least 2 characters to start searching.",
+    "tipEnter": "Press Enter to see all results on a full page.",
+    "tipFuzzy": "The search engine handles minor typos automatically with fuzzy matching.",
+    "tipsClose": "Got it"
   },
   "translation": {
     "selectTranslation": "Select Translation",
@@ -214,6 +222,7 @@
     "shortcutDarkMode": "Toggle dark mode",
     "shortcutHelp": "Show shortcuts",
     "shortcutClose": "Close / unfocus",
-    "pressEscToClose": "Press Esc to close"
+    "pressEscToClose": "Press Esc to close",
+    "showKeyboardShortcuts": "Keyboard shortcuts"
   }
 }

@@ -19,6 +19,26 @@
       [attr.aria-label]="'search.clearSearch' | translate">
       <mat-icon>close</mat-icon>
     </button>
+    <button
+      *ngIf="!searchValue"
+      class="search-tips-btn"
+      (mousedown)="showTips = !showTips"
+      [attr.aria-label]="'search.tipsTitle' | translate">
+      <mat-icon>help_outline</mat-icon>
+    </button>
+  </div>
+
+  <div class="search-tips-panel" *ngIf="showTips" (mousedown)="$event.stopPropagation()">
+    <h4>{{ 'search.tipsTitle' | translate }}</h4>
+    <ul>
+      <li>{{ 'search.tipModes' | translate }}</li>
+      <li>{{ 'search.tipMultipleWords' | translate }}</li>
+      <li>{{ 'search.tipArabic' | translate }}</li>
+      <li>{{ 'search.tipFuzzy' | translate }}</li>
+      <li>{{ 'search.tipMinChars' | translate }}</li>
+      <li>{{ 'search.tipEnter' | translate }}</li>
+    </ul>
+    <button class="tips-close-btn" (mousedown)="showTips = false">{{ 'search.tipsClose' | translate }}</button>
   </div>
 
   <div class="search-dropdown" *ngIf="showDropdown" role="listbox">

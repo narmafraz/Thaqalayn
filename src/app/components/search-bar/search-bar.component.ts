@@ -24,6 +24,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   searchValue = '';
   showDropdown = false;
+  showTips = false;
   private searchSubject = new Subject<string>();
   private subscriptions: Subscription[] = [];
 
@@ -53,6 +54,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
 
   onSearchInput(value: string): void {
     this.searchValue = value;
+    this.showTips = false;
     this.searchSubject.next(value);
   }
 
@@ -82,6 +84,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   onBlur(): void {
     setTimeout(() => {
       this.showDropdown = false;
+      this.showTips = false;
     }, 200);
   }
 

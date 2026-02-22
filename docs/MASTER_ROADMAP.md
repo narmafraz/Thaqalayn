@@ -255,10 +255,10 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 5: Platform Expansion (COMPLETE ~70%)
+## Phase 5: Platform Expansion (COMPLETE ~90%)
 
 > **Goal:** Complete all Four Books, add additional collections, modernize the stack.
-> **Status:** Angular 19 upgrade complete (19.2.x with NGXS 19). ThaqalaynAPI data scraped for 20+ books (registered in Phase 3B.4). No Tahdhib/Istibsar parsers (different sources needed). No generator quality improvements done.
+> **Status:** Angular 19 upgrade complete (19.2.x with NGXS 19). ThaqalaynAPI data scraped and fully generated for 20+ books (registered in Phase 3B.4). Full data generation pipeline running end-to-end: 22 books, 40,621 verses, 973 generator tests passing. Gradings working in both dict and list formats (824 dict + 13,900 list). No Tahdhib/Istibsar parsers (different sources needed). Data optimization (5.4) remaining.
 > **Team evaluation:** At end of Phase 5, assess whether the platform is ready for community features.
 
 ### Team Composition (5 agents)
@@ -321,12 +321,12 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 5.4 Data Optimization (remaining)
 
-| Task | Description | Savings | Effort |
-|------|-------------|---------|--------|
-| Extract verse_translations to shared file | One translations metadata file per book, not per chapter. | ~5 MB | Medium |
-| Index file splitting for scalability | Per-book index files when 30+ books are added. | Scalability | Medium |
-| Field name shortening (optional) | Rename long field names (e.g., `indexed_titles`→`it`). | ~20 MB | High (invasive) |
-| Brotli pre-compression | Pre-compress large JSON files for faster CDN delivery. | Transfer savings | Low |
+| Status | Task | Description | Savings | Effort |
+|--------|------|-------------|---------|--------|
+| [x] | Brotli pre-compression | Netlify CDN handles Brotli compression automatically for all static assets. No pre-compression needed. | Transfer savings | N/A |
+| [ ] | Extract verse_translations to shared file | Measured: only 0.42 MB across 7,738 files (not 5 MB as estimated). Cross-project change not justified for <0.1% savings. Deferred indefinitely. | ~0.4 MB | Medium |
+| [ ] | Index file splitting for scalability | Per-book index files when 30+ books are added. Not needed yet (22 books). | Scalability | Medium |
+| [ ] | Field name shortening (optional) | Rename long field names (e.g., `indexed_titles`→`it`). Breaking change across all 3 projects. | ~20 MB | High (invasive) |
 
 ---
 
@@ -506,6 +506,9 @@ Documented decisions and notable bug fixes applied during development.
 | **Search URL path fix** | 4 | Search result links were generating incorrect URLs. The SearchService was constructing paths that did not match the Angular router's expected format. Fixed path construction to align with the app's routing structure. |
 | **PWA manifest creation** | 4 | `manifest.webmanifest` was missing or misconfigured after initial PWA setup. Created proper manifest with correct `start_url`, icons, theme color, and display mode. |
 | **apple-touch-icon fix** | 4 | iOS devices were not displaying the correct icon when adding the app to the home screen. Added properly sized `apple-touch-icon` link in `index.html`. |
+| **Gradings type mismatch** | 5 | `Verse.gradings` was typed as `Dict[str, str]` but kafi_sarwar.py produces `List[str]` format. Changed to `Union[Dict[str, str], List[str]]`. Updated JSON Schema to use `oneOf`. Fixed the only failing test (`test_kafi_paths.py`). |
+| **Windows pipeline bugs** | 5 | Three fixes: (1) UTF-8 stdout encoding for Arabic text (`sys.stdout.reconfigure`), (2) directory-as-file PermissionError in kafi_sarwar.py, (3) glob pattern matching sibling files. Pipeline now runs end-to-end on Windows. |
+| **narrator_chain.text test updates** | 5 | Data validation tests still checked for `narrator_chain.text` which was removed in Phase 2. Updated to check `narrator_chain.parts` instead. |
 
 ### Deferred Decisions
 

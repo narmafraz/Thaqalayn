@@ -371,3 +371,36 @@ kbd {
     height: 20px;
   }
 }
+
+/* ===================== Keyboard Shortcuts Button ===================== */
+.shortcuts-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: 4px;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Hide shortcuts button on mobile (no physical keyboard)
+@media (max-width: 768px) {
+  .shortcuts-btn {
+    display: none;
+  }
+}

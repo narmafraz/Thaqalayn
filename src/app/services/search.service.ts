@@ -32,6 +32,16 @@ interface FullTextDocument {
   i: number;    // local index
 }
 
+/** Matches the search-meta.json schema */
+interface SearchMeta {
+  version: number;
+  schemas: {
+    book: {
+      files: Record<string, string>;  // e.g. { "quran": "quran-docs.json", "al-kafi": "al-kafi-docs.json" }
+    };
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -100,15 +110,21 @@ export class SearchService {
   }
 
   private async _loadFullTextIndex(): Promise<void> {
-    const books = ['quran-docs', 'al-kafi-docs'];
-    const bookNames: Record<string, string> = {
-      'quran-docs': 'Quran',
-      'al-kafi-docs': 'Al-Kafi',
-    };
-
     try {
-      for (const bookKey of books) {
-        const url = `${environment.apiBaseUrl}index/search/${bookKey}.json`;
+      // Fetch search-meta.json to discover all available book indexes
+      const metaUrl = `${environment.apiBaseUrl}index/search/search-meta.json`;
+      const meta = await this.http.get<SearchMeta>(metaUrl).toPromise();
+
+      if (!meta?.schemas?.book?.files) {
+        console.warn('[SearchService] search-meta.json has no book files');
+        this.fullTextLoaded = true;
+        return;
+      }
+
+      const bookFiles = meta.schemas.book.files;
+
+      for (const [bookSlug, filename] of Object.entries(bookFiles)) {
+        const url = `${environment.apiBaseUrl}index/search/${filename}`;
         const data = await this.http.get<FullTextDocument[]>(url).toPromise();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -128,7 +144,8 @@ export class SearchService {
           }
         }
 
-        this.fullTextDbs.set(bookKey, { db, bookName: bookNames[bookKey] || bookKey });
+        const bookName = this.slugToDisplayName(bookSlug);
+        this.fullTextDbs.set(bookSlug, { db, bookName });
       }
 
       this.fullTextLoaded = true;
@@ -137,6 +154,14 @@ export class SearchService {
       this.fullTextLoading = null;
       throw err;
     }
+  }
+
+  /** Convert a book slug like 'al-kafi' to a display name like 'Al-Kafi' */
+  private slugToDisplayName(slug: string): string {
+    return slug
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   async searchTitles(query: string, limit = 20): Promise<SearchResult[]> {

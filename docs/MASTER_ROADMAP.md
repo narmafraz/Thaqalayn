@@ -255,7 +255,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 5: Platform Expansion (COMPLETE ~60%)
+## Phase 5: Platform Expansion (COMPLETE ~65%)
 
 > **Goal:** Complete all Four Books, add additional collections, modernize the stack.
 > **Status:** Angular 19 upgrade complete (19.2.x with NGXS 19). ThaqalaynAPI data scraped for 20+ books (registered in Phase 3B.4). No Tahdhib/Istibsar parsers (different sources needed). No generator quality improvements done.
@@ -310,13 +310,14 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 5.5 Generator Quality
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Externalize configuration | Create `config.py`/`config.yaml` for book indices, paths, source directories. Currently hard-coded across files. | Medium |
-| Fix platform-specific file paths | Replace Windows backslashes with `pathlib.Path` or `os.path.join()` for cross-platform compatibility. | Low |
-| DRY refactoring | Extract shared translation ID formatting, path conversion logic, chapter loading patterns into utilities. Use `BookParser` base class. | Medium |
-| Python type hints + mypy | Add complete type annotations to all public functions. Add `mypy` to CI pipeline. | Medium |
-| Increase parser test coverage | Add parser-level integration tests for `quran.py`, `kafi.py`, `kafi_sarwar.py` (correct verse/chapter counts, translation pairing, malformed HTML handling). | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Externalize configuration | Created `app/config.py` with project-wide constants: paths (APP_DIR, RAW_DIR), book identifiers, translation IDs, API settings, `get_raw_path()` helper, JSON encoding settings. | Medium |
+| [x] | Fix platform-specific file paths | Replaced Windows backslashes with `os.path.join()` and forward slashes in `quran.py`, `kafi.py`, `kafi_sarwar.py`. All path operations now cross-platform compatible. | Low |
+| [ ] | DRY refactoring | Extract shared translation ID formatting, path conversion logic, chapter loading patterns into utilities. Use `BookParser` base class. | Medium |
+| [x] | Python type hints | Added complete type annotations to all public functions in `lib_db.py`, `kafi.py`, `kafi_sarwar.py`, `quran.py`. | Medium |
+| [ ] | Add mypy to CI | Add `mypy` to CI pipeline for type checking. | Low |
+| [ ] | Increase parser test coverage | Add parser-level integration tests for `quran.py`, `kafi.py`, `kafi_sarwar.py` (correct verse/chapter counts, translation pairing, malformed HTML handling). | Medium |
 
 ### 5.4 Data Optimization (remaining)
 
@@ -416,7 +417,7 @@ Everything below has been implemented and tested. Included for context — do no
 | Status | Task | Source | Effort |
 |--------|------|--------|--------|
 | [x] | Enhanced PWA (app-like nav, home screen) | ARCHITECTURE.md §3 — Mobile bottom navigation bar with route-aware active section tracking. Fixed-position bottom nav with Home, Books, Topics, Bookmarks icons on screens <=768px. Dark mode support, safe-area-inset for notched devices. Replaces text footer on mobile. | Medium |
-| [ ] | Capacitor wrapper (if app store needed) | ARCHITECTURE.md §3 | High |
+| [x] | Capacitor wrapper (if app store needed) | ARCHITECTURE.md §3 — Configured Capacitor with Android/iOS platforms, splash screen, status bar, keyboard, haptics, and share plugins. Added `cap:build`, `cap:android`, `cap:sync` npm scripts. Native directories gitignored. | High |
 | [ ] | Custom domain | PHASE3_FEATURE_PROPOSAL.md §8.7 | Low (~$12/yr) |
 | [x] | Angular SSG/prerendering | PHASE3_FEATURE_PROPOSAL.md §8.8 — Installed `@angular/ssr`, added SSR-safe `isPlatformBrowser` guards to all services (theme, i18n, keyboard, PWA) and app component. Production-only prerendering of static routes (/, /about, /support, /download, /topics, /bookmarks, /books) with client hydration (`provideClientHydration(withEventReplay())`). | High |
 

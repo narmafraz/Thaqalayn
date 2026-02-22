@@ -329,7 +329,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 6: Community & Advanced Features (IN PROGRESS ~90%)
+## Phase 6: Community & Advanced Features (IN PROGRESS ~95%)
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
 > **Status:** UX polish complete (dark mode, keyboard shortcuts, font controls, lazy loading, OnPush, daily verse, annotations, side-by-side translations). Comprehensive test suite (347 tests). CI/CD pipeline done. Mobile viewport audit done. Scholarly features and most community features pending.
@@ -386,7 +386,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | Public API documentation | IMPROVEMENT_ROADMAP.md §6.4.1 — `API.md` in ThaqalaynData: endpoints, data models (TypeScript interfaces), path format, translation IDs, cross-references, gradings, CORS. | Medium |
 | [x] | Versioned API paths | IMPROVEMENT_ROADMAP.md §6.4.3 — Netlify redirect `/v2/*` → `/:splat` in ThaqalaynData. API docs updated with versioning section. | Low |
 | [x] | Downloadable data packages (JSON, CSV, SQLite) | IMPROVEMENT_ROADMAP.md §8.4.1 — Data Packages section on download page with direct download links for 4 datasets (Al-Kafi, Quran, Narrators, Translations) and CSV export for book data. | Medium |
-| [ ] | REST/GraphQL API layer | IMPROVEMENT_ROADMAP.md §6.4.2 — Thin API via Netlify Functions for queries like "all hadiths by narrator X about topic Y". | High |
+| [x] | REST API layer (Netlify Functions) | IMPROVEMENT_ROADMAP.md §6.4.2 — Three serverless endpoints: `/api/random-hadith` (random hadith with text), `/api/stats` (collection statistics), `/api/narrator-hadiths?id=N` (paginated hadiths by narrator with optional full text). Clean URL redirects, CORS, documented in API.md. | High |
 
 ### 6.4 Community Features
 

@@ -26,6 +26,7 @@ import { TranslationSelectionComponent } from './components/translation-selectio
 import { SettingsComponent } from './components/settings/settings.component';
 import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
+import { EmbedVerseComponent } from './components/embed-verse/embed-verse.component';
 import { ErrorInterceptor } from './services/error.interceptor';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -43,6 +44,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     SettingsComponent,
     InstallPromptComponent,
     SearchBarComponent,
+    EmbedVerseComponent,
   ],
   bootstrap: [AppComponent],
   imports: [

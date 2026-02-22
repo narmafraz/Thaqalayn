@@ -161,7 +161,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 4: Search, PWA & UX Enhancement (COMPLETE ~80%)
+## Phase 4: Search, PWA & UX Enhancement (COMPLETE ~85%)
 
 > **Goal:** Most-requested features: full-text search, offline support, bookmarks.
 > **Status:** Core features implemented (search with Orama, PWA, bookmarks with Dexie.js, audio, sharing, language auto-detection). Word-by-word Quran, some mobile UX, and NGXS error state deferred.
@@ -240,7 +240,7 @@ Everything below has been implemented and tested. Included for context — do no
 |--------|------|-------------|--------|
 | [x] | Mobile viewport audit | Tested at 320px, 360px, 375px. Added 360px breakpoint tier, fixed search dropdown overflow with CSS min(), added breadcrumb scroll mask fade, responsive people-list table, compact header/footer at ultra-narrow widths. | Medium |
 | [x] | Fix "Mentioned In" link clipping | Fixed via 360px breakpoint and responsive adjustments to chapter-content, people-list, and breadcrumbs. | Low |
-| [ ] | Touch-friendly navigation | Swipe gestures for next/prev chapter on mobile. Not yet implemented. | Medium |
+| [x] | Touch-friendly navigation | Swipe gestures for next/prev chapter on mobile. Horizontal swipe >80px triggers navigation with vertical filtering. | Medium |
 | [x] | Browser language auto-detection | On first visit, detects `navigator.language` and sets default UI + translation language. | Low |
 
 ### 4.7 Word-by-Word Quran (DEFERRED)
@@ -329,7 +329,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 6: Community & Advanced Features (IN PROGRESS ~65%)
+## Phase 6: Community & Advanced Features (IN PROGRESS ~75%)
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
 > **Status:** UX polish complete (dark mode, keyboard shortcuts, font controls, lazy loading, OnPush, daily verse, annotations, side-by-side translations). Comprehensive test suite (347 tests). CI/CD pipeline done. Mobile viewport audit done. Scholarly features and most community features pending.
@@ -355,10 +355,10 @@ Everything below has been implemented and tested. Included for context — do no
 
 | Status | Task | Source | Effort |
 |--------|------|--------|--------|
-| [ ] | Hadith grading system with filtering | IMPROVEMENT_ROADMAP.md §8.2.1 | High |
+| [x] | Hadith grading system with filtering | IMPROVEMENT_ROADMAP.md §8.2.1 — Inline color-coded grading badges on chapter-content (sahih, hasan, daif, mutabar, majhul, muwathaq). Added `gradings?: string[]` to Verse interface. Parsing handles `Scholar: <span>term</span>` HTML format. Tooltip shows full grading text. | High |
 | [ ] | Thematic tagging & topic index | IMPROVEMENT_ROADMAP.md §8.2.3 | Medium |
 | [ ] | Comparative hadith view (same hadith across collections) | IMPROVEMENT_ROADMAP.md §8.2.4 | Medium |
-| [ ] | Tafsir integration (Quran commentary via free API) | FEATURE_PROPOSALS.md §5 | Medium |
+| [x] | Tafsir integration (Quran commentary via free API) | FEATURE_PROPOSALS.md §5 — TafsirService using spa5k/tafsir_api CDN. 3 English editions (Ibn Kathir, al-Jalalayn, Maarif-ul-Quran). Expandable tafsir panel with edition selector on Quran verse cards. Cached per-surah with shareReplay. | Medium |
 | [x] | Side-by-side translation view | IMPROVEMENT_ROADMAP.md §5.1.4 — Compare button in translation selector, second dropdown via `?translation2=` query param, grid layout in verse-text, responsive (stacks on mobile). | Medium |
 
 ### 6.2 UX Polish & Code Quality

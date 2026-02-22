@@ -6,7 +6,7 @@ import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
 import { Observable, Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, map, startWith } from 'rxjs/operators';
 import { ThemeMode } from '@app/services/theme.service';
 
 @Component({
@@ -39,6 +39,7 @@ export class AppComponent implements OnInit, OnDestroy {
   theme$: Observable<ThemeMode>;
   fontSize$: Observable<number>;
   helpVisible$: Observable<boolean>;
+  isEmbed$: Observable<boolean>;
 
   private static readonly STATIC_TITLES: Record<string, string> = {
     '/about': 'About',
@@ -59,6 +60,11 @@ export class AppComponent implements OnInit, OnDestroy {
     this.theme$ = this.themeService.theme$;
     this.fontSize$ = this.themeService.fontSize$;
     this.helpVisible$ = this.keyboard.helpVisible$;
+    this.isEmbed$ = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map((event: NavigationEnd) => (event.urlAfterRedirects || event.url).split('?')[0].startsWith('/embed/')),
+      startWith(window.location.pathname.startsWith('/embed/'))
+    );
   }
 
   onLanguageChange(lang: string): void {

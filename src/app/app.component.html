@@ -1,42 +1,46 @@
-<div id="site">
-  <a class="skip-link" href="#main-content">{{ 'app.skipToContent' | translate }}</a>
-  <header id="header">
-      <div class="bannerTop" routerLink="/">
-        <img height="70%" src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
-        <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
+<div id="site" [class.embed-mode]="isEmbed$ | async">
+  <ng-container *ngIf="!(isEmbed$ | async)">
+    <a class="skip-link" href="#main-content">{{ 'app.skipToContent' | translate }}</a>
+    <header id="header">
+        <div class="bannerTop" routerLink="/">
+          <img height="70%" src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
+          <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
 
-        <div class="font-controls" (click)="$event.stopPropagation()" *ngIf="fontSize$ | async as fontSize">
-          <button (click)="decreaseFontSize()" [attr.aria-label]="'settings.decreaseFont' | translate" [disabled]="fontSize <= 75">A-</button>
-          <button (click)="resetFontSize()" [attr.aria-label]="'settings.resetFont' | translate">A</button>
-          <button (click)="increaseFontSize()" [attr.aria-label]="'settings.increaseFont' | translate" [disabled]="fontSize >= 150">A+</button>
+          <div class="font-controls" (click)="$event.stopPropagation()" *ngIf="fontSize$ | async as fontSize">
+            <button (click)="decreaseFontSize()" [attr.aria-label]="'settings.decreaseFont' | translate" [disabled]="fontSize <= 75">A-</button>
+            <button (click)="resetFontSize()" [attr.aria-label]="'settings.resetFont' | translate">A</button>
+            <button (click)="increaseFontSize()" [attr.aria-label]="'settings.increaseFont' | translate" [disabled]="fontSize >= 150">A+</button>
+          </div>
+
+          <button class="theme-toggle" (click)="toggleTheme(); $event.stopPropagation()" [attr.aria-label]="'settings.toggleDarkMode' | translate">
+            <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+
+          <mat-select
+            class="lang-picker"
+            [value]="currentLang$ | async"
+            (selectionChange)="onLanguageChange($event.value)"
+            (click)="$event.stopPropagation()"
+            [attr.aria-label]="'language.picker' | translate">
+            <mat-option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</mat-option>
+          </mat-select>
         </div>
-
-        <button class="theme-toggle" (click)="toggleTheme(); $event.stopPropagation()" [attr.aria-label]="'settings.toggleDarkMode' | translate">
-          <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
-        </button>
-
-        <mat-select
-          class="lang-picker"
-          [value]="currentLang$ | async"
-          (selectionChange)="onLanguageChange($event.value)"
-          (click)="$event.stopPropagation()"
-          [attr.aria-label]="'language.picker' | translate">
-          <mat-option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</mat-option>
-        </mat-select>
-      </div>
-      <nav class="crumbs" aria-label="Breadcrumb"><app-breadcrumbs></app-breadcrumbs></nav>
-  </header>
+        <nav class="crumbs" aria-label="Breadcrumb"><app-breadcrumbs></app-breadcrumbs></nav>
+    </header>
+  </ng-container>
   <main id="main-content" class="main">
     <router-outlet></router-outlet>
   </main>
-  <app-install-prompt></app-install-prompt>
-  <footer id="footer">
-    <a href="https://twitter.com/ProjThaqalayn" target="_blank">{{ 'nav.news' | translate }}</a> |
-    <a routerLink="/bookmarks">{{ 'nav.bookmarks' | translate }}</a> |
-    <a routerLink="/download">{{ 'nav.download' | translate }}</a> |
-    <a routerLink="/support">{{ 'nav.support' | translate }}</a> |
-    <a routerLink="/about">{{ 'nav.about' | translate }}</a>
-  </footer>
+  <ng-container *ngIf="!(isEmbed$ | async)">
+    <app-install-prompt></app-install-prompt>
+    <footer id="footer">
+      <a href="https://twitter.com/ProjThaqalayn" target="_blank">{{ 'nav.news' | translate }}</a> |
+      <a routerLink="/bookmarks">{{ 'nav.bookmarks' | translate }}</a> |
+      <a routerLink="/download">{{ 'nav.download' | translate }}</a> |
+      <a routerLink="/support">{{ 'nav.support' | translate }}</a> |
+      <a routerLink="/about">{{ 'nav.about' | translate }}</a>
+    </footer>
+  </ng-container>
 </div>
 
 <!-- Keyboard shortcuts help overlay -->

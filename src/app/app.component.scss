@@ -213,3 +213,19 @@ a:hover {
     font-size: 12px;
   }
 }
+
+// Embed mode: remove background and minimize padding
+#site.embed-mode {
+  background: transparent;
+  background-image: none;
+  min-height: auto;
+
+  .main {
+    padding: 0;
+    margin: 0;
+  }
+}
+
+:host-context(body.dark-theme) #site.embed-mode {
+  background: transparent;
+}

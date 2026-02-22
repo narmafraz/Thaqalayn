@@ -1,0 +1,71 @@
+<div class="embed-container" [class.embed-dark]="theme === 'dark'" [class.embed-light]="theme === 'light'">
+
+  <div *ngIf="(loading$ | async)" class="embed-loading">
+    <mat-spinner diameter="32"></mat-spinner>
+  </div>
+
+  <ng-container *ngIf="(book$ | async) as book">
+
+    <!-- Verse Detail embed (single hadith/verse page) -->
+    <ng-container *ngIf="book.kind === 'verse_detail'">
+      <div class="embed-header">
+        <span class="embed-title">{{ book.data.chapter_title?.en || '' }} {{ book.data.verse.part_type }} {{ book.data.verse.local_index }}</span>
+        <a class="embed-logo" href="https://thaqalayn.netlify.app/books/{{ book.index }}" target="_blank" rel="noopener">Thaqalayn</a>
+      </div>
+
+      <div class="embed-arabic" lang="ar" dir="rtl">
+        <p *ngIf="book.data.verse.narrator_chain" class="embed-narrator-chain">
+          <ng-container *ngFor="let npart of book.data.verse.narrator_chain.parts">{{ npart.text }}</ng-container>
+        </p>
+        <p *ngFor="let txt of book.data.verse.text" class="embed-verse-text" [innerHTML]="txt"></p>
+      </div>
+
+      <div class="embed-translation" *ngIf="book.data.verse.translations as translations">
+        <p *ngFor="let trt of translations[(translation$ | async)]"
+           [class]="'embed-translation-text ' + (translationClass$ | async)"
+           [innerHTML]="trt"></p>
+      </div>
+
+      <div class="embed-gradings" *ngIf="book.data.verse?.gradings?.length">
+        <span *ngFor="let g of book.data.verse.gradings"
+              [class]="'embed-grading-chip ' + getGradingClass(parseGradingTerm(g))">
+          {{ parseGradingTerm(g) }}
+        </span>
+      </div>
+
+      <div class="embed-footer">
+        <span class="embed-ref">{{ book.data.chapter_title?.en || book.index }}</span>
+        <a class="embed-view-link" href="https://thaqalayn.netlify.app/books/{{ book.index }}" target="_blank" rel="noopener">
+          View on Thaqalayn →
+        </a>
+      </div>
+    </ng-container>
+
+    <!-- Chapter Content embed (verse_list — show first verse) -->
+    <ng-container *ngIf="book.kind === 'verse_list'">
+      <div class="embed-header">
+        <span class="embed-title">{{ book.data.titles?.en || book.index }}</span>
+        <a class="embed-logo" href="https://thaqalayn.netlify.app/books/{{ book.index }}" target="_blank" rel="noopener">Thaqalayn</a>
+      </div>
+
+      <ng-container *ngIf="book.data.verses?.length">
+        <div class="embed-arabic" lang="ar" dir="rtl">
+          <p *ngFor="let txt of book.data.verses[0].text" class="embed-verse-text" [innerHTML]="txt"></p>
+        </div>
+        <div class="embed-translation" *ngIf="book.data.verses[0].translations as translations">
+          <p *ngFor="let trt of translations[(translation$ | async)]"
+             [class]="'embed-translation-text ' + (translationClass$ | async)"
+             [innerHTML]="trt"></p>
+        </div>
+      </ng-container>
+
+      <div class="embed-footer">
+        <span class="embed-ref">{{ book.data.titles?.en || book.index }}</span>
+        <a class="embed-view-link" href="https://thaqalayn.netlify.app/books/{{ book.index }}" target="_blank" rel="noopener">
+          View on Thaqalayn →
+        </a>
+      </div>
+    </ng-container>
+
+  </ng-container>
+</div>

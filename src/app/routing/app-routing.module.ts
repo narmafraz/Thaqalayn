@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { ExtraOptions, RouterModule, Routes } from '@angular/router';
 import { BookDispatcherComponent } from '@app/components/book-dispatcher/book-dispatcher.component';
+import { EmbedVerseComponent } from '@app/components/embed-verse/embed-verse.component';
 import { BookPartResolver } from './book-part-resolver';
 import { BookTitlesResolver } from './book-titles-resolver';
 
 
 const routes: Routes = [
   { path: '', redirectTo: '/books?lang=en', pathMatch: 'full' },
+  { path: 'embed/books/:index', component: EmbedVerseComponent, resolve: { titles: BookPartResolver } },
   { path: 'books', component: BookDispatcherComponent, resolve: { titles: BookTitlesResolver } },
   { path: 'books/:index', component: BookDispatcherComponent, resolve: { titles: BookPartResolver } },
   {

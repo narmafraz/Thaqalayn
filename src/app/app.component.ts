@@ -6,7 +6,7 @@ import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
 import { Observable, Subscription } from 'rxjs';
-import { filter, map, startWith } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 import { ThemeMode } from '@app/services/theme.service';
 
 @Component({
@@ -40,6 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
   fontSize$: Observable<number>;
   helpVisible$: Observable<boolean>;
   isEmbed$: Observable<boolean>;
+  activeSection$: Observable<string>;
 
   private static readonly STATIC_TITLES: Record<string, string> = {
     '/about': 'About',
@@ -65,6 +66,20 @@ export class AppComponent implements OnInit, OnDestroy {
       filter(event => event instanceof NavigationEnd),
       map((event: NavigationEnd) => (event.urlAfterRedirects || event.url).split('?')[0].startsWith('/embed/')),
       startWith(window.location.pathname.startsWith('/embed/'))
+    );
+    this.activeSection$ = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map((event: NavigationEnd) => {
+        const path = (event.urlAfterRedirects || event.url).split('?')[0];
+        if (path === '/' || path === '/books') return 'home';
+        if (path.startsWith('/books/')) return 'books';
+        if (path.startsWith('/people/')) return 'books';
+        if (path.startsWith('/bookmarks')) return 'bookmarks';
+        if (path.startsWith('/topics')) return 'topics';
+        return 'home';
+      }),
+      startWith('home'),
+      distinctUntilChanged()
     );
   }
 

@@ -41,6 +41,24 @@
       <a routerLink="/support">{{ 'nav.support' | translate }}</a> |
       <a routerLink="/about">{{ 'nav.about' | translate }}</a>
     </footer>
+    <nav class="bottom-nav" aria-label="Main navigation" *ngIf="activeSection$ | async as section">
+      <a routerLink="/" class="bottom-nav-item" [class.active]="section === 'home'" queryParamsHandling="preserve">
+        <mat-icon>home</mat-icon>
+        <span>{{ 'nav.home' | translate }}</span>
+      </a>
+      <a routerLink="/books" class="bottom-nav-item" [class.active]="section === 'books'" queryParamsHandling="preserve">
+        <mat-icon>menu_book</mat-icon>
+        <span>{{ 'nav.books' | translate }}</span>
+      </a>
+      <a routerLink="/topics" class="bottom-nav-item" [class.active]="section === 'topics'" queryParamsHandling="preserve">
+        <mat-icon>category</mat-icon>
+        <span>{{ 'nav.topics' | translate }}</span>
+      </a>
+      <a routerLink="/bookmarks" class="bottom-nav-item" [class.active]="section === 'bookmarks'" queryParamsHandling="preserve">
+        <mat-icon>bookmark</mat-icon>
+        <span>{{ 'nav.bookmarks' | translate }}</span>
+      </a>
+    </nav>
   </ng-container>
 </div>
 

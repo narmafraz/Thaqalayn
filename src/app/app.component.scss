@@ -229,3 +229,65 @@ a:hover {
 :host-context(body.dark-theme) #site.embed-mode {
   background: transparent;
 }
+
+// Mobile bottom navigation - only visible on mobile
+.bottom-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--bg-primary, #fff);
+    border-top: 1px solid var(--border-color, #e0e0e0);
+    justify-content: space-around;
+    align-items: center;
+    padding: 4px 0;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    text-decoration: none;
+    color: var(--text-secondary, #666);
+    font-size: 10px;
+    transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    &.active {
+      color: var(--link-color, #673ab7);
+    }
+  }
+
+  // Add bottom padding to main content so it's not hidden behind bottom nav
+  .main {
+    padding-bottom: 64px !important;
+  }
+
+  // Hide text-based footer on mobile since bottom nav replaces it
+  #footer {
+    display: none;
+  }
+}
+
+:host-context(body.dark-theme) .bottom-nav {
+  background: var(--bg-primary, #1a1a2e);
+  border-top-color: var(--border-color, #333);
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+}

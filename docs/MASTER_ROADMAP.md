@@ -255,7 +255,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 5: Platform Expansion (COMPLETE ~65%)
+## Phase 5: Platform Expansion (COMPLETE ~70%)
 
 > **Goal:** Complete all Four Books, add additional collections, modernize the stack.
 > **Status:** Angular 19 upgrade complete (19.2.x with NGXS 19). ThaqalaynAPI data scraped for 20+ books (registered in Phase 3B.4). No Tahdhib/Istibsar parsers (different sources needed). No generator quality improvements done.
@@ -314,9 +314,9 @@ Everything below has been implemented and tested. Included for context — do no
 |--------|------|-------------|--------|
 | [x] | Externalize configuration | Created `app/config.py` with project-wide constants: paths (APP_DIR, RAW_DIR), book identifiers, translation IDs, API settings, `get_raw_path()` helper, JSON encoding settings. | Medium |
 | [x] | Fix platform-specific file paths | Replaced Windows backslashes with `os.path.join()` and forward slashes in `quran.py`, `kafi.py`, `kafi_sarwar.py`. All path operations now cross-platform compatible. | Low |
-| [ ] | DRY refactoring | Extract shared translation ID formatting, path conversion logic, chapter loading patterns into utilities. Use `BookParser` base class. | Medium |
+| [x] | DRY refactoring | Created `base_parser.py` with shared utilities: `make_chapter()`, `make_verse()`, `register_translation()`, `publish_book()`, `get_parser_raw_path()`. Reduces duplication across parsers. | Medium |
 | [x] | Python type hints | Added complete type annotations to all public functions in `lib_db.py`, `kafi.py`, `kafi_sarwar.py`, `quran.py`. | Medium |
-| [ ] | Add mypy to CI | Add `mypy` to CI pipeline for type checking. | Low |
+| [x] | Add mypy to CI | Added `mypy>=1.0` to dev deps, `[tool.mypy]` config in pyproject.toml, type checking step in GitHub Actions CI. Checks `base_parser.py`, `config.py`, `lib_db.py`, `lib_model.py`. | Low |
 | [ ] | Increase parser test coverage | Add parser-level integration tests for `quran.py`, `kafi.py`, `kafi_sarwar.py` (correct verse/chapter counts, translation pairing, malformed HTML handling). | Medium |
 
 ### 5.4 Data Optimization (remaining)
@@ -394,8 +394,8 @@ Everything below has been implemented and tested. Included for context — do no
 | Status | Task | Source | Effort |
 |--------|------|--------|--------|
 | [x] | User annotations & notes (Dexie.js local) | FEATURE_PROPOSALS.md §3 — Dexie v2 schema, CRUD methods, note editor on chapter-content + verse-detail, "My Notes" section on bookmarks page, export/import support. | Medium |
-| [ ] | Cross-device sync (Firebase free tier, opt-in) | IMPROVEMENT_ROADMAP.md §8.3.1 | High |
-| [ ] | Discussion / commentary system (moderated) | IMPROVEMENT_ROADMAP.md §8.3.2 | High |
+| [x] | Cross-device sync (Firebase free tier, opt-in) | IMPROVEMENT_ROADMAP.md §8.3.1 — SyncService with Firebase JS SDK (dynamic imports for tree-shaking), Google + anonymous auth, push/pull/two-way sync via Firestore, status observables. Bookmarks page shows sync UI only when Firebase is configured (`projectId` set). i18n support across all 12 locales. | High |
+| [x] | Discussion / commentary system (moderated) | IMPROVEMENT_ROADMAP.md §8.3.2 — DiscussionService with Firebase Firestore real-time comments. Collapsible discussion panel on verse-detail pages. Post, flag, delete comments. Scholar verification badge. Google auth. Only visible when Firebase configured. i18n across 12 locales. | High |
 | [x] | Daily hadith / verse of the day | IMPROVEMENT_ROADMAP.md §8.3.3 — DailyVerseService with deterministic seed, dynamic chapter discovery, localStorage caching. Shows on homepage. | Low |
 | [x] | Embeddable widgets | IMPROVEMENT_ROADMAP.md §8.4.3 — `/embed/books/:index` route with minimal card layout, theme support via `?theme=dark`, grading badges, "View on Thaqalayn" footer link. Iframe-friendly: no header/footer/breadcrumbs. | Medium |
 

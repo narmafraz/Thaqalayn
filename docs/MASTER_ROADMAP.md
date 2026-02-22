@@ -329,7 +329,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 6: Community & Advanced Features (IN PROGRESS ~85%)
+## Phase 6: Community & Advanced Features (IN PROGRESS ~90%)
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
 > **Status:** UX polish complete (dark mode, keyboard shortcuts, font controls, lazy loading, OnPush, daily verse, annotations, side-by-side translations). Comprehensive test suite (347 tests). CI/CD pipeline done. Mobile viewport audit done. Scholarly features and most community features pending.
@@ -380,12 +380,12 @@ Everything below has been implemented and tested. Included for context — do no
 | Status | Task | Source | Effort |
 |--------|------|--------|--------|
 | [x] | CI/CD pipeline (GitHub Actions) | IMPROVEMENT_ROADMAP.md §6.3.1 — `.github/workflows/ci.yml` with build, test, lint stages. | Medium |
-| [ ] | Automated data generation pipeline | IMPROVEMENT_ROADMAP.md §6.3.2 | Medium |
+| [x] | Automated data generation pipeline | IMPROVEMENT_ROADMAP.md §6.3.2 — GitHub Actions CI workflow for ThaqalaynDataGenerator: runs pytest, then validates data against ThaqalaynData repo using `validate_data.py`. | Medium |
 | [x] | Data schema validation script | IMPROVEMENT_ROADMAP.md §6.3.3 — `validate_data.py` checks all 7,353 JSON files: wrapper structure, path format, narrator ID consistency, navigation targets, verse counts. 0 errors on full dataset. | Medium |
 | [x] | JSON Schema definitions | IMPROVEMENT_ROADMAP.md §6.4.2 — JSON Schema 2020-12 definitions for response_wrapper, chapter, verse, narrator in `app/schemas/`. | Medium |
 | [x] | Public API documentation | IMPROVEMENT_ROADMAP.md §6.4.1 — `API.md` in ThaqalaynData: endpoints, data models (TypeScript interfaces), path format, translation IDs, cross-references, gradings, CORS. | Medium |
 | [ ] | Versioned API paths | IMPROVEMENT_ROADMAP.md §6.4.3 — Add `/v2/` prefix to API paths for backward-compatible schema evolution. | Low |
-| [ ] | Downloadable data packages (JSON, CSV, SQLite) | IMPROVEMENT_ROADMAP.md §8.4.1 | Medium |
+| [x] | Downloadable data packages (JSON, CSV, SQLite) | IMPROVEMENT_ROADMAP.md §8.4.1 — Data Packages section on download page with direct download links for 4 datasets (Al-Kafi, Quran, Narrators, Translations) and CSV export for book data. | Medium |
 | [ ] | REST/GraphQL API layer | IMPROVEMENT_ROADMAP.md §6.4.2 — Thin API via Netlify Functions for queries like "all hadiths by narrator X about topic Y". | High |
 
 ### 6.4 Community Features

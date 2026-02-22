@@ -161,7 +161,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 4: Search, PWA & UX Enhancement (COMPLETE ~95%)
+## Phase 4: Search, PWA & UX Enhancement (COMPLETE)
 
 > **Goal:** Most-requested features: full-text search, offline support, bookmarks.
 > **Status:** Core features implemented (search with Orama, PWA, bookmarks with Dexie.js, audio, sharing, language auto-detection). Word-by-word Quran, some mobile UX, and NGXS error state deferred.
@@ -232,7 +232,7 @@ Everything below has been implemented and tested. Included for context — do no
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
 | [x] | Share button on hadith pages | Share button on verse-detail. `navigator.share()` on mobile, copy-to-clipboard on desktop. | Low |
-| [ ] | Verse card images | Client-side generated share images with Arabic calligraphy. Not yet implemented. | Medium |
+| [x] | Verse card images | ShareCardService using Canvas API generates PNG cards with Arabic text, translation, reference, grading, and branding. Integrated into both chapter-content (per-verse icon button) and verse-detail components. Uses `navigator.share()` with file on mobile, falls back to download on desktop. | Medium |
 
 ### 4.6 Responsive Design & Mobile Polish
 

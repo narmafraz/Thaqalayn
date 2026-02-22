@@ -10,5 +10,12 @@
     </p>
     <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="txt"></p>
   </div>
-  <div><p *ngFor="let trt of verse.translations[(translation$ | async)]" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p></div>
+  <div [class.side-by-side]="(translation2$ | async)">
+    <div class="translation-col">
+      <p *ngFor="let trt of verse.translations[(translation$ | async)]" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
+    </div>
+    <div class="translation-col translation-col-2" *ngIf="(translation2$ | async) as t2">
+      <p *ngFor="let trt of verse.translations[t2]" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
+    </div>
+  </div>
 </div>

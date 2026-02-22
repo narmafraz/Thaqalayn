@@ -1,7 +1,31 @@
-<mat-form-field *ngIf="(translations$ | async) as translations">
-  <mat-label>{{ 'translation.selectTranslation' | translate }}</mat-label>
-  <mat-select name="translation" (selectionChange)="selectedTranslation($event.value)" [ngModel]="translation$ | async">
-    <mat-option *ngFor="let translation of translations" [value]="translation.id">
-      {{translation.lang | expandLanguage}}: {{translation.name}}</mat-option>
-  </mat-select>
-</mat-form-field>
+<ng-container *ngIf="(translations$ | async) as translations">
+  <ng-container *ngIf="(translation$ | async) as currentTranslation">
+    <div class="translation-controls" *ngIf="translations.length > 0">
+      <mat-form-field>
+        <mat-label>{{ 'translation.selectTranslation' | translate }}</mat-label>
+        <mat-select name="translation" (selectionChange)="selectedTranslation($event.value)" [ngModel]="currentTranslation">
+          <mat-option *ngFor="let translation of translations" [value]="translation.id">
+            {{translation.lang | expandLanguage}}: {{translation.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button *ngIf="translations.length > 1"
+              mat-icon-button
+              class="compare-btn"
+              (click)="toggleCompare(translations, currentTranslation)"
+              [class.active]="(translation2$ | async)"
+              [matTooltip]="'translation.compare' | translate"
+              [attr.aria-label]="'translation.compare' | translate">
+        <mat-icon>compare_arrows</mat-icon>
+      </button>
+
+      <mat-form-field *ngIf="(translation2$ | async) as t2" class="second-translation">
+        <mat-label>{{ 'translation.compareWith' | translate }}</mat-label>
+        <mat-select name="translation2" (selectionChange)="selectedTranslation2($event.value)" [ngModel]="t2">
+          <mat-option *ngFor="let translation of translations" [value]="translation.id">
+            {{translation.lang | expandLanguage}}: {{translation.name}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </ng-container>
+</ng-container>

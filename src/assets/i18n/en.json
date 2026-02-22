@@ -72,7 +72,9 @@
   },
   "translation": {
     "selectTranslation": "Select Translation",
-    "language": "Language"
+    "language": "Language",
+    "compare": "Compare translations",
+    "compareWith": "Compare with"
   },
   "common": {
     "loading": "Loading...",

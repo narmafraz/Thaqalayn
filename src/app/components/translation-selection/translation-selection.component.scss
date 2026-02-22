@@ -1,0 +1,24 @@
+.translation-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.compare-btn {
+  opacity: 0.6;
+
+  &:hover, &.active {
+    opacity: 1;
+  }
+
+  &.active {
+    color: var(--link-color, #673ab7);
+  }
+}
+
+.second-translation {
+  mat-label {
+    font-size: 12px;
+  }
+}

@@ -135,6 +135,23 @@ export class BooksState {
     return lang + 'Text';
   }
 
+  @Selector([BooksState, BooksState.getCurrentNavigatedPart, RouterState.getTranslation2])
+  public static getSecondTranslation(state: BooksStateModel, book: Book, translation2: string): string {
+    if (!translation2) return undefined;
+    const verseTranslations = getVerseTranslations(book);
+    if (verseTranslations && verseTranslations.some(x => x === translation2)) {
+      return translation2;
+    }
+    return undefined;
+  }
+
+  @Selector([BooksState, BooksState.getSecondTranslation])
+  public static getSecondTranslationClass(state: BooksStateModel, translation2: string): string {
+    if (!translation2) { return undefined; }
+    const lang = translation2.substring(0, translation2.indexOf('.')).toLowerCase();
+    return lang + 'Text';
+  }
+
   @Selector([BooksState, BooksState.getCurrentNavigatedPart, RouterState.getLanguage, IndexState.getBookForLanguage])
   public static getCurrentNavigatedCrumbs(state: BooksStateModel, currentPart: Book, language: string, getBookForLanguage: (lang: string) => IndexedTitles): Crumb[] {
     if (!currentPart) return [];

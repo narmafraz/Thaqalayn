@@ -329,7 +329,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 6: Community & Advanced Features (IN PROGRESS ~40%)
+## Phase 6: Community & Advanced Features (IN PROGRESS ~50%)
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
 > **Status:** UX polish largely complete (dark mode, keyboard shortcuts, font controls, lazy loading, OnPush, daily verse). CI/CD pipeline done. Scholarly features and most community features pending.
@@ -359,7 +359,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [ ] | Thematic tagging & topic index | IMPROVEMENT_ROADMAP.md §8.2.3 | Medium |
 | [ ] | Comparative hadith view (same hadith across collections) | IMPROVEMENT_ROADMAP.md §8.2.4 | Medium |
 | [ ] | Tafsir integration (Quran commentary via free API) | FEATURE_PROPOSALS.md §5 | Medium |
-| [ ] | Side-by-side translation view | IMPROVEMENT_ROADMAP.md §5.1.4 | Medium |
+| [x] | Side-by-side translation view | IMPROVEMENT_ROADMAP.md §5.1.4 — Compare button in translation selector, second dropdown via `?translation2=` query param, grid layout in verse-text, responsive (stacks on mobile). | Medium |
 
 ### 6.2 UX Polish & Code Quality
 
@@ -392,7 +392,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 | Status | Task | Source | Effort |
 |--------|------|--------|--------|
-| [ ] | User annotations & notes (Dexie.js local) | FEATURE_PROPOSALS.md §3 | Medium |
+| [x] | User annotations & notes (Dexie.js local) | FEATURE_PROPOSALS.md §3 — Dexie v2 schema, CRUD methods, note editor on chapter-content + verse-detail, "My Notes" section on bookmarks page, export/import support. | Medium |
 | [ ] | Cross-device sync (Firebase free tier, opt-in) | IMPROVEMENT_ROADMAP.md §8.3.1 | High |
 | [ ] | Discussion / commentary system (moderated) | IMPROVEMENT_ROADMAP.md §8.3.2 | High |
 | [x] | Daily hadith / verse of the day | IMPROVEMENT_ROADMAP.md §8.3.3 — DailyVerseService with deterministic seed, dynamic chapter discovery, localStorage caching. Shows on homepage. | Low |

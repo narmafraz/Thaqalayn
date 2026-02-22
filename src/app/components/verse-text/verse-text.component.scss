@@ -18,3 +18,27 @@
   font-weight: normal;
   line-height:2.35em;
 }
+
+.side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  .translation-col-2 {
+    border-left: 1px solid var(--border-color, #e0e0e0);
+    padding-left: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .side-by-side {
+    grid-template-columns: 1fr;
+
+    .translation-col-2 {
+      border-left: none;
+      border-top: 1px solid var(--border-color, #e0e0e0);
+      padding-left: 0;
+      padding-top: 8px;
+    }
+  }
+}

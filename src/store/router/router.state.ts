@@ -9,6 +9,7 @@ export interface RouterStateModel {
   fragment: string;
   sort: string;
   translation: string;
+  translation2: string;
   language: string;
 }
 
@@ -28,6 +29,7 @@ nextAction returns Observable<Action>
     fragment: undefined,
     sort: undefined,
     translation: undefined,
+    translation2: undefined,
     language: 'en',
   }
 })
@@ -47,6 +49,11 @@ export class RouterState {
   @Selector()
   public static getTranslation(state: RouterStateModel) {
     return state.translation;
+  }
+
+  @Selector()
+  public static getTranslation2(state: RouterStateModel) {
+    return state.translation2;
   }
 
   @Selector()
@@ -100,6 +107,15 @@ export class RouterState {
     const storeIndex = context.getState().translation;
     if (routerIndex !== storeIndex) {
       context.patchState({translation: routerIndex});
+    }
+  }
+
+  @Action(RouterNavigation)
+  translation2Changed(context: StateContext<RouterStateModel>, action: RouterNavigation) {
+    const routerValue = action.routerState.root.queryParamMap.get('translation2');
+    const storeValue = context.getState().translation2;
+    if (routerValue !== storeValue) {
+      context.patchState({translation2: routerValue});
     }
   }
 }

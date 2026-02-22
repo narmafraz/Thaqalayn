@@ -14,7 +14,8 @@ import { Observable } from 'rxjs';
 export class VerseTextComponent {
   translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);
   translationClass$: Observable<string> = inject(Store).select(BooksState.getTranslationClass);
+  translation2$: Observable<string> = inject(Store).select(BooksState.getSecondTranslation);
+  translationClass2$: Observable<string> = inject(Store).select(BooksState.getSecondTranslationClass);
 
   @Input() verse: Verse;
-
 }

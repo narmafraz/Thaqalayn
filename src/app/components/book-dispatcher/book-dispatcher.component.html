@@ -10,7 +10,23 @@
 
   <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
     <ng-container *ngSwitchCase="'chapter_list'">
-      <app-book-tree *ngIf="book.index === 'books'"></app-book-tree>
+      <ng-container *ngIf="book.index === 'books'">
+        <div *ngIf="(dailyVerse$ | async) as dv" class="daily-verse-card mat-elevation-z2">
+          <div class="daily-verse-label">
+            <mat-icon>auto_stories</mat-icon>
+            <span>{{ 'dailyVerse.title' | translate }}</span>
+          </div>
+          <div class="daily-verse-arabic" lang="ar" dir="rtl">{{ dv.arabicText }}</div>
+          <div class="daily-verse-translation" *ngIf="dv.translationText" [innerHTML]="dv.translationText"></div>
+          <div class="daily-verse-footer">
+            <span class="daily-verse-ref">{{ dv.reference }}</span>
+            <a [routerLink]="dv.path" queryParamsHandling="preserve" class="daily-verse-link">
+              {{ 'dailyVerse.readMore' | translate }} →
+            </a>
+          </div>
+        </div>
+        <app-book-tree></app-book-tree>
+      </ng-container>
       <app-chapter-list [book$]="book$"></app-chapter-list>
     </ng-container>
     <app-chapter-content *ngSwitchCase="'verse_list'" [book$]="book$"></app-chapter-content>

@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Book } from '@app/models';
+import { DailyVerse, DailyVerseService } from '@app/services/daily-verse.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RetryLoadBookPart } from '@store/books/books.actions';
@@ -18,8 +19,10 @@ export class BookDispatcherComponent {
   book$: Observable<Book> = inject(Store).select(BooksState.getCurrentNavigatedPart);
   loading$: Observable<boolean> = inject(Store).select(BooksState.getCurrentLoading);
   error$: Observable<string> = inject(Store).select(BooksState.getCurrentError);
+  dailyVerse$: Observable<DailyVerse | null>;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, dailyVerseService: DailyVerseService) {
+    this.dailyVerse$ = dailyVerseService.getDailyVerse();
   }
 
   onRetry(): void {

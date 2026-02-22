@@ -136,6 +136,10 @@
     "fa": "\u0641\u0627\u0631\u0633\u06cc",
     "fr": "Fran\u00e7ais"
   },
+  "dailyVerse": {
+    "title": "Verse of the Day",
+    "readMore": "Read more"
+  },
   "settings": {
     "toggleDarkMode": "Toggle dark mode",
     "increaseFont": "Increase font size",

@@ -1,6 +1,6 @@
 # Master Roadmap
 
-> **Last updated:** 2026-02-21
+> **Last updated:** 2026-02-22
 > **Purpose:** Single source of truth for all planned work across the Thaqalayn ecosystem. Consolidates and supersedes individual proposals. Each phase ends with a team evaluation checkpoint.
 >
 > **Source documents consolidated:**
@@ -145,7 +145,7 @@ Everything below has been implemented and tested. Included for context — do no
 |--------|------|-------------|--------|
 | [x] | Build normalization engine | `arabic_normalization.py` — strips tashkeel, normalizes hamza/teh marbuta/alef maksura, removes tatweel. | Medium |
 | [x] | 3-tier comparison | Exact → diacritics-only → substantive differences. Confidence scoring. | High |
-| [ ] | Validation data files | `validation/{book}.json` or inline in per-hadith files. Not yet generated. | Medium |
+| [x] | Validation data files | `validation/cross-validation/` — 1,977 per-chapter JSON files + summary.json. Cross-validated 12,190 hadiths between HubeAli and thaqalayn.net sources (96-97% confidence). `cross_validate.py` handles narrator chain concatenation and hadith number prefix stripping. | Medium |
 | [x] | Angular: verification badges | Verification badge infrastructure built. Trust indicators on hadith pages. | Medium |
 | [x] | Angular: diff viewer | DiffViewerComponent: collapsible panel with LCS-based character-level Arabic text diffing. Color-coded equal/insert/delete/replace segments. Dark mode + RTL support. Integrated into verse-detail cross-validation section. 14 unit tests. | Medium |
 

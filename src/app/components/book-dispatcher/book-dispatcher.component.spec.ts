@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { NgxsModule } from '@ngxs/store';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BookDispatcherComponent } from './book-dispatcher.component';
 
 describe('BookDispatcherComponent', () => {
@@ -9,7 +10,7 @@ describe('BookDispatcherComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [NgxsModule.forRoot([])],
+      imports: [NgxsModule.forRoot([]), HttpClientTestingModule],
       declarations: [BookDispatcherComponent],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();

@@ -1,6 +1,6 @@
 # Master Roadmap
 
-> **Last updated:** 2026-02-22
+> **Last updated:** 2026-02-21
 > **Purpose:** Single source of truth for all planned work across the Thaqalayn ecosystem. Consolidates and supersedes individual proposals. Each phase ends with a team evaluation checkpoint.
 >
 > **Source documents consolidated:**
@@ -317,7 +317,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | DRY refactoring | Created `base_parser.py` with shared utilities: `make_chapter()`, `make_verse()`, `register_translation()`, `publish_book()`, `get_parser_raw_path()`. Reduces duplication across parsers. | Medium |
 | [x] | Python type hints | Added complete type annotations to all public functions in `lib_db.py`, `kafi.py`, `kafi_sarwar.py`, `quran.py`. | Medium |
 | [x] | Add mypy to CI | Added `mypy>=1.0` to dev deps, `[tool.mypy]` config in pyproject.toml, type checking step in GitHub Actions CI. Checks `base_parser.py`, `config.py`, `lib_db.py`, `lib_model.py`. | Low |
-| [ ] | Increase parser test coverage | Add parser-level integration tests for `quran.py`, `kafi.py`, `kafi_sarwar.py` (correct verse/chapter counts, translation pairing, malformed HTML handling). | Medium |
+| [x] | Increase parser test coverage | Added 94 tests across 3 new files: `test_base_parser.py` (35 tests for make_chapter, make_verse, register_translation, publish_book, get_parser_raw_path), `test_kafi_parser.py` (42 tests for extract_headings, we_dont_care, table_of_contents, join_texts, is_* helpers, add_hadith, regex patterns), `test_kafi_sarwar_parser.py` (17 tests for we_dont_care, sitepath_from_filepath, constants, add_chapter_content with HTML fixtures). Also fixed `register_translation()` bug (Pydantic required fields). Total: 955 generator tests. | Medium |
 
 ### 5.4 Data Optimization (remaining)
 

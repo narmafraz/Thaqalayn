@@ -1,6 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { BooksService } from './books.service';
+import { OfflineStorageService } from './offline-storage.service';
 import { Book } from '@app/models';
 
 describe('BooksService', () => {
@@ -9,9 +10,21 @@ describe('BooksService', () => {
 
   const API_BASE = 'http://localhost:8888/';
 
+  const mockOfflineStorage = {
+    getPartFromBook: jasmine.createSpy('getPartFromBook').and.returnValue(Promise.resolve(null)),
+    getCachedResponse: jasmine.createSpy('getCachedResponse').and.returnValue(Promise.resolve(null)),
+    cacheResponse: jasmine.createSpy('cacheResponse').and.returnValue(Promise.resolve()),
+  };
+
   beforeEach(() => {
+    mockOfflineStorage.getPartFromBook.and.returnValue(Promise.resolve(null));
+    mockOfflineStorage.getCachedResponse.and.returnValue(Promise.resolve(null));
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        { provide: OfflineStorageService, useValue: mockOfflineStorage },
+      ],
     });
     service = TestBed.inject(BooksService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -29,7 +42,7 @@ describe('BooksService', () => {
 
     describe('URL construction', () => {
 
-      it('should replace colons with slashes for al-kafi:1:2:3', () => {
+      it('should replace colons with slashes for al-kafi:1:2:3', fakeAsync(() => {
         const mockBook: Book = {
           kind: 'chapter_list',
           index: 'al-kafi:1:2:3',
@@ -37,13 +50,14 @@ describe('BooksService', () => {
         };
 
         service.getPart('al-kafi:1:2:3').subscribe();
+        tick(0); // resolve offline storage Promise
 
         const req = httpMock.expectOne(`${API_BASE}books/al-kafi/1/2/3.json`);
         expect(req.request.method).toBe('GET');
         req.flush(mockBook);
-      });
+      }));
 
-      it('should replace colons with slashes for quran:1', () => {
+      it('should replace colons with slashes for quran:1', fakeAsync(() => {
         const mockBook: Book = {
           kind: 'verse_list',
           index: 'quran:1',
@@ -51,13 +65,14 @@ describe('BooksService', () => {
         };
 
         service.getPart('quran:1').subscribe();
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/quran/1.json`);
         expect(req.request.method).toBe('GET');
         req.flush(mockBook);
-      });
+      }));
 
-      it('should handle a single-segment index with no colons', () => {
+      it('should handle a single-segment index with no colons', fakeAsync(() => {
         const mockBook: Book = {
           kind: 'chapter_list',
           index: 'al-kafi',
@@ -65,13 +80,14 @@ describe('BooksService', () => {
         };
 
         service.getPart('al-kafi').subscribe();
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/al-kafi.json`);
         expect(req.request.method).toBe('GET');
         req.flush(mockBook);
-      });
+      }));
 
-      it('should handle deeply nested indices like al-kafi:1:2:3:4', () => {
+      it('should handle deeply nested indices like al-kafi:1:2:3:4', fakeAsync(() => {
         const mockBook: Book = {
           kind: 'verse_content',
           index: 'al-kafi:1:2:3:4',
@@ -79,24 +95,26 @@ describe('BooksService', () => {
         };
 
         service.getPart('al-kafi:1:2:3:4').subscribe();
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/al-kafi/1/2/3/4.json`);
         expect(req.request.method).toBe('GET');
         req.flush(mockBook);
-      });
+      }));
 
-      it('should construct the correct URL for quran:114', () => {
+      it('should construct the correct URL for quran:114', fakeAsync(() => {
         service.getPart('quran:114').subscribe();
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/quran/114.json`);
         expect(req.request.method).toBe('GET');
         req.flush({ kind: 'verse_list', index: 'quran:114', data: {} });
-      });
+      }));
     });
 
     describe('successful responses', () => {
 
-      it('should return a ChapterList book', (done: DoneFn) => {
+      it('should return a ChapterList book', fakeAsync(() => {
         const mockBook: Book = {
           kind: 'chapter_list',
           index: 'al-kafi:1',
@@ -121,18 +139,21 @@ describe('BooksService', () => {
           },
         };
 
+        let receivedBook: Book | undefined;
         service.getPart('al-kafi:1').subscribe((book) => {
-          expect(book).toEqual(mockBook);
-          expect(book.kind).toBe('chapter_list');
-          expect(book.index).toBe('al-kafi:1');
-          done();
+          receivedBook = book;
         });
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/al-kafi/1.json`);
         req.flush(mockBook);
-      });
 
-      it('should return a VerseContent book', (done: DoneFn) => {
+        expect(receivedBook).toEqual(mockBook);
+        expect(receivedBook!.kind).toBe('chapter_list');
+        expect(receivedBook!.index).toBe('al-kafi:1');
+      }));
+
+      it('should return a VerseContent book', fakeAsync(() => {
         const mockBook: Book = {
           kind: 'verse_content',
           index: 'al-kafi:1:1:1:1',
@@ -149,17 +170,20 @@ describe('BooksService', () => {
           },
         };
 
+        let receivedBook: Book | undefined;
         service.getPart('al-kafi:1:1:1:1').subscribe((book) => {
-          expect(book).toEqual(mockBook);
-          expect(book.kind).toBe('verse_content');
-          done();
+          receivedBook = book;
         });
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`);
         req.flush(mockBook);
-      });
 
-      it('should return a verse_list book for a Quran surah', (done: DoneFn) => {
+        expect(receivedBook).toEqual(mockBook);
+        expect(receivedBook!.kind).toBe('verse_content');
+      }));
+
+      it('should return a verse_list book for a Quran surah', fakeAsync(() => {
         const mockBook: Book = {
           kind: 'verse_list',
           index: 'quran:1',
@@ -184,18 +208,21 @@ describe('BooksService', () => {
           },
         };
 
+        let receivedBook: Book | undefined;
         service.getPart('quran:1').subscribe((book) => {
-          expect(book).toEqual(mockBook);
-          expect(book.kind).toBe('verse_list');
-          if (book.kind === 'verse_list') {
-            expect(book.data.titles.ar).toBe('الفاتحة');
-          }
-          done();
+          receivedBook = book;
         });
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/quran/1.json`);
         req.flush(mockBook);
-      });
+
+        expect(receivedBook).toEqual(mockBook);
+        expect(receivedBook!.kind).toBe('verse_list');
+        if (receivedBook!.kind === 'verse_list') {
+          expect(receivedBook!.data.titles.ar).toBe('الفاتحة');
+        }
+      }));
     });
 
     describe('HTTP error handling', () => {
@@ -207,19 +234,18 @@ describe('BooksService', () => {
           next: () => fail('Expected an error, not a success'),
           error: (error) => { receivedError = error; },
         });
+        tick(0); // resolve offline storage Promise
 
         // Initial request
         httpMock.expectOne(`${API_BASE}books/nonexistent/path.json`)
           .flush('Not Found', { status: 404, statusText: 'Not Found' });
 
-        // Advance past the 1000ms retry delay
         tick(1000);
 
         // First retry
         httpMock.expectOne(`${API_BASE}books/nonexistent/path.json`)
           .flush('Not Found', { status: 404, statusText: 'Not Found' });
 
-        // Advance past the 1000ms retry delay
         tick(1000);
 
         // Second retry
@@ -237,6 +263,7 @@ describe('BooksService', () => {
           next: () => fail('Expected an error, not a success'),
           error: (error) => { receivedError = error; },
         });
+        tick(0);
 
         // Initial request
         httpMock.expectOne(`${API_BASE}books/al-kafi/1.json`)
@@ -271,6 +298,7 @@ describe('BooksService', () => {
           next: (book) => { receivedBook = book; },
           error: () => fail('Expected success after retry'),
         });
+        tick(0);
 
         // Initial request fails
         httpMock.expectOne(`${API_BASE}books/al-kafi/1.json`)
@@ -292,6 +320,7 @@ describe('BooksService', () => {
           next: () => fail('Expected an error, not a success'),
           error: (error) => { receivedError = error; },
         });
+        tick(0);
 
         const progressEvent = new ProgressEvent('error');
 
@@ -317,13 +346,14 @@ describe('BooksService', () => {
 
     describe('request method', () => {
 
-      it('should use HTTP GET method', () => {
+      it('should use HTTP GET method', fakeAsync(() => {
         service.getPart('quran:2').subscribe();
+        tick(0);
 
         const req = httpMock.expectOne(`${API_BASE}books/quran/2.json`);
         expect(req.request.method).toBe('GET');
         req.flush({ kind: 'verse_list', index: 'quran:2', data: {} });
-      });
+      }));
     });
   });
 });

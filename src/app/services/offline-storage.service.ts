@@ -1,12 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Book } from '@app/models';
 import { environment } from '@env/environment';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 const DB_NAME = 'thaqalayn-offline';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = 'books';
 const META_STORE = 'meta';
+const CACHE_STORE = 'cache';
 
 export interface OfflineBookMeta {
   bookId: string;
@@ -38,6 +40,9 @@ export class OfflineStorageService {
   private progressSubject = new BehaviorSubject<DownloadProgress>({
     bookId: '', loaded: 0, total: 0, status: 'idle'
   });
+
+  /** In-memory cache of parsed complete book data to avoid repeated JSON parsing */
+  private parsedBookCache = new Map<string, any>();
 
   progress$: Observable<DownloadProgress> = this.progressSubject.asObservable();
 
@@ -94,6 +99,7 @@ export class OfflineStorageService {
     const db = await this.getDb();
     await this.deleteFromStore(db, STORE_NAME, bookId);
     await this.deleteFromStore(db, META_STORE, bookId);
+    this.parsedBookCache.delete(bookId);
   }
 
   /** Check if a book is available offline */
@@ -127,6 +133,82 @@ export class OfflineStorageService {
     }
   }
 
+  /** Look up a specific part from a downloaded complete book.
+   *  Returns the Book response as the API would, or null if not found offline. */
+  async getPartFromBook(index: string): Promise<Book | null> {
+    const bookId = index.split(':')[0];
+    if (!BOOK_MANIFESTS[bookId]) return null;
+
+    try {
+      if (!(await this.isBookDownloaded(bookId))) return null;
+
+      if (!this.parsedBookCache.has(bookId)) {
+        const rawData = await this.getBookData(bookId);
+        if (!rawData) return null;
+        this.parsedBookCache.set(bookId, JSON.parse(rawData));
+      }
+
+      const completeBook = this.parsedBookCache.get(bookId);
+      return this.findPart(completeBook, index);
+    } catch {
+      return null;
+    }
+  }
+
+  /** Cache an individual API response for offline re-reading */
+  async cacheResponse(index: string, data: Book): Promise<void> {
+    try {
+      const db = await this.getDb();
+      await this.putInStore(db, CACHE_STORE, index, JSON.stringify(data));
+    } catch {
+      // Silently fail — caching is best-effort
+    }
+  }
+
+  /** Retrieve a cached API response */
+  async getCachedResponse(index: string): Promise<Book | null> {
+    try {
+      const db = await this.getDb();
+      const raw = await this.getFromStore<string>(db, CACHE_STORE, index);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private findPart(book: any, targetIndex: string): Book | null {
+    if (!book) return null;
+
+    const data = book.data || book;
+
+    // Check if this node matches
+    if (book.index === targetIndex || data.index === targetIndex) {
+      if (book.kind) return book as Book;
+      // Construct the Book wrapper
+      const hasVerses = data.verses && data.verses.length > 0;
+      const hasSubChapters = data.chapters && data.chapters.length > 0;
+      const kind = hasVerses ? 'verse_list' : 'chapter_list';
+      return { kind, index: targetIndex, data } as Book;
+    }
+
+    // Search in sub-chapters
+    const chapters = data.chapters || [];
+    for (const chapter of chapters) {
+      if (chapter.index === targetIndex) {
+        const hasVerses = chapter.verses && chapter.verses.length > 0;
+        const kind = hasVerses ? 'verse_list' : 'chapter_list';
+        return { kind, index: targetIndex, data: chapter } as Book;
+      }
+      // Recurse only if target starts with this chapter's index
+      if (targetIndex.startsWith(chapter.index + ':')) {
+        const found = this.findPart({ index: chapter.index, data: chapter }, targetIndex);
+        if (found) return found;
+      }
+    }
+
+    return null;
+  }
+
   // -- IndexedDB helpers --
 
   private openDb(): void {
@@ -141,6 +223,9 @@ export class OfflineStorageService {
       }
       if (!db.objectStoreNames.contains(META_STORE)) {
         db.createObjectStore(META_STORE);
+      }
+      if (!db.objectStoreNames.contains(CACHE_STORE)) {
+        db.createObjectStore(CACHE_STORE);
       }
     };
 
@@ -161,6 +246,9 @@ export class OfflineStorageService {
         }
         if (!db.objectStoreNames.contains(META_STORE)) {
           db.createObjectStore(META_STORE);
+        }
+        if (!db.objectStoreNames.contains(CACHE_STORE)) {
+          db.createObjectStore(CACHE_STORE);
         }
       };
       request.onsuccess = () => {

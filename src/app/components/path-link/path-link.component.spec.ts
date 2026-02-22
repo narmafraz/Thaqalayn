@@ -49,15 +49,37 @@ describe('PathLinkComponent', () => {
     });
   });
 
-  describe('removeBookPrefix', () => {
-    it('should remove /books/ prefix', () => {
-      const result = component.removeBookPrefix('/books/al-kafi:1:2:3');
-      expect(result).toBe('al-kafi:1:2:3');
+  describe('formatReadable', () => {
+    it('should format Al-Kafi volume', () => {
+      expect(component.formatReadable('/books/al-kafi:1')).toBe('Al-Kafi, Vol. 1');
     });
 
-    it('should handle quran paths', () => {
-      const result = component.removeBookPrefix('/books/quran:1');
-      expect(result).toBe('quran:1');
+    it('should format Al-Kafi book', () => {
+      expect(component.formatReadable('/books/al-kafi:1:2')).toBe('Al-Kafi 1:2');
+    });
+
+    it('should format Al-Kafi chapter', () => {
+      expect(component.formatReadable('/books/al-kafi:1:2:3')).toBe('Al-Kafi 1:2:3');
+    });
+
+    it('should format Al-Kafi hadith with #', () => {
+      expect(component.formatReadable('/books/al-kafi:1:2:3:4')).toBe('Al-Kafi 1:2:3, #4');
+    });
+
+    it('should format Quran surah', () => {
+      expect(component.formatReadable('/books/quran:1')).toBe('Quran 1');
+    });
+
+    it('should format Quran verse', () => {
+      expect(component.formatReadable('/books/quran:1:5')).toBe('Quran 1:5');
+    });
+
+    it('should handle book name only', () => {
+      expect(component.formatReadable('/books/al-kafi')).toBe('Al-Kafi');
+    });
+
+    it('should title-case unknown books', () => {
+      expect(component.formatReadable('/books/some-book:1:2')).toBe('Some Book 1:2');
     });
   });
 

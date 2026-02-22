@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export type ThemeMode = 'light' | 'dark';
@@ -16,11 +17,14 @@ const FONT_STEP = 10;
 export class ThemeService {
   private themeSubject: BehaviorSubject<ThemeMode>;
   private fontSizeSubject: BehaviorSubject<number>;
+  private isBrowser: boolean;
 
   theme$: Observable<ThemeMode>;
   fontSize$: Observable<number>;
 
-  constructor() {
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+
     const savedTheme = this.detectTheme();
     this.themeSubject = new BehaviorSubject<ThemeMode>(savedTheme);
     this.theme$ = this.themeSubject.asObservable();
@@ -47,7 +51,9 @@ export class ThemeService {
   }
 
   setTheme(theme: ThemeMode): void {
-    localStorage.setItem(THEME_KEY, theme);
+    if (this.isBrowser) {
+      localStorage.setItem(THEME_KEY, theme);
+    }
     this.applyTheme(theme);
     this.themeSubject.next(theme);
   }
@@ -67,12 +73,17 @@ export class ThemeService {
   }
 
   private setFontSize(size: number): void {
-    localStorage.setItem(FONT_SIZE_KEY, String(size));
+    if (this.isBrowser) {
+      localStorage.setItem(FONT_SIZE_KEY, String(size));
+    }
     this.applyFontSize(size);
     this.fontSizeSubject.next(size);
   }
 
   private detectTheme(): ThemeMode {
+    if (!this.isBrowser) {
+      return 'light';
+    }
     const saved = localStorage.getItem(THEME_KEY) as ThemeMode;
     if (saved === 'light' || saved === 'dark') {
       return saved;
@@ -85,6 +96,9 @@ export class ThemeService {
   }
 
   private loadFontSize(): number {
+    if (!this.isBrowser) {
+      return DEFAULT_FONT_SIZE;
+    }
     const saved = localStorage.getItem(FONT_SIZE_KEY);
     if (saved) {
       const size = parseInt(saved, 10);
@@ -96,6 +110,7 @@ export class ThemeService {
   }
 
   private applyTheme(theme: ThemeMode): void {
+    if (!this.isBrowser) { return; }
     document.body.classList.toggle('dark-theme', theme === 'dark');
     // Update meta theme-color for mobile browsers
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -105,6 +120,7 @@ export class ThemeService {
   }
 
   private applyFontSize(size: number): void {
+    if (!this.isBrowser) { return; }
     document.documentElement.style.setProperty('--font-scale', String(size / 100));
   }
 }

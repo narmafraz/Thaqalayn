@@ -1,4 +1,5 @@
-import { Injectable, ApplicationRef } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, ApplicationRef, PLATFORM_ID } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { BehaviorSubject, Observable, first, filter } from 'rxjs';
 
@@ -16,6 +17,7 @@ export class PwaService {
   private installableSubject = new BehaviorSubject<boolean>(false);
   private updateAvailableSubject = new BehaviorSubject<boolean>(false);
   private installedSubject = new BehaviorSubject<boolean>(false);
+  private isBrowser: boolean;
 
   /** Whether the app can be installed (install prompt is available) */
   installable$: Observable<boolean> = this.installableSubject.asObservable();
@@ -29,9 +31,13 @@ export class PwaService {
   constructor(
     private swUpdate: SwUpdate,
     private appRef: ApplicationRef,
+    @Inject(PLATFORM_ID) platformId: object,
   ) {
-    this.detectStandaloneMode();
-    this.listenForInstallPrompt();
+    this.isBrowser = isPlatformBrowser(platformId);
+    if (this.isBrowser) {
+      this.detectStandaloneMode();
+      this.listenForInstallPrompt();
+    }
     this.listenForUpdates();
   }
 
@@ -53,7 +59,9 @@ export class PwaService {
     if (!this.swUpdate.isEnabled) return;
 
     this.swUpdate.activateUpdate().then(() => {
-      window.location.reload();
+      if (this.isBrowser) {
+        window.location.reload();
+      }
     });
   }
 

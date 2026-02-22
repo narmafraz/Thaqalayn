@@ -61,14 +61,14 @@ describe('ThemeService', () => {
       localStorageStore['thaqalayn-theme'] = 'dark';
 
       // Recreate the service
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentTheme).toBe('dark');
     });
 
     it('should use light theme from localStorage when saved', () => {
       localStorageStore['thaqalayn-theme'] = 'light';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentTheme).toBe('light');
     });
 
@@ -78,7 +78,7 @@ describe('ThemeService', () => {
         return { matches: true } as MediaQueryList;
       });
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentTheme).toBe('dark');
     });
 
@@ -89,14 +89,14 @@ describe('ThemeService', () => {
         return { matches: true } as MediaQueryList;
       });
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentTheme).toBe('dark');
     });
 
     it('should default to light when localStorage is invalid and system has no preference', () => {
       localStorageStore['thaqalayn-theme'] = 'invalid';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentTheme).toBe('light');
     });
   });
@@ -382,42 +382,42 @@ describe('ThemeService', () => {
     it('should load saved font size from localStorage on creation', () => {
       localStorageStore['thaqalayn-font-size'] = '120';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentFontSize).toBe(120);
     });
 
     it('should default to 100 when localStorage font size is invalid', () => {
       localStorageStore['thaqalayn-font-size'] = 'abc';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentFontSize).toBe(100);
     });
 
     it('should default to 100 when localStorage font size is below minimum', () => {
       localStorageStore['thaqalayn-font-size'] = '50';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentFontSize).toBe(100);
     });
 
     it('should default to 100 when localStorage font size exceeds maximum', () => {
       localStorageStore['thaqalayn-font-size'] = '200';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentFontSize).toBe(100);
     });
 
     it('should accept font size at exact minimum boundary (75)', () => {
       localStorageStore['thaqalayn-font-size'] = '75';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentFontSize).toBe(75);
     });
 
     it('should accept font size at exact maximum boundary (150)', () => {
       localStorageStore['thaqalayn-font-size'] = '150';
 
-      const freshService = new ThemeService();
+      const freshService = new ThemeService('browser' as unknown as object);
       expect(freshService.currentFontSize).toBe(150);
     });
   });

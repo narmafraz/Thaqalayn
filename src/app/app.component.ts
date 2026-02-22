@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Book, getChapter, Narrator } from '@app/models';
 import { I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
@@ -50,6 +51,8 @@ export class AppComponent implements OnInit, OnDestroy {
     '/topics': 'Topics',
   };
 
+  private isBrowser: boolean;
+
   constructor(
     private seo: SeoService,
     private router: Router,
@@ -57,15 +60,18 @@ export class AppComponent implements OnInit, OnDestroy {
     private i18n: I18nService,
     private themeService: ThemeService,
     private keyboard: KeyboardShortcutService,
+    @Inject(PLATFORM_ID) platformId: object,
   ) {
+    this.isBrowser = isPlatformBrowser(platformId);
     this.currentLang$ = this.i18n.currentLang$;
     this.theme$ = this.themeService.theme$;
     this.fontSize$ = this.themeService.fontSize$;
     this.helpVisible$ = this.keyboard.helpVisible$;
+    const initialEmbed = this.isBrowser ? window.location.pathname.startsWith('/embed/') : false;
     this.isEmbed$ = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map((event: NavigationEnd) => (event.urlAfterRedirects || event.url).split('?')[0].startsWith('/embed/')),
-      startWith(window.location.pathname.startsWith('/embed/'))
+      startWith(initialEmbed)
     );
     this.activeSection$ = this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -113,24 +119,26 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscriptions.push(
-      this.i18n.isRtl$.subscribe(isRtl => {
-        document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
-      })
-    );
+    if (this.isBrowser) {
+      this.subscriptions.push(
+        this.i18n.isRtl$.subscribe(isRtl => {
+          document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+        })
+      );
 
-    this.subscriptions.push(
-      this.i18n.currentLang$.subscribe(lang => {
-        document.documentElement.lang = lang;
-      })
-    );
+      this.subscriptions.push(
+        this.i18n.currentLang$.subscribe(lang => {
+          document.documentElement.lang = lang;
+        })
+      );
 
-    // Handle legacy hash-based URLs (redirect #/books/quran:1 to /books/quran:1)
-    if (window.location.hash.startsWith('#/')) {
-      const newPath = window.location.hash.substring(1);
-      // Use replaceState to avoid adding to browser history
-      window.history.replaceState(null, '', newPath);
-      this.router.navigateByUrl(newPath);
+      // Handle legacy hash-based URLs (redirect #/books/quran:1 to /books/quran:1)
+      if (window.location.hash.startsWith('#/')) {
+        const newPath = window.location.hash.substring(1);
+        // Use replaceState to avoid adding to browser history
+        window.history.replaceState(null, '', newPath);
+        this.router.navigateByUrl(newPath);
+      }
     }
 
     this.subscriptions.push(

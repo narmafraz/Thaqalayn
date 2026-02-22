@@ -1,4 +1,5 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -11,19 +12,26 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class KeyboardShortcutService implements OnDestroy {
   private helpVisibleSubject = new BehaviorSubject<boolean>(false);
   helpVisible$: Observable<boolean> = this.helpVisibleSubject.asObservable();
+  private isBrowser: boolean;
 
   private boundHandler = this.handleKeydown.bind(this);
 
   constructor(
     private router: Router,
     private store: Store,
-    private theme: ThemeService
+    private theme: ThemeService,
+    @Inject(PLATFORM_ID) platformId: object
   ) {
-    document.addEventListener('keydown', this.boundHandler);
+    this.isBrowser = isPlatformBrowser(platformId);
+    if (this.isBrowser) {
+      document.addEventListener('keydown', this.boundHandler);
+    }
   }
 
   ngOnDestroy(): void {
-    document.removeEventListener('keydown', this.boundHandler);
+    if (this.isBrowser) {
+      document.removeEventListener('keydown', this.boundHandler);
+    }
   }
 
   toggleHelp(): void {
@@ -108,6 +116,7 @@ export class KeyboardShortcutService implements OnDestroy {
   }
 
   private focusSearch(): void {
+    if (!this.isBrowser) { return; }
     const searchInput = document.querySelector<HTMLInputElement>('.search-bar-input input, .search-bar-input');
     if (searchInput) {
       searchInput.focus();

@@ -1,0 +1,7 @@
+/
+/about
+/support
+/download
+/topics
+/bookmarks
+/books

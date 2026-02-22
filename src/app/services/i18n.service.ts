@@ -1,5 +1,6 @@
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -14,12 +15,14 @@ export class I18nService {
   private strings: Record<string, unknown> = {};
   private langSubject: BehaviorSubject<string>;
   private stringsChangedSubject = new Subject<void>();
+  private isBrowser: boolean;
 
   currentLang$: Observable<string>;
   isRtl$: Observable<boolean>;
   stringsChanged$ = this.stringsChangedSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, @Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId);
     const initialLang = this.detectLanguage();
     this.langSubject = new BehaviorSubject<string>(initialLang);
     this.currentLang$ = this.langSubject.asObservable();
@@ -43,12 +46,18 @@ export class I18nService {
   }
 
   setLanguage(lang: string): void {
-    localStorage.setItem(STORAGE_KEY, lang);
+    if (this.isBrowser) {
+      localStorage.setItem(STORAGE_KEY, lang);
+    }
     this.loadStrings(lang);
     this.langSubject.next(lang);
   }
 
   private detectLanguage(): string {
+    if (!this.isBrowser) {
+      return 'en';
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const urlLang = urlParams.get('lang');
     if (urlLang) {
@@ -71,6 +80,9 @@ export class I18nService {
   }
 
   private detectBrowserLanguage(): string | null {
+    if (!this.isBrowser) {
+      return null;
+    }
     const supported = ['en', 'ar', 'fa', 'fr', 'ur', 'tr', 'id', 'bn', 'es', 'de', 'ru', 'zh'];
     const navLangs = navigator.languages || [navigator.language];
     for (const lang of navLangs) {

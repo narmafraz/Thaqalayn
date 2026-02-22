@@ -76,6 +76,19 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
       : result.path;
   }
 
+  /** Format a raw path like "/books/al-khisal:4:189" to "Al-Khisal 4:189" */
+  formatPath(path: string): string {
+    const match = path.match(/\/books\/([^:]+):?(.*)/);
+    if (!match) return path;
+    const slug = match[1];
+    const rest = match[2];
+    const name = slug
+      .split('-')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join('-');
+    return rest ? `${name} ${rest}` : name;
+  }
+
   private buildBookFilters(results: SearchResult[]): void {
     const counts = new Map<string, number>();
     for (const r of results) {

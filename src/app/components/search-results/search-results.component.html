@@ -70,7 +70,7 @@
           <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
           <div class="result-footer">
             <span class="result-book">{{ result.bookName }}</span>
-            <span class="result-path">{{ result.path }}</span>
+            <span class="result-path">{{ formatPath(result.path) }}</span>
           </div>
         </mat-card-content>
       </mat-card>

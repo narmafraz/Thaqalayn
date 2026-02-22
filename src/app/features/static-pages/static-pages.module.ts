@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 
@@ -8,6 +9,7 @@ import { SupportComponent } from '../../components/support/support.component';
 import { DownloadComponent } from '../../components/download/download.component';
 import { BookmarksComponent } from '../../components/bookmarks/bookmarks.component';
 import { SearchResultsComponent } from '../../components/search-results/search-results.component';
+import { TopicsComponent } from '../../components/topics/topics.component';
 
 const routes: Routes = [
   { path: 'about', component: AboutComponent },
@@ -15,6 +17,7 @@ const routes: Routes = [
   { path: 'download', component: DownloadComponent },
   { path: 'bookmarks', component: BookmarksComponent },
   { path: 'search', component: SearchResultsComponent },
+  { path: 'topics', component: TopicsComponent },
 ];
 
 @NgModule({
@@ -24,9 +27,11 @@ const routes: Routes = [
     DownloadComponent,
     BookmarksComponent,
     SearchResultsComponent,
+    TopicsComponent,
   ],
   imports: [
     SharedModule,
+    FormsModule,
     RouterModule.forChild(routes),
     MatCardModule,
   ],

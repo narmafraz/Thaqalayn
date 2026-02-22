@@ -46,6 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
     '/bookmarks': 'Bookmarks',
     '/download': 'Download',
     '/support': 'Support',
+    '/topics': 'Topics',
   };
 
   constructor(

@@ -17,7 +17,8 @@
     "navigateNext": "Navigate to the next chapter",
     "navigateParent": "Navigate to the parent",
     "hadithNavigation": "Hadith navigation",
-    "bookmarks": "Bookmarks"
+    "bookmarks": "Bookmarks",
+    "topics": "Topics"
   },
   "book": {
     "reference": "Reference",
@@ -157,6 +158,12 @@
     "placeholder": "Write your personal note here...",
     "notes": "My Notes",
     "noNotes": "No notes yet. Add notes to verses while reading to find them here."
+  },
+  "topics": {
+    "title": "Topics",
+    "description": "Browse hadith collections by topic. Topics are derived from the traditional book divisions of Al-Kafi.",
+    "searchPlaceholder": "Search topics...",
+    "chapters": "chapters"
   },
   "settings": {
     "toggleDarkMode": "Toggle dark mode",

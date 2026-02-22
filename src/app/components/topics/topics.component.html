@@ -1,0 +1,37 @@
+<div class="content mat-elevation-z8">
+  <h1>{{ 'topics.title' | translate }}</h1>
+  <p class="subtitle">{{ 'topics.description' | translate }}</p>
+
+  <div class="search-box">
+    <mat-icon>search</mat-icon>
+    <input
+      type="text"
+      [placeholder]="'topics.searchPlaceholder' | translate"
+      [ngModel]="searchQuery"
+      (ngModelChange)="filterTopics($event)"
+      class="search-input">
+  </div>
+
+  <div *ngIf="filteredCategories.length === 0 && categories.length > 0" class="no-results">
+    {{ 'search.noResults' | translate }}
+  </div>
+
+  <section *ngFor="let category of filteredCategories" class="topic-category">
+    <h2>
+      <mat-icon class="category-icon">{{ category.icon }}</mat-icon>
+      {{ category.name }}
+    </h2>
+
+    <div class="topic-grid">
+      <a *ngFor="let topic of category.topics"
+         [routerLink]="['/books', topic.path.substring(7)]"
+         class="topic-card">
+        <div class="topic-title">{{ topic.title }}</div>
+        <div class="topic-arabic" *ngIf="topic.arabicTitle">{{ topic.arabicTitle }}</div>
+        <div class="topic-meta">
+          <span *ngIf="topic.chapterCount > 0">{{ topic.chapterCount }} {{ 'topics.chapters' | translate }}</span>
+        </div>
+      </a>
+    </div>
+  </section>
+</div>

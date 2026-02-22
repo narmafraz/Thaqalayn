@@ -87,3 +87,33 @@
 .right-index {
   padding-left: 55px;
 }
+
+@media (max-width: 600px) {
+  .filter-field {
+    padding: 10px 16px;
+  }
+
+  .mat-mdc-cell {
+    padding: 8px 4px 8px 0;
+    font-size: 13px;
+  }
+
+  .left-index {
+    padding-right: 8px;
+  }
+
+  .right-index {
+    padding-left: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .mat-mdc-cell {
+    padding: 6px 2px 6px 0;
+    font-size: 12px;
+  }
+
+  .filter-field {
+    padding: 8px 8px;
+  }
+}

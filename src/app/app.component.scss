@@ -192,3 +192,24 @@ a:hover {
     display: none;
   }
 }
+
+@media (max-width: 360px) {
+  #header {
+    height: 80px;
+  }
+
+  .bannerTop {
+    height: 55px;
+    font-size: 1.2rem;
+  }
+
+  .crumbs {
+    height: 25px;
+    font-size: 10px;
+    padding-left: 2% !important;
+  }
+
+  #footer {
+    font-size: 12px;
+  }
+}

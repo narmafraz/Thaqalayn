@@ -110,6 +110,28 @@ mat-mdc-card {
     margin-left: 0;
     margin-top: 4px;
   }
+
+  .note-display {
+    margin: 0 8px 12px;
+    padding: 8px 12px;
+  }
+
+  .note-editor {
+    margin: 0 8px 12px;
+    padding: 8px 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ref {
+    padding-left: 4px;
+    padding-right: 2px;
+    font-size: 9px;
+  }
+
+  mat-mdc-card {
+    margin: 10px 1px 8px 1px;
+  }
 }
 
 .perRel {

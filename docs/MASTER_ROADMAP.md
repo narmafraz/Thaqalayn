@@ -189,8 +189,8 @@ Everything below has been implemented and tested. Included for context — do no
 |--------|------|-------------|--------|
 | [x] | ErrorInterceptor | Global HTTP error capture (`src/app/services/error.interceptor.ts`). | Low |
 | [x] | Timeout & retry | Added `timeout(30000)` and `retry({ count: 2, delay: 1000 })` to `BooksService.getPart()` and `PeopleService.getNarrator()`. | Low |
-| [ ] | Loading/error state in NGXS | Add `loading` and `errors` fields to `BooksStateModel`. Components show spinner/retry UI. Not yet implemented. | Medium |
-| [ ] | Error display component | "Failed to load chapter. Retry?" component for user feedback on network failures. Not yet implemented. | Medium |
+| [x] | Loading/error state in NGXS | `loading` and `errors` fields in `BooksStateModel`, `getCurrentLoading`/`getCurrentError` selectors, wired into book-dispatcher with spinner and retry. | Medium |
+| [x] | Error display component | `ErrorDisplayComponent` with retry button, used in book-dispatcher, people-content, people-list. | Medium |
 
 ### 4.1 Full-Text Search
 

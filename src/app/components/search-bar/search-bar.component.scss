@@ -70,7 +70,7 @@ input {
   top: 100%;
   left: 0;
   right: 0;
-  min-width: 280px;
+  min-width: min(280px, 90vw);
   background: var(--card-bg, #fff);
   border-radius: 0 0 4px 4px;
   box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));

@@ -22,3 +22,13 @@
     font-size: 12px;
   }
 }
+
+@media (max-width: 600px) {
+  .translation-controls {
+    gap: 2px;
+
+    mat-form-field {
+      font-size: 12px;
+    }
+  }
+}

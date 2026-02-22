@@ -1,10 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
 import { InitSearchIndex, SearchQuery, SetSearchMode } from '@store/search/search.actions';
 import { SearchMode, SearchResult } from '@app/services/search.service';
 import { Observable, Subscription } from 'rxjs';
+
+interface BookFilterEntry {
+  name: string;
+  count: number;
+}
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,9 +26,13 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   mode$: Observable<SearchMode> = inject(Store).select(SearchState.getMode);
   fullTextLoading$: Observable<boolean> = inject(Store).select(SearchState.isFullTextLoading);
 
+  bookFilters: BookFilterEntry[] = [];
+  activeBookFilter: string | null = null;
+  filteredResults: SearchResult[] = [];
+  private allResults: SearchResult[] = [];
   private subscriptions: Subscription[] = [];
 
-  constructor(private store: Store, private route: ActivatedRoute) {}
+  constructor(private store: Store, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.store.dispatch(new InitSearchIndex());
@@ -36,6 +45,15 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
         }
       })
     );
+
+    this.subscriptions.push(
+      this.results$.subscribe(results => {
+        this.allResults = results;
+        this.buildBookFilters(results);
+        this.applyFilter();
+        this.cdr.markForCheck();
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -46,9 +64,40 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SetSearchMode(mode));
   }
 
+  toggleBookFilter(bookName: string): void {
+    this.activeBookFilter = this.activeBookFilter === bookName ? null : bookName;
+    this.applyFilter();
+    this.cdr.markForCheck();
+  }
+
   getBookPath(result: SearchResult): string {
     return result.path.startsWith('/books/')
       ? result.path.substring(7)
       : result.path;
+  }
+
+  private buildBookFilters(results: SearchResult[]): void {
+    const counts = new Map<string, number>();
+    for (const r of results) {
+      if (r.bookName) {
+        counts.set(r.bookName, (counts.get(r.bookName) || 0) + 1);
+      }
+    }
+    this.bookFilters = Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // Reset filter if the active book is no longer in results
+    if (this.activeBookFilter && !counts.has(this.activeBookFilter)) {
+      this.activeBookFilter = null;
+    }
+  }
+
+  private applyFilter(): void {
+    if (!this.activeBookFilter) {
+      this.filteredResults = this.allResults;
+    } else {
+      this.filteredResults = this.allResults.filter(r => r.bookName === this.activeBookFilter);
+    }
   }
 }

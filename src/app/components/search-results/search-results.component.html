@@ -38,9 +38,24 @@
       <span *ngIf="results.length === 0 && !(loading$ | async)">{{ 'search.noResultsFor' | translate }} "{{ query }}"</span>
     </p>
 
+    <div class="book-filters" *ngIf="bookFilters.length > 1">
+      <span class="filter-label">
+        <mat-icon>filter_list</mat-icon>
+        {{ 'search.filter' | translate }}:
+      </span>
+      <button
+        *ngFor="let filter of bookFilters"
+        class="book-filter-chip"
+        [class.active]="activeBookFilter === filter.name"
+        (click)="toggleBookFilter(filter.name)">
+        {{ filter.name }}
+        <span class="chip-count">{{ filter.count }}</span>
+      </button>
+    </div>
+
     <div class="results-list">
       <mat-card
-        *ngFor="let result of results"
+        *ngFor="let result of filteredResults"
         appearance="outlined"
         class="result-card"
         [class.hadith-result]="result.kind === 'hadith'"

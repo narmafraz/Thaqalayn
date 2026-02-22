@@ -89,5 +89,24 @@
     "ar": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
     "fa": "\u0641\u0627\u0631\u0633\u06cc",
     "fr": "Fran\u00e7ais"
+  },
+  "sync": {
+    "title": "Cloud Sync",
+    "description": "Sync your bookmarks, reading progress, and notes across devices.",
+    "signInGoogle": "Sign in with Google",
+    "signInAnonymous": "Sign in anonymously",
+    "anonymous": "Anonymous User",
+    "signOut": "Sign out",
+    "syncNow": "Sync now",
+    "push": "Push to cloud",
+    "pull": "Pull from cloud",
+    "lastSync": "Last synced",
+    "status": {
+      "disconnected": "Disconnected",
+      "connecting": "Connecting",
+      "synced": "Synced",
+      "syncing": "Syncing",
+      "error": "Error"
+    }
   }
 }

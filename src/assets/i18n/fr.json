@@ -80,6 +80,25 @@
     "clear": "Effacer",
     "bookNavigation": "Navigation des livres"
   },
+  "sync": {
+    "title": "Synchronisation cloud",
+    "description": "Synchronisez vos signets, votre progression de lecture et vos notes entre vos appareils.",
+    "signInGoogle": "Se connecter avec Google",
+    "signInAnonymous": "Connexion anonyme",
+    "anonymous": "Utilisateur anonyme",
+    "signOut": "Se d\u00e9connecter",
+    "syncNow": "Synchroniser",
+    "push": "Envoyer vers le cloud",
+    "pull": "T\u00e9l\u00e9charger du cloud",
+    "lastSync": "Derni\u00e8re synchronisation",
+    "status": {
+      "disconnected": "D\u00e9connect\u00e9",
+      "connecting": "Connexion",
+      "synced": "Synchronis\u00e9",
+      "syncing": "Synchronisation",
+      "error": "Erreur"
+    }
+  },
   "breadcrumb": {
     "home": "Accueil"
   },

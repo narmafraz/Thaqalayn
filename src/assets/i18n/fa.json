@@ -80,6 +80,25 @@
     "clear": "پاک کردن",
     "bookNavigation": "پیمایش کتاب‌ها"
   },
+  "sync": {
+    "title": "همگام‌سازی ابری",
+    "description": "نشانک‌ها، پیشرفت مطالعه و یادداشت‌های خود را بین دستگاه‌ها همگام کنید.",
+    "signInGoogle": "ورود با گوگل",
+    "signInAnonymous": "ورود ناشناس",
+    "anonymous": "کاربر ناشناس",
+    "signOut": "خروج",
+    "syncNow": "همگام‌سازی",
+    "push": "ارسال به ابر",
+    "pull": "دریافت از ابر",
+    "lastSync": "آخرین همگام‌سازی",
+    "status": {
+      "disconnected": "قطع",
+      "connecting": "در حال اتصال",
+      "synced": "همگام",
+      "syncing": "در حال همگام‌سازی",
+      "error": "خطا"
+    }
+  },
   "breadcrumb": {
     "home": "صفحه اصلی"
   },

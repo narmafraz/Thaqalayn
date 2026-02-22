@@ -76,6 +76,55 @@
     </div>
   </section>
 
+  <!-- Cloud Sync section -->
+  <section *ngIf="syncConfigured" class="sync-section">
+    <h2>{{ 'sync.title' | translate }}</h2>
+
+    <div *ngIf="!(syncUser$ | async)" class="sync-login">
+      <p class="sync-description">{{ 'sync.description' | translate }}</p>
+      <div class="sync-actions">
+        <button mat-raised-button color="primary" (click)="signInWithGoogle()">
+          <mat-icon>account_circle</mat-icon> {{ 'sync.signInGoogle' | translate }}
+        </button>
+        <button mat-stroked-button (click)="signInAnonymously()">
+          <mat-icon>person_outline</mat-icon> {{ 'sync.signInAnonymous' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="syncUser$ | async as user" class="sync-connected">
+      <div class="sync-user-info">
+        <mat-icon>{{ user.isAnonymous ? 'person_outline' : 'account_circle' }}</mat-icon>
+        <span>{{ user.displayName || user.email || ('sync.anonymous' | translate) }}</span>
+      </div>
+      <div class="sync-status">
+        <span class="sync-status-badge" [ngClass]="syncStatus$ | async">
+          {{ 'sync.status.' + (syncStatus$ | async) | translate }}
+        </span>
+        <span *ngIf="lastSync$ | async as last" class="sync-last">
+          {{ 'sync.lastSync' | translate }}: {{ last | date:'short' }}
+        </span>
+      </div>
+      <div class="sync-actions">
+        <button mat-raised-button color="primary" (click)="syncNow()"
+                [disabled]="(syncStatus$ | async) === 'syncing'">
+          <mat-icon>sync</mat-icon> {{ 'sync.syncNow' | translate }}
+        </button>
+        <button mat-stroked-button (click)="pushToCloud()"
+                [disabled]="(syncStatus$ | async) === 'syncing'">
+          <mat-icon>cloud_upload</mat-icon> {{ 'sync.push' | translate }}
+        </button>
+        <button mat-stroked-button (click)="pullFromCloud()"
+                [disabled]="(syncStatus$ | async) === 'syncing'">
+          <mat-icon>cloud_download</mat-icon> {{ 'sync.pull' | translate }}
+        </button>
+        <button mat-stroked-button color="warn" (click)="signOut()">
+          <mat-icon>logout</mat-icon> {{ 'sync.signOut' | translate }}
+        </button>
+      </div>
+    </div>
+  </section>
+
   <!-- Export/Import section -->
   <section class="export-section">
     <h2>{{ 'bookmark.exportImport' | translate }}</h2>

@@ -89,5 +89,24 @@
     "ar": "العربية",
     "fa": "فارسی",
     "fr": "Français"
+  },
+  "sync": {
+    "title": "Cloud Sync",
+    "description": "Sync your bookmarks, reading progress, and notes across devices.",
+    "signInGoogle": "Sign in with Google",
+    "signInAnonymous": "Sign in anonymously",
+    "anonymous": "Anonymous User",
+    "signOut": "Sign out",
+    "syncNow": "Sync now",
+    "push": "Push to cloud",
+    "pull": "Pull from cloud",
+    "lastSync": "Last synced",
+    "status": {
+      "disconnected": "Disconnected",
+      "connecting": "Connecting",
+      "synced": "Synced",
+      "syncing": "Syncing",
+      "error": "Error"
+    }
   }
 }

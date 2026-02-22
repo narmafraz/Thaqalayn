@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Annotation, Bookmark, BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
-import { Subscription } from 'rxjs';
+import { SyncService, SyncStatus, SyncUser } from '@app/services/sync.service';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,10 +17,22 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   annotations: Annotation[] = [];
   private subs: Subscription[] = [];
 
+  // Sync
+  syncConfigured: boolean;
+  syncUser$: Observable<SyncUser | null>;
+  syncStatus$: Observable<SyncStatus>;
+  lastSync$: Observable<Date | null>;
+
   constructor(
     private bookmarkService: BookmarkService,
+    private syncService: SyncService,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) {
+    this.syncConfigured = this.syncService.isConfigured;
+    this.syncUser$ = this.syncService.user$;
+    this.syncStatus$ = this.syncService.status$;
+    this.lastSync$ = this.syncService.lastSync$;
+  }
 
   ngOnInit(): void {
     this.subs.push(
@@ -105,5 +118,30 @@ export class BookmarksComponent implements OnInit, OnDestroy {
       alert('Invalid bookmark file');
     }
     input.value = '';
+  }
+
+  // Sync methods
+  signInWithGoogle(): void {
+    this.syncService.signInWithGoogle();
+  }
+
+  signInAnonymously(): void {
+    this.syncService.signInAnonymously();
+  }
+
+  signOut(): void {
+    this.syncService.signOut();
+  }
+
+  syncNow(): void {
+    this.syncService.sync();
+  }
+
+  pushToCloud(): void {
+    this.syncService.pushToCloud();
+  }
+
+  pullFromCloud(): void {
+    this.syncService.pullFromCloud();
   }
 }

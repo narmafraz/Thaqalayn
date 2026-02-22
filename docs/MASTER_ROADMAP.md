@@ -258,7 +258,7 @@ Everything below has been implemented and tested. Included for context — do no
 ## Phase 5: Platform Expansion (COMPLETE ~90%)
 
 > **Goal:** Complete all Four Books, add additional collections, modernize the stack.
-> **Status:** Angular 19 upgrade complete (19.2.x with NGXS 19). ThaqalaynAPI data scraped and fully generated for 20+ books (registered in Phase 3B.4). Full data generation pipeline running end-to-end: 22 books, 40,621 verses, 973 generator tests passing. Gradings working in both dict and list formats (824 dict + 13,900 list). No Tahdhib/Istibsar parsers (different sources needed). Data optimization (5.4) remaining.
+> **Status:** Angular 19 upgrade complete (19.2.x with NGXS 19). ThaqalaynAPI data scraped and fully generated for 22 books (registered in Phase 3B.4). Full data generation pipeline running end-to-end: 22 books, 40,621 verses, 1,009 generator tests passing. Gradings working in both dict and list formats (824 dict + 13,900 list). Cross-reference linker for all books complete (2,146 hadiths linked, 79,814 modular files patched). No Tahdhib/Istibsar parsers (different sources needed). Data optimization (5.4) remaining.
 > **Team evaluation:** At end of Phase 5, assess whether the platform is ready for community features.
 
 ### Team Composition (5 agents)
@@ -280,24 +280,27 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 5.1 Complete the Four Books
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Man La Yahduruhu al-Faqih parser | ThaqalaynAPI JSON source (5 vols, Arabic+English). Use generic `thaqalayn_api.py`. | Medium |
-| Tahdhib al-Ahkam parser | ghbook.ir HTML/EPUB source (10 vols, Arabic). rafed.net Word for cross-reference. | High |
-| al-Istibsar parser | ghbook.ir HTML/EPUB source (4 vols, Arabic). No English translation available. | High |
-| Generalize narrator extraction | Refactor `kafi_narrators.py` into shared module. Different books have different chain styles. | High |
-| Cross-reference linker for all books | Extend `link_quran_kafi.py` to `link_books.py` — bidirectional refs across all books. | Medium |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Man La Yahduruhu al-Faqih parser | Already scraped and generated via ThaqalaynAPI `thaqalayn_api.py`. Registered in book_registry.py. | Medium |
+| [ ] | Tahdhib al-Ahkam parser | ghbook.ir HTML/EPUB source (10 vols, Arabic). rafed.net Word for cross-reference. | High |
+| [ ] | al-Istibsar parser | ghbook.ir HTML/EPUB source (4 vols, Arabic). No English translation available. | High |
+| [ ] | Generalize narrator extraction | Refactor `kafi_narrators.py` into shared module. Different books have different chain styles. | High |
+| [x] | Cross-reference linker for all books | `link_books.py` — scans all 22 books for Quran references, creates bidirectional Mentions/Mentioned In relations, replaces `[S:V]`/`(S:V)` with HTML links. 2,146 hadiths across 15 books linked. Propagates changes to 79,814 modular files (verse_list + verse_detail). 30 unit tests. | Medium |
 
-### 5.2 Additional Hadith Collections
+### 5.2 Additional Hadith Collections (COMPLETE)
 
-| Book | Author | Source | Priority |
-|------|--------|--------|----------|
-| Nahj al-Balaghah | Al-Sharif al-Radi | ThaqalaynAPI | High |
-| Tuhaf al-Uqul | Ibn Shuba Harrani | ThaqalaynAPI | Medium |
-| Al-Amali (Tusi/Saduq/Mufid) | Various | ThaqalaynAPI | Medium |
-| Uyun Akhbar al-Ridha | Shaykh Saduq | ThaqalaynAPI | Medium |
-| Kamil al-Ziyarat | Ibn Qulawayh | ThaqalaynAPI | Low |
-| Others (30+ books) | Various | ThaqalaynAPI / mirrors | Low |
+> All books below were scraped via ThaqalaynAPI and registered in book_registry.py during Phase 3B.4.
+> 22 books total are now generated and served, including all listed below plus 10+ additional collections.
+
+| Status | Book | Author | Source | Priority |
+|--------|------|--------|--------|----------|
+| [x] | Nahj al-Balaghah | Al-Sharif al-Radi | ThaqalaynAPI | High |
+| [x] | Tuhaf al-Uqul | Ibn Shuba Harrani | ThaqalaynAPI | Medium |
+| [x] | Al-Amali (Tusi/Saduq/Mufid) | Various | ThaqalaynAPI | Medium |
+| [x] | Uyun Akhbar al-Ridha | Shaykh Saduq | ThaqalaynAPI | Medium |
+| [x] | Kamil al-Ziyarat | Ibn Qulawayh | ThaqalaynAPI | Low |
+| [x] | Others (15+ books) | Various | ThaqalaynAPI | Low |
 
 ### 5.3 Angular 19 Upgrade
 
@@ -511,6 +514,7 @@ Documented decisions and notable bug fixes applied during development.
 | **narrator_chain.text test updates** | 5 | Data validation tests still checked for `narrator_chain.text` which was removed in Phase 2. Updated to check `narrator_chain.parts` instead. |
 | **Search tips ALL CAPS** | 6 | Search tips panel inherited `text-transform: uppercase` from parent `.bannerTop` CSS. Fixed by adding `text-transform: none` to `.search-tips-panel`. |
 | **Single-threaded data server** | 6 | Local dev data server (`serve.py`) used single-threaded `HTTPServer`, causing hangs when Angular sent concurrent API requests. Fixed by adding `ThreadingMixIn` for parallel request handling. |
+| **Cross-reference linker propagation** | 5 | The cross-reference linker only updated complete aggregation files but not the modular verse_list/verse_detail files that the Angular app serves. Added `_propagate_to_modular_files()` to patch 79,814 modular files with relations and HTML-linked translations after cross-referencing. |
 
 ### Deferred Decisions
 

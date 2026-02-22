@@ -66,16 +66,58 @@
           </div>
         </div>
 
-        <!-- Relations / Cross-references -->
+        <!-- Relations / Cross-references with comparative view -->
         <div class="relations-section" *ngIf="book.data.verse.relations as relations">
+          <div class="relations-header">
+            <h3>{{ 'book.crossReferences' | translate }}</h3>
+            <button mat-button class="compare-all-btn" (click)="loadAllRelations(relations)"
+                    *ngIf="!compareExpanded">
+              <mat-icon>compare_arrows</mat-icon> {{ 'book.compareAll' | translate }}
+            </button>
+            <button mat-button class="compare-all-btn" (click)="toggleCompare()"
+                    *ngIf="compareExpanded">
+              <mat-icon>close</mat-icon> {{ 'book.hideComparison' | translate }}
+            </button>
+          </div>
           <ng-container *ngFor="let relation of relations | keyvalue">
             <div class="relation-group" *ngIf="relation.value?.length">
-              <h3>{{ relation.key }}</h3>
+              <span class="relation-type">{{ relation.key }}:</span>
               <div class="relation-links">
-                <app-path-link *ngFor="let rLink of relation.value" [path]="rLink" class="relation-link"></app-path-link>
+                <span *ngFor="let rLink of relation.value" class="relation-link-wrapper">
+                  <app-path-link [path]="rLink" class="relation-link"></app-path-link>
+                  <button class="compare-btn" (click)="loadCompareVerse(rLink)"
+                          *ngIf="!isCompareLoaded(rLink)"
+                          [attr.aria-label]="'Compare with ' + removeBookPrefix(rLink)">
+                    <mat-icon>visibility</mat-icon>
+                  </button>
+                </span>
               </div>
             </div>
           </ng-container>
+
+          <!-- Inline comparison panels -->
+          <div class="compare-panels" *ngIf="compareExpanded && compareEntries.size > 0">
+            <ng-container *ngFor="let entry of compareEntries | keyvalue">
+              <div class="compare-panel" *ngIf="entry.value as cmp">
+                <div class="compare-panel-header">
+                  <a [routerLink]="['/books', removeBookPrefix(cmp.path)]" queryParamsHandling="preserve" class="compare-title">
+                    {{ cmp.chapterTitle || removeBookPrefix(cmp.path) }}
+                  </a>
+                  <span class="compare-path">{{ removeBookPrefix(cmp.path) }}</span>
+                </div>
+                <div class="compare-loading" *ngIf="cmp.loading">
+                  <mat-spinner diameter="18"></mat-spinner>
+                </div>
+                <div class="compare-error" *ngIf="cmp.error && !cmp.loading">{{ cmp.error }}</div>
+                <div class="compare-content" *ngIf="cmp.verse && !cmp.loading">
+                  <p *ngFor="let txt of cmp.verse.text" class="compare-arabic arabic" dir="rtl" lang="ar" [innerHTML]="txt"></p>
+                  <div class="compare-translation" *ngIf="getFirstTranslation(cmp.verse) as trl">
+                    <p *ngFor="let t of trl" [innerHTML]="t"></p>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
         </div>
 
         <!-- Cross-validation -->

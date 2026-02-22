@@ -1,10 +1,19 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { VerseDetail } from '@app/models';
+import { Book, Verse, VerseDetail } from '@app/models';
 import { BookmarkService } from '@app/services/bookmark.service';
+import { BooksService } from '@app/services/books.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+
+interface CompareEntry {
+  path: string;
+  verse: Verse | null;
+  chapterTitle: string;
+  loading: boolean;
+  error: string | null;
+}
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,9 +38,14 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   hasNote = false;
   private sub: Subscription | null = null;
 
+  // Comparative view state
+  compareEntries = new Map<string, CompareEntry>();
+  compareExpanded = false;
+
   constructor(
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
+    private booksService: BooksService,
   ) {}
 
   ngOnInit(): void {
@@ -133,5 +147,77 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       this.linkCopied = true;
       setTimeout(() => this.linkCopied = false, 2000);
     }
+  }
+
+  // Comparative view methods
+  toggleCompare(): void {
+    this.compareExpanded = !this.compareExpanded;
+    this.cdr.markForCheck();
+  }
+
+  isCompareLoaded(path: string): boolean {
+    return this.compareEntries.has(path);
+  }
+
+  getCompareEntry(path: string): CompareEntry | undefined {
+    return this.compareEntries.get(path);
+  }
+
+  loadCompareVerse(path: string): void {
+    if (this.compareEntries.has(path)) return;
+
+    const entry: CompareEntry = { path, verse: null, chapterTitle: '', loading: true, error: null };
+    this.compareEntries.set(path, entry);
+    this.cdr.markForCheck();
+
+    // Parse path: /books/quran:59:2 → chapter index "quran:59", verse local_index 2
+    const stripped = path.replace('/books/', '');
+    const parts = stripped.split(':');
+    const verseIdx = parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 0;
+    const chapterIndex = parts.slice(0, -1).join(':');
+
+    this.booksService.getPart(chapterIndex).subscribe({
+      next: (book: Book) => {
+        entry.loading = false;
+        if (book.kind === 'verse_list' && book.data.verses) {
+          const found = book.data.verses.find(v => v.local_index === verseIdx);
+          entry.verse = found || null;
+          entry.chapterTitle = book.data.titles?.en || chapterIndex;
+          if (!found) {
+            entry.error = `Verse ${verseIdx} not found in chapter`;
+          }
+        } else if (book.kind === 'chapter_list' && book.data.chapters) {
+          // For chapter_list, the verse might be in nested chapters
+          entry.error = 'Content is a chapter list, not verse content';
+        } else {
+          entry.error = 'Unexpected data format';
+        }
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        entry.loading = false;
+        entry.error = 'Failed to load referenced content';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  loadAllRelations(relations: Record<string, string[]>): void {
+    this.compareExpanded = true;
+    for (const paths of Object.values(relations)) {
+      for (const path of paths) {
+        this.loadCompareVerse(path);
+      }
+    }
+  }
+
+  getFirstTranslation(verse: Verse): string[] | null {
+    if (!verse.translations) return null;
+    const keys = Object.keys(verse.translations);
+    return keys.length > 0 ? verse.translations[keys[0]] : null;
+  }
+
+  removeBookPrefix(path: string): string {
+    return path.replace('/books/', '');
   }
 }

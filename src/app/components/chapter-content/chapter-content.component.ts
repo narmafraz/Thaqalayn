@@ -1,9 +1,10 @@
 import { ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ChapterContent, Crumb, Verse } from '@app/models';
+import { Book, ChapterContent, Crumb, Verse } from '@app/models';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
+import { BooksService } from '@app/services/books.service';
 import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -43,6 +44,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   private touchStartY = 0;
   private currentNav: { prev: string | null; next: string | null } = { prev: null, next: null };
 
+  // Inline compare state
+  expandedCompare = new Map<string, { verse: Verse | null; title: string; loading: boolean; error: string | null }>();
+
   constructor(
     private store: Store,
     private viewportScroller: ViewportScroller,
@@ -52,6 +56,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private tafsirService: TafsirService,
     private router: Router,
     private el: ElementRef,
+    private booksService: BooksService,
   ) {
     this.tafsirEditions = this.tafsirService.editions;
     this.fragment$.subscribe(fragment => {
@@ -295,5 +300,57 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       this.bookmarkedPaths.add(bm.path);
     }
     this.cdr.markForCheck();
+  }
+
+  // Inline comparative view
+  toggleCompareVerse(path: string): void {
+    if (this.expandedCompare.has(path)) {
+      this.expandedCompare.delete(path);
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const entry = { verse: null as Verse | null, title: '', loading: true, error: null as string | null };
+    this.expandedCompare.set(path, entry);
+    this.cdr.markForCheck();
+
+    const stripped = path.replace('/books/', '');
+    const parts = stripped.split(':');
+    const verseIdx = parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 0;
+    const chapterIndex = parts.slice(0, -1).join(':');
+
+    this.booksService.getPart(chapterIndex).subscribe({
+      next: (book: Book) => {
+        entry.loading = false;
+        if (book.kind === 'verse_list' && book.data.verses) {
+          const found = book.data.verses.find(v => v.local_index === verseIdx);
+          entry.verse = found || null;
+          entry.title = book.data.titles?.en || chapterIndex;
+          if (!found) entry.error = 'Verse not found';
+        } else {
+          entry.error = 'Unexpected data format';
+        }
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        entry.loading = false;
+        entry.error = 'Failed to load';
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  isCompareExpanded(path: string): boolean {
+    return this.expandedCompare.has(path);
+  }
+
+  getCompareData(path: string) {
+    return this.expandedCompare.get(path);
+  }
+
+  getFirstTranslation(verse: Verse): string[] | null {
+    if (!verse.translations) return null;
+    const keys = Object.keys(verse.translations);
+    return keys.length > 0 ? verse.translations[keys[0]] : null;
   }
 }

@@ -290,6 +290,102 @@ mat-mdc-card {
   .grading-unknown { background-color: rgba(255, 255, 255, 0.08); }
 }
 
+// Inline comparison
+.compare-inline-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--link-color, #673ab7);
+  opacity: 0.4;
+  vertical-align: middle;
+
+  &:hover { opacity: 1; }
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.compare-inline-panel {
+  padding: 10px 16px;
+  margin: 0 16px 12px;
+  background: var(--compare-bg, #f9f9ff);
+  border-radius: 8px;
+  border-left: 3px solid var(--link-color, #673ab7);
+
+  .compare-inline-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .compare-inline-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--link-color, #673ab7);
+  }
+
+  .compare-inline-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--link-color, #673ab7);
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+
+  .compare-inline-close {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: var(--text-secondary, #999);
+    &:hover { color: var(--text-primary, #333); }
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
+
+  .compare-inline-loading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+  }
+
+  .compare-inline-error {
+    color: #c62828;
+    font-size: 12px;
+  }
+
+  .compare-inline-arabic {
+    font-size: 1.1em;
+    line-height: 2;
+    font-family: 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif;
+    margin: 0 0 6px;
+  }
+
+  .compare-inline-translation {
+    border-top: 1px solid var(--border-color, #e0e0e0);
+    padding-top: 6px;
+    p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-primary, #333);
+      margin: 0 0 4px;
+    }
+  }
+}
+
+:host-context(body.dark-theme) {
+  .compare-inline-panel {
+    background: rgba(103, 58, 183, 0.05);
+  }
+}
+
 // Tafsir panel
 .tafsir-icon-btn {
   background: none;

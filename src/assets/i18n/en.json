@@ -39,7 +39,10 @@
     "sourceWord": "source",
     "sourcesWord": "sources",
     "unverified": "Unverified",
-    "tafsir": "Commentary (Tafsir)"
+    "tafsir": "Commentary (Tafsir)",
+    "crossReferences": "Cross-References",
+    "compareAll": "Compare all",
+    "hideComparison": "Hide comparison"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",

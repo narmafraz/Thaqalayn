@@ -180,14 +180,44 @@
   padding-top: 16px;
   border-top: 1px solid var(--border-color, #e0e0e0);
 
-  .relation-group {
+  .relations-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 8px;
 
     h3 {
       font-size: 14px;
       font-weight: 500;
       color: var(--text-secondary, #666);
-      margin-bottom: 4px;
+      margin: 0;
+    }
+
+    .compare-all-btn {
+      font-size: 12px;
+      padding: 2px 8px;
+      min-height: 28px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .relation-group {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .relation-type {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary, #666);
     }
 
     .relation-links {
@@ -196,9 +226,106 @@
       gap: 8px;
     }
 
+    .relation-link-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
     .relation-link {
       display: inline-block;
     }
+
+    .compare-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: var(--link-color, #673ab7);
+      opacity: 0.5;
+
+      &:hover { opacity: 1; }
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  .compare-panels {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .compare-panel {
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    padding: 12px 16px;
+    background: var(--compare-bg, #f9f9ff);
+
+    .compare-panel-header {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .compare-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--link-color, #673ab7);
+      text-decoration: none;
+
+      &:hover { text-decoration: underline; }
+    }
+
+    .compare-path {
+      font-size: 11px;
+      color: var(--text-secondary, #999);
+      font-family: monospace;
+    }
+
+    .compare-loading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+    }
+
+    .compare-error {
+      color: #c62828;
+      font-size: 13px;
+    }
+
+    .compare-arabic {
+      font-size: 1.2em;
+      line-height: 2;
+      font-family: 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif;
+      margin: 0 0 8px;
+    }
+
+    .compare-translation {
+      border-top: 1px solid var(--border-color, #e0e0e0);
+      padding-top: 8px;
+
+      p {
+        font-size: 14px;
+        line-height: 1.7;
+        color: var(--text-primary, #333);
+        margin: 0 0 4px;
+      }
+    }
+  }
+}
+
+:host-context(body.dark-theme) {
+  .compare-panel {
+    background: rgba(103, 58, 183, 0.05);
   }
 }
 

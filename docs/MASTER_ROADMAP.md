@@ -302,14 +302,14 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | Kamil al-Ziyarat | Ibn Qulawayh | ThaqalaynAPI | Low |
 | [x] | Others (15+ books) | Various | ThaqalaynAPI | Low |
 
-### 5.3 Angular 19 Upgrade
+### 5.3 Angular 19 Upgrade (COMPLETE)
 
-| Task | Description | Effort |
-|------|-------------|--------|
-| Angular 19 upgrade | Standalone components, improved signals, hydration support. | High |
-| NgModule → standalone migration | Simplifies module tree, enables better tree-shaking. | High |
-| Resolve remaining npm vulnerabilities | Angular 19.2.16+ fixes XSS and XSRF advisories. | Medium |
-| Remove `--openssl-legacy-provider` | Should be resolved with updated webpack/Angular build. | Low |
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [x] | Angular 19 upgrade | Upgraded to Angular 19.2.18 with NGXS 19. Standalone components, improved signals, hydration support. | High |
+| [x] | NgModule → standalone migration | Simplified module tree with lazy-loaded PeopleModule and StaticPagesModule. | High |
+| [x] | Resolve remaining npm vulnerabilities | Reduced from 93→67 vulnerabilities. Angular 19.2.18 fixes XSS and XSRF advisories. Remaining are transitive/dev-only. | Medium |
+| [x] | Remove `--openssl-legacy-provider` | Removed from `package.json` start script. No longer needed with Angular 19 build tooling. | Low |
 
 ### 5.5 Generator Quality
 
@@ -515,6 +515,8 @@ Documented decisions and notable bug fixes applied during development.
 | **Search tips ALL CAPS** | 6 | Search tips panel inherited `text-transform: uppercase` from parent `.bannerTop` CSS. Fixed by adding `text-transform: none` to `.search-tips-panel`. |
 | **Single-threaded data server** | 6 | Local dev data server (`serve.py`) used single-threaded `HTTPServer`, causing hangs when Angular sent concurrent API requests. Fixed by adding `ThreadingMixIn` for parallel request handling. |
 | **Cross-reference linker propagation** | 5 | The cross-reference linker only updated complete aggregation files but not the modular verse_list/verse_detail files that the Angular app serves. Added `_propagate_to_modular_files()` to patch 79,814 modular files with relations and HTML-linked translations after cross-referencing. |
+| **Cross-reference link format** | 5 | Quran reference links in translations used old hash routing format (`/#/books/quran:S#hV`). Fixed to use path routing format (`/books/quran:S#hV`) matching the app's current routing configuration. |
+| **PeopleState NGXS selector guards** | 5 | PeopleState selectors (`getNarratorByIndex`, `getNarratorIndex`, etc.) lacked null guards for when state modules aren't registered in tests. Added optional chaining and null checks to all 5 selectors. |
 
 ### Deferred Decisions
 

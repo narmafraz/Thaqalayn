@@ -9,7 +9,7 @@ test.describe('No Console Errors', () => {
       }
     });
 
-    await page.goto('/books?lang=en');
+    await page.goto('/#/books?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -24,7 +24,7 @@ test.describe('No Console Errors', () => {
       }
     });
 
-    await page.goto('/books/quran:1?lang=en');
+    await page.goto('/#/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -39,7 +39,7 @@ test.describe('No Console Errors', () => {
       }
     });
 
-    await page.goto('/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -54,7 +54,7 @@ test.describe('No Console Errors', () => {
       }
     });
 
-    await page.goto('/people/narrators/index?lang=en');
+    await page.goto('/#/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -69,7 +69,7 @@ test.describe('No Console Errors', () => {
       }
     });
 
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/#/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 

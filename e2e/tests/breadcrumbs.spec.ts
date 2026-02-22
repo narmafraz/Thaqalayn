@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Breadcrumb Navigation', () => {
   test('should show Home breadcrumb on all pages', async ({ page }) => {
-    await page.goto('/books?lang=en');
+    await page.goto('/#/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     const homeLink = page.locator('.crumb-holder a[routerLink="/"]');
@@ -10,7 +10,7 @@ test.describe('Breadcrumb Navigation', () => {
   });
 
   test('should build breadcrumbs when navigating into a book', async ({ page }) => {
-    await page.goto('/books/al-kafi?lang=en');
+    await page.goto('/#/books/al-kafi?lang=en');
     await page.waitForLoadState('networkidle');
 
     const crumbHolder = page.locator('.crumb-holder');
@@ -19,7 +19,7 @@ test.describe('Breadcrumb Navigation', () => {
   });
 
   test('should show full breadcrumb trail for deep navigation', async ({ page }) => {
-    await page.goto('/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const crumbHolder = page.locator('.crumb-holder');
@@ -33,7 +33,7 @@ test.describe('Breadcrumb Navigation', () => {
   });
 
   test('should navigate back when clicking a breadcrumb', async ({ page }) => {
-    await page.goto('/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click the Home breadcrumb
@@ -48,7 +48,7 @@ test.describe('Breadcrumb Navigation', () => {
   });
 
   test('should show breadcrumbs for Al-Kafi chapter pages', async ({ page }) => {
-    await page.goto('/books/al-kafi:1:2:1?lang=en');
+    await page.goto('/#/books/al-kafi:1:2:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const crumbHolder = page.locator('.crumb-holder');

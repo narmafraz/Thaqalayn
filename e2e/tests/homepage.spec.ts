@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Homepage', () => {
   test('should load and display the book list', async ({ page }) => {
-    await page.goto('/books?lang=en');
+    await page.goto('/#/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Header with app title should be visible
@@ -27,7 +27,7 @@ test.describe('Homepage', () => {
   });
 
   test('should display Arabic titles alongside English titles', async ({ page }) => {
-    await page.goto('/books?lang=en');
+    await page.goto('/#/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     const table = page.locator('table.full-width-table');
@@ -38,7 +38,7 @@ test.describe('Homepage', () => {
   });
 
   test('should display footer navigation links', async ({ page }) => {
-    await page.goto('/books?lang=en');
+    await page.goto('/#/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     const footer = page.locator('#footer');

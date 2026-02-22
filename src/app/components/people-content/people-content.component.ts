@@ -96,7 +96,7 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
 
     // Handle narrator data loading and processing
     this.narrator$.pipe(
-      filter(narrator => !!narrator),
+      filter(narrator => !!narrator && !!narrator.subchains),
       map(narrator => {
         // Pre-process and memoize subchains data
         return Object.entries(narrator.subchains)
@@ -124,7 +124,7 @@ export class PeopleContentComponent implements OnInit, AfterViewInit {
 
     // Handle verse paths
     this.narrator$.subscribe(narrator => {
-      if (narrator) {
+      if (narrator?.verse_paths) {
         this.versePathsDataSource.data = this.sortBy(narrator.verse_paths).map(path => ({ path }));
       }
     });

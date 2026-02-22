@@ -5,7 +5,7 @@
 <ng-template #narratorContent>
   <div class="container" *ngIf="narrator$ | async as narrator">
     <div class="titles">
-      <h1 class="arabic" lang="ar">{{narrator.titles.ar}}</h1>
+      <h1 class="arabic" lang="ar">{{narrator.titles?.ar}}</h1>
       <p class="transliteration" *ngIf="narrator.biography?.english_transliteration">
         {{ narrator.biography.english_transliteration }}
       </p>

@@ -73,9 +73,13 @@ export class RouterState {
 
   @Action(RouterNavigation)
   bookPartIndexChanged(context: StateContext<RouterStateModel>, action: RouterNavigation) {
-    const firstChild = action.routerState.root.firstChild;
-    if (!firstChild) { return; }
-    const routerIndex = firstChild.paramMap.get('index');
+    let child = action.routerState.root.firstChild;
+    let routerIndex: string = null;
+    while (child) {
+      const idx = child.paramMap.get('index');
+      if (idx) { routerIndex = idx; }
+      child = child.firstChild;
+    }
     const storeIndex = context.getState().index;
     if (routerIndex !== storeIndex) {
       context.patchState({index: routerIndex});

@@ -4,7 +4,7 @@ test.describe('Verse Detail Pages', () => {
 
   test.describe('Deep Linking', () => {
     test('should load Al-Kafi hadith detail page directly', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
 
       // Should render the verse detail component (hadith card)
@@ -13,7 +13,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should load Quran verse detail page directly', async ({ page }) => {
-      await page.goto('/books/quran:1:1?lang=en');
+      await page.goto('/#/books/quran:1:1?lang=en');
       await page.waitForLoadState('networkidle');
 
       // Should render content (either verse detail or chapter content)
@@ -24,7 +24,7 @@ test.describe('Verse Detail Pages', () => {
 
   test.describe('Content Rendering', () => {
     test('should display Arabic text on hadith detail page', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -34,7 +34,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should have lang="ar" on Arabic text sections', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -44,7 +44,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should display hadith title with part type and index', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -56,7 +56,7 @@ test.describe('Verse Detail Pages', () => {
 
   test.describe('Chapter Link Icons', () => {
     test('should have detail link icons in Al-Kafi chapter view', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -67,7 +67,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should have detail link icons in Quran surah view', async ({ page }) => {
-      await page.goto('/books/quran:1?lang=en');
+      await page.goto('/#/books/quran:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -77,7 +77,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should have accessible labels on detail link icons', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -92,7 +92,7 @@ test.describe('Verse Detail Pages', () => {
 
   test.describe('Navigation', () => {
     test('should have chapter context link back to chapter', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -104,7 +104,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should have share button', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -116,7 +116,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should have view in chapter link', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -130,7 +130,7 @@ test.describe('Verse Detail Pages', () => {
 
   test.describe('SEO', () => {
     test('should have descriptive page title for hadith detail', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -142,7 +142,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should have meta description', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -152,7 +152,7 @@ test.describe('Verse Detail Pages', () => {
     });
 
     test('should have canonical URL', async ({ page }) => {
-      await page.goto('/books/al-kafi:1:1:1:1?lang=en');
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 

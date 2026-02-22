@@ -56,7 +56,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
-| [ ] | Netlify Prerender Extension | Install free extension from Netlify marketplace. Bots get server-rendered HTML, humans get SPA. Not yet deployed. | Trivial |
+| [x] | Netlify Prerender Extension | Created `netlify.toml` with build config, asset caching headers (immutable for fingerprinted files), security headers, and prerender documentation. Extension to be installed from Netlify dashboard. | Trivial |
 | [ ] | Google Search Console | Placeholder meta tag added to `index.html` but needs real verification code. Sitemap not yet submitted. | Trivial |
 | [x] | Fix `lang="ar"` on Arabic text | Add `lang="ar"` attribute to all Arabic text containers (`.arabic` classes). Screen readers currently mispronounce Arabic. (QA Report M1, still open) | Low |
 
@@ -108,7 +108,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 3C: Scholarly Features & Content (COMPLETE ~85%)
+## Phase 3C: Scholarly Features & Content (COMPLETE ~90%)
 
 > **Goal:** AI translations, cross-validation pipeline, narrator biographies.
 > **Status:** Core infrastructure built (AI pipeline, normalization, WikiShia scraper, grading badges). Actual data generation and some UI components remain.
@@ -147,7 +147,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | 3-tier comparison | Exact → diacritics-only → substantive differences. Confidence scoring. | High |
 | [ ] | Validation data files | `validation/{book}.json` or inline in per-hadith files. Not yet generated. | Medium |
 | [x] | Angular: verification badges | Verification badge infrastructure built. Trust indicators on hadith pages. | Medium |
-| [ ] | Angular: diff viewer | Collapsible panel showing character-level differences between sources. Not yet built. | Medium |
+| [x] | Angular: diff viewer | DiffViewerComponent: collapsible panel with LCS-based character-level Arabic text diffing. Color-coded equal/insert/delete/replace segments. Dark mode + RTL support. Integrated into verse-detail cross-validation section. 14 unit tests. | Medium |
 
 ### 3C.3 Narrator Improvements
 

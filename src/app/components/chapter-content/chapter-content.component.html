@@ -41,11 +41,25 @@
                     [attr.aria-label]="(audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'Pause' : 'Play') + ' audio'">
               <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
             </button>
+            <button *ngIf="isQuranBook(book.index)"
+                    class="tafsir-icon-btn"
+                    (click)="toggleTafsir(book.index, verse.local_index)"
+                    [attr.aria-label]="expandedTafsir.has(verse.local_index) ? 'Hide commentary' : 'Show commentary'">
+              <mat-icon>{{ expandedTafsir.has(verse.local_index) ? 'menu_book' : 'auto_stories' }}</mat-icon>
+            </button>
           </div>
           <div>{{ 'book.reference' | translate }}</div>
           <div>{{getBookName(crumbs)}} {{verse.index}}</div>
           <div>{{ 'book.inBookReference' | translate }}</div>
           <div>{{getInBookReference(crumbs, verse)}}</div>
+          <div class="grading-inline" *ngIf="verse.gradings?.length">
+            <ng-container *ngFor="let g of verse.gradings">
+              <span [class]="'grading-chip ' + parseGrading(g).cssClass"
+                    [matTooltip]="g">
+                {{ parseGrading(g).term || '?' }}
+              </span>
+            </ng-container>
+          </div>
           <div class="related">
             <ng-container *ngIf="verse.relations as relations">
               <div *ngFor="let relation of relations | keyvalue" class="perRel">
@@ -81,6 +95,26 @@
             <mat-icon>delete</mat-icon> {{ 'annotation.delete' | translate }}
           </button>
         </div>
+      </div>
+
+      <!-- Tafsir (Quran commentary) -->
+      <div class="tafsir-panel" *ngIf="expandedTafsir.has(verse.local_index)">
+        <div class="tafsir-header">
+          <mat-icon class="tafsir-icon">auto_stories</mat-icon>
+          <span class="tafsir-label">{{ 'book.tafsir' | translate }}</span>
+          <select class="tafsir-select"
+                  [(ngModel)]="selectedTafsirEdition"
+                  (change)="onTafsirEditionChange(book.index)"
+                  aria-label="Select tafsir edition">
+            <option *ngFor="let ed of tafsirEditions" [value]="ed.slug">{{ ed.name }}</option>
+          </select>
+        </div>
+        <div class="tafsir-loading" *ngIf="loadingTafsir.has(verse.local_index)">
+          <mat-spinner diameter="20"></mat-spinner>
+          Loading commentary...
+        </div>
+        <p class="tafsir-text" *ngIf="!loadingTafsir.has(verse.local_index)"
+           [innerHTML]="expandedTafsir.get(verse.local_index)"></p>
       </div>
     </mat-card>
   </ng-container>

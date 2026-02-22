@@ -41,16 +41,28 @@
              [innerHTML]="trt"></p>
         </div>
 
-        <!-- Gradings -->
-        <div class="gradings-section" *ngIf="book.data.gradings">
+        <!-- Gradings (from verse or detail-level data) -->
+        <div class="gradings-section" *ngIf="book.data.verse?.gradings?.length || book.data.gradings">
           <h3>{{ 'book.grading' | translate }}</h3>
           <div class="grading-badges">
-            <span *ngFor="let grading of book.data.gradings | keyvalue"
-                  [class]="'grading-badge ' + getGradingClass(grading.value)"
-                  [matTooltip]="grading.key">
-              {{ grading.value }}
-              <span class="grading-scholar">({{ grading.key }})</span>
-            </span>
+            <!-- Array format (verse-level gradings) -->
+            <ng-container *ngIf="book.data.verse?.gradings?.length">
+              <span *ngFor="let g of book.data.verse.gradings"
+                    [class]="'grading-badge ' + getGradingClass(parseGradingTerm(g))"
+                    [matTooltip]="g">
+                {{ parseGradingTerm(g) }}
+                <span class="grading-scholar">({{ parseGradingScholar(g) }})</span>
+              </span>
+            </ng-container>
+            <!-- Dict format (detail-level gradings) -->
+            <ng-container *ngIf="!book.data.verse?.gradings?.length && book.data.gradings">
+              <span *ngFor="let grading of book.data.gradings | keyvalue"
+                    [class]="'grading-badge ' + getGradingClass(grading.value)"
+                    [matTooltip]="grading.key">
+                {{ grading.value }}
+                <span class="grading-scholar">({{ grading.key }})</span>
+              </span>
+            </ng-container>
           </div>
         </div>
 

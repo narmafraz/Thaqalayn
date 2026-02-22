@@ -226,3 +226,146 @@ mat-mdc-card {
     background: rgba(255, 193, 7, 0.1);
   }
 }
+
+// Inline grading badges
+.grading-inline {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.grading-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: default;
+}
+
+.grading-sahih {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.grading-hasan {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+.grading-daif {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.grading-mutabar {
+  background-color: #e0f2f1;
+  color: #00695c;
+}
+
+.grading-muwathaq {
+  background-color: #ede7f6;
+  color: #4527a0;
+}
+
+.grading-majhul {
+  background-color: #fce4ec;
+  color: #c62828;
+}
+
+.grading-unknown {
+  background-color: var(--table-stripe, #f5f5f5);
+  color: var(--text-secondary, #616161);
+}
+
+:host-context(body.dark-theme) {
+  .grading-sahih { background-color: rgba(46, 125, 50, 0.2); }
+  .grading-hasan { background-color: rgba(21, 101, 192, 0.2); }
+  .grading-daif { background-color: rgba(230, 81, 0, 0.2); }
+  .grading-mutabar { background-color: rgba(0, 105, 92, 0.2); }
+  .grading-muwathaq { background-color: rgba(69, 39, 160, 0.2); }
+  .grading-majhul { background-color: rgba(198, 40, 40, 0.2); }
+  .grading-unknown { background-color: rgba(255, 255, 255, 0.08); }
+}
+
+// Tafsir panel
+.tafsir-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: #00695c;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.tafsir-panel {
+  padding: 12px 16px;
+  margin: 0 16px 16px;
+  background: var(--tafsir-bg, #f1f8e9);
+  border-radius: 8px;
+  border-left: 3px solid #558b2f;
+
+  .tafsir-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .tafsir-icon {
+    color: #558b2f;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .tafsir-label {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-primary, #333);
+  }
+
+  .tafsir-select {
+    margin-left: auto;
+    padding: 4px 8px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    font-size: 12px;
+    background: var(--card-bg, #fff);
+    color: var(--text-primary, #333);
+    cursor: pointer;
+  }
+
+  .tafsir-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary, #666);
+  }
+
+  .tafsir-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-primary, #333);
+  }
+}
+
+:host-context(body.dark-theme) {
+  .tafsir-panel {
+    background: rgba(85, 139, 47, 0.1);
+  }
+}

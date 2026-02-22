@@ -1,8 +1,10 @@
 import { ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ChapterContent, Crumb, Verse } from '@app/models';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
+import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RouterState } from '@store/router/router.state';
@@ -30,13 +32,28 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   audioState$ = this.audioService.state$;
 
+  // Tafsir state
+  tafsirEditions: TafsirEdition[] = [];
+  selectedTafsirEdition = 'en-tafisr-ibn-kathir';
+  expandedTafsir = new Map<number, string>();
+  loadingTafsir = new Set<number>();
+
+  // Touch swipe state
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private currentNav: { prev: string | null; next: string | null } = { prev: null, next: null };
+
   constructor(
     private store: Store,
     private viewportScroller: ViewportScroller,
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
     public audioService: AudioService,
+    private tafsirService: TafsirService,
+    private router: Router,
+    private el: ElementRef,
   ) {
+    this.tafsirEditions = this.tafsirService.editions;
     this.fragment$.subscribe(fragment => {
       setTimeout(() => {
           this.viewportScroller.scrollToAnchor(fragment);
@@ -50,15 +67,55 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       // Track reading progress
       const title = book.data.titles?.en || book.index;
       this.bookmarkService.updateReadingProgress('/books/' + book.index, title);
+      // Cache nav for swipe
+      this.currentNav = {
+        prev: book.data.nav?.prev || null,
+        next: book.data.nav?.next || null,
+      };
       // Load bookmark and annotation states for all verses
       this.loadBookmarkStates(book);
       this.loadAnnotationStates(book);
     });
+
+    // Touch swipe navigation
+    const host = this.el.nativeElement;
+    host.addEventListener('touchstart', this.onTouchStart, { passive: true });
+    host.addEventListener('touchend', this.onTouchEnd, { passive: true });
   }
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    const host = this.el.nativeElement;
+    host.removeEventListener('touchstart', this.onTouchStart);
+    host.removeEventListener('touchend', this.onTouchEnd);
   }
+
+  private onTouchStart = (e: TouchEvent): void => {
+    this.touchStartX = e.changedTouches[0].screenX;
+    this.touchStartY = e.changedTouches[0].screenY;
+  };
+
+  private onTouchEnd = (e: TouchEvent): void => {
+    const dx = e.changedTouches[0].screenX - this.touchStartX;
+    const dy = e.changedTouches[0].screenY - this.touchStartY;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
+
+    // Only trigger on horizontal swipes (>80px) that are more horizontal than vertical
+    if (absDx < 80 || absDy > absDx * 0.6) return;
+
+    if (dx > 0 && this.currentNav.prev) {
+      // Swipe right → previous chapter
+      this.router.navigate(['/books', this.currentNav.prev.replace('/books/', '')], {
+        queryParamsHandling: 'preserve',
+      });
+    } else if (dx < 0 && this.currentNav.next) {
+      // Swipe left → next chapter
+      this.router.navigate(['/books', this.currentNav.next.replace('/books/', '')], {
+        queryParamsHandling: 'preserve',
+      });
+    }
+  };
 
   getInBookReference(crumbs: Crumb[], verse: Verse): string {
     let result = '';
@@ -113,6 +170,43 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     }
   }
 
+  toggleTafsir(bookIndex: string, ayah: number): void {
+    if (this.expandedTafsir.has(ayah)) {
+      this.expandedTafsir.delete(ayah);
+      this.cdr.markForCheck();
+      return;
+    }
+    const surah = this.getQuranSurah(bookIndex);
+    if (surah <= 0) return;
+
+    this.loadingTafsir.add(ayah);
+    this.cdr.markForCheck();
+
+    this.tafsirService.getAyahTafsir(surah, ayah, this.selectedTafsirEdition)
+      .subscribe(text => {
+        this.loadingTafsir.delete(ayah);
+        this.expandedTafsir.set(ayah, text || 'No tafsir available for this verse.');
+        this.cdr.markForCheck();
+      });
+  }
+
+  onTafsirEditionChange(bookIndex: string): void {
+    // Reload all currently expanded tafsirs with the new edition
+    const surah = this.getQuranSurah(bookIndex);
+    if (surah <= 0) return;
+    const ayahs = Array.from(this.expandedTafsir.keys());
+    ayahs.forEach(ayah => {
+      this.loadingTafsir.add(ayah);
+      this.tafsirService.getAyahTafsir(surah, ayah, this.selectedTafsirEdition)
+        .subscribe(text => {
+          this.loadingTafsir.delete(ayah);
+          this.expandedTafsir.set(ayah, text || 'No tafsir available for this verse.');
+          this.cdr.markForCheck();
+        });
+    });
+    this.cdr.markForCheck();
+  }
+
   getVersePath(bookIndex: string, verse: Verse): string {
     return '/books/' + bookIndex + ':' + verse.local_index;
   }
@@ -160,6 +254,26 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     this.editingNotePath = null;
     this.editingNoteText = '';
     this.cdr.markForCheck();
+  }
+
+  parseGrading(raw: string): { scholar: string; term: string; cssClass: string } {
+    // Format: "Scholar Name: <span>Arabic term</span> - Source Reference"
+    const match = raw.match(/^(.+?):\s*<span>\s*(.+?)\s*<\/span>/);
+    if (!match) return { scholar: raw, term: '', cssClass: 'grading-unknown' };
+    const scholar = match[1].trim();
+    const term = match[2].trim();
+    return { scholar, term, cssClass: this.getGradingClass(term) };
+  }
+
+  getGradingClass(term: string): string {
+    const lower = term.toLowerCase();
+    if (lower.includes('صحيح') || lower.includes('sahih')) return 'grading-sahih';
+    if (lower.includes('حسن') || lower.includes('hasan')) return 'grading-hasan';
+    if (lower.includes('ضعيف') || lower.includes("da'if") || lower.includes('daif')) return 'grading-daif';
+    if (lower.includes('معتبر') || lower.includes("mu'tabar") || lower.includes('muatabar')) return 'grading-mutabar';
+    if (lower.includes('مجهول') || lower.includes('majhul')) return 'grading-majhul';
+    if (lower.includes('موثق') || lower.includes('muwathaq')) return 'grading-muwathaq';
+    return 'grading-unknown';
   }
 
   private async loadAnnotationStates(book: ChapterContent): Promise<void> {

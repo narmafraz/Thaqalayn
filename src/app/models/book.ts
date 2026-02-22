@@ -39,6 +39,7 @@ export interface Verse {
   part_type: string;
   relations: Record<string, string[]>;
   narrator_chain: NarratorChain;
+  gradings?: string[];
 }
 
 export interface Chapter {

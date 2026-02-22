@@ -60,13 +60,25 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
   }
 
-  getGradingClass(grading: string): string {
-    const lower = grading.toLowerCase();
-    if (lower === 'sahih' || lower === 'صحيح') return 'grading-sahih';
-    if (lower === 'hasan' || lower === 'حسن') return 'grading-hasan';
-    if (lower === "da'if" || lower === 'ضعيف' || lower === 'daif') return 'grading-daif';
-    if (lower === "mu'tabar" || lower === 'معتبر' || lower === 'muatabar') return 'grading-mutabar';
+  getGradingClass(term: string): string {
+    const lower = term.toLowerCase();
+    if (lower.includes('صحيح') || lower.includes('sahih')) return 'grading-sahih';
+    if (lower.includes('حسن') || lower.includes('hasan')) return 'grading-hasan';
+    if (lower.includes('ضعيف') || lower.includes("da'if") || lower.includes('daif')) return 'grading-daif';
+    if (lower.includes('معتبر') || lower.includes("mu'tabar") || lower.includes('muatabar')) return 'grading-mutabar';
+    if (lower.includes('مجهول') || lower.includes('majhul')) return 'grading-majhul';
+    if (lower.includes('موثق') || lower.includes('muwathaq')) return 'grading-muwathaq';
     return 'grading-unknown';
+  }
+
+  parseGradingTerm(raw: string): string {
+    const match = raw.match(/<span>\s*(.+?)\s*<\/span>/);
+    return match ? match[1] : raw;
+  }
+
+  parseGradingScholar(raw: string): string {
+    const match = raw.match(/^(.+?):/);
+    return match ? match[1].trim() : '';
   }
 
   getChapterRouterLink(chapterPath: string): string {

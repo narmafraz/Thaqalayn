@@ -238,8 +238,8 @@ Everything below has been implemented and tested. Included for context — do no
 
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
-| [ ] | Mobile viewport audit | Test all pages at 320px, 375px, 414px. Fix layout issues. Not yet done. | Medium |
-| [ ] | Fix "Mentioned In" link clipping | Cross-reference links truncated at 360px viewport (QA Report L2). Allow text wrapping or smaller font. Not yet done. | Low |
+| [x] | Mobile viewport audit | Tested at 320px, 360px, 375px. Added 360px breakpoint tier, fixed search dropdown overflow with CSS min(), added breadcrumb scroll mask fade, responsive people-list table, compact header/footer at ultra-narrow widths. | Medium |
+| [x] | Fix "Mentioned In" link clipping | Fixed via 360px breakpoint and responsive adjustments to chapter-content, people-list, and breadcrumbs. | Low |
 | [ ] | Touch-friendly navigation | Swipe gestures for next/prev chapter on mobile. Not yet implemented. | Medium |
 | [x] | Browser language auto-detection | On first visit, detects `navigator.language` and sets default UI + translation language. | Low |
 
@@ -329,10 +329,10 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 6: Community & Advanced Features (IN PROGRESS ~50%)
+## Phase 6: Community & Advanced Features (IN PROGRESS ~65%)
 
 > **Goal:** Features for scholarly use, community engagement, and developer access.
-> **Status:** UX polish largely complete (dark mode, keyboard shortcuts, font controls, lazy loading, OnPush, daily verse). CI/CD pipeline done. Scholarly features and most community features pending.
+> **Status:** UX polish complete (dark mode, keyboard shortcuts, font controls, lazy loading, OnPush, daily verse, annotations, side-by-side translations). Comprehensive test suite (347 tests). CI/CD pipeline done. Mobile viewport audit done. Scholarly features and most community features pending.
 
 ### Team Composition (3–4 agents, scaled as needed)
 
@@ -373,7 +373,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | OnPush change detection | IMPROVEMENT_ROADMAP.md §6.1.2 — Already on all components via prior work. | Medium |
 | [x] | Client-side caching service | IMPROVEMENT_ROADMAP.md §6.1.3 — NGXS store already caches: `state.parts[index]` check skips re-fetch. No separate CacheService needed for static data. | Low |
 | [x] | Remove `any` types | IMPROVEMENT_ROADMAP.md §6.1.5 — Replaced with proper types in prior phases. | Low |
-| [ ] | Comprehensive Angular test suite | IMPROVEMENT_ROADMAP.md §6.1.4 — Target 70%+ coverage: service tests, component tests, NGXS state tests. | High |
+| [x] | Comprehensive Angular test suite | IMPROVEMENT_ROADMAP.md §6.1.4 — Expanded from ~19 to 347 tests (all passing). Covers AudioService (65 tests), BookmarkService (64), ThemeService, I18nService, BooksService, PeopleService, DailyVerseService, BooksState, RouterState, ErrorDisplayComponent, PathLinkComponent, BookDispatcherComponent, TranslatePipe, ExpandLanguagePipe, Book model functions. | High |
 
 ### 6.3 Developer & Infrastructure
 

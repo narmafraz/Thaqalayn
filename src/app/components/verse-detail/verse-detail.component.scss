@@ -139,6 +139,16 @@
     background-color: var(--table-stripe, #f5f5f5);
     color: var(--text-secondary, #616161);
   }
+
+  .grading-muwathaq {
+    background-color: #ede7f6;
+    color: #4527a0;
+  }
+
+  .grading-majhul {
+    background-color: #fce4ec;
+    color: #c62828;
+  }
 }
 
 :host-context(body.dark-theme) {
@@ -153,6 +163,12 @@
   }
   .grading-mutabar {
     background-color: rgba(0, 105, 92, 0.2);
+  }
+  .grading-muwathaq {
+    background-color: rgba(69, 39, 160, 0.2);
+  }
+  .grading-majhul {
+    background-color: rgba(198, 40, 40, 0.2);
   }
   .grading-unknown {
     background-color: rgba(255, 255, 255, 0.08);

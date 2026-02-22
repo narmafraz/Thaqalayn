@@ -1,0 +1,40 @@
+<div class="diff-viewer" *ngIf="diffs && diffs.length > 0">
+  <button class="diff-toggle" (click)="toggle()" [attr.aria-expanded]="!collapsed">
+    <mat-icon>{{ collapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+    <span>{{ 'book.showDifferences' | translate }}</span>
+    <span class="diff-count">({{ diffs.length }})</span>
+  </button>
+
+  <div class="diff-panels" *ngIf="!collapsed">
+    <div class="diff-panel" *ngFor="let diff of diffs">
+      <div class="diff-header">
+        <span class="diff-label diff-label-a">{{ diff.label_a }}</span>
+        <mat-icon>compare_arrows</mat-icon>
+        <span class="diff-label diff-label-b">{{ diff.label_b }}</span>
+      </div>
+
+      <div class="diff-content" dir="rtl" lang="ar">
+        <div class="diff-line diff-line-a">
+          <span class="diff-line-label">{{ diff.label_a }}</span>
+          <span class="diff-text">
+            <ng-container *ngFor="let seg of diff.segments">
+              <span *ngIf="seg.type === 'equal'" class="seg-equal">{{ seg.text }}</span>
+              <span *ngIf="seg.type === 'delete'" class="seg-delete">{{ seg.text_a }}</span>
+              <span *ngIf="seg.type === 'replace'" class="seg-replace-a">{{ seg.text_a }}</span>
+            </ng-container>
+          </span>
+        </div>
+        <div class="diff-line diff-line-b">
+          <span class="diff-line-label">{{ diff.label_b }}</span>
+          <span class="diff-text">
+            <ng-container *ngFor="let seg of diff.segments">
+              <span *ngIf="seg.type === 'equal'" class="seg-equal">{{ seg.text }}</span>
+              <span *ngIf="seg.type === 'insert'" class="seg-insert">{{ seg.text_b }}</span>
+              <span *ngIf="seg.type === 'replace'" class="seg-replace-b">{{ seg.text_b }}</span>
+            </ng-container>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

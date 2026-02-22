@@ -80,6 +80,21 @@ export interface VerseContent {
   data: Verse;
 }
 
+export interface TextDiff {
+  source_a: string;
+  source_b: string;
+  label_a: string;
+  label_b: string;
+  segments: DiffSegment[];
+}
+
+export interface DiffSegment {
+  type: 'equal' | 'insert' | 'delete' | 'replace';
+  text_a?: string;
+  text_b?: string;
+  text?: string;
+}
+
 export interface VerseDetailData {
   verse: Verse;
   chapter_path: string;
@@ -91,6 +106,7 @@ export interface VerseDetailData {
     status: string;
     confidence: number;
     sources: string[];
+    diffs?: TextDiff[];
   };
   scholarly_notes?: string[];
 }

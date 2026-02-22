@@ -27,6 +27,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
 import { SearchBarComponent } from './components/search-bar/search-bar.component';
 import { EmbedVerseComponent } from './components/embed-verse/embed-verse.component';
+import { DiffViewerComponent } from './components/diff-viewer/diff-viewer.component';
 import { ErrorInterceptor } from './services/error.interceptor';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -45,6 +46,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     InstallPromptComponent,
     SearchBarComponent,
     EmbedVerseComponent,
+    DiffViewerComponent,
   ],
   bootstrap: [AppComponent],
   imports: [

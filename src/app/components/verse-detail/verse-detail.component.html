@@ -127,6 +127,7 @@
             <span *ngIf="cv.status === 'verified'">{{ 'book.verifiedFrom' | translate }} {{ cv.sources.length }} {{ cv.sources.length > 1 ? ('book.sourcesWord' | translate) : ('book.sourceWord' | translate) }}</span>
             <span *ngIf="cv.status !== 'verified'">{{ 'book.unverified' | translate }}</span>
           </div>
+          <app-diff-viewer *ngIf="cv.diffs && cv.diffs.length > 0" [diffs]="cv.diffs"></app-diff-viewer>
         </div>
 
         <!-- Source URL -->

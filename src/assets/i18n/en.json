@@ -44,7 +44,9 @@
     "crossReferences": "Cross-References",
     "compareAll": "Compare all",
     "hideComparison": "Hide comparison",
-    "shareImage": "Share as image"
+    "shareImage": "Share as image",
+    "showDifferences": "Show text differences",
+    "hideDifferences": "Hide differences"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",

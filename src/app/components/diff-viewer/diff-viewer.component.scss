@@ -1,0 +1,191 @@
+.diff-viewer {
+  margin-top: 12px;
+}
+
+.diff-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: var(--bg-hover, rgba(0, 0, 0, 0.04));
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .diff-count {
+    color: var(--text-tertiary, #999);
+    font-size: 12px;
+  }
+}
+
+.diff-panels {
+  margin-top: 8px;
+}
+
+.diff-panel {
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.diff-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--bg-secondary, #f5f5f5);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  font-size: 12px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--text-tertiary, #999);
+  }
+}
+
+.diff-label {
+  font-weight: 500;
+}
+
+.diff-label-a {
+  color: #c62828;
+}
+
+.diff-label-b {
+  color: #1565c0;
+}
+
+.diff-content {
+  padding: 12px;
+  font-family: "Traditional Arabic", "Scheherazade", serif;
+  font-size: 1.2rem;
+  line-height: 2;
+}
+
+.diff-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px dashed var(--border-color, #e0e0e0);
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+.diff-line-label {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-family: "Roboto", sans-serif;
+  color: var(--text-tertiary, #999);
+  padding-top: 4px;
+  min-width: 40px;
+  text-align: center;
+  direction: ltr;
+}
+
+.diff-text {
+  flex: 1;
+}
+
+// Diff segment coloring
+.seg-equal {
+  color: var(--text-primary, #333);
+}
+
+.seg-delete {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #c62828;
+  text-decoration: line-through;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.seg-insert {
+  background-color: rgba(21, 101, 192, 0.15);
+  color: #1565c0;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.seg-replace-a {
+  background-color: rgba(198, 40, 40, 0.15);
+  color: #c62828;
+  text-decoration: line-through;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.seg-replace-b {
+  background-color: rgba(21, 101, 192, 0.15);
+  color: #1565c0;
+  font-weight: 600;
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+// Dark mode
+:host-context(body.dark-theme) {
+  .diff-toggle {
+    color: var(--text-secondary, #aaa);
+  }
+
+  .diff-header {
+    background: var(--bg-secondary, #1a1a2e);
+  }
+
+  .seg-equal {
+    color: var(--text-primary, #e0e0e0);
+  }
+
+  .seg-delete,
+  .seg-replace-a {
+    background-color: rgba(239, 83, 80, 0.2);
+    color: #ef5350;
+  }
+
+  .seg-insert,
+  .seg-replace-b {
+    background-color: rgba(66, 165, 245, 0.2);
+    color: #42a5f5;
+  }
+
+  .diff-label-a {
+    color: #ef5350;
+  }
+
+  .diff-label-b {
+    color: #42a5f5;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 600px) {
+  .diff-content {
+    font-size: 1rem;
+    padding: 8px;
+  }
+
+  .diff-line-label {
+    min-width: 30px;
+    font-size: 9px;
+  }
+}

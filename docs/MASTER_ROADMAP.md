@@ -356,7 +356,7 @@ Everything below has been implemented and tested. Included for context — do no
 | Status | Task | Source | Effort |
 |--------|------|--------|--------|
 | [x] | Hadith grading system with filtering | IMPROVEMENT_ROADMAP.md §8.2.1 — Inline color-coded grading badges on chapter-content (sahih, hasan, daif, mutabar, majhul, muwathaq). Added `gradings?: string[]` to Verse interface. Parsing handles `Scholar: <span>term</span>` HTML format. Tooltip shows full grading text. | High |
-| [ ] | Thematic tagging & topic index | IMPROVEMENT_ROADMAP.md §8.2.3 | Medium |
+| [x] | Thematic tagging & topic index | IMPROVEMENT_ROADMAP.md §8.2.3 — `/topics` page with categorized card grid. Topics extracted from Al-Kafi book-level chapters, grouped into 6 categories (Theology, Knowledge & Ethics, Worship, Jurisprudence, Daily Life, Family & Life Events). Search filter, bilingual display, direct navigation to chapters. | Medium |
 | [x] | Comparative hadith view (same hadith across collections) | IMPROVEMENT_ROADMAP.md §8.2.4 — Inline expansion of cross-references on both chapter-content and verse-detail. Click expand button to fetch and display the referenced Quran verse or hadith text + translation without navigating away. "Compare all" button on verse-detail loads all relations at once. | Medium |
 | [x] | Tafsir integration (Quran commentary via free API) | FEATURE_PROPOSALS.md §5 — TafsirService using spa5k/tafsir_api CDN. 3 English editions (Ibn Kathir, al-Jalalayn, Maarif-ul-Quran). Expandable tafsir panel with edition selector on Quran verse cards. Cached per-surah with shareReplay. | Medium |
 | [x] | Side-by-side translation view | IMPROVEMENT_ROADMAP.md §5.1.4 — Compare button in translation selector, second dropdown via `?translation2=` query param, grid layout in verse-text, responsive (stacks on mobile). | Medium |
@@ -384,7 +384,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | Data schema validation script | IMPROVEMENT_ROADMAP.md §6.3.3 — `validate_data.py` checks all 7,353 JSON files: wrapper structure, path format, narrator ID consistency, navigation targets, verse counts. 0 errors on full dataset. | Medium |
 | [x] | JSON Schema definitions | IMPROVEMENT_ROADMAP.md §6.4.2 — JSON Schema 2020-12 definitions for response_wrapper, chapter, verse, narrator in `app/schemas/`. | Medium |
 | [x] | Public API documentation | IMPROVEMENT_ROADMAP.md §6.4.1 — `API.md` in ThaqalaynData: endpoints, data models (TypeScript interfaces), path format, translation IDs, cross-references, gradings, CORS. | Medium |
-| [ ] | Versioned API paths | IMPROVEMENT_ROADMAP.md §6.4.3 — Add `/v2/` prefix to API paths for backward-compatible schema evolution. | Low |
+| [x] | Versioned API paths | IMPROVEMENT_ROADMAP.md §6.4.3 — Netlify redirect `/v2/*` → `/:splat` in ThaqalaynData. API docs updated with versioning section. | Low |
 | [x] | Downloadable data packages (JSON, CSV, SQLite) | IMPROVEMENT_ROADMAP.md §8.4.1 — Data Packages section on download page with direct download links for 4 datasets (Al-Kafi, Quran, Narrators, Translations) and CSV export for book data. | Medium |
 | [ ] | REST/GraphQL API layer | IMPROVEMENT_ROADMAP.md §6.4.2 — Thin API via Netlify Functions for queries like "all hadiths by narrator X about topic Y". | High |
 

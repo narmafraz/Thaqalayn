@@ -1,6 +1,6 @@
 # Master Roadmap
 
-> **Last updated:** 2026-02-21
+> **Last updated:** 2026-02-22
 > **Purpose:** Single source of truth for all planned work across the Thaqalayn ecosystem. Consolidates and supersedes individual proposals. Each phase ends with a team evaluation checkpoint.
 >
 > **Source documents consolidated:**
@@ -407,10 +407,11 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 6.6 AI-Assisted Features
 
-| Task | Source | Effort |
-|------|--------|--------|
-| Semantic search (embeddings) | IMPROVEMENT_ROADMAP.md §8.5.1 | High |
-| RAG chatbot for hadith Q&A | IMPROVEMENT_ROADMAP.md §8.5.3 | High |
+| Status | Task | Source | Effort |
+|--------|------|--------|--------|
+| [x] | Full-text search across Quran & Al-Kafi | Extends Phase 4.1 — Titles/Full Text mode toggle in search UI. Full-text mode lazy-loads quran-docs (~2MB) and al-kafi-docs (~19MB) Orama indexes on demand. Searches English translations, Arabic text, and chapter titles. Results show snippets, hadith badges, and book attribution. Fixed title index field mapping and search race condition. | High |
+| [ ] | Semantic search (embeddings) | IMPROVEMENT_ROADMAP.md §8.5.1 | High |
+| [ ] | RAG chatbot for hadith Q&A | IMPROVEMENT_ROADMAP.md §8.5.3 | High |
 
 ### 6.7 Mobile App
 

@@ -123,7 +123,8 @@ export class SearchService {
 
       const bookFiles = meta.schemas.book.files;
 
-      for (const [bookSlug, filename] of Object.entries(bookFiles)) {
+      // Load all book indexes in parallel for faster startup
+      await Promise.all(Object.entries(bookFiles).map(async ([bookSlug, filename]) => {
         const url = `${environment.apiBaseUrl}index/search/${filename}`;
         const data = await this.http.get<FullTextDocument[]>(url).toPromise();
 
@@ -146,7 +147,7 @@ export class SearchService {
 
         const bookName = this.slugToDisplayName(bookSlug);
         this.fullTextDbs.set(bookSlug, { db, bookName });
-      }
+      }));
 
       this.fullTextLoaded = true;
     } catch (err) {
@@ -173,11 +174,14 @@ export class SearchService {
     const isMultiWord = normalizedQuery.trim().split(/\s+/).length > 1;
 
     // Use AND logic (threshold: 0) for multi-word queries, with OR fallback
+    // Boost English titles higher than Arabic, and partType lowest
     let results = await search(this.titlesDb, {
       term: normalizedQuery,
       limit,
       properties: ['en', 'ar', 'arn', 'pt'],
       threshold: isMultiWord ? 0 : 1,
+      tolerance: isMultiWord ? 0 : 1,
+      boost: { en: 2, ar: 1.5, arn: 1.5, pt: 0.5 },
     });
 
     // If AND returned too few results, fall back to OR
@@ -187,6 +191,8 @@ export class SearchService {
         limit,
         properties: ['en', 'ar', 'arn', 'pt'],
         threshold: 1,
+        tolerance: 1,
+        boost: { en: 2, ar: 1.5, arn: 1.5, pt: 0.5 },
       });
     }
 
@@ -215,11 +221,14 @@ export class SearchService {
 
     for (const [, entry] of this.fullTextDbs) {
       // Use AND logic for multi-word queries, with OR fallback
+      // Boost English translations and chapter titles above Arabic
       let results = await search(entry.db, {
         term: normalizedQuery,
         limit: perBookLimit,
         properties: ['ar', 'en', 't'],
         threshold: isMultiWord ? 0 : 1,
+        tolerance: isMultiWord ? 0 : 1,
+        boost: { en: 2, t: 1.5, ar: 1 },
       });
 
       // If AND returned nothing for this book, fall back to OR
@@ -229,6 +238,8 @@ export class SearchService {
           limit: perBookLimit,
           properties: ['ar', 'en', 't'],
           threshold: 1,
+          tolerance: 1,
+          boost: { en: 2, t: 1.5, ar: 1 },
         });
       }
 
@@ -276,11 +287,9 @@ export class SearchService {
   }
 
   private bookNameFromPath(path: string): string {
-    if (path.startsWith('/books/quran')) return 'Quran';
-    if (path.startsWith('/books/al-kafi')) return 'Al-Kafi';
-    // Fallback: extract from path
     const match = path.match(/\/books\/([^:]+)/);
-    return match ? match[1] : '';
+    if (!match) return '';
+    return this.slugToDisplayName(match[1]);
   }
 
   private normalizeArabic(text: string): string {

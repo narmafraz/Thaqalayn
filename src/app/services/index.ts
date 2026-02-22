@@ -8,5 +8,6 @@ export * from './people.service';
 export * from './search.service';
 export * from './pwa.service';
 export * from './seo.service';
+export * from './share-card.service';
 export * from './theme.service';
 

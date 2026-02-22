@@ -35,6 +35,12 @@
                     [attr.aria-label]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
               <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
             </button>
+            <button class="share-image-icon-btn"
+                    (click)="shareAsImage(book, verse, crumbs)"
+                    [disabled]="generatingImageIndex === verse.local_index"
+                    [attr.aria-label]="'Share as image'">
+              <mat-icon>{{ generatingImageIndex === verse.local_index ? 'hourglass_empty' : 'image' }}</mat-icon>
+            </button>
             <button *ngIf="isQuranBook(book.index)"
                     class="audio-icon-btn"
                     (click)="toggleAudio(book.index, verse.local_index)"

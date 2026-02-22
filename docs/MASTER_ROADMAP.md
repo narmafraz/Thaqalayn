@@ -108,7 +108,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
-## Phase 3C: Scholarly Features & Content (COMPLETE ~80%)
+## Phase 3C: Scholarly Features & Content (COMPLETE ~85%)
 
 > **Goal:** AI translations, cross-validation pipeline, narrator biographies.
 > **Status:** Core infrastructure built (AI pipeline, normalization, WikiShia scraper, grading badges). Actual data generation and some UI components remain.
@@ -156,12 +156,12 @@ Everything below has been implemented and tested. Included for context — do no
 | [x] | WikiShia scraper | `wikishia/` module — MediaWiki API scraper for narrator biographies. | Medium |
 | [x] | Name matching pipeline | 5-step approach: exact match, normalized match, fuzzy match, manual mapping, AI-assisted. | High |
 | [x] | AI name transliterations | Infrastructure for generating English transliterations for 4,860 Arabic names via Haiku Batch (~$2). | Low |
-| [ ] | Readable hadith references | Replace raw paths with human-readable references on narrator pages. Not yet implemented. | Medium |
+| [x] | Readable hadith references | PathLinkComponent formats paths as human-readable references (e.g. "Quran 59:2", "Al-Kafi 1:2:3, #4"). Book name mapping for known books with titleCase fallback. | Medium |
 | [x] | Biography display | Grading badges displayed in UI. | Medium |
 
 ---
 
-## Phase 4: Search, PWA & UX Enhancement (COMPLETE ~85%)
+## Phase 4: Search, PWA & UX Enhancement (COMPLETE ~95%)
 
 > **Goal:** Most-requested features: full-text search, offline support, bookmarks.
 > **Status:** Core features implemented (search with Orama, PWA, bookmarks with Dexie.js, audio, sharing, language auto-detection). Word-by-word Quran, some mobile UX, and NGXS error state deferred.
@@ -206,8 +206,8 @@ Everything below has been implemented and tested. Included for context — do no
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
 | [x] | `ng add @angular/pwa` | PwaService + manifest.webmanifest created. Service worker for app shell caching. Includes apple-touch-icon fix. | Low |
-| [ ] | Cache-on-read strategy | Cache visited JSON files for offline re-reading. Not yet implemented. | Medium |
-| [ ] | "Download for offline" per book | Store selected book data in IndexedDB for full offline access. Not yet implemented. | Medium |
+| [x] | Cache-on-read strategy | BooksService caches every API response in IndexedDB for offline re-reading. Complements service worker caching. | Medium |
+| [x] | "Download for offline" per book | BooksService checks OfflineStorageService first: extracts individual chapters from downloaded complete books via `getPartFromBook()`, with in-memory parsed book cache for performance. | Medium |
 | [x] | Install prompt | "Add to Home Screen" prompt for mobile users. | Low |
 
 ### 4.3 Bookmarks & Reading Progress

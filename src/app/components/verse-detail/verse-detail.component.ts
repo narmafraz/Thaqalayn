@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, O
 import { Book, Verse, VerseDetail } from '@app/models';
 import { BookmarkService } from '@app/services/bookmark.service';
 import { BooksService } from '@app/services/books.service';
+import { ShareCardService, ShareCardData } from '@app/services/share-card.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable, Subscription } from 'rxjs';
@@ -32,11 +33,14 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   );
 
   linkCopied = false;
+  generatingImage = false;
   isBookmarked = false;
   noteText = '';
   showNoteEditor = false;
   hasNote = false;
+  currentTranslation = '';
   private sub: Subscription | null = null;
+  private transSub: Subscription | null = null;
 
   // Comparative view state
   compareEntries = new Map<string, CompareEntry>();
@@ -46,9 +50,13 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
     private booksService: BooksService,
+    private shareCard: ShareCardService,
   ) {}
 
   ngOnInit(): void {
+    this.transSub = this.translation$.subscribe(t => {
+      this.currentTranslation = t || '';
+    });
     this.sub = this.book$.subscribe(book => {
       if (!book) return;
       const path = '/books/' + book.index;
@@ -72,6 +80,7 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.transSub?.unsubscribe();
   }
 
   getGradingClass(term: string): string {
@@ -147,6 +156,33 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       this.linkCopied = true;
       setTimeout(() => this.linkCopied = false, 2000);
     }
+  }
+
+  async shareAsImage(book: VerseDetail, translationId: string): Promise<void> {
+    this.generatingImage = true;
+    this.cdr.markForCheck();
+    try {
+      const verse = book.data.verse;
+      const arabicText = (verse.text || []).join(' ').replace(/<[^>]*>/g, '');
+      const translations = verse.translations || {};
+      const transTexts = translations[translationId] || Object.values(translations)[0] || [];
+      const translationText = transTexts.join(' ').replace(/<[^>]*>/g, '');
+      const reference = `${verse.part_type} ${verse.local_index}`;
+      const bookTitle = book.data.chapter_title?.en || book.index;
+      const grading = verse.gradings?.[0] ? this.parseGradingTerm(verse.gradings[0]) : undefined;
+
+      await this.shareCard.shareAsImage({
+        arabicText,
+        translationText,
+        reference,
+        bookTitle,
+        grading,
+      });
+    } catch {
+      // Failed to generate/share
+    }
+    this.generatingImage = false;
+    this.cdr.markForCheck();
   }
 
   // Comparative view methods

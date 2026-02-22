@@ -151,6 +151,11 @@
           <mat-icon>share</mat-icon>
           <span>{{ linkCopied ? ('book.linkCopied' | translate) : ('book.share' | translate) }}</span>
         </button>
+        <button mat-button (click)="shareAsImage(book, currentTranslation)" class="share-btn"
+                [disabled]="generatingImage">
+          <mat-icon>image</mat-icon>
+          <span>{{ generatingImage ? ('common.loading' | translate) : ('book.shareImage' | translate) }}</span>
+        </button>
         <a mat-button
            [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
            [fragment]="'h' + book.data.verse.local_index"

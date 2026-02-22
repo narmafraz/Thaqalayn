@@ -5,6 +5,7 @@ import { Book, ChapterContent, Crumb, Verse } from '@app/models';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
 import { BooksService } from '@app/services/books.service';
+import { ShareCardService } from '@app/services/share-card.service';
 import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -44,6 +45,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   private touchStartY = 0;
   private currentNav: { prev: string | null; next: string | null } = { prev: null, next: null };
 
+  // Share as image state
+  generatingImageIndex: number | null = null;
+
   // Inline compare state
   expandedCompare = new Map<string, { verse: Verse | null; title: string; loading: boolean; error: string | null }>();
 
@@ -57,6 +61,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private router: Router,
     private el: ElementRef,
     private booksService: BooksService,
+    private shareCard: ShareCardService,
   ) {
     this.tafsirEditions = this.tafsirService.editions;
     this.fragment$.subscribe(fragment => {
@@ -352,5 +357,32 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     if (!verse.translations) return null;
     const keys = Object.keys(verse.translations);
     return keys.length > 0 ? verse.translations[keys[0]] : null;
+  }
+
+  async shareAsImage(book: ChapterContent, verse: Verse, crumbs: Crumb[]): Promise<void> {
+    this.generatingImageIndex = verse.local_index;
+    this.cdr.markForCheck();
+    try {
+      const arabicText = (verse.text || []).join(' ').replace(/<[^>]*>/g, '');
+      const translations = verse.translations || {};
+      const transKeys = Object.keys(translations);
+      const transTexts = transKeys.length > 0 ? translations[transKeys[0]] : [];
+      const translationText = (transTexts || []).join(' ').replace(/<[^>]*>/g, '');
+      const reference = `${verse.part_type} ${verse.local_index}`;
+      const bookTitle = this.getBookName(crumbs) || book.data.titles?.en || book.index;
+      const grading = verse.gradings?.[0] ? this.parseGrading(verse.gradings[0]).term : undefined;
+
+      await this.shareCard.shareAsImage({
+        arabicText,
+        translationText,
+        reference,
+        bookTitle,
+        grading,
+      });
+    } catch {
+      // Failed to generate/share
+    }
+    this.generatingImageIndex = null;
+    this.cdr.markForCheck();
   }
 }

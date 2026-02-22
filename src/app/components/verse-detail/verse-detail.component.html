@@ -191,6 +191,72 @@
           </button>
         </div>
       </div>
+
+      <!-- Discussion Panel -->
+      <div *ngIf="discussionEnabled" class="discussion-section">
+        <div class="discussion-header" (click)="showCommentEditor = !showCommentEditor">
+          <mat-icon>forum</mat-icon>
+          <span>{{ 'discussion.title' | translate }}</span>
+          <mat-icon class="expand-icon">{{ showCommentEditor ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+
+        <div *ngIf="showCommentEditor" class="discussion-body">
+          <!-- Comments list -->
+          <div *ngIf="(discussionLoading$ | async)" class="discussion-loading">
+            <mat-icon>hourglass_empty</mat-icon>
+            <span>{{ 'common.loading' | translate }}</span>
+          </div>
+
+          <div class="comment-list">
+            <div class="comment-item" *ngFor="let comment of comments$ | async">
+              <div class="comment-meta">
+                <span class="comment-author">
+                  <mat-icon *ngIf="comment.scholarVerified" class="scholar-badge" matTooltip="Scholar verified">verified</mat-icon>
+                  {{ comment.authorName }}
+                </span>
+                <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
+              </div>
+              <p class="comment-text">{{ comment.text }}</p>
+              <div class="comment-actions">
+                <button mat-icon-button (click)="flagComment(comment.id)"
+                        [attr.aria-label]="'discussion.flag' | translate"
+                        matTooltip="{{ 'discussion.flag' | translate }}">
+                  <mat-icon>flag</mat-icon>
+                </button>
+                <button mat-icon-button (click)="deleteComment(comment.id)"
+                        [attr.aria-label]="'discussion.delete' | translate"
+                        matTooltip="{{ 'discussion.delete' | translate }}">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="(comments$ | async)?.length === 0 && !(discussionLoading$ | async)" class="discussion-empty">
+            <p>{{ 'discussion.noComments' | translate }}</p>
+          </div>
+
+          <!-- Comment input -->
+          <div *ngIf="isSignedIn" class="comment-editor">
+            <textarea [(ngModel)]="newCommentText"
+                      [placeholder]="'discussion.placeholder' | translate"
+                      rows="2"
+                      class="comment-textarea"
+                      aria-label="Write a comment"></textarea>
+            <button mat-raised-button color="primary" (click)="postComment(book)"
+                    [disabled]="!newCommentText.trim()">
+              <mat-icon>send</mat-icon> {{ 'discussion.post' | translate }}
+            </button>
+          </div>
+
+          <div *ngIf="!isSignedIn" class="discussion-sign-in">
+            <p>{{ 'discussion.signInPrompt' | translate }}</p>
+            <button mat-stroked-button (click)="signInForDiscussion()">
+              <mat-icon>account_circle</mat-icon> {{ 'sync.signInGoogle' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
     </mat-card>
 
     <!-- Prev/Next Navigation -->

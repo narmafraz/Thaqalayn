@@ -10,5 +10,6 @@ export * from './pwa.service';
 export * from './seo.service';
 export * from './share-card.service';
 export * from './sync.service';
+export * from './discussion.service';
 export * from './theme.service';
 

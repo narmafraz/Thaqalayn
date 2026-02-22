@@ -80,6 +80,15 @@
     "clear": "Effacer",
     "bookNavigation": "Navigation des livres"
   },
+  "discussion": {
+    "title": "Discussion",
+    "noComments": "Aucun commentaire pour le moment. Soyez le premier à partager vos réflexions.",
+    "placeholder": "Partagez vos réflexions ou commentaires...",
+    "post": "Publier",
+    "flag": "Signaler",
+    "delete": "Supprimer",
+    "signInPrompt": "Connectez-vous pour participer à la discussion."
+  },
   "sync": {
     "title": "Synchronisation cloud",
     "description": "Synchronisez vos signets, votre progression de lecture et vos notes entre vos appareils.",

@@ -464,6 +464,166 @@
   }
 }
 
+// Discussion section
+.discussion-section {
+  margin: 16px;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+  padding-top: 8px;
+}
+
+.discussion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  cursor: pointer;
+  color: var(--text-secondary, #666);
+  font-weight: 500;
+  font-size: 14px;
+
+  &:hover {
+    color: var(--link-color, #673ab7);
+  }
+
+  .expand-icon {
+    margin-left: auto;
+  }
+}
+
+.discussion-body {
+  padding: 8px 0;
+}
+
+.discussion-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  color: var(--text-muted, #999);
+  font-size: 13px;
+}
+
+.discussion-empty {
+  text-align: center;
+  padding: 16px 0;
+  color: var(--text-muted, #999);
+  font-size: 13px;
+}
+
+.comment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.comment-item {
+  padding: 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  background: var(--card-bg, #fafafa);
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.comment-author {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-primary, #333);
+
+  .scholar-badge {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #2e7d32;
+  }
+}
+
+.comment-date {
+  font-size: 11px;
+  color: var(--text-muted, #999);
+}
+
+.comment-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-primary, #333);
+  white-space: pre-wrap;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+
+  button {
+    opacity: 0.4;
+    &:hover { opacity: 1; }
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.comment-editor {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .comment-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-primary, #333);
+    background: var(--card-bg, #fff);
+    resize: vertical;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--link-color, #673ab7);
+    }
+  }
+
+  button {
+    align-self: flex-end;
+  }
+}
+
+.discussion-sign-in {
+  text-align: center;
+  padding: 12px 0;
+
+  p {
+    color: var(--text-muted, #999);
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+}
+
+:host-context(body.dark-theme) {
+  .comment-item {
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
 .hadith-nav {
   display: flex;
   justify-content: space-between;

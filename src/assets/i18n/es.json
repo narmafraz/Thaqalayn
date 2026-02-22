@@ -90,6 +90,15 @@
     "fa": "\u0641\u0627\u0631\u0633\u06cc",
     "fr": "Fran\u00e7ais"
   },
+  "discussion": {
+    "title": "Discussion",
+    "noComments": "No comments yet. Be the first to share your thoughts.",
+    "placeholder": "Share your thoughts or insights...",
+    "post": "Post",
+    "flag": "Report",
+    "delete": "Delete",
+    "signInPrompt": "Sign in to join the discussion."
+  },
   "sync": {
     "title": "Cloud Sync",
     "description": "Sync your bookmarks, reading progress, and notes across devices.",

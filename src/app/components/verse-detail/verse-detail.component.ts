@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, O
 import { Book, Verse, VerseDetail } from '@app/models';
 import { BookmarkService } from '@app/services/bookmark.service';
 import { BooksService } from '@app/services/books.service';
+import { Comment, DiscussionService } from '@app/services/discussion.service';
 import { ShareCardService, ShareCardData } from '@app/services/share-card.service';
+import { SyncService } from '@app/services/sync.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable, Subscription } from 'rxjs';
@@ -46,17 +48,38 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   compareEntries = new Map<string, CompareEntry>();
   compareExpanded = false;
 
+  // Discussion state
+  discussionEnabled: boolean;
+  comments$: Observable<Comment[]>;
+  discussionLoading$: Observable<boolean>;
+  showCommentEditor = false;
+  newCommentText = '';
+  isSignedIn = false;
+
   constructor(
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
     private booksService: BooksService,
     private shareCard: ShareCardService,
-  ) {}
+    private discussionService: DiscussionService,
+    private syncService: SyncService,
+  ) {
+    this.discussionEnabled = this.discussionService.isConfigured;
+    this.comments$ = this.discussionService.comments$;
+    this.discussionLoading$ = this.discussionService.loading$;
+  }
 
   ngOnInit(): void {
     this.transSub = this.translation$.subscribe(t => {
       this.currentTranslation = t || '';
     });
+    // Track sign-in state for discussion
+    if (this.discussionEnabled) {
+      this.syncService.user$.subscribe(user => {
+        this.isSignedIn = !!user;
+        this.cdr.markForCheck();
+      });
+    }
     this.sub = this.book$.subscribe(book => {
       if (!book) return;
       const path = '/books/' + book.index;
@@ -75,6 +98,10 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       const title = (book.data.chapter_title?.en || '') + ' ' +
         book.data.verse.part_type + ' ' + book.data.verse.local_index;
       this.bookmarkService.updateReadingProgress(path, title);
+      // Load discussion comments
+      if (this.discussionEnabled) {
+        this.discussionService.loadComments(path);
+      }
     });
   }
 
@@ -255,5 +282,27 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
 
   removeBookPrefix(path: string): string {
     return path.replace('/books/', '');
+  }
+
+  // Discussion methods
+  async postComment(book: VerseDetail): Promise<void> {
+    if (!this.newCommentText.trim()) return;
+    const path = '/books/' + book.index;
+    await this.discussionService.addComment(path, this.newCommentText.trim());
+    this.newCommentText = '';
+    this.showCommentEditor = false;
+    this.cdr.markForCheck();
+  }
+
+  async flagComment(commentId: string): Promise<void> {
+    await this.discussionService.flagComment(commentId);
+  }
+
+  async deleteComment(commentId: string): Promise<void> {
+    await this.discussionService.deleteComment(commentId);
+  }
+
+  signInForDiscussion(): void {
+    this.syncService.signInWithGoogle();
   }
 }

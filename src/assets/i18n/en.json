@@ -111,7 +111,9 @@
     "offlineDescription": "Download books to your device for offline access. Downloaded content will be available even without an internet connection.",
     "downloadForOffline": "Download",
     "remove": "Remove",
-    "openSource": "Open Source and Free"
+    "openSource": "Open Source and Free",
+    "dataPackages": "Data Packages",
+    "dataPackagesDescription": "Download complete datasets as JSON files or export them as CSV for use in your own projects and research."
   },
   "bookmark": {
     "title": "Bookmarks",

@@ -45,6 +45,34 @@
     </p>
   </section>
 
+  <!-- Data Packages Section -->
+  <section class="data-packages">
+    <h2>{{ 'download.dataPackages' | translate }}</h2>
+    <p>{{ 'download.dataPackagesDescription' | translate }}</p>
+
+    <div class="package-list">
+      <div class="package-item" *ngFor="let pkg of dataPackages">
+        <div class="package-info">
+          <mat-icon class="package-icon">file_download</mat-icon>
+          <div>
+            <span class="package-name">{{ pkg.name }}</span>
+            <span class="package-meta">{{ pkg.format }} &middot; {{ pkg.size }}</span>
+          </div>
+        </div>
+        <div class="package-actions">
+          <a [href]="pkg.url" target="_blank" mat-raised-button color="primary" download>
+            <mat-icon>download</mat-icon> {{ 'download.downloadForOffline' | translate }}
+          </a>
+          <button mat-button (click)="exportAsCsv(pkg.id)" *ngIf="pkg.csvExport"
+                  [disabled]="csvExporting === pkg.id">
+            <mat-icon>table_chart</mat-icon>
+            {{ csvExporting === pkg.id ? 'Exporting...' : 'Export CSV' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Open Source Section -->
   <section>
     <h2>{{ 'download.openSource' | translate }}</h2>
@@ -57,6 +85,9 @@
     </p>
     <p>Also note that this data was generated from other raw data and the script used to generate it is in:
       <a href="https://github.com/narmafraz/ThaqalaynDataGenerator" target="_blank">https://github.com/narmafraz/ThaqalaynDataGenerator</a>
+    </p>
+    <p>The API documentation with endpoint reference, data models, and usage examples is available at:
+      <a href="https://github.com/narmafraz/ThaqalaynData/blob/master/API.md" target="_blank">API Documentation</a>
     </p>
     <p>If this data is useful to you and you do end up creating a project using it then we would like to hear about it please!<br>
       You can do this by contacting us through raising an issue on one of the above repositories <br>

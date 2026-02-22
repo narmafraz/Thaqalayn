@@ -196,10 +196,10 @@ Everything below has been implemented and tested. Included for context — do no
 
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
-| [x] | Build-time Orama indexes | Generated per-book split indexes at build time (titles ~100KB, per-book corpus ~5-10 MB each). | High |
+| [x] | Build-time Orama indexes | Generated per-book split indexes for all 22 books (38,578 documents). Dynamic discovery via `search-meta.json`. Titles index ~1.4 MB, per-book corpus files vary. | High |
 | [x] | Arabic normalization in indexer | Same normalization as navigation search, applied to index content. | Medium |
-| [x] | Search UI component | SearchService with Orama, search bar in header, results page with highlighted matches grouped by book. Includes URL path fix. | High |
-| [x] | Lazy-load indexes | Loads titles index immediately (~100 KB), full-text index on demand. | Medium |
+| [x] | Search UI component | SearchService with Orama, search bar in header, results page with book filter chips, human-readable path formatting, search tips dialog. AND search for multi-word queries with OR fallback. Boost weighting and fuzzy tolerance. | High |
+| [x] | Lazy-load indexes | Loads titles index immediately, full-text indexes on demand with parallel loading (Promise.all). | Medium |
 
 ### 4.2 Offline / PWA Support
 
@@ -409,7 +409,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 | Status | Task | Source | Effort |
 |--------|------|--------|--------|
-| [x] | Full-text search across Quran & Al-Kafi | Extends Phase 4.1 — Titles/Full Text mode toggle in search UI. Full-text mode lazy-loads quran-docs (~2MB) and al-kafi-docs (~19MB) Orama indexes on demand. Searches English translations, Arabic text, and chapter titles. Results show snippets, hadith badges, and book attribution. Fixed title index field mapping and search race condition. | High |
+| [x] | Full-text search across all 22 books | Extends Phase 4.1 — Expanded from 2 books (Quran, Al-Kafi) to all 22 books (38,578 documents). Dynamic book discovery via `search-meta.json`. Parallel index loading. AND search for multi-word queries (threshold:0) with OR fallback. Boost weighting (English 2x, Arabic 1.5x). Fuzzy tolerance for typos. Book filter chips on results page. Human-readable path formatting. Search tips dialog. Comprehensive Orama features reference doc (`docs/ORAMA_SEARCH_FEATURES.md`). | High |
 | [ ] | Semantic search (embeddings) | IMPROVEMENT_ROADMAP.md §8.5.1 | High |
 | [ ] | RAG chatbot for hadith Q&A | IMPROVEMENT_ROADMAP.md §8.5.3 | High |
 
@@ -509,6 +509,8 @@ Documented decisions and notable bug fixes applied during development.
 | **Gradings type mismatch** | 5 | `Verse.gradings` was typed as `Dict[str, str]` but kafi_sarwar.py produces `List[str]` format. Changed to `Union[Dict[str, str], List[str]]`. Updated JSON Schema to use `oneOf`. Fixed the only failing test (`test_kafi_paths.py`). |
 | **Windows pipeline bugs** | 5 | Three fixes: (1) UTF-8 stdout encoding for Arabic text (`sys.stdout.reconfigure`), (2) directory-as-file PermissionError in kafi_sarwar.py, (3) glob pattern matching sibling files. Pipeline now runs end-to-end on Windows. |
 | **narrator_chain.text test updates** | 5 | Data validation tests still checked for `narrator_chain.text` which was removed in Phase 2. Updated to check `narrator_chain.parts` instead. |
+| **Search tips ALL CAPS** | 6 | Search tips panel inherited `text-transform: uppercase` from parent `.bannerTop` CSS. Fixed by adding `text-transform: none` to `.search-tips-panel`. |
+| **Single-threaded data server** | 6 | Local dev data server (`serve.py`) used single-threaded `HTTPServer`, causing hangs when Angular sent concurrent API requests. Fixed by adding `ThreadingMixIn` for parallel request handling. |
 
 ### Deferred Decisions
 

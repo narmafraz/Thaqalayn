@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "Buscar en libros y cap\u00edtulos...",
     "clearSearch": "Limpiar b\u00fasqueda",
     "noResults": "No se encontraron resultados",
-    "noResultsFor": "No se encontraron resultados para"
+    "noResultsFor": "No se encontraron resultados para",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "Seleccionar traducci\u00f3n",

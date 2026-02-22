@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, inject, OnDestroy, OnIn
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
-import { ClearSearch, InitSearchIndex, SearchQuery } from '@store/search/search.actions';
-import { SearchResult } from '@app/services/search.service';
+import { ClearSearch, InitSearchIndex, SearchQuery, SetSearchMode } from '@store/search/search.actions';
+import { SearchMode, SearchResult } from '@app/services/search.service';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
@@ -20,6 +20,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   results$: Observable<SearchResult[]> = inject(Store).select(SearchState.getResults);
   loading$: Observable<boolean> = inject(Store).select(SearchState.isLoading);
   query$: Observable<string> = inject(Store).select(SearchState.getQuery);
+  mode$: Observable<SearchMode> = inject(Store).select(SearchState.getMode);
 
   searchValue = '';
   showDropdown = false;
@@ -29,10 +30,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
-    // Initialize the search index on first use
     this.store.dispatch(new InitSearchIndex());
 
-    // Debounce search input
     this.subscriptions.push(
       this.searchSubject.pipe(
         debounceTime(300),
@@ -76,8 +75,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     });
   }
 
+  setMode(mode: SearchMode): void {
+    this.store.dispatch(new SetSearchMode(mode));
+  }
+
   onBlur(): void {
-    // Delay to allow click on dropdown items
     setTimeout(() => {
       this.showDropdown = false;
     }, 200);

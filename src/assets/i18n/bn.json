@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "কিতাব ও অধ্যায়ে অনুসন্ধান...",
     "clearSearch": "অনুসন্ধান মুছুন",
     "noResults": "কোনো ফলাফল পাওয়া যায়নি",
-    "noResultsFor": "কোনো ফলাফল পাওয়া যায়নি এর জন্য"
+    "noResultsFor": "কোনো ফলাফল পাওয়া যায়নি এর জন্য",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "অনুবাদ নির্বাচন করুন",

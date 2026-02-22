@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "کتابوں اور ابواب میں تلاش کریں...",
     "clearSearch": "تلاش صاف کریں",
     "noResults": "کوئی نتیجہ نہیں ملا",
-    "noResultsFor": "کوئی نتیجہ نہیں ملا برائے"
+    "noResultsFor": "کوئی نتیجہ نہیں ملا برائے",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "ترجمہ منتخب کریں",

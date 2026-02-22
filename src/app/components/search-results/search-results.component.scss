@@ -9,6 +9,55 @@ h1 {
   margin-bottom: 16px;
 }
 
+.search-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-secondary, #666);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    border-color: var(--link-color, #673ab7);
+    color: var(--link-color, #673ab7);
+  }
+
+  &.active {
+    background: var(--link-color, #673ab7);
+    border-color: var(--link-color, #673ab7);
+    color: #fff;
+  }
+}
+
+.fulltext-loading-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  background: var(--table-hover, #f5f5f5);
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+}
+
 .loading-container {
   display: flex;
   justify-content: center;
@@ -47,6 +96,21 @@ h1 {
   &:hover {
     box-shadow: var(--card-shadow, 0 2px 8px rgba(0, 0, 0, 0.15));
   }
+
+  &.hadith-result {
+    border-left: 3px solid var(--link-color, #673ab7);
+  }
+}
+
+:host-context([dir="rtl"]) .result-card.hadith-result {
+  border-left: none;
+  border-right: 3px solid var(--link-color, #673ab7);
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .result-title {
@@ -55,19 +119,46 @@ h1 {
   color: var(--text-primary, #333);
 }
 
+.result-kind-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--link-color, #673ab7);
+  color: #fff;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .result-title-ar {
   font-size: 1.2em;
   margin-top: 4px;
 }
 
+.result-snippet {
+  font-size: 13px;
+  color: var(--text-secondary, #555);
+  margin-top: 6px;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.result-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
 .result-book {
   font-size: 13px;
   color: var(--link-color, #673ab7);
-  margin-top: 4px;
 }
 
 .result-path {
   font-size: 12px;
   color: var(--text-muted, #999);
-  margin-top: 2px;
 }

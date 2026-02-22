@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "Cari kitab dan bab...",
     "clearSearch": "Hapus pencarian",
     "noResults": "Tidak ada hasil ditemukan",
-    "noResultsFor": "Tidak ada hasil ditemukan untuk"
+    "noResultsFor": "Tidak ada hasil ditemukan untuk",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",

@@ -1,6 +1,28 @@
 <div class="search-results-container">
   <h1>{{ 'search.search' | translate }}</h1>
 
+  <div class="search-mode-toggle" *ngIf="(mode$ | async) as mode">
+    <button
+      class="mode-btn"
+      [class.active]="mode === 'titles'"
+      (click)="setMode('titles')">
+      <mat-icon>title</mat-icon>
+      {{ 'search.modeTitles' | translate }}
+    </button>
+    <button
+      class="mode-btn"
+      [class.active]="mode === 'fulltext'"
+      (click)="setMode('fulltext')">
+      <mat-icon>article</mat-icon>
+      {{ 'search.modeFullText' | translate }}
+    </button>
+  </div>
+
+  <div *ngIf="(fullTextLoading$ | async)" class="fulltext-loading-banner">
+    <mat-spinner diameter="16"></mat-spinner>
+    <span>{{ 'search.loadingFullText' | translate }}</span>
+  </div>
+
   <div *ngIf="(loading$ | async)" class="loading-container">
     <mat-spinner diameter="48"></mat-spinner>
   </div>
@@ -12,7 +34,7 @@
 
   <ng-container *ngIf="(results$ | async) as results">
     <p *ngIf="(query$ | async) as query" class="results-summary">
-      <span *ngIf="results.length > 0">{{ results.length }} results for "{{ query }}"</span>
+      <span *ngIf="results.length > 0">{{ results.length }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
       <span *ngIf="results.length === 0 && !(loading$ | async)">{{ 'search.noResultsFor' | translate }} "{{ query }}"</span>
     </p>
 
@@ -21,13 +43,20 @@
         *ngFor="let result of results"
         appearance="outlined"
         class="result-card"
+        [class.hadith-result]="result.kind === 'hadith'"
         [routerLink]="['/books', getBookPath(result)]"
         queryParamsHandling="preserve">
         <mat-card-content>
-          <div class="result-title">{{ result.title }}</div>
+          <div class="result-header">
+            <div class="result-title">{{ result.title }}</div>
+            <span *ngIf="result.kind === 'hadith'" class="result-kind-badge">{{ 'search.hadith' | translate }}</span>
+          </div>
           <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
-          <div class="result-book">{{ result.bookName }}</div>
-          <div class="result-path">{{ result.path }}</div>
+          <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
+          <div class="result-footer">
+            <span class="result-book">{{ result.bookName }}</span>
+            <span class="result-path">{{ result.path }}</span>
+          </div>
         </mat-card-content>
       </mat-card>
     </div>

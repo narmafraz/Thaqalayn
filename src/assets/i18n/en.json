@@ -76,7 +76,12 @@
     "searchBooksAndChapters": "Search books and chapters...",
     "clearSearch": "Clear search",
     "noResults": "No results found",
-    "noResultsFor": "No results found for"
+    "noResultsFor": "No results found for",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "Select Translation",

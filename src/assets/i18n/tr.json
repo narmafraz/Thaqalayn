@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "Kitap ve bölümlerde ara...",
     "clearSearch": "Aramayı temizle",
     "noResults": "Sonuç bulunamadı",
-    "noResultsFor": "Sonuç bulunamadı:"
+    "noResultsFor": "Sonuç bulunamadı:",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "Çeviri seçin",

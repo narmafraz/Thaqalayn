@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "جستجو در کتاب‌ها و باب‌ها...",
     "clearSearch": "پاک کردن جستجو",
     "noResults": "نتیجه‌ای یافت نشد",
-    "noResultsFor": "نتیجه‌ای یافت نشد برای"
+    "noResultsFor": "نتیجه‌ای یافت نشد برای",
+    "resultsFor": "نتیجه برای",
+    "modeTitles": "عناوین",
+    "modeFullText": "متن کامل",
+    "loadingFullText": "در حال بارگذاری فهرست متن کامل...",
+    "hadith": "حدیث"
   },
   "translation": {
     "selectTranslation": "انتخاب ترجمه",

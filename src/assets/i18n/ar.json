@@ -68,7 +68,12 @@
     "searchBooksAndChapters": "بحث في الكتب والأبواب...",
     "clearSearch": "مسح البحث",
     "noResults": "لم يتم العثور على نتائج",
-    "noResultsFor": "لم يتم العثور على نتائج لـ"
+    "noResultsFor": "لم يتم العثور على نتائج لـ",
+    "resultsFor": "نتيجة لـ",
+    "modeTitles": "العناوين",
+    "modeFullText": "النص الكامل",
+    "loadingFullText": "جارٍ تحميل فهرس النص الكامل...",
+    "hadith": "حديث"
   },
   "translation": {
     "selectTranslation": "اختيار الترجمة",

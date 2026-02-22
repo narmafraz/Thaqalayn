@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
-import { SearchResult, SearchService } from '@app/services/search.service';
+import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { ClearSearch, InitSearchIndex, SearchQuery } from './search.actions';
+import { ClearSearch, InitSearchIndex, SearchQuery, SetSearchMode } from './search.actions';
 
 export interface SearchStateModel {
   query: string;
+  mode: SearchMode;
   results: SearchResult[];
   loading: boolean;
   indexReady: boolean;
+  fullTextLoading: boolean;
   error: string | undefined;
 }
 
@@ -15,9 +17,11 @@ export interface SearchStateModel {
   name: 'search',
   defaults: {
     query: '',
+    mode: 'titles',
     results: [],
     loading: false,
     indexReady: false,
+    fullTextLoading: false,
     error: undefined
   }
 })
@@ -28,6 +32,11 @@ export class SearchState {
   @Selector([SearchState])
   public static getQuery(state: SearchStateModel): string {
     return state.query;
+  }
+
+  @Selector([SearchState])
+  public static getMode(state: SearchStateModel): SearchMode {
+    return state.mode;
   }
 
   @Selector([SearchState])
@@ -46,6 +55,11 @@ export class SearchState {
   }
 
   @Selector([SearchState])
+  public static isFullTextLoading(state: SearchStateModel): boolean {
+    return state.fullTextLoading;
+  }
+
+  @Selector([SearchState])
   public static getError(state: SearchStateModel): string | undefined {
     return state.error;
   }
@@ -60,6 +74,17 @@ export class SearchState {
     }
   }
 
+  @Action(SetSearchMode)
+  public async setMode(ctx: StateContext<SearchStateModel>, action: SetSearchMode) {
+    const state = ctx.getState();
+    ctx.patchState({ mode: action.mode });
+
+    // If switching to fulltext and we have a query, re-run the search
+    if (state.query) {
+      ctx.dispatch(new SearchQuery(state.query));
+    }
+  }
+
   @Action(SearchQuery)
   public async search(ctx: StateContext<SearchStateModel>, action: SearchQuery) {
     const query = action.query.trim();
@@ -68,14 +93,28 @@ export class SearchState {
       return;
     }
 
-    ctx.patchState({ query, loading: true, error: undefined });
+    const state = ctx.getState();
+    const isFullText = state.mode === 'fulltext';
+
+    ctx.patchState({
+      query,
+      loading: true,
+      fullTextLoading: isFullText && !this.searchService.isFullTextLoaded,
+      error: undefined
+    });
 
     try {
-      const results = await this.searchService.searchTitles(query);
-      ctx.patchState({ results, loading: false });
+      // Ensure titles index is loaded before searching
+      await this.searchService.loadTitlesIndex();
+      if (!ctx.getState().indexReady) {
+        ctx.patchState({ indexReady: true });
+      }
+      const results = await this.searchService.searchAll(query, state.mode);
+      ctx.patchState({ results, loading: false, fullTextLoading: false });
     } catch {
       ctx.patchState({
         loading: false,
+        fullTextLoading: false,
         error: 'Search failed'
       });
     }

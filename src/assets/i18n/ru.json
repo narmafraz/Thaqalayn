@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "Поиск по книгам и главам...",
     "clearSearch": "Очистить поиск",
     "noResults": "Результатов не найдено",
-    "noResultsFor": "Результатов не найдено для"
+    "noResultsFor": "Результатов не найдено для",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "Выбрать перевод",

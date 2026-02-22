@@ -31,7 +31,11 @@
         class="dropdown-item"
         role="option"
         (mousedown)="selectResult(result)">
-        <div class="result-title">{{ result.title || result.titleAr }}</div>
+        <div class="result-title">
+          {{ result.title || result.titleAr }}
+          <span *ngIf="result.kind === 'hadith'" class="result-kind-badge">{{ 'search.hadith' | translate }}</span>
+        </div>
+        <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
         <div class="result-meta">{{ result.bookName }}</div>
       </div>
       <div *ngIf="results.length === 0 && !(loading$ | async)" class="dropdown-empty">

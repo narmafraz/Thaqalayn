@@ -101,6 +101,32 @@ input {
   text-overflow: ellipsis;
 }
 
+.result-snippet {
+  font-size: 12px;
+  color: var(--text-secondary, #555);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-kind-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--link-color, #673ab7);
+  color: #fff;
+  margin-left: 6px;
+  vertical-align: middle;
+  font-weight: 500;
+}
+
+:host-context([dir="rtl"]) .result-kind-badge {
+  margin-left: 0;
+  margin-right: 6px;
+}
+
 .result-meta {
   font-size: 12px;
   color: var(--text-muted, #888);

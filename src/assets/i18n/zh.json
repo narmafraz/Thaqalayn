@@ -59,7 +59,12 @@
     "searchBooksAndChapters": "搜索经典和章节...",
     "clearSearch": "清除搜索",
     "noResults": "未找到结果",
-    "noResultsFor": "未找到相关结果："
+    "noResultsFor": "未找到相关结果：",
+    "resultsFor": "results for",
+    "modeTitles": "Titles",
+    "modeFullText": "Full Text",
+    "loadingFullText": "Loading full-text index...",
+    "hadith": "Hadith"
   },
   "translation": {
     "selectTranslation": "选择翻译",

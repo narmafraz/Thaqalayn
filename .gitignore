@@ -56,3 +56,7 @@ Thumbs.db
 # Playwright
 /test-results/
 /playwright-report/
+
+# Capacitor native platforms (generated from web build)
+/android/
+/ios/

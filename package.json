@@ -10,7 +10,10 @@
     "e2e": "npx playwright test",
     "e2e:headed": "npx playwright test --headed",
     "generate-sitemap": "node scripts/generate-sitemap.js",
-    "serve:ssr:Thaqalayn": "node dist/Thaqalayn/server/server.mjs"
+    "serve:ssr:Thaqalayn": "node dist/Thaqalayn/server/server.mjs",
+    "cap:build": "ng build --configuration=production && npx cap sync",
+    "cap:android": "npx cap open android",
+    "cap:sync": "npx cap sync"
   },
   "private": true,
   "dependencies": {
@@ -27,6 +30,15 @@
     "@angular/router": "~19.2.18",
     "@angular/service-worker": "~19.2.18",
     "@angular/ssr": "^19.2.20",
+    "@capacitor/android": "^8.1.0",
+    "@capacitor/cli": "^8.1.0",
+    "@capacitor/core": "^8.1.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/ios": "^8.1.0",
+    "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/share": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.1",
     "@ngxs/devtools-plugin": "^19.0.0",
     "@ngxs/logger-plugin": "^19.0.0",
     "@ngxs/router-plugin": "^19.0.0",

@@ -310,3 +310,122 @@ Tracks architectural and implementation decisions made during development, inclu
 **Moving to Phase 5** — Platform Expansion (Angular 19 upgrade, Four Books parsers, additional collections)
 
 ---
+
+## Phase 7 Decisions
+
+### D014: AI Translation Model — Opus 4.6 over Haiku 4.5 (2026-02-23)
+
+**Context:** Phase 3C planned to use Claude Haiku Batch API for translations (~$245). Budget constraints have since been lifted (~$14k/month available).
+
+**Options considered:**
+1. **Haiku 4.5 Batch** — $0.50/$2.50 per MTok. Original plan, ~$270 total.
+2. **Sonnet 4.6 Batch** — $1.50/$7.50 per MTok. ~$810 total. Good quality.
+3. **Opus 4.6 Batch** — $2.50/$12.50 per MTok. ~$1,350 total (translation only). Best quality.
+
+**Decision:** Option 3 — Opus 4.6 via Batch API.
+
+**Rationale:**
+- Shia hadith translation requires specialized knowledge: Islamic terminology, honorific conventions, sectarian sensitivity, literary register for Nahj al-Balaghah
+- Opus produces scholarly-quality translations vs Haiku's functional translations
+- Same pricing as Opus 4.5 but with 1M context, 128K output, adaptive thinking
+- Budget is not a constraint (~$14k available, pipeline costs ~$6,400)
+- 50% batch discount makes Opus affordable for the full corpus
+
+---
+
+### D015: Combined AI Pipeline — Multi-Output Per API Call (2026-02-23)
+
+**Context:** If we're sending every verse to the API for translation, we should extract maximum value per call.
+
+**Decision:** Each API call generates 9 output types simultaneously:
+1. Translation, 2. Word-by-word analysis, 3. Thematic tags, 4. Hadith type classification, 5. Summary, 6. Key terms glossary, 7. Related Quran references, 8. SEO question, 9. Historical context
+
+**Rationale:**
+- Input tokens are the same regardless of output requested — amortizes input cost
+- Output tokens increase ~4x (200→800 per request) but total pipeline cost is still within budget
+- Generates massive value: 10 languages × 9 content types = 90 pieces of content per verse
+- All outputs are pre-computed at build time (aligns with static architecture constraint)
+
+---
+
+### D016: AI Content Attribution — Mandatory Model + Date Labelling (2026-02-23)
+
+**Context:** All AI-generated content must be clearly labelled.
+
+**Decision:** Every AI-generated artifact includes:
+- `ai_generated: true` flag
+- `model` identifier (e.g., "claude-opus-4-6-20260205")
+- `generated_date`
+- `pipeline_version`
+
+This applies in raw files, served JSON, translation registry, and Angular UI display.
+
+**Rationale:** Transparency, reproducibility, and user trust. Users must know they're reading AI translations, not scholarly translations.
+
+---
+
+### D017: AI Content Persistence — ThaqalaynData (Not DataGen) (2026-02-23)
+
+**Context:** Where to store AI-generated content in git.
+
+**Options considered:**
+1. **ThaqalaynDataGenerator `raw/`** — Alongside other source data
+2. **ThaqalaynData `ai-content/`** — In the data repo
+
+**Decision:** Option 2 — ThaqalaynData under `ai-content/`.
+
+**Rationale:**
+- AI content is original project content, not re-derivable input
+- Cost to reproduce: ~$6,400 vs free for parser re-runs
+- Generator `raw/` holds external source data (someone else's content)
+- AI content must be treated as first-class artifacts, committed to git
+
+---
+
+### D018: Quality Validation — Two-Pass AI Self-Check (2026-02-23)
+
+**Context:** How to ensure AI translation quality at scale.
+
+**Decision:** Three-phase pipeline:
+1. **Generate** (Opus 4.6 Batch) — produce all content
+2. **Validate** (Sonnet 4.6 Batch) — score each translation on accuracy, fluency, terminology, honorifics
+3. **Regenerate** (Opus 4.6 Batch) — re-do items scoring below threshold, with validator feedback
+
+**Rationale:**
+- Using a different (cheaper) model for validation reduces bias
+- Automated scoring catches systematic issues at scale
+- Regeneration with feedback produces better results than blind retry
+- Total validation cost ~$1,040 (well within budget)
+
+---
+
+### D019: Deprioritize Sunni Collections & RAG Chatbot (2026-02-23)
+
+**Context:** Prioritization decisions for remaining features.
+
+**Decisions:**
+- **Sunni hadith collections:** Explicitly deprioritized by project owner. Focus remains on Shia collections.
+- **RAG chatbot:** Deprioritized. Requires server-side LLM calls which violates zero-ongoing-costs constraint. Not viable with static-only architecture.
+
+---
+
+### D020: Hadith Similarity — Hybrid TF-IDF + Embeddings (2026-02-23)
+
+**Context:** Need to show similar hadiths across collections.
+
+**Options considered:**
+1. **Pure AI** — Ask Claude to identify similar hadiths. Cost: prohibitive (800M pairwise comparisons).
+2. **TF-IDF only** — Fast, free, but only catches lexical overlap.
+3. **Embeddings only** — Catches semantic similarity but expensive to generate for 40k items.
+4. **Hybrid: TF-IDF + Embeddings** — TF-IDF for candidate filtering, embeddings for re-ranking. Best quality/cost.
+
+**Decision:** Option 4 — Hybrid approach with local computation (free).
+
+**Rationale:**
+- TF-IDF narrows 40k→50 candidates per hadith (fast, free)
+- Sentence embeddings re-rank the 50 candidates (high quality)
+- All computation is offline/build-time (aligns with static architecture)
+- No API costs — uses local models (sentence-transformers)
+- Reuses existing `arabic_normalization.py` for text preprocessing
+
+---

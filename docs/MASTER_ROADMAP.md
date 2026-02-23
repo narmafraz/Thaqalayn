@@ -131,13 +131,15 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 3C.1 AI-Powered Translations
 
+> **SUPERSEDED by Phase 7.** The original Haiku-based translation pipeline has been replaced by a comprehensive Opus 4.6-based pipeline that combines translations with word-by-word analysis, tagging, summaries, and quality validation. See [`docs/AI_CONTENT_PIPELINE.md`](AI_CONTENT_PIPELINE.md) and Phase 7 in this document.
+
 | Status | Task | Description | Effort | Cost |
 |--------|------|-------------|--------|------|
-| [x] | Translation pipeline script | `ai_translation.py` — batch script sending Arabic+English to Claude Haiku Batch API, outputs per-verse translations. | Medium | - |
-| [ ] | Generate 5 priority languages | Urdu, Turkish, Farsi, Indonesian, Bengali — not yet generated, requires ~$122 API costs. | Medium | ~$122 |
-| [ ] | Generate 5 additional languages | Spanish, French, German, Russian, Chinese — not yet generated, requires ~$123 API costs. | Medium | ~$123 |
-| [ ] | Quality review process | Sample-based review per language. Mark as "AI-generated" with disclaimer. Blocked on translation generation. | Medium | - |
-| [ ] | Translation ingestion | Script to merge new translation files into existing verse data. Blocked on translation generation. | Medium | - |
+| [x] | Translation pipeline script | `ai_translation.py` — batch script infrastructure (to be upgraded to `ai_pipeline.py` in Phase 7). | Medium | - |
+| SUPERSEDED | Generate 5 priority languages | Moved to Phase 7.1 with Opus 4.6 + combined content generation. | Medium | — |
+| SUPERSEDED | Generate 5 additional languages | Moved to Phase 7.1 with Opus 4.6 + combined content generation. | Medium | — |
+| SUPERSEDED | Quality review process | Moved to Phase 7.1 with automated AI validation pass (Sonnet 4.6). | Medium | — |
+| SUPERSEDED | Translation ingestion | Moved to Phase 7.1 with checkpoint-based ingestion. | Medium | — |
 
 ### 3C.2 Arabic Text Cross-Validation
 
@@ -404,9 +406,9 @@ Everything below has been implemented and tested. Included for context — do no
 
 ### 6.5 Future Content Expansion
 
-| Task | Source | Effort |
-|------|--------|--------|
-| Sunni hadith collections (Sahih Bukhari, Muslim, etc.) | IMPROVEMENT_ROADMAP.md §8.1.2 — Cross-sectarian comparative resource. Many available via sunnah.com. | High |
+| Status | Task | Source | Effort |
+|--------|------|--------|--------|
+| DEPRIORITIZED | Sunni hadith collections (Sahih Bukhari, Muslim, etc.) | IMPROVEMENT_ROADMAP.md §8.1.2 — Cross-sectarian comparative resource. Many available via sunnah.com. **Decision (2026-02-23): Explicitly deprioritized by project owner. Focus remains on Shia collections.** | High |
 
 ### 6.6 AI-Assisted Features
 
@@ -414,7 +416,7 @@ Everything below has been implemented and tested. Included for context — do no
 |--------|------|--------|--------|
 | [x] | Full-text search across all 22 books | Extends Phase 4.1 — Expanded from 2 books (Quran, Al-Kafi) to all 22 books (38,578 documents). Dynamic book discovery via `search-meta.json`. Parallel index loading. AND search for multi-word queries (threshold:0) with OR fallback. Boost weighting (English 2x, Arabic 1.5x). Fuzzy tolerance for typos. Book filter chips on results page. Human-readable path formatting. Search tips dialog. Comprehensive Orama features reference doc (`docs/ORAMA_SEARCH_FEATURES.md`). | High |
 | [ ] | Semantic search (embeddings) | IMPROVEMENT_ROADMAP.md §8.5.1 | High |
-| [ ] | RAG chatbot for hadith Q&A | IMPROVEMENT_ROADMAP.md §8.5.3 | High |
+| DEPRIORITIZED | RAG chatbot for hadith Q&A | IMPROVEMENT_ROADMAP.md §8.5.3 — **Decision (2026-02-23): Deprioritized. Requires server-side LLM calls which violates the zero-ongoing-costs architectural constraint. Would need Netlify Functions + per-query API costs. Not viable with static-only architecture.** | High |
 
 ### 6.7 Mobile App
 
@@ -427,16 +429,73 @@ Everything below has been implemented and tested. Included for context — do no
 
 ---
 
+## Phase 7: AI Content Generation & Enrichment (PLANNED)
+
+> **Goal:** Generate AI translations, word-by-word analysis, thematic tags, summaries, and similarity data for the entire corpus using Claude Opus 4.6 Batch API.
+> **Status:** Planning complete. Sample generation next, then bulk pipeline.
+> **Budget:** ~$14,000 available. Estimated pipeline cost: ~$6,400.
+> **Full design document:** [`docs/AI_CONTENT_PIPELINE.md`](AI_CONTENT_PIPELINE.md)
+
+### 7.1 AI Content Pipeline
+
+| Status | Task | Description | Est. Cost |
+|--------|------|-------------|-----------|
+| [ ] | Upgrade `ai_translation.py` to `ai_pipeline.py` | Combined pipeline: translation + word-by-word + tags + summaries + glossary + cross-refs + type classification + SEO questions. Manifest-based fault tolerance with checkpoint recovery. Atomic file writes. Budget guards. | — |
+| [ ] | Generate review samples | 20 verses × 3 languages (Urdu, Farsi, Turkish) from Al-Kafi, Quran, Nahj al-Balaghah, Faqih. For human review before bulk generation. | ~$2 |
+| [ ] | Review and approve samples | Compare AI translations with existing human translations. Verify word-by-word accuracy, tag relevance, summary quality. Iterate on prompt if needed. | — |
+| [ ] | Generate Tier 1 languages (ur, tr, fa) | All 22 books + Quran. ~140,000 API calls via Opus 4.6 Batch. | ~$1,900 |
+| [ ] | Generate Tier 2 languages (id, bn) | All 22 books + Quran. ~94,000 API calls. | ~$1,270 |
+| [ ] | Generate Tier 3 languages (es, fr, de, ru, zh) | All 22 books + Quran. ~234,000 API calls. | ~$3,160 |
+| [ ] | Validation pass (all languages) | Sonnet 4.6 Batch scores each translation on accuracy, fluency, terminology, honorifics. | ~$774 |
+| [ ] | Regenerate failures | Re-generate items scoring below threshold with validator feedback. Est. 5% failure rate. | ~$267 |
+| [ ] | Ingest into ThaqalaynData | Merge translations into served `books/` files. Create `words/` directory for word-by-word. Update `index/translations.json`. | — |
+| [ ] | Angular UI: AI translation badges | Show "AI Generated" indicator on translations. Display model + date in tooltip. Disclaimer on first use. | — |
+| [ ] | Angular UI: word-by-word component | Clickable Arabic words with popover showing translation, root, POS. Reused for both Quran and hadith. | — |
+
+### 7.2 Quran Word-by-Word (QUL Data)
+
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | Download and process QUL data | Convert QUL SQLite/JSON to per-ayah word files (`words/quran/{surah}/{ayah}.json`). 6,236 files. | Medium |
+| [ ] | Generate root index | Aggregate ~1,700 unique roots with meanings and occurrence counts. | Low |
+| [ ] | Generate root detail pages | Per-root files with lemmas, occurrences, related roots. ~1,700 files. | Medium |
+| [ ] | Angular: word-by-word verse component | Grid layout with clickable words. Toggle between reading and word-by-word views. | Medium |
+| [ ] | Angular: word popover component | Tooltip: translation, root, morphology (POS, gender, number, case from QUL). | Medium |
+| [ ] | Angular: root exploration pages | Route `/words/root/{root}` showing all occurrences across Quran. | High |
+
+### 7.3 Hadith Similarity Detection
+
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | Research & design similarity approach | Evaluate: TF-IDF + cosine similarity, Arabic sentence embeddings, Jaccard on normalized text, LCS-based matching. See research notes. | Medium |
+| [ ] | Build similarity computation pipeline | Offline computation of pairwise similarity scores. Store as pre-computed JSON. | High |
+| [ ] | Generate similarity data | Run pipeline across entire corpus. Output: per-hadith list of similar hadiths with confidence scores. | Medium |
+| [ ] | Angular: similar hadiths panel | Expandable section on verse-detail showing similar hadiths across collections with diff highlighting. | Medium |
+
+### 7.4 Source Acquisition for Four Books Completion
+
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | Investigate hadith.inoor.ir API | Reverse-engineer internal REST API of the Noor hadith platform. See [`docs/RESEARCH_TAHDHIB_ISTIBSAR_SOURCES.md`](RESEARCH_TAHDHIB_ISTIBSAR_SOURCES.md). | Medium |
+| [ ] | Build Tahdhib al-Ahkam parser | Parse from hadith.inoor.ir or ghbook.ir HTML/EPUB. 10 volumes, ~13,590 hadiths. | High |
+| [ ] | Build al-Istibsar parser | Parse from same source. 4 volumes, ~5,511 hadiths. | High |
+| [ ] | Generalize narrator extraction | Refactor `kafi_narrators.py` into shared module for different chain styles. | High |
+
+---
+
 ## Cost Summary
 
 | Item | Cost | Phase |
 |------|------|-------|
-| AI translations (10 languages, Haiku Batch) | ~$245 | 3C |
+| ~~AI translations (10 languages, Haiku Batch)~~ | ~~$245~~ | ~~3C~~ |
+| AI content pipeline (Opus 4.6 Batch — translations + word-by-word + tags + summaries for 10 languages) | ~$6,400 | 7 |
 | AI name transliterations (4,860 names) | ~$2 | 3C |
 | AI UI string translations (~50 keys × 10 langs) | ~$0.10 | 3B |
 | Custom domain (annual, optional) | ~$12/yr | 6 |
 | **All infrastructure** | **Free** | All |
-| **Total one-time** | **~$247** | |
+| **Total one-time** | **~$6,414** | |
+
+> **Budget note (2026-02-23):** Project has ~$15,000/month Anthropic API budget through end of April 2026. As of Feb 23, less than $1,000 spent this month. The Phase 7 AI pipeline is fully funded.
 
 ---
 

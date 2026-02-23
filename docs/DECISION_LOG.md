@@ -502,3 +502,49 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 - Flagged words can be reviewed in bulk rather than word-by-word
 
 ---
+
+### D024: AI Narrator Extraction with Isnad/Matn Separation (2026-02-23)
+
+**Context:** Only Al-Kafi has fully parsed narrator chains with linked narrator pages (via regex-based `kafi_narrators.py`). Other 21 books have raw narrator text but no structured extraction. Narrator linking is a key scholarly feature.
+
+**Decision:** Add `isnad_matn` field to the AI pipeline output. The AI separates the narrator chain (isnad) from the body (matn), identifies each narrator by name, and assesses identity confidence (definite/likely/ambiguous).
+
+**Implementation:**
+- New `isnad_matn` field in prompt with: `isnad_ar`, `matn_ar`, `has_chain`, `narrators[]`
+- Each narrator has: `name_ar`, `name_en`, `role` (narrator/companion/imam/author), `position`, `identity_confidence` (definite/likely/ambiguous), `ambiguity_note`, `known_identity`
+- During ingestion, AI narrators are matched against the existing `NarratorIndex` (exact → normalized → fuzzy match), reusing stable IDs
+- For Al-Kafi: AI narrator data cross-validates existing regex extraction and adds enrichment (confidence, identity)
+- For other books: AI narrator data is the primary source for narrator linking
+- Ambiguity data displayed in Angular UI (tooltip for ambiguous narrators, detail section on narrator pages)
+
+**Rationale:**
+- Extends narrator linking from 1 book to all 22+ books
+- Ambiguity detection is unique — no existing tool does this for Shia hadith narrator chains
+- Replaces the need to write per-book regex parsers for narrator extraction
+- Cost: ~400 additional output tokens per hadith, adding ~$500 to pipeline total
+
+---
+
+### D025: Research-Based Prompt Improvements (2026-02-23)
+
+**Context:** Survey of 17+ published papers on AI translation of Arabic religious texts identified six techniques that improve quality. See `docs/RESEARCH_AI_ARABIC_TRANSLATION.md`.
+
+**Decision:** Incorporate all six into the pipeline:
+
+1. **Few-shot examples (5 examples in prompt)** — Highest-impact technique. Adds ~2,000 input tokens.
+2. **Temperature 0.5** — Reduces creative hallucination. Zero cost.
+3. **Islamic term glossary (~200 terms)** — Ensures term consistency. Adds ~500 input tokens.
+4. **Pre-diacritize with CAMeL Tools** — LLM validates instead of generates. Free preprocessing.
+5. **Back-translation → standard (1% sample)** — Promoted from optional. ~$50 cost.
+6. **Separate isnad from matn** — Already incorporated via D024.
+
+**Cost impact:** Pipeline total increased from ~$3,311 to ~$3,926 (+$615, ~18% increase).
+
+**Rationale:**
+- Research basis is strong (ACL 2025 papers, IslamicEval 2025 shared task, 250k-page Al-Shamela project)
+- Few-shot examples alone were the single most effective technique in every study
+- Temperature 0.5 is free and universally recommended for religious content
+- Glossary prevents inconsistent term translation across 46,000 hadiths
+- Pre-diacritization shifts AI from generation to verification (easier, more accurate)
+
+---

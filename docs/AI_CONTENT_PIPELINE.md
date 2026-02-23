@@ -21,6 +21,9 @@
 9. [Sample-First Approach](#9-sample-first-approach)
 10. [Cost Estimates](#10-cost-estimates)
 11. [Quran-Specific Considerations](#11-quran-specific-considerations)
+12. [Hadith Similarity Detection](#12-hadith-similarity-detection)
+13. [AI Narrator Extraction & Integration](#13-ai-narrator-extraction--integration)
+14. [Research-Based Prompt Improvements](#14-research-based-prompt-improvements)
 
 ---
 
@@ -134,6 +137,7 @@ English reference translation: {ENGLISH_TEXT}
 Book: {BOOK_NAME}
 Chapter: {CHAPTER_TITLE}
 Hadith number: {HADITH_NUMBER}
+Existing narrator chain (if available): {EXISTING_NARRATOR_CHAIN_TEXT_OR_NULL}
 
 Generate a single JSON object with these fields:
 
@@ -217,7 +221,59 @@ Generate a single JSON object with these fields:
    }
    Example: [{"ref": "96:1", "relationship": "explicit"}, {"ref": "20:114", "relationship": "thematic"}]
 
-8. "translations": (object) Translations into ALL of the following 10 languages.
+8. "isnad_matn": (object) Separate the narrator chain (isnad) from the body text (matn).
+   The isnad is the chain of transmission listing who narrated from whom, typically at
+   the start of the hadith and ending with "قال" (said) or similar. The matn is the
+   actual content of the hadith after the isnad.
+   {
+     "isnad_ar": (string) The Arabic text of the narrator chain only. Empty string ""
+           if there is no narrator chain (e.g., Quran, du'a texts, direct Imam statements
+           without chain).
+     "matn_ar": (string) The Arabic text of the hadith body (everything after the isnad).
+     "has_chain": (boolean) true if the hadith has a narrator chain, false otherwise.
+     "narrators": (array) Each narrator mentioned in the isnad, in transmission order
+           (first narrator = closest to the Imam/Prophet, last = the compiler/student).
+           Empty array [] if has_chain is false.
+       [
+         {
+           "name_ar": "أَحْمَدُ بْنُ مُحَمَّدِ بْنِ خَالِدٍ",
+           "name_en": "Ahmad ibn Muhammad ibn Khalid",
+           "role": (enum) MUST be exactly one of:
+                 "narrator"   — a standard narrator in the chain
+                 "companion"  — a sahabi (companion of the Prophet/Imam)
+                 "imam"       — one of the 12 Imams or the Prophet (saww)
+                 "author"     — the book's author/compiler (first in chain for some books)
+           "position": (integer) 1-based position in the chain (1 = first mentioned)
+           "identity_confidence": (enum) MUST be exactly one of:
+                 "definite"   — this name unambiguously refers to one known individual
+                                in Shia hadith scholarship
+                 "likely"     — most probably refers to one specific individual, but
+                                there is a minor possibility of confusion with another
+                 "ambiguous"  — this name is shared by multiple known individuals in
+                                Shia hadith history, and the specific person cannot be
+                                determined from the chain alone
+           "ambiguity_note": (string or null) If identity_confidence is "likely" or
+                 "ambiguous", explain briefly who the candidates are.
+                 Example: "Could refer to Ahmad ibn Muhammad ibn Khalid al-Barqi (d. 274 AH)
+                 or Ahmad ibn Muhammad ibn Khalid al-Kashi. The former is more likely given
+                 the preceding narrator." Null if identity_confidence is "definite".
+           "known_identity": (string or null) If identity_confidence is "definite" or
+                 "likely", provide the full scholarly identification.
+                 Example: "Ahmad ibn Muhammad ibn Khalid al-Barqi (d. 274 AH), author of
+                 al-Mahasin". Null if "ambiguous".
+         }
+       ]
+   }
+
+   IMPORTANT for isnad_matn:
+   - In the narrator chain (isnad), translate narrator names as proper nouns with
+     consistent transliteration — do not translate names into the target language.
+   - The body text (matn) contains the substantive content — translate this as
+     the primary content of the hadith.
+   - Some hadiths have no chain (direct Imam quotes, du'as, Quranic commentary).
+     Set has_chain: false and narrators: [] for these.
+
+9. "translations": (object) Translations into ALL of the following 10 languages.
    For each language, provide:
    - "text": (string) faithful translation of the hadith
    - "summary": (string) 1-2 sentence summary in that language
@@ -257,6 +313,8 @@ VALID_HADITH_TYPES = {"legal_ruling", "ethical_teaching", "dua", "narrative",
                       "creedal", "eschatological", "biographical"}
 VALID_LANGUAGE_KEYS = {"ur", "tr", "fa", "id", "bn", "es", "fr", "de", "ru", "zh"}
 VALID_QURAN_RELATIONSHIPS = {"explicit", "thematic"}
+VALID_NARRATOR_ROLES = {"narrator", "companion", "imam", "author"}
+VALID_IDENTITY_CONFIDENCE = {"definite", "likely", "ambiguous"}
 
 def validate_enums(result):
     errors = []
@@ -282,6 +340,26 @@ def validate_enums(result):
             errors.append(f"invalid quran ref format: {ref}")
         elif not (1 <= int(parts[0]) <= 114):
             errors.append(f"invalid surah number: {parts[0]} in ref {ref}")
+    # Validate isnad_matn
+    isnad_matn = result.get("isnad_matn", {})
+    if not isinstance(isnad_matn.get("has_chain"), bool):
+        errors.append(f"invalid has_chain: {isnad_matn.get('has_chain')}")
+    if isnad_matn.get("has_chain"):
+        if not isnad_matn.get("isnad_ar"):
+            errors.append("has_chain is true but isnad_ar is empty")
+        if not isnad_matn.get("narrators"):
+            errors.append("has_chain is true but narrators is empty")
+    for i, narrator in enumerate(isnad_matn.get("narrators", [])):
+        if narrator.get("role") not in VALID_NARRATOR_ROLES:
+            errors.append(f"invalid narrator role: {narrator.get('role')} at position {i+1}")
+        if narrator.get("identity_confidence") not in VALID_IDENTITY_CONFIDENCE:
+            errors.append(f"invalid identity_confidence: {narrator.get('identity_confidence')} "
+                         f"for {narrator.get('name_en')}")
+        if narrator.get("identity_confidence") in ("likely", "ambiguous") and not narrator.get("ambiguity_note"):
+            errors.append(f"missing ambiguity_note for {narrator.get('name_en')} "
+                         f"with confidence {narrator.get('identity_confidence')}")
+        if narrator.get("position") != i + 1:
+            errors.append(f"narrator position mismatch: expected {i+1}, got {narrator.get('position')}")
     for key in result["translations"]:
         if key not in VALID_LANGUAGE_KEYS:
             errors.append(f"invalid language key: {key}")
@@ -322,6 +400,49 @@ Items with enum validation errors are sent to the retry queue rather than reject
     {"ref": "96:1", "relationship": "explicit"},
     {"ref": "20:114", "relationship": "thematic"}
   ],
+  "isnad_matn": {
+    "isnad_ar": "عَنْ عِدَّةٍ مِنْ أَصْحَابِنَا عَنْ أَحْمَدَ بْنِ مُحَمَّدِ بْنِ خَالِدٍ عَنْ أَبِيهِ عَنْ أَبِي عَبْدِ اللَّهِ عليه السلام قَالَ",
+    "matn_ar": "طَلَبُ الْعِلْمِ فَرِيضَةٌ عَلَى كُلِّ مُسْلِمٍ...",
+    "has_chain": true,
+    "narrators": [
+      {
+        "name_ar": "عِدَّةٌ مِنْ أَصْحَابِنَا",
+        "name_en": "A number of our companions",
+        "role": "narrator",
+        "position": 1,
+        "identity_confidence": "ambiguous",
+        "ambiguity_note": "Generic reference to multiple unnamed companions of the Imam. Common in al-Kafi to refer to a group of direct students.",
+        "known_identity": null
+      },
+      {
+        "name_ar": "أَحْمَدُ بْنُ مُحَمَّدِ بْنِ خَالِدٍ",
+        "name_en": "Ahmad ibn Muhammad ibn Khalid",
+        "role": "narrator",
+        "position": 2,
+        "identity_confidence": "definite",
+        "ambiguity_note": null,
+        "known_identity": "Ahmad ibn Muhammad ibn Khalid al-Barqi (d. 274 AH), author of al-Mahasin"
+      },
+      {
+        "name_ar": "أَبِيهِ",
+        "name_en": "his father",
+        "role": "narrator",
+        "position": 3,
+        "identity_confidence": "likely",
+        "ambiguity_note": "Refers to Muhammad ibn Khalid al-Barqi, father of Ahmad. Identification is based on the preceding narrator being Ahmad ibn Muhammad ibn Khalid.",
+        "known_identity": "Muhammad ibn Khalid al-Barqi"
+      },
+      {
+        "name_ar": "أَبُو عَبْدِ اللَّهِ",
+        "name_en": "Abu Abdillah",
+        "role": "imam",
+        "position": 4,
+        "identity_confidence": "definite",
+        "ambiguity_note": null,
+        "known_identity": "Imam Ja'far al-Sadiq (AS), the sixth Imam (d. 148 AH)"
+      }
+    ]
+  },
   "translations": {
     "ur": {
       "text": "اردو ترجمہ...",
@@ -351,23 +472,27 @@ Items with enum validation errors are sent to the retry queue rather than reject
 
 | Component | Est. input tokens | Est. output tokens |
 |-----------|------------------:|-------------------:|
-| System prompt | ~300 | — |
+| System prompt + few-shot examples | ~2,300 | — |
 | Arabic text + English ref + context | ~350 | — |
+| Islamic term glossary | ~500 | — |
 | **Language-independent (generated once):** | | |
 | Diacritized text + status + changes | — | ~200 |
 | Word analysis | — | ~400 |
-| Tags + type + related Quran | — | ~80 |
+| Tags + type + related Quran | — | ~100 |
+| Isnad/matn separation + narrator analysis | — | ~400 |
 | **Per-language (× 10):** | | |
 | Translation text (× 10) | — | ~2,000 |
 | Summary (× 10) | — | ~500 |
 | Key terms (× 10) | — | ~500 |
 | SEO question (× 10) | — | ~300 |
-| **Total per request** | **~650** | **~3,980** |
+| **Total per request** | **~3,150** | **~4,400** |
 
 Compared to single-language approach (10 separate calls):
-- Input: 650 vs 5,500 tokens (8.5× savings)
-- Output: 3,980 vs 10,000 tokens (2.5× savings)
+- Input: 3,150 vs 28,000 tokens (8.9× savings — glossary + examples amortized)
+- Output: 4,400 vs 11,000 tokens (2.5× savings)
 - API calls: 46,857 vs 468,570 (10× fewer)
+
+> **Note:** Input tokens increased from the original ~650 estimate due to few-shot examples (~2,000 tokens for 5 examples) and the Islamic term glossary (~500 tokens). These are amortized across all languages and outputs in the multi-language approach, so cost impact is modest.
 
 ---
 
@@ -1070,13 +1195,13 @@ For each sample, verify:
 | Total verses | 40,621 (hadith) + 6,236 (Quran) = 46,857 |
 | Languages per request | 10 (all at once) |
 | **Total requests** | **46,857** (not 468,570) |
-| Est. input tokens/request | 650 |
-| Est. output tokens/request | 3,980 (shared outputs + 10 language-specific outputs) |
-| Total input tokens | ~30M |
-| Total output tokens | ~187M |
-| Input cost ($2.50/MTok) | ~$76 |
-| Output cost ($12.50/MTok) | ~$2,338 |
-| **Generation total** | **~$2,414** |
+| Est. input tokens/request | 3,150 (includes few-shot examples + glossary) |
+| Est. output tokens/request | 4,400 (shared outputs + narrator analysis + 10 language-specific outputs) |
+| Total input tokens | ~148M |
+| Total output tokens | ~206M |
+| Input cost ($2.50/MTok) | ~$370 |
+| Output cost ($12.50/MTok) | ~$2,575 |
+| **Generation total** | **~$2,945** |
 
 ### Validation Pass (Sonnet 4.6 Batch)
 
@@ -1107,14 +1232,15 @@ Regeneration re-sends the full multi-language request for verses with failures, 
 
 | Phase | Cost |
 |-------|------|
-| Samples (20 verses × 1 multi-lang call each) | ~$1 |
-| Generation (46,857 multi-lang calls) | ~$2,414 |
+| Samples (20 verses × 1 multi-lang call each) | ~$2 |
+| Generation (46,857 multi-lang calls) | ~$2,945 |
 | Validation (468,570 per-lang reviews) | ~$774 |
-| Regeneration (~2,343 multi-lang calls) | ~$122 |
-| **Pipeline total** | **~$3,311** |
-| Budget remaining after | ~$10,689 |
+| Regeneration (~2,343 multi-lang calls) | ~$155 |
+| Back-translation spot check (1% sample) | ~$50 |
+| **Pipeline total** | **~$3,926** |
+| Budget remaining after | ~$10,074 |
 
-> **Cost savings from multi-language approach:** ~$4,300 less than single-language (~$7,600). The savings come from sending input tokens once instead of 10 times and generating language-independent outputs (word analysis, diacritization, tags) only once.
+> **Cost savings from multi-language approach:** ~$4,000+ less than single-language. The few-shot examples and glossary add ~2,500 input tokens per request, but this is amortized across all 10 languages. In single-language mode, these would be sent 10× per verse.
 
 ---
 
@@ -1252,6 +1378,286 @@ ThaqalaynData/
 ### Why Not Pure AI?
 
 Pairwise comparison of 40,000 hadiths = 800 million pairs. Even at Haiku pricing, this would cost tens of thousands of dollars. The hybrid approach uses free local computation for the heavy lifting and reserves AI for enrichment only.
+
+---
+
+## 13. AI Narrator Extraction & Integration
+
+### Problem
+
+Currently, only Al-Kafi has fully parsed narrator chains with linked narrator pages. The existing `kafi_narrators.py` pipeline uses regex-based extraction tuned specifically for Al-Kafi's narrator chain patterns. Other books (ThaqalaynAPI-sourced, future Tahdhib/Istibsar) have narrator chain text but no structured extraction.
+
+### Solution: AI Narrator Extraction
+
+The `isnad_matn` field in the AI pipeline output provides structured narrator data for **every hadith across all books**. This enables narrator linking for the entire corpus, not just Al-Kafi.
+
+### How AI Output Integrates with Existing Narrator System
+
+The existing narrator system uses this structure:
+
+```
+NarratorChain:
+  parts: [                        ← alternating plain text and narrator links
+    {kind: "plain", text: ""},
+    {kind: "narrator", text: "أحمد", path: "/people/narrators/42"},
+    {kind: "plain", text: " عَنْ "},
+    {kind: "narrator", text: "محمد", path: "/people/narrators/17"},
+    {kind: "plain", text: " قَالَ"}
+  ]
+```
+
+The AI output provides:
+
+```
+isnad_matn:
+  isnad_ar: "عَنْ أَحْمَدَ بْنِ مُحَمَّدٍ عَنْ مُحَمَّدٍ قَالَ"
+  narrators: [
+    {name_ar: "أَحْمَدُ بْنُ مُحَمَّدٍ", name_en: "Ahmad ibn Muhammad", ...},
+    {name_ar: "مُحَمَّدٌ", name_en: "Muhammad", ...}
+  ]
+```
+
+### Ingestion Pipeline: AI Narrators → Narrator System
+
+During the `ingest` step, AI narrator data is converted into the existing narrator system:
+
+1. **Name matching against existing index:**
+   - For each AI-identified narrator, normalize the Arabic name (strip diacritics, normalize hamza/teh marbuta)
+   - Search existing `NarratorIndex` for a match (exact → normalized → fuzzy)
+   - If found: reuse the existing narrator ID (stable IDs are critical)
+   - If not found: assign a new sequential ID
+
+2. **Build `NarratorChain.parts`:**
+   - Use the `isnad_ar` text and the `narrators[].name_ar` entries
+   - Split the isnad text on each narrator name to build alternating `plain`/`narrator` parts
+   - Assign paths (`/people/narrators/{id}`) to each narrator part
+
+3. **Update narrator objects:**
+   - Add hadith path to `narrator.verse_paths`
+   - Build subchains (full chain + consecutive pairs, matching `getCombinations()` logic)
+   - Update narration counts in the global index
+
+4. **Store ambiguity data:**
+   - `identity_confidence` and `ambiguity_note` are stored in a new narrator metadata file
+   - Narrators with `ambiguous` confidence get a flag on their narrator page
+   - This enables future scholarly review of ambiguous identifications
+
+### Handling Al-Kafi (Already Has Parsed Narrators)
+
+For Al-Kafi, the existing regex-based extraction is the **primary source** for narrator chains. AI narrator data serves as:
+- **Cross-validation** — compare AI-extracted narrators with regex-extracted narrators
+- **Enrichment** — add `identity_confidence`, `ambiguity_note`, and `known_identity` to existing narrator records
+- **Gap filling** — catch narrators the regex missed (e.g., unusual chain formats)
+
+Discrepancies are logged to `ai-content/narrator-reconciliation/al-kafi.jsonl` for review.
+
+### Handling Other Books (No Existing Narrator Data)
+
+For books sourced from ThaqalaynAPI and future Tahdhib/Istibsar, AI narrator extraction is the **primary source**. The pipeline:
+
+1. Generates `NarratorChain.parts` from AI output
+2. Creates new narrator entries in the global index
+3. Builds subchain data for narrator pages
+4. Flags ambiguous identifications for review
+
+### Narrator Ambiguity in Angular UI
+
+- **Definite** narrators: displayed as normal clickable links (existing behavior)
+- **Likely** narrators: displayed as clickable links with a subtle indicator (e.g., dashed underline)
+- **Ambiguous** narrators: displayed with an info icon; clicking shows a tooltip with the `ambiguity_note` explaining the possible identities
+
+On narrator detail pages (`/people/narrators/{id}`):
+- New "Identity Confidence" section showing the AI's assessment
+- If ambiguous, list the candidate individuals with explanations
+- Link to scholarly references where available
+
+### Storage
+
+```
+ThaqalaynDataGenerator/
+  ai-content/
+    narrator-reconciliation/             ← comparison: AI vs regex extraction
+      al-kafi.jsonl                      ← discrepancies for review
+      summary.json                       ← match rate, new narrators found
+    narrator-ambiguity/                  ← ambiguity assessments
+      by-narrator/
+        {narrator_id}.json               ← per-narrator confidence data
+      ambiguous_narrators.json           ← index of all ambiguous identifications
+
+ThaqalaynData/
+  people/narrators/{id}.json             ← existing, now enriched with:
+                                         ←   identity_confidence, ambiguity_note,
+                                         ←   known_identity (from AI)
+```
+
+---
+
+## 14. Research-Based Prompt Improvements
+
+> Based on survey of 17+ published papers on AI translation of Arabic religious texts. Full research document: [`docs/RESEARCH_AI_ARABIC_TRANSLATION.md`](RESEARCH_AI_ARABIC_TRANSLATION.md)
+
+### 14.1 Few-Shot Examples (Highest Impact)
+
+Research consistently shows that 5-10 example translations in the prompt **outperform zero-shot and instruction-only approaches** for Arabic religious text. The paper "Building Domain-Specific LLMs Faithful To The Islamic Worldview" found few-shot prompting achieved optimal F1-scores and smallest embedding distances across all tested models.
+
+**Implementation:** Add 5 representative hadith examples to the system prompt, covering:
+
+1. A hadith with a full narrator chain (standard isnad → matn format)
+2. A short ethical teaching (minimal chain, clear moral message)
+3. A jurisprudential ruling (fiqh terminology, halal/haram)
+4. A du'a/supplication text (no narrator chain)
+5. A narrative hadith (historical account with multiple characters)
+
+Each example includes the complete expected JSON output, showing:
+- Correct honorific handling
+- Proper isnad/matn separation
+- Consistent narrator transliteration
+- Correct enum values
+- Well-structured translations across all 10 languages
+
+**Token cost:** ~2,000 additional input tokens per request. In the multi-language approach this is sent once per verse (not 10×), so the amortized cost is modest (~$370 total across the entire pipeline).
+
+### 14.2 Islamic Term Glossary
+
+Providing a controlled vocabulary of key terms with preferred translations significantly improves consistency across the corpus. Without a glossary, the model may translate "صلاة" as "prayer" in one hadith and "salat" in another.
+
+**Implementation:** Include a glossary of ~200-300 terms in the system prompt:
+
+```
+GLOSSARY OF ISLAMIC TERMS — Use these translations consistently:
+
+Arabic          | English           | Urdu      | Turkish    | Farsi
+صلاة            | salat (prayer)    | نماز      | namaz      | نماز
+وضوء            | wudu              | وضو       | abdest     | وضو
+زكاة            | zakat             | زکوٰة     | zekat      | زکات
+حج              | hajj              | حج        | hac        | حج
+خمس             | khums             | خمس       | humus      | خمس
+نجاسة           | najasah           | نجاست     | necaset    | نجاست
+طهارة           | taharah           | طہارت     | taharet    | طهارت
+اجتهاد          | ijtihad           | اجتہاد    | içtihat    | اجتهاد
+تقلید           | taqlid            | تقلید     | taklid     | تقلید
+مرجع تقلید      | marja' al-taqlid  | مرجع تقلید| müçtehit   | مرجع تقلید
+عصمة            | 'ismah (infallibility) | عصمت | masumiyet  | عصمت
+ولایة           | wilayah           | ولایت     | velayet    | ولایت
+غیبة            | ghaybah (occultation) | غیبت  | gaybet     | غیبت
+[... ~200 more terms ...]
+```
+
+**Token cost:** ~500 additional input tokens. The glossary is the same for every hadith, so it's efficiently amortized in the multi-language approach.
+
+**Source for glossary terms:** Extracted from existing translations in ThaqalaynData (en.qarai, en.sarwar) plus standard Islamic terminology references.
+
+### 14.3 Temperature Setting
+
+Research recommends **temperature 0.5 or lower** for religious content to reduce creative hallucination. The MufassirQAS system (Islamic QA with RAG) used temperature 0.5 specifically for religious content.
+
+**Implementation:** Set `temperature: 0.5` in the Batch API request configuration.
+
+```python
+# In batch request JSONL generation
+{
+    "custom_id": "al-kafi:1:1:1:1",
+    "params": {
+        "model": "claude-opus-4-6-20260205",
+        "max_tokens": 16000,
+        "temperature": 0.5,
+        "messages": [...]
+    }
+}
+```
+
+**Cost impact:** None. Temperature is a parameter, not a cost factor.
+
+### 14.4 Pre-Diacritization with CAMeL Tools
+
+Research suggests dedicated Arabic NLP tools produce more reliable diacritics than LLMs alone. Rather than asking the LLM to add diacritics from scratch, **pre-diacritize the text** with CAMeL Tools or Tashkeel, then ask the LLM to validate and correct.
+
+**Implementation:** Add a preprocessing step before batch generation:
+
+```python
+from camel_tools.disambig.bert import BERTUnfactoredDisambiguator
+
+disambiguator = BERTUnfactoredDisambiguator.pretrained()
+
+def pre_diacritize(text: str) -> str:
+    """Add diacritics using CAMeL Tools BERT disambiguator."""
+    sentences = text.split('.')
+    diacritized = []
+    for sent in sentences:
+        disambig = disambiguator.disambiguate(sent.split())
+        diacritized.append(' '.join([d.analyses[0]['diac'] for d in disambig]))
+    return '.'.join(diacritized)
+```
+
+The LLM prompt changes from "add diacritics" to "validate and correct these pre-diacritized diacritics":
+
+```
+1. "diacritized_text": The Arabic text below has been pre-diacritized by an automated tool.
+   Validate the diacritics, correct any errors, and complete any missing ones.
+   Pre-diacritized text: {PRE_DIACRITIZED_TEXT}
+```
+
+**Benefit:** Shifts the LLM's task from **generation** (harder, more error-prone) to **verification** (easier, more accurate). The LLM can focus on catching errors in the automated diacritization rather than producing all diacritics from scratch.
+
+**Cost impact:** Adds ~30 seconds of local computation per hadith (one-time preprocessing). No API cost.
+
+### 14.5 Back-Translation Validation (Promoted to Standard)
+
+The Al-Shamela Library project (ACL 2025) successfully translated 250,000+ pages of Islamic literature and validated quality by back-translating with an independent model and measuring cosine similarity.
+
+**Implementation:** Promoted from "optional" to standard for 1% sample:
+
+1. Select a random 1% sample (~469 translations across all languages)
+2. Back-translate each AI translation to Arabic using **Sonnet 4.6** (different model = independent validation)
+3. Compute cosine similarity between original Arabic and back-translated Arabic using `sentence-transformers`
+4. Flag items with similarity < 0.7 for manual review
+5. Compute aggregate quality metrics per language
+
+**Cost:** ~$50 for 1% sample (already included in pipeline total).
+
+### 14.6 Isnad/Matn Separation Instructions
+
+Research on hadith translation specifically recommends explicitly instructing the model to separate the narrator chain (isnad) from the hadith body (matn) and to handle narrator names as proper nouns with consistent transliteration.
+
+**Implementation:** Already incorporated into the prompt via the `isnad_matn` field (Section 3, field 8). The system prompt includes:
+
+```
+- In the narrator chain (isnad), translate narrator names as proper nouns with
+  consistent transliteration — do not translate names into the target language.
+- The body text (matn) contains the substantive content — translate this as
+  the primary content of the hadith.
+```
+
+### 14.7 Updated System Prompt (Incorporating All Research Findings)
+
+The final system prompt incorporates all research-based improvements:
+
+```
+You are a specialist in Shia Islamic scholarly texts. You are translating and analyzing
+hadith from the Four Books and other primary Shia sources.
+
+IMPORTANT RULES:
+- Preserve all honorifics: عليه السلام (peace be upon him), صلى الله عليه وآله وسلم, etc.
+- Use established Islamic terminology (do not translate terms like "wudu", "salat", "zakat"
+  unless the target language has established equivalents — see GLOSSARY below)
+- Be faithful to Shia scholarly tradition in interpretation
+- Do not add commentary or interpretation — translate faithfully
+- When quoting Quran, reproduce the exact text — never paraphrase scripture
+- In the narrator chain (isnad), treat narrator names as proper nouns — transliterate
+  consistently, do not translate names into the target language
+- The body text (matn) is the substantive content — translate this faithfully
+- For ALL enum fields, use ONLY the exact values listed. Do not invent new values.
+- This text is in classical Arabic (fusha qadima). Note that vocabulary and syntax
+  differ from Modern Standard Arabic.
+- Output valid JSON only
+
+GLOSSARY OF ISLAMIC TERMS:
+{GLOSSARY}
+
+EXAMPLES:
+Below are {N} examples showing the expected input and output format.
+{FEW_SHOT_EXAMPLES}
+```
 
 ---
 

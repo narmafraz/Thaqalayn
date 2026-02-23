@@ -14,6 +14,8 @@
 4. [Pipeline Architecture](#4-pipeline-architecture)
 5. [Fault Tolerance & Recovery](#5-fault-tolerance--recovery)
 6. [Quality Validation (AI Self-Check)](#6-quality-validation-ai-self-check)
+6B. [Quran Reference Validation](#6b-quran-reference-validation)
+6C. [Arabic Root Cross-Validation (CAMeL Tools)](#6c-arabic-root-cross-validation-camel-tools)
 7. [Attribution & Labelling](#7-attribution--labelling)
 8. [Storage & Persistence](#8-storage--persistence)
 9. [Sample-First Approach](#9-sample-first-approach)
@@ -170,7 +172,9 @@ Generate a single JSON object with these fields:
              "DEM"   — demonstrative (اسم إشارة)
              "NEG"   — negation particle (حرف نفي)
              "COND"  — conditional particle (أداة شرط)
-             "INTERR" — interrogative (أداة استفهام)
+             "INTERR" — interrogative (أداة استفهام),
+       "is_proper_noun": (boolean) true if this word is a proper noun (name of a
+             person, place, tribe, book, etc.) — e.g., محمد, مكة, قريش. false otherwise.
      }
    ]
 
@@ -202,9 +206,16 @@ Generate a single JSON object with these fields:
    - "eschatological"       — about end times, resurrection, afterlife events
    - "biographical"         — about a specific person's life or character
 
-7. "related_quran": (array of strings) Quran references in "surah:ayah" format.
+7. "related_quran": (array of objects) Quran references related to this hadith.
    Only include clearly related verses. Empty array [] if none.
-   Example: ["96:1", "20:114"]
+   Each entry:
+   {
+     "ref": "96:1",
+     "relationship": (enum) MUST be exactly one of:
+           "explicit"  — the hadith directly quotes, cites, or explains this verse
+           "thematic"  — the hadith covers a related theme or topic without direct citation
+   }
+   Example: [{"ref": "96:1", "relationship": "explicit"}, {"ref": "20:114", "relationship": "thematic"}]
 
 8. "translations": (object) Translations into ALL of the following 10 languages.
    For each language, provide:
@@ -245,6 +256,7 @@ VALID_HADITH_TYPES = {"legal_ruling", "ethical_teaching", "dua", "narrative",
                       "prophetic_tradition", "quranic_commentary", "supplication",
                       "creedal", "eschatological", "biographical"}
 VALID_LANGUAGE_KEYS = {"ur", "tr", "fa", "id", "bn", "es", "fr", "de", "ru", "zh"}
+VALID_QURAN_RELATIONSHIPS = {"explicit", "thematic"}
 
 def validate_enums(result):
     errors = []
@@ -258,6 +270,18 @@ def validate_enums(result):
     for word in result["word_analysis"]:
         if word["pos"] not in VALID_POS_TAGS:
             errors.append(f"invalid pos: {word['pos']} for word {word['word']}")
+        if not isinstance(word.get("is_proper_noun"), bool):
+            errors.append(f"invalid is_proper_noun: {word.get('is_proper_noun')} for word {word['word']}")
+    for ref_obj in result.get("related_quran", []):
+        if ref_obj.get("relationship") not in VALID_QURAN_RELATIONSHIPS:
+            errors.append(f"invalid quran relationship: {ref_obj.get('relationship')} for ref {ref_obj.get('ref')}")
+        # Validate surah:ayah format
+        ref = ref_obj.get("ref", "")
+        parts = ref.split(":")
+        if len(parts) != 2 or not parts[0].isdigit() or not parts[1].isdigit():
+            errors.append(f"invalid quran ref format: {ref}")
+        elif not (1 <= int(parts[0]) <= 114):
+            errors.append(f"invalid surah number: {parts[0]} in ref {ref}")
     for key in result["translations"]:
         if key not in VALID_LANGUAGE_KEYS:
             errors.append(f"invalid language key: {key}")
@@ -281,18 +305,23 @@ Items with enum validation errors are sent to the retry queue rather than reject
       "word": "عَنْ",
       "translation_en": "from/about",
       "root": "ع ن ن",
-      "pos": "PREP"
+      "pos": "PREP",
+      "is_proper_noun": false
     },
     {
       "word": "عِدَّةٍ",
       "translation_en": "a number of",
       "root": "ع د د",
-      "pos": "N"
+      "pos": "N",
+      "is_proper_noun": false
     }
   ],
   "tags": ["theology", "knowledge"],
   "hadith_type": "ethical_teaching",
-  "related_quran": ["96:1", "20:114"],
+  "related_quran": [
+    {"ref": "96:1", "relationship": "explicit"},
+    {"ref": "20:114", "relationship": "thematic"}
+  ],
   "translations": {
     "ur": {
       "text": "اردو ترجمہ...",
@@ -347,15 +376,22 @@ Compared to single-language approach (10 separate calls):
 ### Overview
 
 ```
-┌─────────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
-│  Generate    │────▶│  Submit   │────▶│   Poll   │────▶│ Download │────▶│ Validate │
-│  JSONL files │     │  batches  │     │  status  │     │ results  │     │  (Pass 2)│
-└─────────────┘     └──────────┘     └──────────┘     └──────────┘     └──────────┘
-                                                                              │
-                    ┌──────────┐     ┌──────────┐     ┌──────────┐           │
-                    │  Serve   │◀────│  Ingest  │◀────│ Regen    │◀──────────┘
-                    │  (merge) │     │  (write) │     │ failures │
-                    └──────────┘     └──────────┘     └──────────┘
+┌─────────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
+│  Generate    │────▶│  Submit   │────▶│   Poll   │────▶│ Download │
+│  JSONL files │     │  batches  │     │  status  │     │ results  │
+└─────────────┘     └──────────┘     └──────────┘     └──────────┘
+                                                             │
+                   ┌───────────────────────────────────────────┘
+                   ▼
+┌──────────────┐     ┌──────────────┐     ┌──────────┐     ┌──────────┐
+│ Validate     │────▶│ Validate     │────▶│ Validate │────▶│ Regen    │
+│ Quran refs   │     │ roots (CAMeL)│     │ (Pass 2) │     │ failures │
+└──────────────┘     └──────────────┘     └──────────┘     └──────────┘
+                                                                  │
+                    ┌──────────┐     ┌──────────┐                │
+                    │  Serve   │◀────│  Ingest  │◀───────────────┘
+                    │  (merge) │     │  (write) │
+                    └──────────┘     └──────────┘
 ```
 
 ### CLI Commands
@@ -373,13 +409,19 @@ python -m app.ai_pipeline status --manifest jobs/main.json
 # Step 4: Download completed results (idempotent — skips already-downloaded)
 python -m app.ai_pipeline download --manifest jobs/main.json
 
-# Step 5: Run validation pass (Sonnet 4.6 batch)
+# Step 5a: Validate Quran references against actual Quran text (local, no API cost)
+python -m app.ai_pipeline validate-quran-refs --manifest jobs/main.json
+
+# Step 5b: Cross-validate Arabic roots against CAMeL Tools (local, no API cost)
+python -m app.ai_pipeline validate-roots --manifest jobs/main.json
+
+# Step 6: Run translation quality validation pass (Sonnet 4.6 batch)
 python -m app.ai_pipeline validate --manifest jobs/main.json
 
-# Step 6: Regenerate items that failed validation
+# Step 7: Regenerate items that failed validation
 python -m app.ai_pipeline regenerate --manifest jobs/main.json --threshold 7
 
-# Step 7: Ingest validated results into data files (resumable from checkpoint)
+# Step 8: Ingest validated results into data files (resumable from checkpoint)
 python -m app.ai_pipeline ingest --manifest jobs/main.json
 
 # Utility commands
@@ -483,6 +525,8 @@ The manifest file (`jobs/{job_id}.json`) tracks the entire pipeline state. It is
 | **Process crash during generation** | Manifest has generated JSONL but no `batch_id` for that book×lang | Re-run `generate` — it skips already-generated JSONL files |
 | **Batch submission fails** | Manifest has JSONL but `status: "pending"` (no `batch_id`) | Re-run `submit` — it only submits batches without a `batch_id` |
 | **Batch partially fails** | `failed > 0` in batch entry, `failed_ids` list populated | Run `retry` — creates new batch with only the failed IDs |
+| **Quran ref validation crash** | `quran_ref_validation.last_checkpoint` set | Re-run `validate-quran-refs` — resumes from checkpoint |
+| **Root validation crash** | `root_validation.last_checkpoint` set | Re-run `validate-roots` — resumes from checkpoint |
 | **Validation batch fails** | `validated: false` or missing `validation_batch_id` | Re-run `validate` — it skips already-validated batches |
 | **Ingestion crash** | `ingestion.last_checkpoint` is set but `phase: "in_progress"` | Re-run `ingest` — it resumes from `last_checkpoint` |
 | **Budget exceeded** | `budget.remaining_usd < estimated_next_batch_cost` | Pipeline refuses to submit, prints warning. User must increase `budget.limit_usd`. |
@@ -510,6 +554,8 @@ Every command is safe to re-run:
 | `generate` | Skips if JSONL file already exists for that book×lang |
 | `submit` | Skips batches that already have a `batch_id` |
 | `download` | Skips if `results_file` already exists |
+| `validate-quran-refs` | Skips chapters already validated, resumes from checkpoint |
+| `validate-roots` | Skips chapters already validated, resumes from checkpoint |
 | `validate` | Skips if `validated: true` |
 | `regenerate` | Only processes items below threshold not yet regenerated |
 | `ingest` | Resumes from `last_checkpoint` |
@@ -572,6 +618,220 @@ For a random 1% sample (~4,000 items), perform back-translation:
 3. High divergence = flag for manual review
 
 Cost: ~$50 for 1% sample. Provides statistical confidence in overall quality.
+
+---
+
+## 6B. Quran Reference Validation
+
+### Problem
+
+The AI's `related_quran` suggestions have a **high hallucination risk** — the model may suggest Quran verse references that are plausible-sounding but incorrect. Since this is a religious text platform, incorrect cross-references are unacceptable without clear labelling.
+
+### Validation Pipeline Step
+
+After downloading AI results (Step 4) and before ingestion (Step 7), a **Quran reference validation step** checks every AI-suggested reference against the actual Quran text in ThaqalaynData.
+
+```
+┌──────────┐     ┌──────────────┐     ┌──────────┐     ┌──────────┐
+│ Download │────▶│ Validate     │────▶│ Validate │────▶│ Regen    │
+│ results  │     │ Quran refs   │     │ (Pass 2) │     │ failures │
+└──────────┘     └──────────────┘     └──────────┘     └──────────┘
+```
+
+### How It Works
+
+For each AI-suggested `related_quran` entry:
+
+1. **Load the actual Quran text** for the referenced surah:ayah from `ThaqalaynData/books/quran:{surah}/{verse}.json`
+2. **Extract the Arabic text** of the referenced ayah
+3. **Search the hadith Arabic text** for textual overlap with the ayah:
+   - Normalize both texts (strip diacritics, normalize hamza/teh marbuta — reuse `arabic_normalization.py`)
+   - Look for shared n-grams (minimum 3 consecutive words) between hadith text and ayah text
+   - Compute a text overlap score (0.0–1.0)
+4. **Classify the reference** based on overlap + AI-declared relationship:
+
+| AI Declared | Text Overlap Score | Final Classification | Action |
+|-------------|-------------------|---------------------|--------|
+| `explicit` | ≥ 0.3 (shared phrases found) | `explicit_verified` | Accept — strong evidence |
+| `explicit` | < 0.3 (no textual overlap) | `thematic_unverified` | **Downgrade** — AI claimed explicit but no textual evidence |
+| `thematic` | ≥ 0.3 (shared phrases found) | `explicit_verified` | **Upgrade** — AI was conservative, text proves direct link |
+| `thematic` | < 0.3 | `thematic_unverified` | Accept at lower confidence |
+
+5. **Invalid references** (surah > 114, ayah > max for that surah) are **rejected entirely**
+
+### Output Classifications
+
+After validation, every Quran cross-reference in the served data carries one of three relationship types:
+
+| Classification | Source | Meaning | UI Display |
+|----------------|--------|---------|------------|
+| `explicit_reference` | Existing `link_books.py` regex detection | Quran text appears verbatim in the hadith. Detected by pattern matching, not AI. | Full confidence — no badge needed |
+| `explicit_verified` | AI-suggested + text overlap confirmed | AI identified the reference AND textual overlap was found | High confidence badge |
+| `thematic_unverified` | AI-suggested, no textual overlap confirmed | AI suggests a thematic connection but it could not be verified against the text | "AI Suggested" badge with lower visual weight |
+
+### Storage of Validation Results
+
+Validation results are stored alongside AI content in ThaqalaynDataGenerator:
+
+```
+ThaqalaynDataGenerator/
+  ai-content/
+    quran-ref-validation/
+      summary.json               ← aggregate stats (verified/downgraded/upgraded/rejected counts)
+      al-kafi/
+        1_1_1.json               ← per-chapter validation results
+      rejected/
+        rejected_refs.jsonl      ← all rejected/invalid references with reasons
+```
+
+Each per-chapter validation file:
+
+```json
+{
+  "chapter_path": "/books/al-kafi:1:1:1",
+  "validated_at": "2026-02-24T10:00:00Z",
+  "references": [
+    {
+      "hadith_path": "/books/al-kafi:1:1:1:3",
+      "ref": "96:1",
+      "ai_relationship": "explicit",
+      "text_overlap_score": 0.72,
+      "shared_phrases": ["اقْرَأْ بِاسْمِ رَبِّكَ"],
+      "final_classification": "explicit_verified"
+    },
+    {
+      "hadith_path": "/books/al-kafi:1:1:1:5",
+      "ref": "20:114",
+      "ai_relationship": "thematic",
+      "text_overlap_score": 0.08,
+      "shared_phrases": [],
+      "final_classification": "thematic_unverified"
+    }
+  ]
+}
+```
+
+### CLI Command
+
+```bash
+# Run after download, before validation pass
+python -m app.ai_pipeline validate-quran-refs --manifest jobs/main.json
+
+# View summary
+python -m app.ai_pipeline validate-quran-refs --manifest jobs/main.json --summary
+```
+
+### Angular UI Impact
+
+- **`explicit_reference`** (from `link_books.py`): Displayed as current "Mentions" links — no change needed
+- **`explicit_verified`** (AI + text match): Displayed with a Quran icon and high confidence styling
+- **`thematic_unverified`** (AI only): Displayed with a lighter "Related" label and "AI Suggested" badge. Users understand this is a thematic connection, not a proven citation.
+
+---
+
+## 6C. Arabic Root Cross-Validation (CAMeL Tools)
+
+### Problem
+
+AI-generated Arabic word roots in `word_analysis` have a **medium-high hallucination risk**. The model may produce plausible but incorrect roots, especially for rare words, loan words, or words with irregular derivations.
+
+### Solution: Cross-Check Against CAMeL Tools
+
+[CAMeL Tools](https://github.com/CAMeL-Lab/camel_tools) is an open-source Arabic NLP toolkit developed by NYU Abu Dhabi. It provides morphological analysis grounded in established Arabic linguistic databases (SAMA/ALMOR).
+
+### How It Works
+
+1. **For each word in `word_analysis`**, run CAMeL Tools morphological analyzer:
+   ```python
+   from camel_tools.morphology.analyzer import Analyzer
+
+   analyzer = Analyzer.builtin_analyzer(db_name='calima-msa-s31')
+
+   def validate_root(word: str, ai_root: str) -> dict:
+       analyses = analyzer.analyze(word)
+       camel_roots = {a.get('root', '') for a in analyses if a.get('root')}
+
+       # Normalize root format: CAMeL uses "s-m-w", our format is "س م و"
+       ai_root_normalized = ai_root.replace(" ", "")
+       camel_roots_normalized = {r.replace("-", "") for r in camel_roots}
+
+       match = ai_root_normalized in camel_roots_normalized
+       return {
+           "word": word,
+           "ai_root": ai_root,
+           "camel_roots": list(camel_roots),
+           "match": match,
+           "camel_pos_tags": [a.get('pos') for a in analyses]
+       }
+   ```
+
+2. **Classification:**
+
+| Scenario | Action |
+|----------|--------|
+| AI root matches one of CAMeL's analyses | **Accept** — root is verified |
+| AI root doesn't match but CAMeL has analyses | **Flag** — add `root_verified: false` to output, log discrepancy |
+| CAMeL has no analysis (unknown word) | **Accept AI root** — likely a proper noun or rare term, flag as `root_source: "ai_only"` |
+| AI root is empty/missing | **Use CAMeL root** if available, flag as `root_source: "camel"` |
+
+3. **Proper nouns** (where `is_proper_noun: true`) are **exempt** from root validation — proper nouns often have no meaningful Arabic root or have irregular derivations.
+
+### Output Fields Added to word_analysis
+
+After cross-validation, each word entry gains:
+
+```json
+{
+  "word": "عِلْمٍ",
+  "translation_en": "knowledge",
+  "root": "ع ل م",
+  "pos": "N",
+  "is_proper_noun": false,
+  "root_verified": true,
+  "root_source": "ai+camel"
+}
+```
+
+| Field | Values | Meaning |
+|-------|--------|---------|
+| `root_verified` | `true` / `false` | Whether the root was confirmed by CAMeL Tools |
+| `root_source` | `"ai+camel"` / `"ai_only"` / `"camel"` | Where the root came from |
+
+### CLI Command
+
+```bash
+# Run after download, can run in parallel with Quran ref validation
+python -m app.ai_pipeline validate-roots --manifest jobs/main.json
+
+# View summary (match rate, flagged words, corrections)
+python -m app.ai_pipeline validate-roots --manifest jobs/main.json --summary
+```
+
+### Storage
+
+```
+ThaqalaynDataGenerator/
+  ai-content/
+    root-validation/
+      summary.json               ← aggregate stats (match rate, flagged count)
+      flagged_roots.jsonl        ← all words where AI root didn't match CAMeL
+```
+
+### Installation
+
+```bash
+# Add to ThaqalaynDataGenerator dependencies
+pip install camel-tools
+
+# Download morphological database (one-time, ~200 MB)
+camel_data -i morphology-db-msa-s31
+```
+
+### Angular UI Impact
+
+- Words with `root_verified: true` display normally
+- Words with `root_verified: false` could show a subtle indicator (e.g., lighter root text or small "?" icon) — optional, depending on UI review
+- The `root_source` field is metadata for debugging/auditing, not displayed to users
 
 ---
 
@@ -692,6 +952,15 @@ ThaqalaynDataGenerator/
         batch_def456_results.jsonl
       validation/
         batch_val_xyz789_results.jsonl
+    quran-ref-validation/                    ← Quran reference validation results
+      summary.json                           ← aggregate stats
+      al-kafi/
+        1_1_1.json                           ← per-chapter validated references
+      rejected/
+        rejected_refs.jsonl                  ← invalid/rejected references
+    root-validation/                         ← CAMeL Tools root cross-check results
+      summary.json                           ← aggregate stats (match rate, flags)
+      flagged_roots.jsonl                    ← words where AI root didn't match CAMeL
     validated/                               ← post-validation, ready to ingest
       al-kafi/
         ur/1_1_1.json                        ← per-chapter validated results
@@ -699,7 +968,7 @@ ThaqalaynDataGenerator/
       quran/
         ur/1.json
         ur/2.json
-    rejected/                                ← failed validation, for review
+    rejected/                                ← failed translation validation, for review
       al-kafi/
         ur/rejected.jsonl
     samples/                                 ← initial review samples
@@ -723,6 +992,8 @@ ThaqalaynData/                               ← only served files (deployed to 
 | `ai-content/manifest.json` | DataGenerator | Yes | No |
 | `ai-content/metadata.json` | DataGenerator | Yes | No |
 | `ai-content/raw/*.jsonl` | DataGenerator | Yes (LFS if >100MB) | No |
+| `ai-content/quran-ref-validation/*` | DataGenerator | Yes | No |
+| `ai-content/root-validation/*` | DataGenerator | Yes | No |
 | `ai-content/validated/*.json` | DataGenerator | Yes | No |
 | `ai-content/rejected/*.jsonl` | DataGenerator | Yes | No |
 | `ai-content/samples/*.json` | DataGenerator | Yes | No |
@@ -781,7 +1052,9 @@ For each sample, verify:
 - [ ] Diacritics status accurately reflects what was changed
 - [ ] Tags are relevant to content
 - [ ] Summary accurately captures meaning
-- [ ] No hallucinated Quran references
+- [ ] Quran references validated against actual Quran text (explicit vs thematic correctly classified)
+- [ ] Proper nouns correctly flagged (`is_proper_noun`)
+- [ ] Arabic roots spot-checked against CAMeL Tools output
 - [ ] JSON structure is valid and complete
 - [ ] Compare with existing human translations where available
 - [ ] Optional: cross-check diacritization with CAMeL Tools or Mishkal output

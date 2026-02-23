@@ -433,3 +433,72 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 - Reuses existing `arabic_normalization.py` for text preprocessing
 
 ---
+
+### D021: Quran Reference Validation — Keep With Confidence Levels (2026-02-23)
+
+**Context:** AI-generated `related_quran` field has high hallucination risk. Original recommendation was to drop the field entirely. Project owner requested validation instead.
+
+**Options considered:**
+1. **Drop `related_quran` entirely** — Safe but loses a valuable feature.
+2. **Keep and validate** — Check AI suggestions against actual Quran text. Tag with confidence level.
+3. **Keep without validation** — Risky for a religious text platform.
+
+**Decision:** Option 2 — Keep with three-tier validation and confidence labelling.
+
+**Implementation:**
+- After downloading AI results, run `validate-quran-refs` step (local, no API cost)
+- Loads actual Quran text from ThaqalaynData, searches for textual overlap with hadith
+- Three output classifications:
+  - `explicit_reference` — from existing `link_books.py` regex (highest confidence, not AI)
+  - `explicit_verified` — AI suggested + textual overlap confirmed
+  - `thematic_unverified` — AI suggested, no textual overlap (displayed with "AI Suggested" badge)
+- Invalid references (bad surah/ayah numbers) are rejected entirely
+- Rejected refs are logged in `ai-content/quran-ref-validation/rejected/`
+
+**Rationale:**
+- Users benefit from thematic connections even without verified text overlap
+- Clear labelling (explicit vs thematic) prevents users from treating AI suggestions as verified citations
+- Validation is free (local text comparison, no API calls)
+- Existing `link_books.py` cross-references continue as the gold standard
+
+---
+
+### D022: Proper Noun Flag in Word Analysis (2026-02-23)
+
+**Context:** AI word analysis includes root extraction, but proper nouns (names of people, places, tribes) often have no meaningful Arabic root or have irregular derivations.
+
+**Decision:** Add `is_proper_noun: boolean` to the `word_analysis` schema.
+
+**Rationale:**
+- Proper nouns are exempt from root validation (CAMeL Tools cross-check), reducing false positives
+- Enables UI features: proper nouns can link to narrator pages, place pages, etc.
+- Helps downstream NLP tasks (e.g., named entity recognition)
+- Trivial cost — boolean field in existing per-word output
+
+---
+
+### D023: Arabic Root Cross-Validation via CAMeL Tools (2026-02-23)
+
+**Context:** AI-generated Arabic roots have medium-high hallucination risk, especially for rare words, loan words, or irregular derivations.
+
+**Options considered:**
+1. **Trust AI roots blindly** — Fast but unreliable for a scholarly platform.
+2. **Manual review** — Infeasible for 500k+ words.
+3. **Cross-check against CAMeL Tools** — Automated, free, grounded in established Arabic linguistic databases (SAMA/ALMOR).
+
+**Decision:** Option 3 — Automated cross-validation using CAMeL Tools morphological analyzer.
+
+**Implementation:**
+- Run `validate-roots` after downloading AI results (local, no API cost)
+- For each word, compare AI root with CAMeL Tools morphological analysis
+- Add `root_verified` (bool) and `root_source` ("ai+camel" / "ai_only" / "camel") fields
+- Proper nouns (`is_proper_noun: true`) are exempt from validation
+- Flagged mismatches logged to `ai-content/root-validation/flagged_roots.jsonl`
+
+**Rationale:**
+- CAMeL Tools is the gold standard for Arabic NLP (NYU Abu Dhabi, open source)
+- Free, local computation — no API costs
+- Adds a verifiable quality signal to the word analysis data
+- Flagged words can be reviewed in bulk rather than word-by-word
+
+---

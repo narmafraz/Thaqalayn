@@ -1,6 +1,6 @@
 # Master Roadmap
 
-> **Last updated:** 2026-02-22
+> **Last updated:** 2026-02-23
 > **Purpose:** Single source of truth for all planned work across the Thaqalayn ecosystem. Consolidates and supersedes individual proposals. Each phase ends with a team evaluation checkpoint.
 >
 > **Source documents consolidated:**
@@ -446,9 +446,11 @@ Everything below has been implemented and tested. Included for context — do no
 | [ ] | Generate Tier 1 languages (ur, tr, fa) | All 22 books + Quran. ~140,000 API calls via Opus 4.6 Batch. | ~$1,900 |
 | [ ] | Generate Tier 2 languages (id, bn) | All 22 books + Quran. ~94,000 API calls. | ~$1,270 |
 | [ ] | Generate Tier 3 languages (es, fr, de, ru, zh) | All 22 books + Quran. ~234,000 API calls. | ~$3,160 |
+| [ ] | Validate Quran references | Check AI-suggested Quran cross-refs against actual Quran text. Classify as `explicit_verified` or `thematic_unverified`. Reject invalid refs. | — |
+| [ ] | Validate Arabic roots (CAMeL Tools) | Cross-check AI-generated word roots against CAMeL Tools morphological analyzer. Flag mismatches, add `root_verified` field. | — |
 | [ ] | Validation pass (all languages) | Sonnet 4.6 Batch scores each translation on accuracy, fluency, terminology, honorifics. | ~$774 |
 | [ ] | Regenerate failures | Re-generate items scoring below threshold with validator feedback. Est. 5% failure rate. | ~$267 |
-| [ ] | Ingest into ThaqalaynData | Merge translations into served `books/` files. Create `words/` directory for word-by-word. Update `index/translations.json`. | — |
+| [ ] | Ingest into ThaqalaynData | Merge translations into served `books/` files. Create `words/` directory for word-by-word. Update `index/translations.json`. Quran refs carry validated relationship types. | — |
 | [ ] | Angular UI: AI translation badges | Show "AI Generated" indicator on translations. Display model + date in tooltip. Disclaimer on first use. | — |
 | [ ] | Angular UI: diacritized text toggle | Option to view fully voweled Arabic text (AI-diacritized) vs original. Show diacritics status badge. | — |
 | [ ] | Angular UI: word-by-word component | Clickable Arabic words with popover showing translation, root, POS. Reused for both Quran and hadith. | — |

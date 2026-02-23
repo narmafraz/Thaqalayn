@@ -491,23 +491,37 @@ Translation entries in verse data:
 
 ## 8. Storage & Persistence
 
-### Decision: ThaqalaynData Repository
+### Decision: ThaqalaynDataGenerator Repository (ai-content/)
 
-AI-generated content is persisted in **ThaqalaynData** (not ThaqalaynDataGenerator) because:
+AI-generated content is persisted in **ThaqalaynDataGenerator** under a new `ai-content/` directory (committed to git, unlike `raw/` which is gitignored).
 
-| Factor | ThaqalaynDataGenerator | **ThaqalaynData** |
-|--------|----------------------|-------------------|
-| Purpose | Code that generates data | **The data itself** |
-| `raw/` folder | Input files from external sources | N/A |
-| Cost to reproduce | Free (re-run parser) | **~$4,700 (re-call API)** |
-| Git tracking | Code versioning | **Data versioning** |
+**Why not ThaqalaynData?** ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo is served to browsers. Putting intermediate AI data there would:
+- Deploy hundreds of MB of JSONL, manifests, and validation data that no browser ever fetches
+- Duplicate content (raw AI results + merged `books/` files both contain the translations)
+- Bloat the CDN with non-useful data
 
-AI content is **original content created by this project**, not re-derivable input. It must be treated as a first-class artifact.
+**Why not ThaqalaynDataGenerator `raw/`?** The `raw/` directory is gitignored because its contents are free to re-download from external sources. AI content costs ~$6,400 to reproduce and must be committed.
+
+| Directory | Gitignored? | Contents | Cost to Reproduce |
+|-----------|:-----------:|----------|:-----------------:|
+| `raw/` | Yes | External source data (HTML, API JSON) | Free (re-scrape) |
+| **`ai-content/`** | **No** | **AI-generated translations, analysis** | **~$6,400** |
+
+This fits the existing data flow — both directories are **inputs** to the generation pipeline:
+
+```
+ThaqalaynDataGenerator/
+  raw/          → parsers read external sources    → write to ThaqalaynData/books/
+  ai-content/   → ingestion reads AI results       → write to ThaqalaynData/books/
+                                                   → write to ThaqalaynData/words/
+```
+
+**ThaqalaynData stays clean** — only served files that the Angular app actually fetches.
 
 ### Directory Structure
 
 ```
-ThaqalaynData/
+ThaqalaynDataGenerator/
   ai-content/                                ← committed to git (original content)
     manifest.json                            ← pipeline state & tracking
     metadata.json                            ← global attribution & stats
@@ -530,32 +544,43 @@ ThaqalaynData/
     samples/                                 ← initial review samples
       al-kafi_ur_sample.json
       quran_fa_sample.json
-  books/                                     ← served files (translations merged in)
+
+ThaqalaynData/                               ← only served files (deployed to CDN)
+  books/                                     ← translations merged into existing files
     al-kafi/1/1/1.json                       ← existing + new AI translation fields
-  words/                                     ← new: word-by-word analysis (served)
+  words/                                     ← new: word-by-word analysis
     al-kafi/1/1/1.json                       ← per-chapter word analysis
     quran/1.json                             ← per-surah word analysis
   index/
     translations.json                        ← updated with AI translation entries
 ```
 
-### What Gets Committed to Git
+### What Gets Committed Where
 
-| Content | Committed | Served to Angular | Reason |
-|---------|:---------:|:-----------------:|--------|
-| `ai-content/manifest.json` | Yes | No | Job tracking, recovery state |
-| `ai-content/metadata.json` | Yes | No | Global attribution |
-| `ai-content/raw/*.jsonl` | Yes | No | Original API responses (source of truth) |
-| `ai-content/validated/*.json` | Yes | No | Post-validation results |
-| `ai-content/rejected/*.jsonl` | Yes | No | Audit trail |
-| `ai-content/samples/*.json` | Yes | No | Initial review samples |
-| `books/*` (with translations merged) | Yes | Yes | Served verse data |
-| `words/*` (word-by-word) | Yes | Yes | Served word analysis |
-| `index/translations.json` (updated) | Yes | Yes | Translation registry |
+| Content | Repository | Committed | Served to Angular |
+|---------|-----------|:---------:|:-----------------:|
+| `ai-content/manifest.json` | DataGenerator | Yes | No |
+| `ai-content/metadata.json` | DataGenerator | Yes | No |
+| `ai-content/raw/*.jsonl` | DataGenerator | Yes (LFS if >100MB) | No |
+| `ai-content/validated/*.json` | DataGenerator | Yes | No |
+| `ai-content/rejected/*.jsonl` | DataGenerator | Yes | No |
+| `ai-content/samples/*.json` | DataGenerator | Yes | No |
+| `books/*` (with translations merged) | Data | Yes | **Yes** |
+| `words/*` (word-by-word) | Data | Yes | **Yes** |
+| `index/translations.json` (updated) | Data | Yes | **Yes** |
 
 ### Git Workflow for AI Content
 
 Since raw API results can be large (potentially hundreds of MB of JSONL), use Git LFS for `ai-content/raw/` if total size exceeds 100 MB. The validated per-chapter files in `ai-content/validated/` are smaller and can use regular git.
+
+### Ingestion Step
+
+The ingestion step in the pipeline reads from `ThaqalaynDataGenerator/ai-content/validated/` and writes merged output to `ThaqalaynData/`. This is analogous to how parsers read from `raw/` and write to ThaqalaynData — the generator project transforms source data into served data.
+
+```bash
+# Ingest reads from ai-content/validated/, writes to DESTINATION_DIR (ThaqalaynData)
+python -m app.ai_pipeline ingest --manifest ai-content/manifest.json
+```
 
 ---
 

@@ -364,21 +364,25 @@ This applies in raw files, served JSON, translation registry, and Angular UI dis
 
 ---
 
-### D017: AI Content Persistence — ThaqalaynData (Not DataGen) (2026-02-23)
+### D017: AI Content Persistence — ThaqalaynDataGenerator `ai-content/` (2026-02-23)
 
 **Context:** Where to store AI-generated content in git.
 
 **Options considered:**
-1. **ThaqalaynDataGenerator `raw/`** — Alongside other source data
-2. **ThaqalaynData `ai-content/`** — In the data repo
+1. **ThaqalaynDataGenerator `raw/`** — Alongside other source data. But `raw/` is gitignored.
+2. **ThaqalaynData `ai-content/`** — In the data repo, committed to git.
+3. **ThaqalaynDataGenerator `ai-content/`** — New committed directory in the generator repo.
 
-**Decision:** Option 2 — ThaqalaynData under `ai-content/`.
+**Decision:** Option 3 — ThaqalaynDataGenerator under `ai-content/` (committed, not gitignored).
 
-**Rationale:**
-- AI content is original project content, not re-derivable input
-- Cost to reproduce: ~$6,400 vs free for parser re-runs
-- Generator `raw/` holds external source data (someone else's content)
-- AI content must be treated as first-class artifacts, committed to git
+**Initial thought was Option 2, revised after review:**
+ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets served to browsers. Putting hundreds of MB of intermediate JSONL, manifests, and validation data there would bloat the CDN with files no browser ever fetches, and duplicate content (raw AI results + merged `books/` files both contain translations).
+
+**Rationale for Option 3:**
+- AI content is an **input** to the generation pipeline, like `raw/` — but unlike `raw/` it costs ~$6,400 to reproduce, so it must be committed
+- ThaqalaynData stays clean — only contains files the Angular app actually fetches
+- Follows existing data flow: `raw/` → parsers → ThaqalaynData, `ai-content/` → ingestion → ThaqalaynData
+- No deployment bloat, no duplication
 
 ---
 

@@ -99,6 +99,15 @@ The quality validation pass uses the cheaper Sonnet 4.6 ($1.50/$7.50 batch) sinc
 
 Each API call sends one verse/hadith and receives a structured JSON response containing ALL the following content types. This amortizes input token costs across multiple outputs.
 
+### Multi-Language Strategy
+
+Each API call processes **one verse × all 10 languages** in a single request. This is better than one-language-at-a-time because:
+
+1. **Language-independent outputs** (word analysis, diacritization, tags) are generated once instead of 10 times
+2. **Input tokens** (Arabic text + system prompt) are sent once instead of 10 times
+3. **Cross-language consistency** — the model settles on one interpretation and applies it uniformly
+4. **63% cost reduction** — from ~$6,500 to ~$2,400 for the generation pass
+
 ### Prompt Design
 
 **System prompt:**
@@ -112,6 +121,7 @@ IMPORTANT RULES:
   unless the target language has established equivalents)
 - Be faithful to Shia scholarly tradition in interpretation
 - Do not add commentary or interpretation — translate faithfully
+- For ALL enum fields, use ONLY the exact values listed. Do not invent new values.
 - Output valid JSON only
 ```
 
@@ -122,75 +132,213 @@ English reference translation: {ENGLISH_TEXT}
 Book: {BOOK_NAME}
 Chapter: {CHAPTER_TITLE}
 Hadith number: {HADITH_NUMBER}
-Target language: {LANGUAGE_CODE} ({LANGUAGE_NAME})
 
-Generate the following as a single JSON object:
+Generate a single JSON object with these fields:
 
-1. "translation": Your translation into {LANGUAGE_NAME}
-2. "word_analysis": Array of objects for each Arabic word:
-   [{"word": "بِسْمِ", "translation": "In the name of", "root": "س م و", "pos": "noun"}]
-3. "diacritized_text": The full Arabic text with complete tashkeel (fatha, kasra, damma,
-   sukun, shadda, tanwin on every applicable letter). If the original already has
-   diacritics, preserve correct ones and fix any errors. If partial, complete them.
-4. "diacritics_status": One of: "added" (was bare), "completed" (was partial),
-   "validated" (was full, no changes needed), "corrected" (was full, fixes applied)
-5. "diacritics_changes": Array of corrections to existing diacritics (empty if "added"):
-   [{"original": "عَلِمَ", "corrected": "عُلِمَ", "reason": "passive voice per context"}]
-6. "tags": Array of 2-5 thematic tags from this controlled vocabulary:
-   [theology, ethics, jurisprudence, worship, quran-commentary, prophetic-tradition,
-    family, social-relations, knowledge, dua, afterlife, history, economy, governance]
-7. "hadith_type": One of: legal_ruling, narrative, dua, ethical_teaching,
-   prophetic_tradition, quranic_commentary, historical_account, supplication
-8. "summary": 1-2 sentence summary of the hadith content
-9. "key_terms": Object mapping Arabic terms to {LANGUAGE_NAME} explanations:
-   {"term_arabic": "explanation in target language"}
-10. "related_quran": Array of Quran references (surah:ayah) this hadith relates to
-    (only if clearly related, empty array if none)
-11. "seo_question": A natural question this hadith answers, in {LANGUAGE_NAME}
+1. "diacritized_text": (string) The full Arabic text with complete tashkeel (fatha, kasra,
+   damma, sukun, shadda, tanwin on every applicable letter). If the original already has
+   diacritics, preserve correct ones and fix errors. If partial, complete the missing ones.
+
+2. "diacritics_status": (enum) MUST be exactly one of these values:
+   - "added"      — original had no/minimal diacritics, full tashkeel was added
+   - "completed"  — original had partial diacritics, missing ones were filled in
+   - "validated"  — original had full diacritics, all were correct, no changes made
+   - "corrected"  — original had full diacritics, but some errors were fixed
+
+3. "diacritics_changes": (array) Corrections made to existing diacritics. Empty array []
+   if diacritics_status is "added" or "validated". Each entry:
+   {"original": "عَلِمَ", "corrected": "عُلِمَ", "reason": "passive voice per context"}
+
+4. "word_analysis": (array) One entry per Arabic word in order of appearance:
+   [
+     {
+       "word": "بِسْمِ",
+       "translation_en": "In the name of",
+       "root": "س م و",
+       "pos": (enum) MUST be exactly one of:
+             "N"     — noun (اسم)
+             "V"     — verb (فعل)
+             "ADJ"   — adjective (صفة)
+             "ADV"   — adverb (ظرف)
+             "PREP"  — preposition (حرف جر)
+             "CONJ"  — conjunction (حرف عطف)
+             "PRON"  — pronoun (ضمير)
+             "DET"   — determiner/article (أداة تعريف)
+             "PART"  — particle (حرف)
+             "INTJ"  — interjection (حرف نداء)
+             "REL"   — relative pronoun (اسم موصول)
+             "DEM"   — demonstrative (اسم إشارة)
+             "NEG"   — negation particle (حرف نفي)
+             "COND"  — conditional particle (أداة شرط)
+             "INTERR" — interrogative (أداة استفهام)
+     }
+   ]
+
+5. "tags": (array of 2-5 enums) Each tag MUST be exactly one of:
+   - "theology"            — beliefs about God, prophets, imams, divine attributes
+   - "ethics"              — moral teachings, virtues, character development
+   - "jurisprudence"       — legal rulings, halal/haram, fiqh obligations
+   - "worship"             — prayer, fasting, hajj, zakat, ritual acts
+   - "quran_commentary"    — interpretation or context for Quran verses
+   - "prophetic_tradition" — sayings or actions of Prophet Muhammad (saww)
+   - "family"              — marriage, parenting, family relations, inheritance
+   - "social_relations"    — community, neighbors, justice, rights, brotherhood
+   - "knowledge"           — seeking knowledge, scholarship, learning, teachers
+   - "dua"                 — supplications, prayers, dhikr
+   - "afterlife"           — paradise, hell, Day of Judgment, barzakh, death
+   - "history"             — historical events, biographies, battles, migrations
+   - "economy"             — trade, wealth, poverty, charity, financial ethics
+   - "governance"          — leadership, authority, political ethics, wilayah
+
+6. "hadith_type": (enum) MUST be exactly one of:
+   - "legal_ruling"         — contains a specific fiqhi/legal ruling
+   - "ethical_teaching"     — moral or ethical instruction
+   - "dua"                  — supplication or prayer text
+   - "narrative"            — story or historical account
+   - "prophetic_tradition"  — direct saying or action of the Prophet (saww)
+   - "quranic_commentary"   — explanation or context for a Quran verse
+   - "supplication"         — formulaic prayer or devotional text
+   - "creedal"              — statement of belief or theological principle
+   - "eschatological"       — about end times, resurrection, afterlife events
+   - "biographical"         — about a specific person's life or character
+
+7. "related_quran": (array of strings) Quran references in "surah:ayah" format.
+   Only include clearly related verses. Empty array [] if none.
+   Example: ["96:1", "20:114"]
+
+8. "translations": (object) Translations into ALL of the following 10 languages.
+   For each language, provide:
+   - "text": (string) faithful translation of the hadith
+   - "summary": (string) 1-2 sentence summary in that language
+   - "key_terms": (object) Arabic terms mapped to explanations in that language
+   - "seo_question": (string) a natural question this hadith answers, in that language
+
+   Languages (use these exact keys):
+   {
+     "ur": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "tr": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "fa": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "id": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "bn": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "es": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "fr": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "de": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "ru": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." },
+     "zh": { "text": "...", "summary": "...", "key_terms": {...}, "seo_question": "..." }
+   }
 ```
 
 > **Dropped from prompt: `historical_context`.** High hallucination risk for religious texts. Most hadiths have no documented historical circumstances. See "What's In Scope" table for rationale.
 
-### Output Schema Per Verse
+### Enum Validation (Post-Processing)
+
+Even with explicit enum values in the prompt, the pipeline validates every enum field after receiving the response:
+
+```python
+VALID_DIACRITICS_STATUS = {"added", "completed", "validated", "corrected"}
+VALID_POS_TAGS = {"N", "V", "ADJ", "ADV", "PREP", "CONJ", "PRON", "DET",
+                  "PART", "INTJ", "REL", "DEM", "NEG", "COND", "INTERR"}
+VALID_TAGS = {"theology", "ethics", "jurisprudence", "worship", "quran_commentary",
+              "prophetic_tradition", "family", "social_relations", "knowledge",
+              "dua", "afterlife", "history", "economy", "governance"}
+VALID_HADITH_TYPES = {"legal_ruling", "ethical_teaching", "dua", "narrative",
+                      "prophetic_tradition", "quranic_commentary", "supplication",
+                      "creedal", "eschatological", "biographical"}
+VALID_LANGUAGE_KEYS = {"ur", "tr", "fa", "id", "bn", "es", "fr", "de", "ru", "zh"}
+
+def validate_enums(result):
+    errors = []
+    if result["diacritics_status"] not in VALID_DIACRITICS_STATUS:
+        errors.append(f"invalid diacritics_status: {result['diacritics_status']}")
+    if result["hadith_type"] not in VALID_HADITH_TYPES:
+        errors.append(f"invalid hadith_type: {result['hadith_type']}")
+    for tag in result["tags"]:
+        if tag not in VALID_TAGS:
+            errors.append(f"invalid tag: {tag}")
+    for word in result["word_analysis"]:
+        if word["pos"] not in VALID_POS_TAGS:
+            errors.append(f"invalid pos: {word['pos']} for word {word['word']}")
+    for key in result["translations"]:
+        if key not in VALID_LANGUAGE_KEYS:
+            errors.append(f"invalid language key: {key}")
+    missing_langs = VALID_LANGUAGE_KEYS - set(result["translations"].keys())
+    if missing_langs:
+        errors.append(f"missing languages: {missing_langs}")
+    return errors
+```
+
+Items with enum validation errors are sent to the retry queue rather than rejected outright — the model may have used a close variant (e.g., `"Noun"` instead of `"N"`) that can be fixed with a targeted retry prompt.
+
+### Output Schema Per Verse (Multi-Language)
 
 ```json
 {
-  "translation": "Translation text in target language...",
-  "word_analysis": [
-    {
-      "word": "بِسْمِ",
-      "translation": "In the name of",
-      "root": "س م و",
-      "pos": "N"
-    }
-  ],
   "diacritized_text": "عَنْ عِدَّةٍ مِنْ أَصْحَابِنَا عَنْ أَحْمَدَ بْنِ مُحَمَّدِ بْنِ خَالِدٍ...",
   "diacritics_status": "completed",
   "diacritics_changes": [],
+  "word_analysis": [
+    {
+      "word": "عَنْ",
+      "translation_en": "from/about",
+      "root": "ع ن ن",
+      "pos": "PREP"
+    },
+    {
+      "word": "عِدَّةٍ",
+      "translation_en": "a number of",
+      "root": "ع د د",
+      "pos": "N"
+    }
+  ],
   "tags": ["theology", "knowledge"],
   "hadith_type": "ethical_teaching",
-  "summary": "The Imam explains that seeking knowledge is obligatory for every Muslim.",
-  "key_terms": {
-    "العلم": "Knowledge, specifically religious knowledge",
-    "الفريضة": "Religious obligation"
-  },
   "related_quran": ["96:1", "20:114"],
-  "seo_question": "What is the Islamic obligation regarding seeking knowledge?"
+  "translations": {
+    "ur": {
+      "text": "اردو ترجمہ...",
+      "summary": "امام نے فرمایا کہ ہر مسلمان پر علم حاصل کرنا فرض ہے۔",
+      "key_terms": {"العلم": "علم، خاص طور پر دینی علم", "الفريضة": "دینی فریضہ"},
+      "seo_question": "علم حاصل کرنے کی اسلامی ذمہ داری کیا ہے؟"
+    },
+    "tr": {
+      "text": "Türkçe çeviri...",
+      "summary": "İmam, ilim öğrenmenin her Müslümana farz olduğunu açıklamaktadır.",
+      "key_terms": {"العلم": "İlim, özellikle dini bilgi", "الفريضة": "Dini yükümlülük"},
+      "seo_question": "İlim öğrenmenin İslami yükümlülüğü nedir?"
+    },
+    "fa": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." },
+    "id": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." },
+    "bn": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." },
+    "es": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." },
+    "fr": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." },
+    "de": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." },
+    "ru": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." },
+    "zh": { "text": "...", "summary": "...", "key_terms": {}, "seo_question": "..." }
+  }
 }
 ```
 
-### Token Estimates Per Request
+### Token Estimates Per Request (Multi-Language)
 
 | Component | Est. input tokens | Est. output tokens |
 |-----------|------------------:|-------------------:|
-| System prompt | ~200 | — |
+| System prompt | ~300 | — |
 | Arabic text + English ref + context | ~350 | — |
-| Translation | — | ~200 |
-| Word analysis | — | ~400 |
+| **Language-independent (generated once):** | | |
 | Diacritized text + status + changes | — | ~200 |
-| Tags + type + summary | — | ~100 |
-| Key terms + refs + SEO question | — | ~100 |
-| **Total per request** | **~550** | **~1,000** |
+| Word analysis | — | ~400 |
+| Tags + type + related Quran | — | ~80 |
+| **Per-language (× 10):** | | |
+| Translation text (× 10) | — | ~2,000 |
+| Summary (× 10) | — | ~500 |
+| Key terms (× 10) | — | ~500 |
+| SEO question (× 10) | — | ~300 |
+| **Total per request** | **~650** | **~3,980** |
+
+Compared to single-language approach (10 separate calls):
+- Input: 650 vs 5,500 tokens (8.5× savings)
+- Output: 3,980 vs 10,000 tokens (2.5× savings)
+- API calls: 46,857 vs 468,570 (10× fewer)
 
 ---
 
@@ -642,28 +790,30 @@ For each sample, verify:
 
 ## 10. Cost Estimates
 
-### Generation Pass (Opus 4.6 Batch)
+### Generation Pass (Opus 4.6 Batch, Multi-Language)
 
 | Metric | Value |
 |--------|-------|
 | Total verses | 40,621 (hadith) + 6,236 (Quran) = 46,857 |
-| Languages | 10 |
-| Total requests | 468,570 |
-| Est. input tokens/request | 550 |
-| Est. output tokens/request | 1,000 (translation + word-by-word + diacritization + tags + summary + glossary + refs + SEO) |
-| Total input tokens | ~258M |
-| Total output tokens | ~469M |
-| Input cost ($2.50/MTok) | ~$645 |
-| Output cost ($12.50/MTok) | ~$5,863 |
-| **Generation total** | **~$6,508** |
+| Languages per request | 10 (all at once) |
+| **Total requests** | **46,857** (not 468,570) |
+| Est. input tokens/request | 650 |
+| Est. output tokens/request | 3,980 (shared outputs + 10 language-specific outputs) |
+| Total input tokens | ~30M |
+| Total output tokens | ~187M |
+| Input cost ($2.50/MTok) | ~$76 |
+| Output cost ($12.50/MTok) | ~$2,338 |
+| **Generation total** | **~$2,414** |
 
 ### Validation Pass (Sonnet 4.6 Batch)
 
+Validation is still per-language since each translation is reviewed independently.
+
 | Metric | Value |
 |--------|-------|
-| Total requests | 468,570 |
-| Est. input tokens/request | 600 (includes original + AI translation) |
-| Est. output tokens/request | 100 |
+| Total requests | 468,570 (46,857 verses × 10 languages) |
+| Est. input tokens/request | 600 (original Arabic + English + AI translation for one language) |
+| Est. output tokens/request | 100 (scores + feedback) |
 | Total input tokens | ~281M |
 | Total output tokens | ~47M |
 | Input cost ($1.50/MTok) | ~$422 |
@@ -672,22 +822,26 @@ For each sample, verify:
 
 ### Regeneration Pass (Opus 4.6 Batch, est. 5% failure rate)
 
+Regeneration re-sends the full multi-language request for verses with failures, so the model can maintain cross-language consistency.
+
 | Metric | Value |
 |--------|-------|
-| Requests (~5% of total) | ~23,400 |
-| Cost (same rate as generation) | ~$325 |
-| **Regeneration total** | **~$325** |
+| Verses requiring regeneration (~5%) | ~2,343 |
+| Cost per request (same as generation) | ~$0.052 |
+| **Regeneration total** | **~$122** |
 
 ### Grand Total
 
 | Phase | Cost |
 |-------|------|
-| Samples (60 calls) | ~$2 |
-| Generation | ~$6,508 |
-| Validation | ~$774 |
-| Regeneration | ~$325 |
-| **Pipeline total** | **~$7,609** |
-| Budget remaining after | ~$6,391 |
+| Samples (20 verses × 1 multi-lang call each) | ~$1 |
+| Generation (46,857 multi-lang calls) | ~$2,414 |
+| Validation (468,570 per-lang reviews) | ~$774 |
+| Regeneration (~2,343 multi-lang calls) | ~$122 |
+| **Pipeline total** | **~$3,311** |
+| Budget remaining after | ~$10,689 |
+
+> **Cost savings from multi-language approach:** ~$4,300 less than single-language (~$7,600). The savings come from sending input tokens once instead of 10 times and generating language-independent outputs (word analysis, diacritization, tags) only once.
 
 ---
 

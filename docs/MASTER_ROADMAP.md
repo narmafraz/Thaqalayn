@@ -433,7 +433,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 > **Goal:** Generate AI translations, word-by-word analysis, thematic tags, summaries, and similarity data for the entire corpus using Claude Opus 4.6 Batch API.
 > **Status:** Planning complete. Sample generation next, then bulk pipeline.
-> **Budget:** ~$14,000 available. Estimated pipeline cost: ~$7,600.
+> **Budget:** ~$14,000 available. Estimated pipeline cost: ~$3,300 (multi-language optimization).
 > **Full design document:** [`docs/AI_CONTENT_PIPELINE.md`](AI_CONTENT_PIPELINE.md)
 
 ### 7.1 AI Content Pipeline
@@ -489,12 +489,12 @@ Everything below has been implemented and tested. Included for context — do no
 | Item | Cost | Phase |
 |------|------|-------|
 | ~~AI translations (10 languages, Haiku Batch)~~ | ~~$245~~ | ~~3C~~ |
-| AI content pipeline (Opus 4.6 Batch — translations + word-by-word + diacritization + tags + summaries for 10 languages) | ~$7,600 | 7 |
+| AI content pipeline (Opus 4.6 Batch — translations + word-by-word + diacritization + tags + summaries for 10 languages, multi-language optimization) | ~$3,300 | 7 |
 | AI name transliterations (4,860 names) | ~$2 | 3C |
 | AI UI string translations (~50 keys × 10 langs) | ~$0.10 | 3B |
 | Custom domain (annual, optional) | ~$12/yr | 6 |
 | **All infrastructure** | **Free** | All |
-| **Total one-time** | **~$7,614** | |
+| **Total one-time** | **~$3,314** | |
 
 > **Budget note (2026-02-23):** Project has ~$15,000/month Anthropic API budget through end of April 2026. As of Feb 23, less than $1,000 spent this month. The Phase 7 AI pipeline is fully funded.
 

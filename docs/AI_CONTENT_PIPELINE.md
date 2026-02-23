@@ -39,13 +39,15 @@ A batch AI pipeline that processes every verse/hadith in the Thaqalayn corpus (4
 |---------|:------------------:|:-----------------------:|
 | AI Translations (10 languages) | Yes | Yes |
 | Word-by-word analysis | Yes (supplement QUL) | Yes (only source) |
+| Diacritization (tashkeel) | No (already fully voweled) | Yes (add/complete/validate) |
 | Thematic tags | Yes | Yes |
 | Summaries | Yes | Yes |
 | Key terms glossary | Yes | Yes |
 | Type classification | N/A | Yes |
 | Related Quran refs | N/A | Yes |
 | SEO question | Yes | Yes |
-| Historical context | No (too well-known) | Yes |
+
+> **Dropped: Historical context.** Unlike translation and word analysis (which are grounded in the source text), historical context requires external knowledge the AI may not have reliably. Most hadiths have no documented *asbab al-hadith*. Risk of plausible-sounding but fabricated context is too high for a religious text platform. Better to have no context than wrong context.
 
 ### What's NOT In Scope
 
@@ -127,19 +129,27 @@ Generate the following as a single JSON object:
 1. "translation": Your translation into {LANGUAGE_NAME}
 2. "word_analysis": Array of objects for each Arabic word:
    [{"word": "بِسْمِ", "translation": "In the name of", "root": "س م و", "pos": "noun"}]
-3. "tags": Array of 2-5 thematic tags from this controlled vocabulary:
+3. "diacritized_text": The full Arabic text with complete tashkeel (fatha, kasra, damma,
+   sukun, shadda, tanwin on every applicable letter). If the original already has
+   diacritics, preserve correct ones and fix any errors. If partial, complete them.
+4. "diacritics_status": One of: "added" (was bare), "completed" (was partial),
+   "validated" (was full, no changes needed), "corrected" (was full, fixes applied)
+5. "diacritics_changes": Array of corrections to existing diacritics (empty if "added"):
+   [{"original": "عَلِمَ", "corrected": "عُلِمَ", "reason": "passive voice per context"}]
+6. "tags": Array of 2-5 thematic tags from this controlled vocabulary:
    [theology, ethics, jurisprudence, worship, quran-commentary, prophetic-tradition,
     family, social-relations, knowledge, dua, afterlife, history, economy, governance]
-4. "hadith_type": One of: legal_ruling, narrative, dua, ethical_teaching,
+7. "hadith_type": One of: legal_ruling, narrative, dua, ethical_teaching,
    prophetic_tradition, quranic_commentary, historical_account, supplication
-5. "summary": 1-2 sentence summary of the hadith content
-6. "key_terms": Object mapping Arabic terms to {LANGUAGE_NAME} explanations:
+8. "summary": 1-2 sentence summary of the hadith content
+9. "key_terms": Object mapping Arabic terms to {LANGUAGE_NAME} explanations:
    {"term_arabic": "explanation in target language"}
-7. "related_quran": Array of Quran references (surah:ayah) this hadith relates to
-   (only if clearly related, empty array if none)
-8. "seo_question": A natural question this hadith answers, in {LANGUAGE_NAME}
-9. "historical_context": 1 sentence of historical context (or null if not applicable)
+10. "related_quran": Array of Quran references (surah:ayah) this hadith relates to
+    (only if clearly related, empty array if none)
+11. "seo_question": A natural question this hadith answers, in {LANGUAGE_NAME}
 ```
+
+> **Dropped from prompt: `historical_context`.** High hallucination risk for religious texts. Most hadiths have no documented historical circumstances. See "What's In Scope" table for rationale.
 
 ### Output Schema Per Verse
 
@@ -154,6 +164,9 @@ Generate the following as a single JSON object:
       "pos": "N"
     }
   ],
+  "diacritized_text": "عَنْ عِدَّةٍ مِنْ أَصْحَابِنَا عَنْ أَحْمَدَ بْنِ مُحَمَّدِ بْنِ خَالِدٍ...",
+  "diacritics_status": "completed",
+  "diacritics_changes": [],
   "tags": ["theology", "knowledge"],
   "hadith_type": "ethical_teaching",
   "summary": "The Imam explains that seeking knowledge is obligatory for every Muslim.",
@@ -162,8 +175,7 @@ Generate the following as a single JSON object:
     "الفريضة": "Religious obligation"
   },
   "related_quran": ["96:1", "20:114"],
-  "seo_question": "What is the Islamic obligation regarding seeking knowledge?",
-  "historical_context": "Narrated during the teaching circle of Imam al-Sadiq in Medina."
+  "seo_question": "What is the Islamic obligation regarding seeking knowledge?"
 }
 ```
 
@@ -175,9 +187,10 @@ Generate the following as a single JSON object:
 | Arabic text + English ref + context | ~350 | — |
 | Translation | — | ~200 |
 | Word analysis | — | ~400 |
+| Diacritized text + status + changes | — | ~200 |
 | Tags + type + summary | — | ~100 |
-| Key terms + refs + context | — | ~100 |
-| **Total per request** | **~550** | **~800** |
+| Key terms + refs + SEO question | — | ~100 |
+| **Total per request** | **~550** | **~1,000** |
 
 ---
 
@@ -615,12 +628,15 @@ For each sample, verify:
 - [ ] Translation reads naturally in target language
 - [ ] Islamic terminology preserved correctly
 - [ ] Honorifics present and correct
-- [ ] Word-by-word analysis has correct roots
+- [ ] Word-by-word analysis has correct roots and POS tags
+- [ ] Diacritized text is correctly voweled (compare with known-good sources)
+- [ ] Diacritics status accurately reflects what was changed
 - [ ] Tags are relevant to content
 - [ ] Summary accurately captures meaning
 - [ ] No hallucinated Quran references
 - [ ] JSON structure is valid and complete
 - [ ] Compare with existing human translations where available
+- [ ] Optional: cross-check diacritization with CAMeL Tools or Mishkal output
 
 ---
 
@@ -634,12 +650,12 @@ For each sample, verify:
 | Languages | 10 |
 | Total requests | 468,570 |
 | Est. input tokens/request | 550 |
-| Est. output tokens/request | 800 |
+| Est. output tokens/request | 1,000 (translation + word-by-word + diacritization + tags + summary + glossary + refs + SEO) |
 | Total input tokens | ~258M |
-| Total output tokens | ~375M |
+| Total output tokens | ~469M |
 | Input cost ($2.50/MTok) | ~$645 |
-| Output cost ($12.50/MTok) | ~$4,688 |
-| **Generation total** | **~$5,333** |
+| Output cost ($12.50/MTok) | ~$5,863 |
+| **Generation total** | **~$6,508** |
 
 ### Validation Pass (Sonnet 4.6 Batch)
 
@@ -659,19 +675,19 @@ For each sample, verify:
 | Metric | Value |
 |--------|-------|
 | Requests (~5% of total) | ~23,400 |
-| Cost (same rate as generation) | ~$267 |
-| **Regeneration total** | **~$267** |
+| Cost (same rate as generation) | ~$325 |
+| **Regeneration total** | **~$325** |
 
 ### Grand Total
 
 | Phase | Cost |
 |-------|------|
 | Samples (60 calls) | ~$2 |
-| Generation | ~$5,333 |
+| Generation | ~$6,508 |
 | Validation | ~$774 |
-| Regeneration | ~$267 |
-| **Pipeline total** | **~$6,376** |
-| Budget remaining after | ~$7,624 |
+| Regeneration | ~$325 |
+| **Pipeline total** | **~$7,609** |
+| Budget remaining after | ~$6,391 |
 
 ---
 
@@ -694,6 +710,8 @@ The Quran gets **both** QUL (free structured data) **and** AI-generated analysis
 - Translations in languages QUL doesn't cover
 - Cross-verification (compare AI roots with QUL roots)
 - Consistency with the hadith word-by-word format
+
+**Diacritization does NOT apply to Quran.** The Quran text from Tanzil.net is already fully voweled in the authoritative Uthmanic script. The diacritization feature is for hadith books only, where source text often has partial or no tashkeel.
 
 ### Quran Translation Sensitivity
 

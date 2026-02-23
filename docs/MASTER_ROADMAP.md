@@ -433,14 +433,14 @@ Everything below has been implemented and tested. Included for context — do no
 
 > **Goal:** Generate AI translations, word-by-word analysis, thematic tags, summaries, and similarity data for the entire corpus using Claude Opus 4.6 Batch API.
 > **Status:** Planning complete. Sample generation next, then bulk pipeline.
-> **Budget:** ~$14,000 available. Estimated pipeline cost: ~$6,400.
+> **Budget:** ~$14,000 available. Estimated pipeline cost: ~$7,600.
 > **Full design document:** [`docs/AI_CONTENT_PIPELINE.md`](AI_CONTENT_PIPELINE.md)
 
 ### 7.1 AI Content Pipeline
 
 | Status | Task | Description | Est. Cost |
 |--------|------|-------------|-----------|
-| [ ] | Upgrade `ai_translation.py` to `ai_pipeline.py` | Combined pipeline: translation + word-by-word + tags + summaries + glossary + cross-refs + type classification + SEO questions. Manifest-based fault tolerance with checkpoint recovery. Atomic file writes. Budget guards. | — |
+| [ ] | Upgrade `ai_translation.py` to `ai_pipeline.py` | Combined pipeline: translation + word-by-word + diacritization + tags + summaries + glossary + cross-refs + type classification + SEO questions. Manifest-based fault tolerance with checkpoint recovery. Atomic file writes. Budget guards. | — |
 | [ ] | Generate review samples | 20 verses × 3 languages (Urdu, Farsi, Turkish) from Al-Kafi, Quran, Nahj al-Balaghah, Faqih. For human review before bulk generation. | ~$2 |
 | [ ] | Review and approve samples | Compare AI translations with existing human translations. Verify word-by-word accuracy, tag relevance, summary quality. Iterate on prompt if needed. | — |
 | [ ] | Generate Tier 1 languages (ur, tr, fa) | All 22 books + Quran. ~140,000 API calls via Opus 4.6 Batch. | ~$1,900 |
@@ -450,6 +450,7 @@ Everything below has been implemented and tested. Included for context — do no
 | [ ] | Regenerate failures | Re-generate items scoring below threshold with validator feedback. Est. 5% failure rate. | ~$267 |
 | [ ] | Ingest into ThaqalaynData | Merge translations into served `books/` files. Create `words/` directory for word-by-word. Update `index/translations.json`. | — |
 | [ ] | Angular UI: AI translation badges | Show "AI Generated" indicator on translations. Display model + date in tooltip. Disclaimer on first use. | — |
+| [ ] | Angular UI: diacritized text toggle | Option to view fully voweled Arabic text (AI-diacritized) vs original. Show diacritics status badge. | — |
 | [ ] | Angular UI: word-by-word component | Clickable Arabic words with popover showing translation, root, POS. Reused for both Quran and hadith. | — |
 
 ### 7.2 Quran Word-by-Word (QUL Data)
@@ -488,12 +489,12 @@ Everything below has been implemented and tested. Included for context — do no
 | Item | Cost | Phase |
 |------|------|-------|
 | ~~AI translations (10 languages, Haiku Batch)~~ | ~~$245~~ | ~~3C~~ |
-| AI content pipeline (Opus 4.6 Batch — translations + word-by-word + tags + summaries for 10 languages) | ~$6,400 | 7 |
+| AI content pipeline (Opus 4.6 Batch — translations + word-by-word + diacritization + tags + summaries for 10 languages) | ~$7,600 | 7 |
 | AI name transliterations (4,860 names) | ~$2 | 3C |
 | AI UI string translations (~50 keys × 10 langs) | ~$0.10 | 3B |
 | Custom domain (annual, optional) | ~$12/yr | 6 |
 | **All infrastructure** | **Free** | All |
-| **Total one-time** | **~$6,414** | |
+| **Total one-time** | **~$7,614** | |
 
 > **Budget note (2026-02-23):** Project has ~$15,000/month Anthropic API budget through end of April 2026. As of Feb 23, less than $1,000 spent this month. The Phase 7 AI pipeline is fully funded.
 

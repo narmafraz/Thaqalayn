@@ -548,3 +548,57 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 - Pre-diacritization shifts AI from generation to verification (easier, more accurate)
 
 ---
+
+### D026: AI Pipeline — New Module vs Extending ai_translation.py (2026-02-23)
+
+**Context:** The existing `ai_translation.py` handles single-language translation via Haiku. The new AI content pipeline needs multi-language + word analysis + tags + narrator extraction via Opus 4.6.
+
+**Options considered:**
+1. **Extend `ai_translation.py`** — Add new functionality to the existing module.
+2. **New `ai_pipeline.py` module** — Separate module for the comprehensive pipeline.
+
+**Decision:** Option 2 — New `app/ai_pipeline.py` module with `app/ai_pipeline_data/` package.
+
+**Rationale:**
+- Different model (Opus 4.6 vs Haiku), different prompt strategy (combined vs single-output), different output format (9 content types vs translation only)
+- Keeps existing translation pipeline intact as fallback
+- Clean separation of concerns: `ai_translation.py` for simple translations, `ai_pipeline.py` for full content generation
+- Data files (glossary, few-shot examples) are pipeline-specific and belong in a dedicated package
+
+---
+
+### D027: Sample Generation Method — Claude Code Direct (2026-02-23)
+
+**Context:** Need sample AI content to validate the pipeline before running the full Batch API job (~$3,926). No Anthropic API key is currently available.
+
+**Decision:** Generate samples directly via Claude Code (which runs Opus 4.6), saving results as JSON files in `ai-content/samples/responses/`.
+
+**Rationale:**
+- Claude Code IS Opus 4.6 — the output quality is identical to what the Batch API would produce
+- Validates the full pipeline: prompt construction → content generation → validation
+- 5 diverse samples (2 Quran + 3 Al-Kafi) cover the key scenarios: Bismillah, monotheism verse, hadith with long chain, hadith with short chain, prophetic tradition
+- No API key or budget required for validation phase
+- Samples serve as quality benchmarks for the eventual Batch API run
+
+---
+
+### D028: Few-Shot Example Count — 3 Examples (2026-02-23)
+
+**Context:** Research (D025) identified few-shot prompting as the single most effective technique. How many examples to include?
+
+**Options considered:**
+1. **1 example** — Minimal, saves tokens but insufficient for format complexity.
+2. **3 examples** — Covers main scenarios (hadith with chain, Quran verse, hadith without chain).
+3. **5 examples** — Research suggests diminishing returns above 5.
+4. **10 examples** — Maximum coverage but excessive token cost per request.
+
+**Decision:** 3 few-shot examples.
+
+**Rationale:**
+- Covers the three distinct scenarios: hadith with full narrator chain, Quran verse (no chain), short hadith without chain
+- Research shows diminishing returns above 3-5 examples for structured JSON output
+- ~2,000 input tokens per request — acceptable cost at $2.50/MTok (Opus batch)
+- Each example is a complete, validated output matching the exact JSON schema
+- Additional examples can be added later if quality review identifies gaps
+
+---

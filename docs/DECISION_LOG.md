@@ -602,3 +602,28 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 - Additional examples can be added later if quality review identifies gaps
 
 ---
+
+### D029: Source Data Repo Separation — ThaqalaynDataSources (2026-02-25)
+
+**Context:** ThaqalaynDataGenerator mixed Python code with source data (`app/raw/`, `ai-content/`, `app/ai_pipeline_data/`). The `raw/` directory was gitignored (too large to track), while `ai-content/` and `ai_pipeline_data/` were tracked alongside code. This made it unclear what was generator code vs input data.
+
+**Decision:** Create a dedicated `ThaqalaynDataSources` repo to hold all source/input data separately from the generator code.
+
+**What moved:**
+- `app/raw/` directories → `ThaqalaynDataSources/raw/`
+- `ai-content/` → `ThaqalaynDataSources/ai-content/`
+- `app/ai_pipeline_data/*.json` → `ThaqalaynDataSources/ai-pipeline-data/`
+
+**How it works:**
+- Generator reads from `SOURCE_DATA_DIR` env var (default: `../ThaqalaynDataSources/`)
+- Scrapers write to the same location
+- Data flow becomes: **Sources → Generator → Data → Angular UI**
+
+**Rationale:**
+- Clean separation of concerns: code vs data
+- Raw data can now be version-controlled in its own repo (was gitignored before)
+- AI content and pipeline data have a clear home
+- Scrapers and parsers all use the same configurable path
+- Follows the same pattern as `DESTINATION_DIR` for output
+
+---

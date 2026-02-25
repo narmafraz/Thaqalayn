@@ -610,7 +610,7 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 **Decision:** Create a dedicated `ThaqalaynDataSources` repo to hold all source/input data separately from the generator code.
 
 **What moved:**
-- `app/raw/` directories → `ThaqalaynDataSources/raw/`
+- `app/raw/` directories → `ThaqalaynDataSources/scraped/`
 - `ai-content/` → `ThaqalaynDataSources/ai-content/`
 - `app/ai_pipeline_data/*.json` → `ThaqalaynDataSources/ai-pipeline-data/`
 

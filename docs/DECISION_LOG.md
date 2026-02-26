@@ -627,3 +627,20 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 - Follows the same pattern as `DESTINATION_DIR` for output
 
 ---
+
+### D030: Defer root and is_proper_noun to Word Dictionary Batch Pass (2026-02-26)
+
+**Context:** The AI content pipeline generates per-verse `word_analysis` with fields: `word`, `translation`, `root`, `pos`, `is_proper_noun`. Analysis showed that `root` and `is_proper_noun` are context-independent — they depend only on the diacritized word form, not on how the word is used in a sentence. In contrast, `translation` and `pos` are context-dependent and must be generated per-verse.
+
+**Decision:** Remove `root` and `is_proper_noun` from the per-verse AI pipeline schema. These fields will be generated later in a dedicated word dictionary batch pass (Phase 7.5) that processes each unique Arabic lemma once rather than repeating for every occurrence across ~46,857 verses.
+
+**Rationale:**
+- Generating `root` once per unique word (~5-10K lemmas) vs per-verse (46,857 times) saves significant cost and avoids inconsistency
+- The word dictionary pass (Phase 7.5) will also generate additional context-independent fields: morphological form (wazn), related words, detailed grammatical analysis
+- Per-verse generation should focus on what requires sentence context: translation and part-of-speech
+- Reduces per-verse output tokens (~10-15%), lowering cost from ~$4,700 to ~$4,400
+
+**Fields remaining in per-verse word_analysis:** `word`, `translation` (11 langs), `pos`
+**Fields deferred to word dictionary:** `root`, `is_proper_noun`, `form/wazn`, related words
+
+---

@@ -484,6 +484,67 @@ Everything below has been implemented and tested. Included for context — do no
 | [ ] | Build al-Istibsar parser | Parse from same source. 4 volumes, ~5,511 hadiths. | High |
 | [ ] | Generalize narrator extraction | Refactor `kafi_narrators.py` into shared module for different chain styles. | High |
 
+### 7.5 Arabic Word Dictionary & Word Detail Pages
+
+> **Goal:** Build a comprehensive Arabic word dictionary with dedicated pages for each unique word, enabling deep study of vocabulary across the entire Quran and hadith corpus. This replaces and expands the earlier "root exploration pages" concept from Phase 4.7/7.2.
+>
+> **Key insight:** Context-independent word attributes (root, morphological form/wazn, is_proper_noun) should NOT be generated per-verse in the AI pipeline. Instead, generate them once per unique word in a dedicated batch pass, producing richer content than what fits in a per-verse prompt.
+
+#### Scope
+
+**Word detail pages** (`/#/words/{word-id}`): A page for each unique Arabic word/lemma showing:
+- Root and morphological form (wazn)
+- Morphological breakdown (prefix-stem-suffix)
+- All inflected forms of this word across the corpus
+- Translations in all 11 languages
+- Related words from the same root (navigate between forms)
+- Occurrences across Quran and all hadith collections
+- Etymology and scholarly notes
+
+**Root index pages** (`/#/words/roots/{root}`): All words sharing a root, grouped by morphological pattern, with occurrence counts and navigation to word detail pages.
+
+**Word-by-word verse integration**: Clickable Arabic words in verse display link to their word detail page.
+
+#### Design Principles (requires UX research)
+- **Progressive disclosure** — Don't overwhelm the user with linguistic detail upfront. Show translation and root first, expand for morphology/etymology/occurrences on demand.
+- **Optimal navigation** — Easy to move between related forms (same root, different pattern) without getting lost. Breadcrumbs and back-navigation are critical.
+- **Audience-aware** — Casual readers need simple translations; Arabic students need morphological detail; scholars need cross-corpus occurrence data. The page must serve all three without cluttering.
+- **In-depth UX research needed** — Before implementation, research similar tools (corpus.quran.com, Aratools, Lane's Lexicon online, ejtaal.net) for navigation patterns, information hierarchy, and what works/doesn't at scale.
+
+#### Data Pipeline
+
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | Extract unique word inventory | Compute unique diacritized lemmas from all AI-generated word_analysis across the corpus. Normalize case endings to group inflected forms under one lemma. | Medium |
+| [ ] | Design word dictionary schema | Define JSON structure for word detail pages: root, form/wazn, morphological breakdown, translations, related words, occurrence index. Research what attributes are most valuable. | Medium |
+| [ ] | Batch AI generation for word content | Generate rich per-word content (root, form, is_proper_noun, morphological breakdown, etymology, related words) once per unique lemma via batch API. Much cheaper than per-verse. | Medium |
+| [ ] | Generate root index files | Aggregate words by root. ~1,700 roots for Quran, more with hadith corpus. Per-root file with all derived words and occurrence counts. | Low |
+| [ ] | Generate word detail files | Per-word JSON files with full linguistic analysis. Estimated ~5,000-10,000 unique lemmas across corpus. | Medium |
+
+#### Angular UI
+
+| Status | Task | Description | Effort |
+|--------|------|-------------|--------|
+| [ ] | UX research and design | Study existing Arabic lexicon tools for navigation patterns. Design wireframes for word detail page with progressive disclosure. User test with different audience levels. | High |
+| [ ] | Word detail page component | Route `/#/words/{word-id}` showing word analysis, translations, related forms, occurrences. | High |
+| [ ] | Root index page component | Route `/#/words/roots/{root}` showing all words from a root grouped by pattern. | Medium |
+| [ ] | Word-by-word verse integration | Clickable Arabic words in verse display linking to word detail pages. Toggle between reading and word-by-word views. | High |
+| [ ] | Word popover component | Quick-view tooltip on hover/tap: translation, root, link to full word page. | Medium |
+
+#### Relationship to Per-Verse AI Pipeline
+
+The per-verse AI pipeline (Phase 7.1) generates **context-dependent** word attributes only:
+- `word` (diacritized surface form)
+- `translation` (11-language object — meaning varies by context)
+- `pos` (part of speech — varies by context)
+
+The word dictionary pipeline generates **context-independent** attributes once per unique word:
+- `root`, `form/wazn`, `is_proper_noun`, morphological breakdown, etymology, related words
+
+This split avoids generating the same root/form thousands of times across verses and enables much richer per-word content.
+
+> **Decision (2026-02-26):** Remove `root` and `is_proper_noun` from the per-verse AI pipeline schema before full corpus generation. These fields will be generated in the word dictionary batch pass instead. See Decision Log D030.
+
 ---
 
 ## Cost Summary
@@ -491,12 +552,13 @@ Everything below has been implemented and tested. Included for context — do no
 | Item | Cost | Phase |
 |------|------|-------|
 | ~~AI translations (10 languages, Haiku Batch)~~ | ~~$245~~ | ~~3C~~ |
-| AI content pipeline (Opus 4.6 Batch — translations + word-by-word + diacritization + narrator extraction + tags + summaries for 10 languages, multi-language optimization, few-shot prompting) | ~$3,926 | 7 |
+| AI content pipeline (Opus 4.6 Batch — translations + word-by-word + diacritization + narrator extraction + tags + summaries for 11 languages, multi-language optimization, few-shot prompting) | ~$4,400 | 7 |
+| AI word dictionary (batch generation — root, form/wazn, morphological breakdown, etymology per unique lemma, ~5-10K words) | ~$50-100 | 7 |
 | AI name transliterations (4,860 names) | ~$2 | 3C |
 | AI UI string translations (~50 keys × 10 langs) | ~$0.10 | 3B |
 | Custom domain (annual, optional) | ~$12/yr | 6 |
 | **All infrastructure** | **Free** | All |
-| **Total one-time** | **~$3,940** | |
+| **Total one-time** | **~$4,565** | |
 
 > **Budget note (2026-02-23):** Project has ~$15,000/month Anthropic API budget through end of April 2026. As of Feb 23, less than $1,000 spent this month. The Phase 7 AI pipeline is fully funded.
 
@@ -586,5 +648,5 @@ Documented decisions and notable bug fixes applied during development.
 |------|-------|-----------|
 | **rafed.net scraper** | 3B | Scraper skeleton was created but full implementation deferred. The rafed.net site serves Word documents that require manual download and extraction. Automated scraping is not viable for this source format. |
 | **lib.eshia.ir scraper** | 3B | Assessed as not viable for automated scraping. The source contains image scans of manuscripts rather than structured/parseable text. Would require OCR which is out of scope. |
-| **Word-by-word Quran** | 4 | Deferred from Phase 4.7 to a later phase. Requires significant effort (QUL SQLite conversion, word popover component, root exploration pages) with lower user-facing priority compared to search, PWA, bookmarks, and audio features. |
+| **Word-by-word Quran** | 4 | Deferred from Phase 4.7 to Phase 7.5 (Arabic Word Dictionary). Expanded scope: dedicated word detail pages per unique lemma, root index pages, navigation between word forms, applies to both Quran and hadith (not just Quran). Context-independent attributes (root, form/wazn, is_proper_noun) generated once per word in batch, not per-verse. Requires UX research for optimal navigation design. |
 | **AI translations generation** | 3C | Pipeline script (`ai_translation.py`) is built and ready, but actual batch generation requires ~$245 in API costs. Awaiting user approval before submitting batch jobs. |

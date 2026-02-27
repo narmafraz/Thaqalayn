@@ -246,6 +246,8 @@ Recommended: Quran-only for Phase 3/4. Hadith word analysis deferred until NLP p
 
 ### 2.1 Overview
 
+> **Status (2026-02-27):** An AI content pipeline has been built using Claude Code agents (not Batch API). It supports 11 languages with word-by-word analysis, diacritized text, isnad/matn analysis, and content tagging. Structure pass caching is implemented. See `ThaqalaynDataGenerator/CLAUDE.md` for full details. The pipeline below remains valid for bulk Batch API translation as an alternative/complement to the agent-based approach.
+
 Use Claude (Anthropic's AI) to translate Arabic hadith and Quran texts into languages beyond those currently available. The current data has English translations for most content and French for some ThaqalaynAPI books. AI translation could add: Urdu, Turkish, Farsi/Persian, Malay/Indonesian, Bengali, Spanish, and more.
 
 ### 2.2 Translation Strategy
@@ -320,8 +322,8 @@ With prompt caching (system prompt reused across hadiths in same batch), input c
 | Tier | Model | Cost/lang | Use Case |
 |------|-------|-----------|----------|
 | Standard | Haiku 4.5 Batch | ~$24 | Most languages, good quality |
-| Premium | Sonnet 4.5 Batch | ~$95 | Major languages (Urdu, Turkish, Farsi) |
-| Verified | Opus 4.5 Batch | ~$375 | Critical/flagship translations |
+| Premium | Sonnet 4.6 Batch | ~$95 | Major languages (Urdu, Turkish, Farsi) |
+| Verified | Opus 4.6 Batch | ~$375 | Critical/flagship translations |
 
 **Recommendation:** Use Haiku for all languages initially ($245 for 10 languages), then upgrade specific high-traffic languages to Sonnet if quality review shows deficiencies.
 
@@ -1227,7 +1229,7 @@ Netlify provisions free Let's Encrypt SSL certificates automatically.
 
 ### 8.8 Future: Angular SSG (Prerendering)
 
-Angular 18 supports build-time prerendering via `@angular/ssr` with `outputMode: "static"`. This generates real HTML files at build time for the most important pages, giving the best possible Core Web Vitals scores (a Google ranking factor). This is architecturally complex for the current NgModule-based app and should be deferred until after an Angular 19+ upgrade with standalone components.
+Angular 19 supports build-time prerendering via `@angular/ssr` with `outputMode: "static"`. This generates real HTML files at build time for the most important pages, giving the best possible Core Web Vitals scores (a Google ranking factor). `@angular/ssr` is installed. The app currently uses NgModule-based architecture; standalone component migration would simplify SSG integration.
 
 ### 8.9 Implementation Steps
 
@@ -1255,7 +1257,7 @@ Angular 18 supports build-time prerendering via `@angular/ssr` with `outputMode:
 | **3** | **SEO: Prerender + Meta + Sitemap** (Section 8.3-8.6) | Medium | **Critical** -- enables indexing | Path routing | Ready |
 | **4** | **Searchable Navigation** (Section 4) | Medium | High -- core UX improvement | Breadcrumb fix | Ready |
 | **5** | **Full i18n** (Section 7) | Medium | High -- unlocks multilingual audience | None | Ready |
-| **6** | **AI Translations** (Section 2) | Medium | High -- 10x language coverage | i18n + Schema changes | Ready |
+| **6** | **AI Translations** (Section 2) | Medium | High -- 10x language coverage | i18n + Schema changes | Pipeline built (agents) |
 | **7** | **Cross-Validation** (Section 6) | High | High -- scholarly integrity | Additional data scraping | Ready |
 | **8** | **Narrator Improvements** (Section 3) | High | Medium-High -- scholarly value | WikiShia scraper | Ready |
 | **9** | **Word-by-Word** (Section 1) | **Very High** | Medium -- learning/study tool | Corpus data processing | **Phase 4** |
@@ -1384,8 +1386,8 @@ All infrastructure remains free (Netlify static hosting, build-time computation)
 
 | Service | URL | Pricing |
 |---------|-----|---------|
-| Claude Batch API (Haiku 4.5) | https://platform.claude.com/docs/en/about-claude/pricing | $0.50/$2.50 per 1M tokens (batch) |
-| Claude Batch API (Sonnet 4.5) | Same | $1.50/$7.50 per 1M tokens (batch) |
+| Claude Batch API (Haiku 4.5) | https://docs.anthropic.com/en/docs/about-claude/pricing | $0.50/$2.50 per 1M tokens (batch) |
+| Claude Batch API (Sonnet 4.6) | Same | $1.50/$7.50 per 1M tokens (batch) |
 
 ### Data Availability for Remaining Four Books
 

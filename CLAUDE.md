@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Thaqalayn is an Angular 18 web application for hosting and displaying Islamic Hadith collections, specifically the Four Books (Al-Kutub Al-Arb'ah) and other primary Hadith sources. The application provides a hierarchical navigation system through books, chapters, and individual Hadiths (verses) with multi-language support and translations.
+Thaqalayn is an Angular 19 web application for hosting and displaying Islamic Hadith collections, specifically the Four Books (Al-Kutub Al-Arb'ah) and other primary Hadith sources. The application provides a hierarchical navigation system through books, chapters, and individual Hadiths (verses) with multi-language support and translations.
 
 ## Development Commands
 
@@ -23,11 +23,11 @@ ng build --configuration=production  # Production build
 
 ### Testing
 ```bash
-# Unit tests (Karma/Jasmine) — 19 specs across 15 files
+# Unit tests (Karma/Jasmine) — 367 tests across 28 spec files
 # On Windows without Chrome installed, set CHROME_BIN to Brave:
 CHROME_BIN="/c/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe" npx ng test --watch=false --browsers=ChromeHeadless
 
-# E2E tests (Playwright) — 78 tests across 12 spec files
+# E2E tests (Playwright) — 187 tests across 16 spec files
 # IMPORTANT: Must run from within the Thaqalayn directory, not from root
 npx playwright test                    # Run all E2E tests (headless)
 npx playwright test --headed           # Run with visible browser
@@ -44,7 +44,7 @@ npx playwright test --reporter=html    # Generate HTML report
 
 ### Linting
 ```bash
-ng lint                  # Run ESLint (migrated from TSLint)
+ng lint                  # Run ESLint (flat config, eslint.config.js)
 ```
 
 ### Code Generation
@@ -147,18 +147,22 @@ As issues are fixed, remove the corresponding rule from `KNOWN_ISSUE_RULES_TO_SK
 Tests live in `e2e/tests/` and use Playwright with `@axe-core/playwright` for accessibility:
 ```
 e2e/tests/
-├── accessibility.spec.ts        # 19 tests — axe-core WCAG 2.1 AA audits
-├── al-kafi-reading.spec.ts      # 6 tests — hadith display, narrator chains
-├── book-navigation.spec.ts      # 3 tests — navigate between books
-├── breadcrumbs.spec.ts          # 5 tests — breadcrumb rendering
-├── cross-references.spec.ts     # 4 tests — Quran/Kafi cross-references
-├── deep-linking.spec.ts         # 10 tests — direct URL access
-├── homepage.spec.ts             # 3 tests — homepage loading
-├── narrator-pages.spec.ts       # 8 tests — narrator list and detail
-├── no-console-errors.spec.ts    # 5 tests — no JS errors on pages
-├── prev-next-navigation.spec.ts # 6 tests — prev/next arrows
-├── quran-reading.spec.ts        # 5 tests — Quran verse display
-└── translation-switching.spec.ts# 4 tests — translation selector
+├── accessibility.spec.ts         # axe-core WCAG 2.1 AA audits
+├── al-kafi-reading.spec.ts       # hadith display, narrator chains
+├── book-navigation.spec.ts       # navigate between books
+├── breadcrumbs.spec.ts           # breadcrumb rendering
+├── cross-references.spec.ts      # Quran/Kafi cross-references
+├── deep-linking.spec.ts          # direct URL access
+├── homepage.spec.ts              # homepage loading
+├── i18n.spec.ts                  # internationalization
+├── narrator-pages.spec.ts        # narrator list and detail
+├── no-console-errors.spec.ts     # no JS errors on pages
+├── phase3c-features.spec.ts      # Phase 3c feature tests
+├── prev-next-navigation.spec.ts  # prev/next arrows
+├── quran-reading.spec.ts         # Quran verse display
+├── seo.spec.ts                   # SEO and meta tags
+├── translation-switching.spec.ts # translation selector
+└── verse-detail.spec.ts          # verse detail view
 ```
 
 ### Routing Notes
@@ -182,6 +186,15 @@ When writing Karma/Jasmine specs for components that use NGXS:
 
 ### Path Structure
 Book parts are identified by colon-separated indices (e.g., "1:2:3") which map to API paths like "books/1/2/3.json". The `BooksService.getPart()` method handles this conversion.
+
+### Installed Feature Dependencies
+The following libraries are installed and available for feature development:
+- **@angular/service-worker** — PWA support (configured in `ngsw-config.json`)
+- **@orama/orama** — Client-side full-text search engine (for search feature)
+- **dexie** — IndexedDB wrapper (for bookmarks, notes, reading progress)
+- **firebase** — Cloud services (for optional cross-device sync)
+- **@capacitor/\*** — Native mobile app framework (Android + iOS wrappers)
+- **@angular/ssr** + **express** — Server-side rendering support
 
 ### Translation System
 - Each chapter's `verse_translations` field contains an array of translation IDs (e.g., `["en.qarai", "en.sarwar"]`)

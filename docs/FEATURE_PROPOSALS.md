@@ -1,10 +1,12 @@
 # Feature Proposals
 
+> **Status (2026-02-27):** PWA is DONE (service worker configured). Libraries installed for Search (Orama), Bookmarks (Dexie), and Cross-device Sync (Firebase). See individual sections for details.
+
 > All proposals in this document adhere to the project's architecture philosophy documented in **[ARCHITECTURE.md](ARCHITECTURE.md)** — most importantly: zero ongoing costs, static-only hosting, build-time computation, and progressive enhancement.
 
 ---
 
-## 1. Search
+## 1. Search — READY TO BUILD (Orama installed)
 
 ### Problem
 
@@ -99,7 +101,9 @@ Could be added as a Phase 2 complement to Orama if bandwidth becomes a concern.
 
 ---
 
-## 2. Offline / PWA Support
+## 2. Offline / PWA Support — DONE
+
+> **Status:** `@angular/pwa` is installed and configured. Service worker is active in production builds. `ngsw-config.json` configured for app shell and data caching.
 
 ### Problem
 
@@ -126,13 +130,15 @@ This adds a service worker that caches:
 
 ---
 
-## 3. Bookmarks, Notes & Reading Progress
+## 3. Bookmarks, Notes & Reading Progress — READY TO BUILD (Dexie installed)
 
 ### Problem
 
 Users have no way to save their place, bookmark important verses, or add personal notes.
 
 ### Recommended Approach: IndexedDB via Dexie.js
+
+> **Status:** `dexie` is installed as a dependency. UI components still need to be built.
 
 All user data stored locally in the browser using [Dexie.js](https://dexie.org/) (a clean wrapper around IndexedDB):
 
@@ -168,7 +174,7 @@ interface ReadingProgress {
 - All data stored in browser, survives page refreshes, no server needed
 - Storage limit: hundreds of MB (far more than needed)
 
-**Optional future enhancement:** Cross-device sync via Firebase Realtime Database free tier (1 GB storage, 10 GB/month transfer, no credit card, free indefinitely). This would be an opt-in feature requiring a Google sign-in.
+**Optional future enhancement:** Cross-device sync via Firebase Realtime Database free tier (1 GB storage, 10 GB/month transfer, no credit card, free indefinitely). This would be an opt-in feature requiring a Google sign-in. **Status:** `firebase` is installed as a dependency.
 
 **Cost: Free.**
 
@@ -246,16 +252,16 @@ The app already has hash-based URLs that uniquely identify every verse (e.g., `h
 
 ## Implementation Priority
 
-| Priority | Feature | Effort | Impact |
-|----------|---------|--------|--------|
-| 1 | **Search** (Orama + static indexes) | High | Highest — most requested missing feature |
-| 2 | **Offline/PWA** | Low | High — `ng add @angular/pwa` is mostly automatic |
-| 3 | **Bookmarks & Reading Progress** | Medium | High — core reading UX improvement |
-| 4 | **Audio Recitation** | Medium | Medium — expected for Quran apps |
-| 5 | **Social Sharing** | Low | Medium — shareable URLs already exist |
-| 6 | **Tafsir** | Medium | Medium — adds scholarly depth |
-| 7 | **Notes/Annotations** | Medium | Lower — power user feature |
-| 8 | **Cross-device Sync** | High | Lower — requires Firebase, adds complexity |
+| Priority | Feature | Effort | Impact | Status |
+|----------|---------|--------|--------|--------|
+| 1 | **Search** (Orama + static indexes) | High | Highest — most requested missing feature | Orama installed |
+| 2 | **Offline/PWA** | Low | High — `ng add @angular/pwa` is mostly automatic | **DONE** |
+| 3 | **Bookmarks & Reading Progress** | Medium | High — core reading UX improvement | Dexie installed |
+| 4 | **Audio Recitation** | Medium | Medium — expected for Quran apps | Not started |
+| 5 | **Social Sharing** | Low | Medium — shareable URLs already exist | Not started |
+| 6 | **Tafsir** | Medium | Medium — adds scholarly depth | Not started |
+| 7 | **Notes/Annotations** | Medium | Lower — power user feature | Dexie installed |
+| 8 | **Cross-device Sync** | High | Lower — requires Firebase, adds complexity | Firebase installed |
 
 ---
 

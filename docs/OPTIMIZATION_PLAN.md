@@ -1,5 +1,7 @@
 # ThaqalaynData Optimization Plan
 
+> **Status (2026-02-27):** Phase 1 is **DONE** — `narrator_chain.text` removal and subchain optimization are both implemented and deployed. See [SCHEMA_PROPOSAL.md](SCHEMA_PROPOSAL.md) for corrected size estimates (breadcrumbs and navigation were already optimized before this plan was written — the ~50 MB savings claimed for those is phantom).
+
 ## Cross-Project Implementation Guide
 
 This document provides a complete plan for optimizing the data model across all 3 projects. An agent should be able to pick this up and make coordinated changes across all projects simultaneously.
@@ -116,7 +118,9 @@ The app reads `book.data.verse_translations` to populate the translation dropdow
 
 ---
 
-### 1.3 Breadcrumb Duplication (~35 MB)
+### 1.3 Breadcrumb Duplication (~35 MB) — NOT APPLICABLE
+
+> **Note:** Breadcrumbs are NOT stored in the generated JSON. They are reconstructed client-side by `BooksState.getCurrentNavigatedCrumbs` using `index/books.{lang}.json`. The ~35 MB savings claimed here is phantom. See [SCHEMA_PROPOSAL.md](SCHEMA_PROPOSAL.md) Section 1.3.6 for details.
 
 **Angular usage** (`Thaqalayn/src/app/components/breadcrumbs/breadcrumbs.component.html`, line 5):
 ```html
@@ -145,7 +149,9 @@ getInBookReference(chapter: Chapter, verse: Verse): string {
 
 ---
 
-### 1.4 Navigation Object Duplication (~15 MB)
+### 1.4 Navigation Object Duplication (~15 MB) — NOT APPLICABLE
+
+> **Note:** Navigation objects already store path strings (not full Crumb objects) in the generated JSON. The ~15 MB savings claimed here is phantom. See [SCHEMA_PROPOSAL.md](SCHEMA_PROPOSAL.md) Section 1.3.5 for details.
 
 **Angular usage** (`Thaqalayn/src/store/books/books.state.ts`, lines 92-99):
 ```typescript
@@ -597,14 +603,14 @@ And update all template references (`book.data.crumbs` → still `crumbs`, `vers
 
 ## PART 3: RECOMMENDED IMPLEMENTATION ORDER
 
-### Phase 1: Generator-Only Changes (No Angular Impact)
+### Phase 1: Generator-Only Changes (No Angular Impact) — DONE
 
 **Estimated savings: 90 MB (19% reduction)**
 
-| Step | Change | File | Savings | Risk |
-|------|--------|------|---------|------|
-| 1a | Remove `narrator_chain.text` | `kafi_narrators.py` (line 161) | 30 MB | None — Angular doesn't use it |
-| 1b | Optimize subchains (Option A: full chains + pairs) | `kafi_narrators.py` (lines 117-145) | 60 MB | Low — Co-Narrators still works |
+| Step | Change | File | Savings | Risk | Status |
+|------|--------|------|---------|------|--------|
+| 1a | Remove `narrator_chain.text` | `kafi_narrators.py` (line 161) | 30 MB | None — Angular doesn't use it | **DONE** |
+| 1b | Optimize subchains (Option A: full chains + pairs) | `kafi_narrators.py` (lines 117-145) | 60 MB | Low — Co-Narrators still works | **DONE** |
 
 **Implementation for Step 1a:**
 
@@ -809,9 +815,10 @@ After each phase, verify:
 
 ## PART 7: EXPECTED TOTAL SAVINGS
 
-| Phase | Savings | Cumulative | % Reduction |
-|-------|---------|------------|-------------|
-| Phase 1 (Generator only) | 90 MB | 395 MB | 19% |
-| Phase 2 (Generator + Angular) | 55 MB | 340 MB | 30% |
-| Phase 3 (Field names, optional) | 20 MB | 320 MB | 34% |
-| **TOTAL** | **165 MB** | **320 MB** | **34%** |
+| Phase | Savings | Cumulative | % Reduction | Status |
+|-------|---------|------------|-------------|--------|
+| Phase 1 (Generator only) | 90 MB | 455 MB | 17% | **DONE** |
+| Phase 2 (Generator + Angular) | 5 MB | 450 MB | 18% | Not started |
+| Phase 3 (Field names, optional) | 20 MB | 430 MB | 21% | Not started |
+
+> **Corrected totals:** Breadcrumb removal (35 MB) and nav simplification (15 MB) do not apply — these were already optimized. See [SCHEMA_PROPOSAL.md](SCHEMA_PROPOSAL.md) Part 3 for corrected figures. Real Phase 2 savings are ~5 MB (verse_translations only).

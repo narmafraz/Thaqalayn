@@ -1,81 +1,67 @@
 # Thaqalayn Ecosystem: Comprehensive Improvement Roadmap
 
-> **Date:** 2026-02-21 (updated)
-> **Scope:** ThaqalaynDataGenerator (Python) | ThaqalaynData (JSON API) | Thaqalayn (Angular 18 UI)
+> **Date:** 2026-02-27 (updated)
+> **Scope:** ThaqalaynDataGenerator (Python) | ThaqalaynData (JSON API) | Thaqalayn (Angular 19 UI)
 > **Primary Goal:** Serve all 4 major Shia hadith books with multi-language translations, accessible to users and developers
 
 ---
 
-## Current Work: Phased Approach (February 2026)
+## Completion Status (February 2026)
 
-> **Principle:** Establish solid test coverage FIRST, then clean up, then add features. No major refactoring or optimization until tests are in place as a regression safety net.
+> **Phase 1 (Tests) and Phase 2 (Cleanup) are largely COMPLETE.** Phase 3+ (Features, New Books, AI Pipeline) are the active frontier.
 
-### Phase 1: Test Coverage (NOW -- must complete before Phase 2)
+### Phase 1: Test Coverage — COMPLETE
 
-#### UIdev -- Fix Tests + E2E Tests
+| Item | Status | Details |
+|------|--------|---------|
+| Fix broken Angular unit tests | **DONE** | All 3 broken specs rewritten; 367 `it()` calls across 28 spec files now pass |
+| E2E tests with Playwright | **DONE** | 187 tests across 16 spec files covering all key user flows |
+| Fix generator test failures | **DONE** | 1143 tests passing (up from 91), 32 test files |
+| Data validation tests | **DONE** | `test_data_validation.py` (64 tests) covers schema, integrity, cross-refs |
+| Parser unit tests | **DONE** | `test_quran_parser.py` (14), `test_kafi_parser.py` (42), `test_kafi_sarwar_parser.py` (17) |
 
-**Step 1: Fix broken unit tests (BLOCKING -- prevents all other tests from running)**
+### Phase 2: Cleanup & Modernization — MOSTLY COMPLETE
 
-The Angular test suite has TypeScript compilation errors that prevent ANY tests from executing:
-- `books.state.spec.ts` -- imports non-existent `BooksAction`, uses wrong `items` state shape
-- `router.state.spec.ts` -- imports non-existent `RouterAction`, uses wrong state shape and `getState` selector
-- `app.component.spec.ts` -- expects old template content (`.content span` with "Thaqalayn app is running!")
+| Item | Status | Details |
+|------|--------|---------|
+| TSLint → ESLint | **DONE** | `eslint.config.js` with `@angular-eslint` v21, flat config |
+| Remove Protractor | **DONE** | Playwright E2E in place (16 spec files) |
+| ProcessingReport class | **DONE** | In `lib_model.py`, replaces global error accumulation |
+| Narrator subchain optimization | **DONE** | `getCombinations()` generates full chains + consecutive pairs only |
+| `narrator_chain.text` removal | **DONE** | Set to `None` after processing in `kafi_narrators.py` |
+| Angular 19 upgrade | **DONE** | Upgraded to Angular 19.2.18, NGXS 19, Material 19 |
+| HTTP error handling | TODO | ErrorInterceptor, loading/error states still needed |
+| npm audit vulnerabilities | TODO | Pending review |
 
-These must be fixed or deleted first so the rest of the test suite can run.
+### Phase 3: Features & Expansion — IN PROGRESS
 
-**Step 2: E2E tests with Playwright**
+| Item | Status | Details |
+|------|--------|---------|
+| PWA support | **DONE** | `@angular/service-worker` installed, `ngsw-config.json` configured with caching strategies |
+| Capacitor mobile app | **INSTALLED** | `@capacitor/android`, `@capacitor/ios` v8.1 — needs native project setup |
+| Search (Orama) | **INSTALLED** | `@orama/orama` v3.1 in dependencies — search feature implementation needed |
+| Bookmarks (Dexie) | **INSTALLED** | `dexie` v4.3 in dependencies — bookmark/notes feature implementation needed |
+| Firebase sync | **INSTALLED** | `firebase` v12.9 in dependencies — cross-device sync implementation needed |
+| AI Content Pipeline | **OPERATIONAL** | 3-pass workflow (generate→review→fix), 20 samples generated, structure pass caching |
+| New book parsers | TODO | Man La Yahduruhu al-Faqih (ThaqalaynAPI data available), Tahdhib, Istibsar |
+| Standalone components migration | TODO | Angular 19 supports standalone; NgModule→standalone migration pending |
 
-Write end-to-end tests covering all key user flows:
-1. Homepage loads and displays book list (Quran, Al-Kafi)
-2. Navigate to Quran surah (`/#/books/quran:1`) -- verify Arabic text, translation, verse count
-3. Navigate to Al-Kafi chapter (`/#/books/al-kafi:1:1:1`) -- verify hadith text, narrator chains
-4. Breadcrumb navigation -- verify crumbs display and clicking navigates correctly
-5. Prev/Next chapter navigation -- verify buttons work and URL updates
-6. Language/translation switching -- verify dropdown changes displayed text
-7. Narrator page (`/#/people/narrators/1`) -- verify name, hadith list, co-narrators
-8. Narrator index page (`/#/people/narrators/index`) -- verify table loads and is searchable
-9. Deep linking -- navigate directly to a specific verse URL, verify content renders
-10. Cross-references -- verify "Mentions" / "Mentioned In" links resolve correctly
+### Remaining Work (Active Priorities)
 
-#### DataGen -- Fix Failing Tests + Data Validation Tests
-
-**Step 1: Fix any failing existing tests**
-
-Generator currently has 91 passing tests. Ensure no regressions and verify all tests pass cleanly.
-
-**Step 2: Data validation tests against ThaqalaynData output**
-
-New test files in `ThaqalaynDataGenerator/tests/`:
-- `test_data_schema.py` -- JSON wrapper format (`index`, `kind`, `data`), valid `kind` values, per-kind schema
-- `test_data_integrity.py` -- Quran completeness (114 surahs, 6236 verses), Al-Kafi completeness (8 volumes, 15281 hadiths), UTF-8 integrity, verse count consistency, narrator index coverage
-- `test_data_crossrefs.py` -- Narrator chain paths resolve, relation paths resolve, navigation links resolve, verse paths in narrator files resolve
-
-**Step 3: Parser unit tests**
-
-Add tests for `quran.py`, `kafi.py`, `kafi_sarwar.py`, `link_quran_kafi.py`. Snapshot tests comparing generated output against known-good samples.
-
-### Phase 2: Cleanup & Modernization (AFTER Phase 1 tests exist)
-
-#### UIdev
-1. Migrate TSLint to ESLint (`ng add @angular-eslint/schematics`, remove tslint + codelyzer)
-2. Remove Protractor (e2e/ directory, protractor.conf.js, devDependency)
-3. Fix npm audit vulnerabilities
-4. Add HTTP error handling (ErrorInterceptor, loading/error states)
-
-#### DataGen
-1. Data optimization: remove `narrator_chain.text` (30 MB savings, 1-line change)
-2. Data optimization: replace `getCombinations()` with full-chains + pairs (60 MB savings)
-3. Refactor global error accumulation into `ProcessingReport` class
-
-### Phase 3: Features & Expansion (AFTER Phase 2)
-1. PWA support (`ng add @angular/pwa`)
-2. Search (Orama + static split indexes)
-3. New book parsers (Man La Yahduruhu al-Faqih first)
-4. Angular 19 upgrade + standalone components migration
+1. **HTTP error handling** — ErrorInterceptor, loading/error states for BooksService/PeopleService
+2. **Search feature build-out** — Orama is installed; need index generation in generator + Angular search UI
+3. **Bookmarks & reading progress** — Dexie installed; need Angular service + UI components
+4. **Scale AI translations** — Pipeline is ready; expand from 20 samples to full corpus
+5. **Word-by-word UI** — AI pipeline generates word_analysis data; need Angular component
+6. **Hadith gradings** — ThaqalaynAPI has grading data; need schema + UI surfacing
+7. **New book parsers** — Start with Man La Yahduruhu al-Faqih (structured JSON available from ThaqalaynAPI)
+8. **Social sharing** — Web Share API + deep links (low effort, high visibility)
+9. **CI/CD pipeline** — GitHub Actions for automated testing on push
 
 ### DataGatherer -- Source Data Research (continues across all phases)
-1. Research sources for remaining 3 hadith books
-2. Document findings and begin trial scraping
+1. **22 books scraped** from ThaqalaynAPI (18,945 hadiths across 25 book folders)
+2. Tahdhib al-Ahkam and al-Istibsar: multiple sources identified (ghbook.ir, rafed.net)
+3. Cross-validation pipeline for Arabic text accuracy
 
 ---
 
@@ -107,22 +93,25 @@ Add tests for `quran.py`, `kafi.py`, `kafi_sarwar.py`, `link_quran_kafi.py`. Sna
 
 ### Technical Health
 
-| Area | ThaqalaynDataGenerator | Thaqalayn (Angular) |
+| Area | ThaqalaynDataGenerator | Thaqalayn (Angular 19) |
 |------|----------------------|---------------------|
-| **Test Coverage** | ~75-80% (good) | Broken tests, low coverage |
-| **Error Handling** | Global accumulation (anti-pattern) | No HTTP error handling |
-| **Code Quality** | Good architecture, some DRY violations | Good structure, deprecated tooling |
-| **Documentation** | Excellent CLAUDE.md | Adequate |
-| **Dependencies** | Current (uv, Pydantic) | Outdated (TSLint, Protractor) |
+| **Test Coverage** | 1143 tests, good coverage | 367 unit tests + 187 E2E tests |
+| **Error Handling** | ProcessingReport class (clean) | No HTTP error handling (TODO) |
+| **Code Quality** | Good architecture, AI pipeline added | Good structure, modern tooling |
+| **Documentation** | Excellent CLAUDE.md | Good CLAUDE.md + docs/ |
+| **Dependencies** | Current (uv, Pydantic) | Current (Angular 19, ESLint 9, Playwright) |
 | **Security** | N/A (offline tool) | No CSP, no input validation |
-| **Performance** | Functional | No lazy loading, no caching |
+| **Performance** | Functional | PWA configured, no lazy loading yet |
+| **AI Pipeline** | Operational (3-pass, caching) | N/A |
 
 ### Data Statistics
 
-- **Total JSON files:** 7,353
-- **Total size:** ~485 MB
+- **Total JSON files:** ~7,350+
+- **Total size:** ~545 MB (1.2 GB on disk with git objects)
 - **Narrator profiles:** 4,861
-- **Optimization potential:** ~165 MB (34%) per existing OPTIMIZATION_PLAN.md
+- **Books served:** 22 distinct works (Quran + Al-Kafi + 20 from ThaqalaynAPI)
+- **Optimization done:** narrator subchains + narrator_chain.text (~90 MB savings applied)
+- **Remaining optimization:** ~5 MB (verse_translations deduplication)
 
 ---
 
@@ -132,15 +121,10 @@ Add tests for `quran.py`, `kafi.py`, `kafi_sarwar.py`, `link_quran_kafi.py`. Sna
 
 ### 2.1 Thaqalayn (Angular) - Critical Fixes
 
-#### 2.1.1 Fix Broken Tests
+#### 2.1.1 Fix Broken Tests — DONE
 
-**Priority:** P0 (Blocking)
-**Files:**
-- `src/store/books/books.state.spec.ts` - References non-existent `BooksAction` and wrong state shape
-- `src/store/router/router.state.spec.ts` - References non-existent `RouterAction`
-- `src/app/app.component.spec.ts` - Expects old template content
-
-**Action:** Rewrite tests to match current component/state interfaces. Each test must use proper NGXS `TestBed` configuration with `NgxsModule.forRoot()`.
+**Priority:** P0 (Blocking) — **COMPLETED**
+All broken specs have been rewritten. The Angular test suite now has 367 `it()` calls across 28 spec files, all passing.
 
 #### 2.1.2 Add HTTP Error Handling
 
@@ -153,46 +137,19 @@ Add tests for `quran.py`, `kafi.py`, `kafi_sarwar.py`, `link_quran_kafi.py`. Sna
 3. Add loading/error state to NGXS stores (`BooksStateModel.loading`, `BooksStateModel.errors`)
 4. Create error display component for user feedback (e.g., "Failed to load chapter. Retry?")
 
-#### 2.1.3 Migrate from TSLint to ESLint
+#### 2.1.3 Migrate from TSLint to ESLint — DONE
 
-**Priority:** P1
-**Rationale:** TSLint has been deprecated since 2019. Current `tslint.json` uses `codelyzer` which is also unmaintained.
+**COMPLETED.** ESLint 9 with flat config (`eslint.config.js`), `@angular-eslint` v21, `typescript-eslint` v8.46. TSLint and codelyzer removed.
 
-**Actions:**
-1. `ng add @angular-eslint/schematics` to auto-migrate
-2. Remove `tslint` and `codelyzer` from devDependencies
-3. Configure ESLint with `@angular-eslint/recommended` + `@typescript-eslint/recommended`
-4. Add accessibility linting: `@angular-eslint/template/accessibility`
+#### 2.1.4 Replace Protractor with Playwright — DONE
 
-#### 2.1.4 Replace Protractor with Cypress (or Playwright)
-
-**Priority:** P1
-**Rationale:** Protractor was deprecated in Angular 12 and has been removed from Angular CLI.
-
-**Actions:**
-1. Remove Protractor config and `e2e/` directory
-2. Install Cypress or Playwright
-3. Write smoke tests for critical paths: book list, chapter navigation, verse rendering, narrator profiles
+**COMPLETED.** Playwright E2E tests in `e2e/tests/` with 187 tests across 16 spec files. Includes accessibility testing via `@axe-core/playwright`.
 
 ### 2.2 ThaqalaynDataGenerator - Foundational Improvements
 
-#### 2.2.1 Refactor Global Error Accumulation
+#### 2.2.1 Refactor Global Error Accumulation — DONE
 
-**Priority:** P1
-**Current State:** `SEQUENCE_ERRORS` global list in `lib_model.py` and `NARRATIONS_WITHOUT_NARRATORS` counter in `kafi_narrators.py` are module-level side effects that are hard to test and reset.
-
-**Action:** Create a `ProcessingReport` class:
-```python
-class ProcessingReport:
-    sequence_errors: List[str] = []
-    narrations_without_narrators: int = 0
-    invalid_quran_refs: List[str] = []
-    sarwar_mismatches: List[str] = []
-
-    def summary(self) -> str: ...
-```
-
-Pass this through the pipeline instead of using globals.
+**COMPLETED.** `ProcessingReport` class exists in `lib_model.py`. All report parameters are optional with `None` default, falling back to a global default report. Tests create isolated instances.
 
 #### 2.2.2 Externalize Configuration
 
@@ -637,18 +594,12 @@ Use `loadChildren` in routing for deferred loading.
 
 **Action:** The NGXS store already caches loaded parts in `state.parts`, but the check in `BookPartResolver` may not prevent re-fetching. Ensure resolvers check the store before dispatching a load action. Optionally add a `CacheService` with TTL.
 
-#### 6.1.4 Comprehensive Test Suite
+#### 6.1.4 Comprehensive Test Suite — DONE
 
-**Priority:** P1
-**Current Coverage:** ~15% (most tests broken)
-**Target Coverage:** 70%+
-
-**Actions:**
-1. Write service tests with `HttpClientTestingModule`
-2. Write component tests for all components
-3. Write NGXS state tests with proper store setup
-4. Write E2E smoke tests with Cypress/Playwright
-5. Add coverage reporting to CI
+**COMPLETED.** Test suite is now comprehensive:
+- 367 unit `it()` calls across 28 spec files (services, components, states, pipes)
+- 187 E2E tests across 16 Playwright spec files (all key user flows + accessibility)
+- Coverage reporting configured (`ng test --code-coverage`)
 
 #### 6.1.5 Remove `any` Types
 
@@ -777,19 +728,13 @@ Use these for:
 
 ### 7.1 Tier 1: Generator-Only Changes (No Angular Impact)
 
-#### 7.1.1 Remove `narrator_chain.text`
+#### 7.1.1 Remove `narrator_chain.text` — DONE
 
-**Priority:** P0
-**Savings:** ~30 MB
-**Risk:** None - Angular only uses `.parts`, never `.text`
-**Action:** In `kafi_narrators.py`, after narrator processing, set `hadith.narrator_chain.text = None`
+**COMPLETED.** `kafi_narrators.py` line 183 sets `hadith.narrator_chain.text = None` after processing. The field is used as intermediate state during narrator chain parsing but cleared before final output.
 
-#### 7.1.2 Optimize Narrator Subchain Generation
+#### 7.1.2 Optimize Narrator Subchain Generation — DONE
 
-**Priority:** P0
-**Savings:** ~60 MB
-**Risk:** Low - Co-Narrators table shows full chains + direct pairs instead of all subsequences
-**Action:** Replace `getCombinations()` to only generate full chains and consecutive pairs (needed for `narrated_from`/`narrated_to` metadata)
+**COMPLETED.** `getCombinations()` now generates only full chains + consecutive pairs. A chain of N narrators produces N entries (1 full chain + N-1 pairs) instead of N*(N+1)/2 - N. Dedup check avoids double-counting for 2-narrator chains.
 
 ### 7.2 Tier 2: Coordinated Generator + Angular Changes
 
@@ -799,11 +744,9 @@ Use these for:
 **Savings:** ~5 MB
 **Action:** Generate `_meta/translators.json` once, remove `verse_translations` from individual chapter files, load once in Angular via new `MetadataService`
 
-#### 7.2.2 Simplify Navigation Objects
+#### 7.2.2 Simplify Navigation Objects — ALREADY DONE
 
-**Priority:** P2
-**Savings:** ~15 MB
-**Action:** Store only path strings in `nav.prev`/`nav.next`/`nav.up` instead of full `Crumb` objects. Angular looks up display metadata from a crumbs index.
+**No action needed.** Navigation already stores path strings, not Crumb objects. See SCHEMA_PROPOSAL.md for details. The 15 MB savings claimed in OPTIMIZATION_PLAN.md was phantom.
 
 ### 7.3 Tier 3: Optional Advanced Optimization
 
@@ -982,72 +925,87 @@ Add parsers and data for the remaining books listed in the README:
 
 ### By Priority
 
-| Priority | Item | Project | Phase |
-|----------|------|---------|-------|
-| P0 | Fix broken Angular tests | Thaqalayn | 1 |
-| P0 | Add HTTP error handling | Thaqalayn | 1 |
-| P0 | Set up CI pipeline | All | 5 |
-| P0 | Create parser base class | Generator | 2 |
-| P0 | Generalize narrator extraction | Generator | 2 |
-| P0 | Implement Man La Yahduruhu al-Faqih parser | Generator | 2 |
-| P0 | Remove `narrator_chain.text` | Generator | 6 |
-| P0 | Optimize narrator subchains | Generator | 6 |
-| P0 | Full-text search | Thaqalayn | 4 |
-| P0 | Add Al-Kafi Farsi translations | Generator | 3 |
-| P1 | Migrate TSLint to ESLint | Thaqalayn | 1 |
-| P1 | Replace Protractor with Cypress | Thaqalayn | 1 |
-| P1 | Refactor global error accumulation | Generator | 1 |
-| P1 | Implement Tahdhib & Istibsar parsers | Generator | 2 |
-| P1 | RTL support | Thaqalayn | 3 |
-| P1 | WCAG 2.1 AA compliance | Thaqalayn | 4 |
-| P1 | Responsive design audit | Thaqalayn | 4 |
-| P1 | Sub-chapter grouping | Thaqalayn | 4 |
-| P1 | Lazy loading | Thaqalayn | 5 |
-| P1 | Comprehensive test suite | Thaqalayn | 5 |
-| P1 | Data schema validation | Generator | 5 |
-| P1 | Hadith grading system | All | 7 |
-| P1 | Nahj al-Balaghah parser | Generator | 7 |
+| Priority | Item | Project | Phase | Status |
+|----------|------|---------|-------|--------|
+| P0 | Fix broken Angular tests | Thaqalayn | 1 | **DONE** |
+| P0 | Add HTTP error handling | Thaqalayn | 1 | TODO |
+| P0 | Set up CI pipeline | All | 5 | TODO |
+| P0 | Create parser base class | Generator | 2 | **DONE** |
+| P0 | Generalize narrator extraction | Generator | 2 | TODO |
+| P0 | Implement Man La Yahduruhu al-Faqih parser | Generator | 2 | TODO |
+| P0 | Remove `narrator_chain.text` | Generator | 6 | **DONE** |
+| P0 | Optimize narrator subchains | Generator | 6 | **DONE** |
+| P0 | Full-text search (Orama) | Thaqalayn | 4 | **INSTALLED** — needs UI |
+| P0 | Add Al-Kafi Farsi translations | Generator | 3 | TODO |
+| P0 | Scale AI translations to full corpus | Generator | 3 | TODO (pipeline ready) |
+| P1 | Migrate TSLint to ESLint | Thaqalayn | 1 | **DONE** |
+| P1 | Replace Protractor with Playwright | Thaqalayn | 1 | **DONE** |
+| P1 | Refactor global error accumulation | Generator | 1 | **DONE** |
+| P1 | PWA support | Thaqalayn | 3 | **DONE** |
+| P1 | Angular 19 upgrade | Thaqalayn | 3 | **DONE** |
+| P1 | Word-by-word translation UI | Thaqalayn | 3 | TODO (data available from AI pipeline) |
+| P1 | Implement Tahdhib & Istibsar parsers | Generator | 2 | TODO |
+| P1 | RTL support | Thaqalayn | 3 | TODO |
+| P1 | WCAG 2.1 AA compliance | Thaqalayn | 4 | Partial (accessibility E2E tests exist) |
+| P1 | Responsive design audit | Thaqalayn | 4 | TODO |
+| P1 | Sub-chapter grouping | Thaqalayn | 4 | TODO |
+| P1 | Lazy loading | Thaqalayn | 5 | TODO |
+| P1 | Comprehensive test suite | Thaqalayn | 5 | **DONE** (367 unit + 187 E2E) |
+| P1 | Data schema validation | Generator | 5 | **DONE** (64 tests) |
+| P1 | Hadith grading system | All | 7 | TODO |
+| P1 | Nahj al-Balaghah parser | Generator | 7 | TODO |
+| P2 | Social sharing (Web Share API) | Thaqalayn | 4 | TODO |
+| P2 | Bookmarks & reading progress (Dexie) | Thaqalayn | 4 | **INSTALLED** — needs UI |
+| P2 | Narrator biographical database | All | 7 | TODO |
 
 ### By Estimated Impact
 
-| Impact | Item | Effort |
-|--------|------|--------|
-| **Highest** | Complete all 4 books | 3-4 months |
-| **Highest** | Full-text search | 2-3 weeks |
-| **High** | Multi-language translations | 2-3 months |
-| **High** | Data optimization (165 MB savings) | 2-4 weeks |
-| **High** | PWA / Offline support | 1-2 weeks |
-| **Medium** | Narrator biographical database | 1-2 months |
-| **Medium** | Thematic tagging | 1 month |
-| **Medium** | CI/CD pipeline | 1 week |
-| **Medium** | Accessibility compliance | 2-3 weeks |
-| **Lower** | Additional hadith collections | Ongoing |
-| **Lower** | AI-assisted features | 2-4 weeks each |
-| **Lower** | API/GraphQL layer | 2-3 weeks |
+| Impact | Item | Effort | Status |
+|--------|------|--------|--------|
+| **Highest** | Complete all 4 books | 3-4 months | TODO |
+| **Highest** | Full-text search (Orama UI) | 1-2 weeks | Orama installed, needs UI |
+| **High** | Multi-language AI translations | 2-3 months | Pipeline ready, 20 samples done |
+| **High** | Data optimization (90 MB savings) | -- | **DONE** |
+| **High** | PWA / Offline support | -- | **DONE** |
+| **High** | Word-by-word translation UI | 1-2 weeks | Data from AI pipeline available |
+| **Medium** | Hadith gradings | 1-2 weeks | ThaqalaynAPI data available |
+| **Medium** | Narrator biographical database | 1-2 months | TODO |
+| **Medium** | Thematic tagging | 1 month | AI pipeline generates tags |
+| **Medium** | CI/CD pipeline | 1 week | TODO |
+| **Medium** | Accessibility compliance | -- | Partial (E2E axe-core tests) |
+| **Medium** | Social sharing | 1 week | TODO |
+| **Medium** | Bookmarks & reading progress | 1-2 weeks | Dexie installed, needs UI |
+| **Lower** | Additional hadith collections | Ongoing | 22 books available via ThaqalaynAPI |
+| **Lower** | AI-assisted features | 2-4 weeks each | Pipeline operational |
+| **Lower** | API/GraphQL layer | 2-3 weeks | TODO |
 
 ### Milestone Targets
 
-| Milestone | Target | Key Deliverables |
-|-----------|--------|-----------------|
-| **M1: Stable Foundation** | Week 4 | Tests pass, error handling, modern tooling |
-| **M2: Three Books** | Month 3 | Man La Yahduruhu al-Faqih added |
-| **M3: All Four Books** | Month 5 | Tahdhib + Istibsar added |
-| **M4: Multi-Language** | Month 7 | Urdu + Farsi for all hadith books |
-| **M5: Optimized & Accessible** | Month 9 | 34% data reduction, WCAG AA, PWA |
-| **M6: Extended Platform** | Month 12+ | Search, grading, additional books, API |
+| Milestone | Target | Key Deliverables | Status |
+|-----------|--------|-----------------|--------|
+| **M1: Stable Foundation** | Week 4 | Tests pass, error handling, modern tooling | **DONE** (tests + tooling; HTTP errors TODO) |
+| **M1.5: AI Pipeline** | Week 8 | AI content generation operational | **DONE** (3-pass, caching, 20 samples) |
+| **M2: Search & Bookmarks** | Month 3 | Orama search UI, Dexie bookmarks, social sharing | Dependencies installed |
+| **M3: Three Books** | Month 4 | Man La Yahduruhu al-Faqih added | TODO |
+| **M4: All Four Books** | Month 6 | Tahdhib + Istibsar added | TODO |
+| **M5: Multi-Language** | Month 8 | AI translations for 11 languages | Pipeline ready |
+| **M6: Optimized & Accessible** | Month 9 | WCAG AA, lazy loading, CI/CD | Partial |
+| **M7: Extended Platform** | Month 12+ | Grading, narrator bios, additional books, API | TODO |
 
 ---
 
-## Appendix A: Quick Wins (Can Be Done Today)
+## Appendix A: Quick Wins
 
-These require minimal effort and provide immediate value:
-
-1. **Remove `narrator_chain.text`** from generator output (1 line change, 30 MB savings)
-2. **Fix `ExpandLanguagePipe`** to include all supported language codes
-3. **Add `<meta>` description tags** for SEO
-4. **Add favicon and PWA manifest** for installability
-5. **Add loading spinners** to components waiting for API data
-6. **Store language preference** in `localStorage` for persistence across visits
+| Item | Effort | Status |
+|------|--------|--------|
+| Remove `narrator_chain.text` from output | 1 line | **DONE** |
+| Fix `ExpandLanguagePipe` for all languages | Low | TODO |
+| Add `<meta>` description tags for SEO | Low | TODO |
+| Add favicon and PWA manifest | Low | **DONE** (PWA configured) |
+| Add loading spinners for API data | Low | TODO |
+| Store language preference in localStorage | Low | TODO |
+| Surface hadith gradings from ThaqalaynAPI | Medium | TODO (data available) |
+| Add HTTP error handling to Angular services | Medium | TODO |
 
 ## Appendix B: Architecture Decision Records (ADRs) Needed
 

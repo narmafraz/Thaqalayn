@@ -216,23 +216,23 @@ This section documents the current technology state, identifies technical debt, 
 
 | Component | Current | Status | Assessment |
 |-----------|---------|--------|------------|
-| **Angular** | 18.0.4 (June 2024) | Behind by 1 major version | Angular 19 released Dec 2025. Upgrade recommended for standalone components support, improved signals, and hydration. Angular 18 enters LTS soon. |
-| **NGXS** | 18.0.0 | Aligned with Angular | Solid choice. Alternatives (NgRx Signals, built-in signals) are maturing but NGXS remains well-maintained and does not need replacement now. |
-| **Angular Material** | 18.0.4 | Aligned | Material 3 (M3) theming available in Angular 18+. Consider adopting M3 for visual refresh. |
-| **TypeScript** | 5.4.5 | Current enough | Angular 19 supports TS 5.6. Will need bump on Angular upgrade. |
+| **Angular** | 19.2.18 | Current | Upgraded from 18. Standalone components migration still pending but NgModules work fine. |
+| **NGXS** | 19.0.0 | Aligned with Angular 19 | Solid choice. Alternatives (NgRx Signals, built-in signals) are maturing but NGXS remains well-maintained. |
+| **Angular Material** | 19.2.19 | Aligned | Material 3 (M3) theming available. Consider adopting M3 for visual refresh. |
+| **TypeScript** | 5.8.3 | Current | Aligned with Angular 19 requirements. |
 | **Python** | 3.8+ (declared) | 3.8 EOL was Oct 2024 | Bump minimum to 3.10+ for `match` statements, better typing, and continued security patches. |
 | **uv** | Latest | Excellent | Best-in-class Python package manager. Keep. |
-| **Pydantic** | v1 (via marshmallow-dataclass) | Mixed | The generator uses marshmallow-dataclass and fastapi encoders but not Pydantic v2 natively. Consider migrating models to Pydantic v2 for better performance and validation. |
-| **Netlify** | Free tier | Healthy | Still the best option for zero-cost static hosting. Bandwidth limits (100 GB/month) are generous. The 485 MB data repo is well within storage limits. |
+| **Pydantic** | v2 (via marshmallow-dataclass) | Good | Generator uses Pydantic v2 with marshmallow-dataclass and custom jsonable encoder. |
+| **Netlify** | Free tier | Healthy | Still the best option for zero-cost static hosting. Bandwidth limits (100 GB/month) are generous. |
 
-### Deprecated Tooling (Must Remove)
+### Deprecated Tooling — RESOLVED
 
-| Tool | Replacement | Priority |
-|------|------------|----------|
-| **TSLint** (deprecated 2019) | ESLint + `@angular-eslint` | High |
-| **Protractor** (deprecated Angular 12) | Playwright (already in project as MCP) | High |
-| **codelyzer** (unmaintained) | `@angular-eslint/template` rules | High |
-| **`--openssl-legacy-provider`** | Resolve by upgrading webpack/Angular build | Medium |
+| Tool | Replacement | Status |
+|------|------------|--------|
+| **TSLint** (deprecated 2019) | ESLint 9 + `@angular-eslint` v21 | **DONE** — `eslint.config.js` (flat config) |
+| **Protractor** (deprecated Angular 12) | Playwright (187 tests, 16 spec files) | **DONE** |
+| **codelyzer** (unmaintained) | `@angular-eslint/template` rules (incl. accessibility) | **DONE** |
+| **`--openssl-legacy-provider`** | Resolve by upgrading webpack/Angular build | Still present in `npm start` script |
 
 ### Architecture Decisions Still Valid
 

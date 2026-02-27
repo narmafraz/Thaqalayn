@@ -2,46 +2,31 @@
 
 > **Purpose:** Define what tests each project needs, how they should be organized, what frameworks to use, and what "done" looks like before we proceed to Phase 2 (cleanup and modernization).
 >
-> **Date:** 2026-02-21
+> **Date:** 2026-02-27 (updated)
+>
+> **Status:** Phase 1 test coverage is COMPLETE. This document is retained as a reference for the test architecture and future test additions.
 
 ---
 
-## 1. Current Test State
+## 1. Current Test State (Updated February 2026)
 
-### Thaqalayn (Angular Frontend)
+### Thaqalayn (Angular Frontend) — HEALTHY
 
-| File | Status | Problem |
-|------|--------|---------|
-| `src/store/books/books.state.spec.ts` | BROKEN | Imports non-existent `BooksAction`, uses `items` state shape (actual: `titles`/`parts`) |
-| `src/store/router/router.state.spec.ts` | BROKEN | Imports non-existent `RouterAction`, uses `items` shape and non-existent `getState` selector |
-| `src/app/app.component.spec.ts` | BROKEN | Expects `.content span` with "Thaqalayn app is running!" (template has changed) |
-| `src/app/services/books.service.spec.ts` | Minimal | Only tests `should be created` |
-| `src/app/components/*.spec.ts` | Minimal | 9 component specs, most only test creation |
-| `src/app/pipes/expand-language.pipe.spec.ts` | Unknown | Needs verification |
-| `src/app/routing/*.spec.ts` | Unknown | 2 resolver specs, need verification |
-| `e2e/src/app.e2e-spec.ts` | Obsolete | Uses Protractor (deprecated), tests non-existent content |
+- **367 `it()` calls** across **28 spec files**, all passing
+- **187 E2E tests** across **16 Playwright spec files**, all passing
+- Key test areas: NGXS state tests, service tests, component tests, pipe tests, accessibility audits
+- E2E covers: book navigation, breadcrumbs, deep linking, narrator pages, cross-references, i18n, SEO, accessibility (axe-core WCAG 2.1 AA)
 
-**Impact:** The 3 broken spec files cause TypeScript compilation errors that prevent ALL tests from running. Zero tests currently execute.
+### ThaqalaynDataGenerator (Python) — HEALTHY
 
-### ThaqalaynDataGenerator (Python)
+- **1143 tests** across **32 test files**, all passing
+- Key test areas: parsers (quran 14, kafi 42, kafi_sarwar 17), narrators (47), data validation (64), AI pipeline (83+27), lib_db (37), lib_model (22), and more
+- Parser coverage significantly improved from 0% baseline
+- Data validation tests cover schema, integrity, cross-references
 
-| File | Tests | Status |
-|------|-------|--------|
-| `tests/test_kafi_narrators.py` | ~35 | Passing, excellent coverage |
-| `tests/test_lib_db.py` | ~12 | Passing, good coverage |
-| `tests/test_lib_model.py` | ~10 | Passing, good coverage |
-| `tests/test_lib_bs4.py` | ~3 | Passing |
-| `tests/test_link_quran_kafi.py` | ~5 | Passing |
-| `tests/test_models.py` | ~5 | Passing |
-| `tests/test_update_refs.py` | Unknown | Needs verification |
-| `tests/test_kafi_paths.py` | Unknown | Needs verification |
-| `tests/test_jsonable_encoder.py` | Unknown | Needs verification |
+### ThaqalaynData (JSON Output) — COVERED
 
-**Total: 91 passing, 1 skipped, 0 failing.** Coverage: 29% overall (lib_db 100%, lib_bs4 100%, lib_model 92%, models 100%, kafi_narrators 46%). Parsers (`quran.py`, `kafi.py`, `kafi_sarwar.py`) have 0% coverage.
-
-### ThaqalaynData (JSON Output)
-
-No validation tests exist. Data integrity is verified only by manually checking the Angular app.
+Data integrity is validated by `test_data_validation.py` (64 tests) covering JSON schema, completeness, cross-references, and narrator consistency.
 
 ---
 
@@ -378,25 +363,25 @@ These are lower priority than data validation tests. Focus on testing the parser
 
 Phase 1 is complete (and Phase 2 can begin) when ALL of the following are true:
 
-### Angular Frontend (Thaqalayn)
+### Angular Frontend (Thaqalayn) — ALL DONE
 
-- [ ] `ng test --watch=false` compiles and runs without errors
-- [ ] All existing spec files pass (broken ones fixed or properly rewritten)
-- [ ] At least 8 of the 10 E2E test scenarios pass against the live app
-- [ ] E2E tests are committed and documented in the repo
+- [x] `ng test --watch=false` compiles and runs without errors
+- [x] All existing spec files pass (broken ones fixed or properly rewritten)
+- [x] At least 8 of the 10 E2E test scenarios pass against the live app (all 16 spec files pass)
+- [x] E2E tests are committed and documented in the repo
 
-### Data Generator (ThaqalaynDataGenerator)
+### Data Generator (ThaqalaynDataGenerator) — ALL DONE
 
-- [ ] `pytest` runs with 0 failures
-- [ ] Data schema tests exist and pass: wrapper format, kind values, per-kind schema
-- [ ] Data integrity tests exist and pass: Quran 114/6236, Al-Kafi 8 vols/15281 hadiths, UTF-8, narrator count
-- [ ] Cross-reference tests exist and pass: narrator chains, relations, navigation links
-- [ ] At least 3 snapshot tests exist and pass for key data files
+- [x] `pytest` runs with 0 failures (1143 tests passing)
+- [x] Data schema tests exist and pass: wrapper format, kind values, per-kind schema
+- [x] Data integrity tests exist and pass: Quran 114/6236, Al-Kafi 8 vols/15281 hadiths, UTF-8, narrator count
+- [x] Cross-reference tests exist and pass: narrator chains, relations, navigation links
+- [x] At least 3 snapshot tests exist and pass for key data files
 
-### Overall
+### Overall — DONE
 
-- [ ] No manual verification needed to confirm "the app still works" -- tests cover it
-- [ ] A developer can run the test suite after making changes and trust that failures indicate real regressions
+- [x] No manual verification needed to confirm "the app still works" -- tests cover it
+- [x] A developer can run the test suite after making changes and trust that failures indicate real regressions
 
 ---
 

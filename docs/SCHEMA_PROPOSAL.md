@@ -1,11 +1,13 @@
 # Schema Proposal: Optimal Data Model for Thaqalayn
 
+> **Status (2026-02-27):** Phase 1 (narrator_chain.text removal + subchain optimization) is **DONE**. Phase 2-4 are not started.
+
 ## Executive Summary
 
 This document proposes an optimal schema for the Thaqalayn project, addressing current inefficiencies, supporting expansion to 30+ book sources, and accommodating new data fields from the ThaqalaynAPI. The proposal is based on a complete end-to-end review of the Python generator models, the generated JSON output, and the Angular TypeScript interfaces and components that consume the data.
 
 **Key outcomes:**
-- ~165 MB data reduction (545 MB to ~380 MB) through structural optimizations
+- ~95 MB data reduction through confirmed structural optimizations (see Part 3 for corrected figures)
 - Support for gradings, French translations, sanad/matn separation, and book metadata from ThaqalaynAPI
 - Generic book registration system for adding new books without code changes
 - Cleaner separation of concerns between data and presentation
@@ -465,15 +467,15 @@ The complete/ directory (126 MB) will also shrink proportionally since it mirror
 
 ## Part 4: Migration Plan
 
-### Phase 1: Generator-Only Changes (No Angular Impact)
+### Phase 1: Generator-Only Changes (No Angular Impact) — DONE
 
 **Changes to `ThaqalaynDataGenerator/app/kafi_narrators.py`:**
 
-1. **Remove narrator_chain.text after processing.** In `process_chapter_verses()`, after `add_narrator_links()` and `update_narrators()` complete, set `hadith.narrator_chain.text = None`. The `clean_nones()` function in `lib_db.py` will strip it from JSON output.
+1. **Remove narrator_chain.text after processing.** ✅ In `process_chapter_verses()`, after `add_narrator_links()` and `update_narrators()` complete, `hadith.narrator_chain.text = None` is set. The `clean_nones()` function in `lib_db.py` strips it from JSON output.
 
-2. **Replace `getCombinations()` with full-chain + pairs version.** This is a drop-in replacement that changes only which subchain entries are generated, not the data flow.
+2. **Replace `getCombinations()` with full-chain + pairs version.** ✅ Drop-in replacement generating only full chains and consecutive pairs.
 
-**Verification:**
+**Verification:** ✅ All passing
 - All 4,860 narrator files regenerated
 - Narrator index metadata (narrations, narrated_from, narrated_to) unchanged
 - Co-Narrators table in Angular still displays correctly
@@ -784,10 +786,10 @@ def build_verse(hadith: dict, chapter_path: str, local_index: int) -> Verse:
 
 ## Appendix B: Implementation Priority
 
-| Priority | Change | Effort | Impact | Dependencies |
-|----------|--------|--------|--------|-------------|
-| 1 | Remove narrator_chain.text | Low | 30 MB | None |
-| 2 | Optimize subchains | Low | 60 MB | None |
+| Priority | Change | Effort | Impact | Dependencies | Status |
+|----------|--------|--------|--------|-------------|--------|
+| 1 | Remove narrator_chain.text | Low | 30 MB | None | **DONE** |
+| 2 | Optimize subchains | Low | 60 MB | None | **DONE** |
 | 3 | Add gradings to Verse | Low | New feature | ThaqalaynAPI parser |
 | 4 | Create book_registry.py | Medium | Extensibility | None |
 | 5 | Create thaqalayn_api.py parser | Medium | New books | Book registry |

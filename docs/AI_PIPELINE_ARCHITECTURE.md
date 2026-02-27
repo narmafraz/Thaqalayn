@@ -82,7 +82,7 @@ Most Quran verses and shorter hadiths use single-pass. Longer hadiths (some Al-K
 | 8 | `isnad_matn` | object | Narrator chain: names, roles, confidence, isnad/matn split |
 | 9 | `translations` | object | 11 languages x {text, summary, key_terms, seo_question} |
 | 10 | `chunks` | array | Semantic segmentation: type, word range, per-chunk translations |
-| 11 | `topics` | array(1-3) | Level 2 topic keys from controlled vocabulary |
+| 11 | `topics` | array(1-5) | Level 2 topic keys from controlled vocabulary |
 | 12 | `key_phrases` | array(0-5) | Multi-word Arabic expressions with categories |
 | 13 | `similar_content_hints` | array(0-3) | Unverified thematic hints for finding parallel narrations |
 
@@ -112,7 +112,7 @@ The **11 languages** are: en, ur, tr, fa, id, bn, es, fr, de, ru, zh.
 - `diacritics_status` in valid enum; cross-check that "added"/"validated" have empty changes
 - Every word in `word_analysis` has all 11 language translations, valid POS tag, diacritics present
 - `tags` has 2-5 items from valid set; `content_type` is valid enum
-- `related_quran` refs have valid surah:ayah format (1-114 surah range)
+- `related_quran` refs have valid surah:ayah format (1-114 surah range, ayah within surah bounds via `quran-data.xml`)
 - `isnad_matn` has required fields; `has_chain=True` requires non-empty isnad_ar and narrators
 - Translations: all 11 languages present, each with text/summary/key_terms/seo_question
 - `key_terms` must be dict (not list), with Arabic-character keys
@@ -123,7 +123,7 @@ The **11 languages** are: en, ur, tr, fa, id, bn, es, fr, de, ru, zh.
 
 ## Stage 5: Quality Review (Pass 2)
 
-`review_result()` runs 8 automated checks that catch issues schema validation cannot:
+`review_result()` runs 10 automated checks that catch issues schema validation cannot:
 
 | # | Check | Category | Catches |
 |---|-------|----------|---------|
@@ -135,6 +135,8 @@ The **11 languages** are: en, ur, tr, fa, id, bn, es, fr, de, ru, zh.
 | 6 | Missing isnad chunk | `missing_isnad_chunk` | has_chain=True without isnad chunk |
 | 7 | Back-reference pattern | `back_reference_no_chain` | Arabic starts with back-ref but has_chain=False |
 | 8 | Key terms disparity | `key_terms_count_disparity` | One language has >2x more key_terms than another |
+| 9 | Word analysis text match | `word_count_mismatch` / `word_text_mismatch` | word_analysis words don't match original Arabic |
+| 10 | Narrator word ranges | `narrator_word_range_mismatch` / `missing_narrator_word_ranges` | word_ranges point to wrong words, or missing in chained hadith |
 
 Translation ratio bounds are per-language: Latin-script (0.3-5.0x), CJK (0.15-3.0x), Perso-Arabic (0.4-4.0x).
 
@@ -227,6 +229,71 @@ The `ai-orchestrate` agent coordinates full corpus runs:
 6. Failed validations queued for retry
 
 The caching system means interrupted runs resume efficiently — structure passes survive pipeline version bumps, and individual chunks can be regenerated without redoing the full hadith.
+
+---
+
+## Narrator Discoverability
+
+Each narrator in `isnad_matn.narrators` can include an optional `word_ranges` field that links the narrator to specific words in `word_analysis`:
+
+```json
+{
+  "name_ar": "مُحَمَّدُ بْنُ يَحْيَى",
+  "name_en": "Muhammad ibn Yahya",
+  "role": "narrator",
+  "position": 1,
+  "word_ranges": [{"word_start": 3, "word_end": 6}]
+}
+```
+
+This enables the UI to highlight narrator names within the word-by-word view and create clickable links to narrator detail pages. The `word_start`/`word_end` use the same half-open indexing as chunk word ranges.
+
+Validation: `validate_result()` checks that `word_ranges` are within bounds. Check 10 in `review_result()` verifies the words at those indices match the narrator's `name_ar`.
+
+---
+
+## Generation Attempts & Quarantine
+
+Each response wrapper tracks `generation_attempts` (starting at 1, incremented on each retry). If a verse exceeds `MAX_GENERATION_ATTEMPTS` (3), it's saved to a quarantine directory instead of responses:
+
+```
+ai-content/{subdir}/quarantine/{verse_id}.json
+```
+
+Quarantined verses include a `quarantine_reason` field and are never retried automatically.
+
+---
+
+## Corpus Manifest
+
+For full-corpus runs, `generate_corpus_manifest()` walks `ThaqalaynData/books/` and produces a manifest of all verse paths:
+
+```json
+{
+  "total": 41449,
+  "verses": [
+    {"path": "/books/quran:1:1", "book": "quran"},
+    {"path": "/books/al-kafi:1:1:1:1", "book": "al-kafi"}
+  ]
+}
+```
+
+CLI: `python -m app.ai_pipeline manifest [--book X] [--volume N] [--range 1-100]`
+
+The manifest supports filtering by book, volume, and numeric range for incremental processing.
+
+---
+
+## Configurable Output Directory
+
+The `AI_CONTENT_SUBDIR` environment variable controls the output subdirectory:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `AI_CONTENT_SUBDIR=samples` | Default | Sample/development runs |
+| `AI_CONTENT_SUBDIR=corpus` | — | Full corpus production runs |
+
+All paths (responses, cache, quarantine) use this prefix. Config constants: `AI_RESPONSES_DIR`, `AI_CACHE_DIR`, `AI_QUARANTINE_DIR`.
 
 ---
 

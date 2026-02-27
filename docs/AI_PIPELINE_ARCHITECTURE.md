@@ -1,0 +1,240 @@
+# AI Pipeline Architecture
+
+> How the Claude Code agent-based AI content generation pipeline works end-to-end.
+
+This document describes the **current production implementation** of the AI content pipeline. For the earlier Batch API design (historical), see [`AI_CONTENT_PIPELINE.md`](AI_CONTENT_PIPELINE.md).
+
+## Overview
+
+The pipeline generates structured AI content (translations, word analysis, tagging, narrator extraction) for every verse and hadith in the corpus (~41,449 items: ~6,236 Quran verses + ~35,213 hadiths). It runs entirely through **Claude Code agents** — no API key or batch API spend. Claude Code runs Opus 4.6, so output quality is identical to the Batch API.
+
+The architecture is a **three-pass, multi-agent system** with caching and parallelization:
+
+```
+Corpus verses  ->  Extract  ->  Generate  ->  Review  ->  Fix (if needed)  ->  Strip  ->  Save
+```
+
+### Agent Roles
+
+| Agent | Model | File | Role |
+|-------|-------|------|------|
+| `ai-orchestrate` | Opus | `.claude/agents/ai-orchestrate.md` | Coordinates all passes across multiple verses |
+| `ai-generate` | Opus | `.claude/agents/ai-generate.md` | Pass 1: content generation (single-pass or chunked) |
+| `ai-review` | Sonnet | `.claude/agents/ai-review.md` | Pass 2: quality review (automated + expert judgment) |
+| `ai-fix` | Opus | `.claude/agents/ai-fix.md` | Pass 3: targeted field correction |
+
+---
+
+## Stage 0: Supporting Data
+
+Before any generation starts, reference data is loaded from `ThaqalaynDataSources/ai-pipeline-data/`:
+
+| File | Contents | Purpose |
+|------|----------|---------|
+| `glossary.json` | ~50 Islamic terms in all 11 languages | Consistent translations (salat = prayer, taqwa = piety) |
+| `word_dictionary.json` | 29 high-frequency Arabic particles | Canonical translations for common words (wa, fi, min, etc.) |
+| `topic_taxonomy.json` | 14 Level 1 x ~5-8 Level 2 topics (~90 total) | Controlled vocabulary for topic assignment |
+| `key_phrases_dictionary.json` | ~160 multi-word Arabic expressions | Seed dictionary for key phrase extraction |
+| `few_shot_examples.json` | 3-5 complete input/output pairs | In-context learning examples |
+| `sample_verses.json` | 20 diverse verse paths | Testing and sample generation |
+
+All reference data is embedded in the system prompt so every agent sees the same material.
+
+---
+
+## Stage 1: Verse Extraction
+
+For each verse path (e.g., `/books/al-kafi:1:2:3:4`), `extract_pipeline_request()`:
+
+1. Converts the path to a filesystem path in `ThaqalaynData/`
+2. Loads the verse JSON and builds a `PipelineRequest`:
+   - **`arabic_text`** — the primary content to analyze
+   - **`english_text`** — reference English translation (if available)
+   - **`book_name`**, **`chapter_title`**, **`hadith_number`** — metadata
+   - **`existing_narrator_chain`** — if pre-extracted by the kafi_narrators parser
+
+---
+
+## Stage 2: Processing Mode Decision
+
+The pipeline checks the Arabic word count against the chunked processing threshold (**200 words**):
+
+- **<= 200 words** -> Single-pass generation (one LLM call generates all 13 fields)
+- **> 200 words** -> Chunked processing (structure pass + per-chunk detail passes)
+
+Most Quran verses and shorter hadiths use single-pass. Longer hadiths (some Al-Kafi narrations exceed 500 words) use chunked processing.
+
+---
+
+## Stage 3: Generation (Pass 1)
+
+### The 13 Generated Fields
+
+| # | Field | Type | Purpose |
+|---|-------|------|---------|
+| 1 | `diacritized_text` | string | Full Arabic text with complete tashkeel (vowel marks) |
+| 2 | `diacritics_status` | enum | How tashkeel was handled: added/completed/validated/corrected |
+| 3 | `diacritics_changes` | array | What corrections were made (empty if "added"/"validated") |
+| 4 | `word_analysis` | array | Per-word: diacritized form, 11-language translations, POS tag |
+| 5 | `tags` | array(2-5) | Thematic tags (theology, ethics, jurisprudence, etc.) |
+| 6 | `content_type` | enum | Single classification (theological, creedal, narrative, etc.) |
+| 7 | `related_quran` | array | Quran cross-references with explicit/thematic relationship |
+| 8 | `isnad_matn` | object | Narrator chain: names, roles, confidence, isnad/matn split |
+| 9 | `translations` | object | 11 languages x {text, summary, key_terms, seo_question} |
+| 10 | `chunks` | array | Semantic segmentation: type, word range, per-chunk translations |
+| 11 | `topics` | array(1-3) | Level 2 topic keys from controlled vocabulary |
+| 12 | `key_phrases` | array(0-5) | Multi-word Arabic expressions with categories |
+| 13 | `similar_content_hints` | array(0-3) | Unverified thematic hints for finding parallel narrations |
+
+The **11 languages** are: en, ur, tr, fa, id, bn, es, fr, de, ru, zh.
+
+### Single-Pass Mode
+
+`build_system_prompt()` + `build_user_message()` produce the full prompt. The LLM generates all 13 fields in one response.
+
+### Chunked Mode (> 200 words)
+
+**Step 1 — Check cache:** `get_cached_or_plan()` checks for a valid cached structure. The 3-layer staleness system determines what needs regeneration (see [Caching](#caching) below).
+
+**Step 2 — Structure pass** (skip if cached): `build_structure_prompt()` generates all fields EXCEPT `word_analysis` and chunk translations. This defines narrative structure: chunk boundaries, verse-level translations, isnad/matn separation, topics, key phrases. Saved via `save_structure_cache()`.
+
+**Step 3 — Detail passes** (one per chunk, parallelizable): `build_chunk_detail_prompt()` generates `word_analysis` entries and chunk translations for one chunk at a time. The full Arabic text is included for context, but the LLM only analyzes the chunk's word segment. Each result saved via `save_chunk_cache()`.
+
+**Step 4 — Assembly:** `assemble_chunked_result()` concatenates word_analysis from all chunks, inserts chunk translations, fixes word ranges to match actual word counts, and validates.
+
+---
+
+## Stage 4: Schema Validation
+
+`validate_result()` enforces strict schema rules:
+
+- All required top-level fields present
+- `diacritics_status` in valid enum; cross-check that "added"/"validated" have empty changes
+- Every word in `word_analysis` has all 11 language translations, valid POS tag, diacritics present
+- `tags` has 2-5 items from valid set; `content_type` is valid enum
+- `related_quran` refs have valid surah:ayah format (1-114 surah range)
+- `isnad_matn` has required fields; `has_chain=True` requires non-empty isnad_ar and narrators
+- Translations: all 11 languages present, each with text/summary/key_terms/seo_question
+- `key_terms` must be dict (not list), with Arabic-character keys
+- Chunks: sequential, non-overlapping, complete coverage of word_analysis
+- Topics from controlled vocabulary; key phrases multi-word with valid categories
+
+---
+
+## Stage 5: Quality Review (Pass 2)
+
+`review_result()` runs 8 automated checks that catch issues schema validation cannot:
+
+| # | Check | Category | Catches |
+|---|-------|----------|---------|
+| 1 | Translation length ratio | `length_ratio` | Summaries masquerading as translations |
+| 2 | Arabic echo-back | `arabic_echo` | Untranslated word translations (>50% Arabic chars) |
+| 3 | European diacritics | `missing_diacritics` | ASCII-only Turkish/French/German/Spanish |
+| 4 | Quran self-reference | `empty_related_quran` | Quran verses with no related verses |
+| 5 | Chunk coherence | `chunk_translation_mismatch` | Chunk translations differ >30% from verse-level |
+| 6 | Missing isnad chunk | `missing_isnad_chunk` | has_chain=True without isnad chunk |
+| 7 | Back-reference pattern | `back_reference_no_chain` | Arabic starts with back-ref but has_chain=False |
+| 8 | Key terms disparity | `key_terms_count_disparity` | One language has >2x more key_terms than another |
+
+Translation ratio bounds are per-language: Latin-script (0.3-5.0x), CJK (0.15-3.0x), Perso-Arabic (0.4-4.0x).
+
+The review agent also applies expert judgment beyond automated checks and returns: **pass**, **needs_fix**, or **needs_regeneration**.
+
+---
+
+## Stage 6: Fix Pass (Pass 3, if needed)
+
+If review returns "needs_fix":
+
+1. `build_fix_prompt()` extracts only flagged fields and warning details
+2. Fix agent generates corrected fields only — does NOT modify unflagged content
+3. Corrections merged back into original result
+4. Result goes through validation + review again (max 2 fix iterations)
+
+If review returns "needs_regeneration" (fundamentally flawed), the entire generation restarts.
+
+---
+
+## Stage 7: Strip Redundant Fields
+
+`strip_redundant_fields()` removes three categories of data that can be reconstructed, achieving **~21% size reduction**:
+
+| Removed field | Reconstructed from |
+|--------------|-------------------|
+| `diacritized_text` | Joining `word_analysis[].word` with spaces |
+| `chunks[].arabic_text` | Joining `word_analysis[word_start:word_end]` words |
+| `translations[lang].text` | Concatenating `chunks[].translations[lang]` |
+
+Both `validate_result()` and `review_result()` auto-call `reconstruct_fields()` when they detect stripped input, so stripped files pass validation seamlessly.
+
+---
+
+## Stage 8: Save and Cache Back-fill
+
+The final result is saved with a wrapper:
+
+```json
+{
+  "verse_path": "/books/al-kafi:1:2:3:4",
+  "ai_attribution": {
+    "model": "claude-opus-4-6-20260205",
+    "generated_date": "2026-02-27",
+    "pipeline_version": "2.0.0",
+    "generation_method": "claude_code_direct"
+  },
+  "result": { /* 13 validated + stripped fields */ }
+}
+```
+
+Saved to: `ThaqalaynDataSources/ai-content/samples/responses/{verse_id}.json`
+(where `verse_id` = path with `/books/` stripped, `:` replaced by `_`)
+
+Then `save_structure_from_file()` and `save_chunk_from_file()` back-fill the cache so future regeneration can reuse structural data.
+
+---
+
+## Caching
+
+Cache location: `ThaqalaynDataSources/ai-content/samples/cache/{verse_id}/`
+
+| File | Contents |
+|------|----------|
+| `meta.json` | Hashes, versions, timestamps for staleness detection |
+| `structure.json` | Structure pass output |
+| `chunk_N.json` | Detail pass output for chunk N |
+
+### Three-Layer Staleness Detection
+
+| Layer | Trigger | Invalidates |
+|-------|---------|-------------|
+| Layer 1 | Arabic text hash changed | Everything (structure + all chunks) |
+| Layer 2 | Structure schema version changed | Everything (structure + all chunks) |
+| Layer 3 | Pipeline version / glossary / language keys | Chunks only (structure survives) |
+
+Key functions: `check_cache_staleness()`, `get_cached_or_plan()`, `invalidate_cache()`, `invalidate_chunks()`.
+
+---
+
+## Orchestration at Scale
+
+The `ai-orchestrate` agent coordinates full corpus runs:
+
+1. Reads the verse list
+2. Skips paths that already have valid response files
+3. Spawns up to **5 parallel `ai-generate` agents** at a time
+4. Each agent runs the full generate -> review -> fix cycle independently
+5. After each batch, runs `python -m app.ai_pipeline validate` to verify
+6. Failed validations queued for retry
+
+The caching system means interrupted runs resume efficiently — structure passes survive pipeline version bumps, and individual chunks can be regenerated without redoing the full hadith.
+
+---
+
+## Key Modules
+
+| Module | Location | Purpose |
+|--------|----------|---------|
+| `ai_pipeline.py` | `ThaqalaynDataGenerator/app/` | Core: PipelineRequest, prompts, validation, strip/reconstruct |
+| `ai_pipeline_review.py` | `ThaqalaynDataGenerator/app/` | Review checks, chunked processing, prompt builders |
+| `ai_pipeline_cache.py` | `ThaqalaynDataGenerator/app/` | 3-layer caching, save/load, staleness detection |
+| `config.py` | `ThaqalaynDataGenerator/app/` | Paths: AI_CONTENT_DIR, AI_PIPELINE_DATA_DIR |

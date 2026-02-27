@@ -89,6 +89,16 @@ Build Time (ThaqalaynDataGenerator)          Runtime (Angular App)
 - Normalize alef maksura (ى → ي)
 - Remove tatweel/kashida (ـ)
 
+### Structured Browsing (Topics & Phrases)
+
+In addition to full-text search, the AI pipeline (v2.0.0) generates `topics` (Level 2 sub-topic tags from a controlled vocabulary of ~90 topics) and `key_phrases` (multi-word Arabic expressions) per hadith. These enable **structured faceted browsing** alongside Orama full-text search:
+
+- **Topic browsing**: `/#/topics` page with two-level taxonomy (14 categories, ~90 sub-topics)
+- **Phrase browsing**: `/#/phrases/{phrase}` pages showing all hadiths containing a specific multi-word expression
+- **Faceted filtering**: Combine search results with topic/phrase filters for precise discovery
+
+Post-processing indexes (`index/topics.json`, `index/phrases.json`) are built at generator time and served as static JSON.
+
 ### Alternative: Pagefind (If Bandwidth Is Critical)
 
 [Pagefind](https://pagefind.app/) uses a chunked index architecture where each search query downloads only ~100-500 KB of index fragments, regardless of total corpus size. This would be better for users on very slow mobile connections, but lacks Arabic stemming (exact match only) and requires generating HTML from JSON at build time.

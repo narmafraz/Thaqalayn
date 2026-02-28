@@ -126,8 +126,8 @@
             <span class="ai-content-type-badge" *ngIf="book.data.verse.ai?.content_type">
               {{ getContentTypeLabel(book.data.verse.ai.content_type) }}
             </span>
-            <span class="ai-tag-badge" *ngFor="let tag of book.data.verse.ai?.tags">{{ tag }}</span>
-            <span class="ai-topic-badge" *ngFor="let topic of book.data.verse.ai?.topics">{{ topic }}</span>
+            <span class="ai-tag-badge" *ngFor="let tag of book.data.verse.ai?.tags">{{ formatLabel(tag) }}</span>
+            <span class="ai-topic-badge" *ngFor="let topic of book.data.verse.ai?.topics">{{ formatLabel(topic) }}</span>
           </div>
         </div>
 
@@ -154,7 +154,7 @@
             <div *ngFor="let phrase of book.data.verse.ai.key_phrases" class="ai-phrase-item">
               <span class="ai-phrase-ar" lang="ar" dir="rtl">{{ phrase.phrase_ar }}</span>
               <span class="ai-phrase-en">{{ phrase.phrase_en }}</span>
-              <span class="ai-phrase-category">{{ phrase.category.replace('_', ' ') }}</span>
+              <span class="ai-phrase-category">{{ formatLabel(phrase.category) }}</span>
             </div>
           </div>
         </div>
@@ -164,7 +164,7 @@
           <h3>Related Narrations</h3>
           <div class="ai-similar-list">
             <div *ngFor="let hint of book.data.verse.ai.similar_content_hints" class="ai-similar-item">
-              <span class="ai-similar-theme">{{ hint.theme.replace('_', ' ') }}</span>
+              <span class="ai-similar-theme">{{ formatLabel(hint.theme) }}</span>
               <p class="ai-similar-desc">{{ hint.description }}</p>
             </div>
           </div>

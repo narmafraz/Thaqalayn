@@ -71,7 +71,7 @@
               {{ getContentTypeLabel(verse.ai.content_type) }}
             </span>
             <span class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags">
-              {{ tag }}
+              {{ formatLabel(tag) }}
             </span>
           </div>
           <div class="ai-quran-refs" *ngIf="verse.ai?.related_quran?.length">

@@ -209,4 +209,47 @@ describe('VerseTextComponent', () => {
     expect(component.chunks.length).toBe(2);
     expect(component.chunks[0].chunk_type).toBe('isnad');
   });
+
+  it('should reconstruct diacritized text from word_analysis when diacritized_text is absent', () => {
+    const aiWithoutDiacText = { ...mockAi };
+    delete aiWithoutDiacText.diacritized_text;
+    component.verse = { ...mockVerse, ai: aiWithoutDiacText };
+    expect(component.hasAiText).toBe(true);
+    expect(component.diacritizedText).toBe('بِسْمِ اللَّهِ');
+  });
+
+  it('should use diacritized_text when present', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    expect(component.diacritizedText).toBe('بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ');
+  });
+
+  it('should reconstruct isnad/matn text from chunks when isnad_ar/matn_ar are absent', () => {
+    const aiNoIsnadText = {
+      ...mockAi,
+      isnad_matn: { has_chain: true, narrators: [] },
+    };
+    component.verse = { ...mockVerse, ai: aiNoIsnadText };
+    expect(component.isnadArabicText).toBe('بِسْمِ');
+    expect(component.matnArabicText).toBe('اللَّهِ');
+  });
+
+  it('should use isnad_ar/matn_ar when present', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    expect(component.isnadArabicText).toBe('عدة من أصحابنا');
+    expect(component.matnArabicText).toBe('قال الإمام');
+  });
+
+  it('should get AI translation from flat summaries/key_terms/seo_questions fields', () => {
+    const aiFlat: AiContent = {
+      summaries: { en: 'A flat summary' },
+      key_terms: { en: { 'term': 'meaning' } },
+      seo_questions: { en: 'A question?' },
+    };
+    component.verse = { ...mockVerse, ai: aiFlat };
+    const entry = component.getAiTranslationForLang('en');
+    expect(entry).toBeDefined();
+    expect(entry!.summary).toBe('A flat summary');
+    expect(entry!.key_terms['term']).toBe('meaning');
+    expect(entry!.seo_question).toBe('A question?');
+  });
 });

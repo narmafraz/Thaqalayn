@@ -56,15 +56,10 @@
   <!-- Standard Arabic text display -->
   <div lang="ar" *ngIf="!showWordAnalysis">
     <!-- Isnad/Matn separated view -->
-    <ng-container *ngIf="showIsnadSeparation && hasIsnadMatn; else standardArabic">
-      <p class="verseText arabic isnad-text" dir="rtl">{{ isnadMatn.isnad_ar }}</p>
+    <ng-container *ngIf="showIsnadSeparation && hasIsnadMatn && isnadArabicText; else standardArabic">
+      <p class="verseText arabic isnad-text" dir="rtl">{{ isnadArabicText }}</p>
       <div class="isnad-divider"></div>
-      <p class="verseText arabic" dir="rtl" *ngIf="showDiacritics && verse.ai?.diacritized_text; else matnOriginal">
-        {{ isnadMatn.matn_ar }}
-      </p>
-      <ng-template #matnOriginal>
-        <p class="verseText arabic" dir="rtl">{{ isnadMatn.matn_ar }}</p>
-      </ng-template>
+      <p class="verseText arabic" dir="rtl">{{ matnArabicText }}</p>
     </ng-container>
 
     <ng-template #standardArabic>
@@ -78,8 +73,8 @@
         </ng-container>
       </p>
       <!-- Diacritized or original text -->
-      <ng-container *ngIf="showDiacritics && verse.ai?.diacritized_text; else originalText">
-        <p class="verseText arabic" dir="rtl">{{ verse.ai.diacritized_text }}</p>
+      <ng-container *ngIf="showDiacritics && hasAiText; else originalText">
+        <p class="verseText arabic" dir="rtl">{{ diacritizedText }}</p>
       </ng-container>
       <ng-template #originalText>
         <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="txt"></p>

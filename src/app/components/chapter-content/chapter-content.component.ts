@@ -386,6 +386,10 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     return ChapterContentComponent.CONTENT_TYPE_LABELS[type] || type;
   }
 
+  formatLabel(text: string): string {
+    return text.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
   getQuranRefLink(ref: string): string {
     const parts = ref.split(':');
     return parts.length >= 1 ? 'quran:' + parts[0] : '';

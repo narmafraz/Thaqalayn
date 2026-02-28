@@ -88,14 +88,15 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       const path = '/books/' + book.index;
       // Set SEO metadata with AI data if available
       const verse = book.data.verse;
-      const aiEn = verse.ai?.translations?.en;
+      const aiSeoQuestion = verse.ai?.seo_questions?.en || verse.ai?.translations?.en?.seo_question;
+      const aiSummary = verse.ai?.summaries?.en || verse.ai?.translations?.en?.summary;
       this.seoService.setVerseDetailPageWithAi(
         book.index,
         verse.local_index,
         verse.part_type,
         book.data.chapter_title?.en || '',
-        aiEn?.seo_question,
-        aiEn?.summary,
+        aiSeoQuestion,
+        aiSummary,
       );
       this.bookmarkService.isBookmarked(path).then(result => {
         this.isBookmarked = result;
@@ -309,6 +310,11 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
 
   getContentTypeLabel(type: ContentType): string {
     return VerseDetailComponent.CONTENT_TYPE_LABELS[type] || type;
+  }
+
+  /** Format snake_case labels for display: "divine_attributes" → "Divine Attributes" */
+  formatLabel(text: string): string {
+    return text.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   getQuranRefLink(ref: string): string {

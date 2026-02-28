@@ -48,7 +48,14 @@ export class VerseTextComponent {
   }
 
   get hasAiText(): boolean {
-    return !!this.verse?.ai?.diacritized_text;
+    return !!this.verse?.ai?.diacritized_text || !!this.verse?.ai?.word_analysis?.length;
+  }
+
+  /** Reconstruct diacritized text from word_analysis if diacritized_text is not present */
+  get diacritizedText(): string {
+    if (this.verse?.ai?.diacritized_text) return this.verse.ai.diacritized_text;
+    const wa = this.verse?.ai?.word_analysis;
+    return wa ? wa.map(e => e.word).join(' ') : '';
   }
 
   get hasIsnadMatn(): boolean {
@@ -57,6 +64,34 @@ export class VerseTextComponent {
 
   get isnadMatn(): IsnadMatn | undefined {
     return this.verse?.ai?.isnad_matn;
+  }
+
+  /** Reconstruct isnad Arabic text from chunks with chunk_type=isnad, or from isnad_matn.isnad_ar */
+  get isnadArabicText(): string {
+    const im = this.verse?.ai?.isnad_matn;
+    if (im?.isnad_ar) return im.isnad_ar;
+    // Reconstruct from chunks
+    const chunks = this.verse?.ai?.chunks;
+    const wa = this.verse?.ai?.word_analysis;
+    if (!chunks || !wa) return '';
+    return chunks
+      .filter(c => c.chunk_type === 'isnad')
+      .map(c => wa.slice(c.word_start, c.word_end).map(e => e.word).join(' '))
+      .join(' ');
+  }
+
+  /** Reconstruct matn Arabic text from non-isnad chunks, or from isnad_matn.matn_ar */
+  get matnArabicText(): string {
+    const im = this.verse?.ai?.isnad_matn;
+    if (im?.matn_ar) return im.matn_ar;
+    // Reconstruct from chunks
+    const chunks = this.verse?.ai?.chunks;
+    const wa = this.verse?.ai?.word_analysis;
+    if (!chunks || !wa) return '';
+    return chunks
+      .filter(c => c.chunk_type !== 'isnad')
+      .map(c => wa.slice(c.word_start, c.word_end).map(e => e.word).join(' '))
+      .join(' ');
   }
 
   get hasWordAnalysis(): boolean {

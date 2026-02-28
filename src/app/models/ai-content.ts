@@ -62,13 +62,14 @@ export interface IsnadNarrator {
 }
 
 export interface IsnadMatn {
-  isnad_ar: string;
-  matn_ar: string;
+  isnad_ar?: string;
+  matn_ar?: string;
   has_chain: boolean;
   narrators: IsnadNarrator[];
 }
 
 export interface AiTranslationEntry {
+  text?: string;
   summary: string;
   key_terms: Record<string, string>;
   seo_question: string;

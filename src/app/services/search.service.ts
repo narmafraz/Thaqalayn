@@ -86,7 +86,8 @@ export class SearchService {
           en: 'string',
           ar: 'string',
           arn: 'string',
-        } as const
+        } as const,
+        language: 'arabic',
       });
 
       if (data) {
@@ -139,7 +140,8 @@ export class SearchService {
             ar: 'string',
             en: 'string',
             i: 'number',
-          } as const
+          } as const,
+          language: 'arabic',
         });
 
         if (data) {
@@ -356,12 +358,16 @@ export class SearchService {
     return text
       // Remove Arabic diacritics
       .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06E8]/g, '')
+      // Remove zero-width characters (ZWNJ, ZWJ, ZWSP, RLM, LRM)
+      .replace(/[\u200B-\u200F\u2028-\u202F\uFEFF]/g, '')
       // Normalize Alif variants
       .replace(/[إأآا]/g, 'ا')
       // Normalize Ta Marbuta
       .replace(/ة/g, 'ه')
-      // Normalize Ya and Alif Maksura
-      .replace(/[يى]/g, 'ي')
+      // Normalize Persian kaf to Arabic kaf
+      .replace(/\u06A9/g, '\u0643')
+      // Normalize Persian/Farsi yeh and Alif Maksura to Arabic yeh
+      .replace(/[\u06CC\u0649\u064A]/g, '\u064A')
       .trim();
   }
 }

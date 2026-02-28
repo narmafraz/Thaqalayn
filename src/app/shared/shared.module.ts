@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ExpandLanguagePipe } from '../pipes/expand-language.pipe';
@@ -23,17 +25,21 @@ import { VerseTextComponent } from '../components/verse-text/verse-text.componen
   ],
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatButtonModule,
+    MatTooltipModule,
   ],
   exports: [
     CommonModule,
+    FormsModule,
     RouterModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatButtonModule,
+    MatTooltipModule,
     TranslatePipe,
     ExpandLanguagePipe,
     PathLinkComponent,

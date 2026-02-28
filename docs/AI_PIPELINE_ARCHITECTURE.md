@@ -232,6 +232,31 @@ The caching system means interrupted runs resume efficiently — structure passe
 
 ---
 
+## Generation Stats
+
+Per-hadith generation metrics are persisted to `ai-content/{subdir}/generation_stats.json`. This file is used for planning future generation runs, estimating costs, and identifying quality trends.
+
+**Content stats** (written by each `ai-generate` agent after step 8):
+- `verse_path`, `verse_id`, `file_size_bytes`, `model`, `generated_date`, `pipeline_version`
+- `source_word_count`, `word_analysis_count`, `is_chunked_processing`
+- `chunk_count`, `chunk_types`, `content_type`, `tags`, `topics`
+- `narrator_count`, `has_chain`, `key_phrase_count`, `similar_hint_count`
+- `quran_ref_count`, `quran_explicit_refs`, `quran_thematic_refs`, `quran_refs_with_word_ranges`
+- `validation_passed`, `validation_errors`, `stats_recorded_at`
+
+**Timing stats** (merged by orchestrator from task notifications):
+- `generation_duration_ms` — wall-clock generation time
+- `generation_total_tokens` — total tokens consumed by the agent
+- `generation_tool_uses` — number of tool calls
+
+**Benchmark findings** (first 100 Al-Kafi, Feb 2026):
+- Short hadiths (14-50 words): ~3-8 min, ~85K tokens
+- Medium hadiths (50-100 words): ~5-8 min, ~90K tokens
+- Long single-pass (100-200 words): ~17-45 min, ~120-140K tokens
+- Chunked hadiths (200+ words): TBD
+
+---
+
 ## Narrator Discoverability
 
 Each narrator in `isnad_matn.narrators` can include an optional `word_ranges` field that links the narrator to specific words in `word_analysis`:

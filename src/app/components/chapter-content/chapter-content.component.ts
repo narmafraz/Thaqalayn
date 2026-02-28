@@ -1,6 +1,7 @@
 import { ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { ContentType } from '@app/models/ai-content';
 import { Book, ChapterContent, Crumb, Verse } from '@app/models';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
@@ -357,6 +358,35 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     if (!verse.translations) return null;
     const keys = Object.keys(verse.translations);
     return keys.length > 0 ? verse.translations[keys[0]] : null;
+  }
+
+  private static readonly CONTENT_TYPE_LABELS: Record<ContentType, string> = {
+    legal_ruling: 'Legal Ruling',
+    ethical_teaching: 'Ethical Teaching',
+    narrative: 'Narrative',
+    prophetic_tradition: 'Prophetic Tradition',
+    quranic_commentary: "Qur'anic Commentary",
+    supplication: 'Supplication',
+    creedal: 'Creedal',
+    eschatological: 'Eschatological',
+    biographical: 'Biographical',
+    theological: 'Theological',
+    exhortation: 'Exhortation',
+    cosmological: 'Cosmological',
+  };
+
+  getContentTypeLabel(type: ContentType): string {
+    return ChapterContentComponent.CONTENT_TYPE_LABELS[type] || type;
+  }
+
+  getQuranRefLink(ref: string): string {
+    const parts = ref.split(':');
+    return parts.length >= 1 ? 'quran:' + parts[0] : '';
+  }
+
+  getQuranRefFragment(ref: string): string {
+    const parts = ref.split(':');
+    return parts.length >= 2 ? 'h' + parts[1] : '';
   }
 
   async shareAsImage(book: ChapterContent, verse: Verse, crumbs: Crumb[]): Promise<void> {

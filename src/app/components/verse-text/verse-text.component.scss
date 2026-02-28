@@ -42,3 +42,268 @@
     }
   }
 }
+
+// AI feature toggles
+.ai-toggles {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 15px 0;
+}
+
+.ai-toggle-btn {
+  background: none;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 2px;
+  color: var(--text-secondary, #666);
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 1;
+    border-color: var(--link-color, #673ab7);
+  }
+
+  &.active {
+    opacity: 1;
+    color: var(--link-color, #673ab7);
+    border-color: var(--link-color, #673ab7);
+    background: rgba(103, 58, 183, 0.05);
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.ai-diacritics-badge {
+  font-size: 9px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  text-transform: capitalize;
+}
+
+:host-context(body.dark-theme) .ai-diacritics-badge {
+  background: rgba(46, 125, 50, 0.2);
+}
+
+// Isnad/Matn separation
+.isnad-text {
+  color: var(--text-secondary, #888) !important;
+  font-size: 0.95em;
+}
+
+.isnad-divider {
+  margin: 4px 15px;
+  border-top: 1px dashed var(--border-color, #e0e0e0);
+}
+
+// Word-by-word analysis
+.word-analysis-grid {
+  padding: 8px 15px;
+}
+
+.word-analysis-lang-select {
+  text-align: left;
+  margin-bottom: 8px;
+  direction: ltr;
+}
+
+.word-lang-select {
+  padding: 4px 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  font-size: 12px;
+  background: var(--card-bg, #fff);
+  color: var(--text-primary, #333);
+  cursor: pointer;
+}
+
+.word-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.word-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 60px;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--link-color, #673ab7);
+    background: rgba(103, 58, 183, 0.03);
+  }
+
+  &.active {
+    border-color: var(--link-color, #673ab7);
+    background: rgba(103, 58, 183, 0.08);
+  }
+}
+
+.word-arabic {
+  font-size: 1.2em;
+  line-height: 1.8;
+  font-family: 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif;
+}
+
+.word-translation {
+  font-size: 11px;
+  color: var(--text-primary, #333);
+  text-align: center;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.word-pos {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+@media (max-width: 600px) {
+  .word-card {
+    min-width: 50px;
+    padding: 4px 6px;
+  }
+
+  .word-arabic {
+    font-size: 1em;
+  }
+
+  .word-translation {
+    font-size: 10px;
+    max-width: 70px;
+  }
+}
+
+// Chunked (paragraph) view
+.chunked-view {
+  padding: 0 15px;
+}
+
+.chunk-block {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--border-color, #e0e0e0);
+}
+
+.chunk-type-isnad {
+  border-left-color: #9e9e9e;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.chunk-type-body {
+  border-left-color: var(--link-color, #673ab7);
+}
+
+.chunk-type-quran_quote {
+  border-left-color: #2e7d32;
+  background: rgba(46, 125, 50, 0.03);
+}
+
+.chunk-type-opening {
+  border-left-color: #1565c0;
+}
+
+.chunk-type-closing {
+  border-left-color: #795548;
+}
+
+.chunk-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-secondary, #999);
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.chunk-arabic {
+  font-size: 1.15em;
+  line-height: 2;
+  font-family: 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif;
+  margin: 0 0 4px;
+}
+
+.chunk-translation {
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: var(--text-primary, #333);
+  margin: 0;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+}
+
+:host-context(body.dark-theme) {
+  .chunk-type-isnad {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .chunk-type-quran_quote {
+    background: rgba(46, 125, 50, 0.05);
+  }
+}
+
+// AI translation extras
+.ai-translation-extra {
+  padding: 4px 15px 8px;
+  font-size: 13px;
+
+  details {
+    margin-top: 6px;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+
+    &:hover {
+      color: var(--link-color, #673ab7);
+    }
+  }
+
+  p {
+    margin: 4px 0 0;
+    line-height: 1.6;
+    color: var(--text-primary, #333);
+  }
+}
+
+.ai-key-terms {
+  .key-term {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    padding: 2px 0;
+  }
+
+  .key-term-arabic {
+    font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+    font-size: 1.1em;
+    color: var(--link-color, #673ab7);
+    flex-shrink: 0;
+  }
+
+  .key-term-gloss {
+    font-size: 12px;
+    color: var(--text-primary, #333);
+  }
+}

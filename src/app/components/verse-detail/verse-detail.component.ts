@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { ContentType } from '@app/models/ai-content';
 import { Book, Verse, VerseDetail } from '@app/models';
 import { BookmarkService } from '@app/services/bookmark.service';
 import { BooksService } from '@app/services/books.service';
 import { Comment, DiscussionService } from '@app/services/discussion.service';
+import { SeoService } from '@app/services/seo.service';
 import { ShareCardService, ShareCardData } from '@app/services/share-card.service';
 import { SyncService } from '@app/services/sync.service';
 import { Store } from '@ngxs/store';
@@ -60,6 +62,7 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
     private booksService: BooksService,
+    private seoService: SeoService,
     private shareCard: ShareCardService,
     private discussionService: DiscussionService,
     private syncService: SyncService,
@@ -83,6 +86,17 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     this.sub = this.book$.subscribe(book => {
       if (!book) return;
       const path = '/books/' + book.index;
+      // Set SEO metadata with AI data if available
+      const verse = book.data.verse;
+      const aiEn = verse.ai?.translations?.en;
+      this.seoService.setVerseDetailPageWithAi(
+        book.index,
+        verse.local_index,
+        verse.part_type,
+        book.data.chapter_title?.en || '',
+        aiEn?.seo_question,
+        aiEn?.summary,
+      );
       this.bookmarkService.isBookmarked(path).then(result => {
         this.isBookmarked = result;
         this.cdr.markForCheck();
@@ -282,6 +296,29 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
 
   removeBookPrefix(path: string): string {
     return path.replace('/books/', '');
+  }
+
+  private static readonly CONTENT_TYPE_LABELS: Record<ContentType, string> = {
+    legal_ruling: 'Legal Ruling', ethical_teaching: 'Ethical Teaching',
+    narrative: 'Narrative', prophetic_tradition: 'Prophetic Tradition',
+    quranic_commentary: "Qur'anic Commentary", supplication: 'Supplication',
+    creedal: 'Creedal', eschatological: 'Eschatological',
+    biographical: 'Biographical', theological: 'Theological',
+    exhortation: 'Exhortation', cosmological: 'Cosmological',
+  };
+
+  getContentTypeLabel(type: ContentType): string {
+    return VerseDetailComponent.CONTENT_TYPE_LABELS[type] || type;
+  }
+
+  getQuranRefLink(ref: string): string {
+    const parts = ref.split(':');
+    return parts.length >= 1 ? 'quran:' + parts[0] : '';
+  }
+
+  getQuranRefFragment(ref: string): string {
+    const parts = ref.split(':');
+    return parts.length >= 2 ? 'h' + parts[1] : '';
   }
 
   // Discussion methods

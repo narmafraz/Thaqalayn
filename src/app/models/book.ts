@@ -1,9 +1,13 @@
+import { AiContent } from './ai-content';
 import { MultiLingualText } from './text';
 
 export interface Translation {
   name: string;
   id: string;
   lang: string;
+  source?: 'human' | 'ai';
+  model?: string;
+  disclaimer?: string;
 }
 
 export interface Crumb {
@@ -40,6 +44,7 @@ export interface Verse {
   relations: Record<string, string[]>;
   narrator_chain: NarratorChain;
   gradings?: string[];
+  ai?: AiContent;
 }
 
 export interface Chapter {

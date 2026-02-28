@@ -120,6 +120,56 @@
           </div>
         </div>
 
+        <!-- AI Content: Tags & Content Type -->
+        <div class="ai-metadata-section" *ngIf="book.data.verse.ai?.content_type || book.data.verse.ai?.tags?.length || book.data.verse.ai?.topics?.length">
+          <div class="ai-badges">
+            <span class="ai-content-type-badge" *ngIf="book.data.verse.ai?.content_type">
+              {{ getContentTypeLabel(book.data.verse.ai.content_type) }}
+            </span>
+            <span class="ai-tag-badge" *ngFor="let tag of book.data.verse.ai?.tags">{{ tag }}</span>
+            <span class="ai-topic-badge" *ngFor="let topic of book.data.verse.ai?.topics">{{ topic }}</span>
+          </div>
+        </div>
+
+        <!-- AI Content: Quran Cross-References -->
+        <div class="ai-quran-section" *ngIf="book.data.verse.ai?.related_quran?.length">
+          <h3>Quran References</h3>
+          <div class="ai-quran-list">
+            <div *ngFor="let qref of book.data.verse.ai.related_quran" class="ai-quran-item">
+              <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
+                 [fragment]="getQuranRefFragment(qref.ref)"
+                 queryParamsHandling="preserve"
+                 class="ai-quran-link">
+                Surah {{ qref.ref.split(':')[0] }}, Ayah {{ qref.ref.split(':')[1] }}
+              </a>
+              <span [class]="'ai-quran-rel-badge ai-quran-rel-' + qref.relationship">{{ qref.relationship }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Content: Key Phrases -->
+        <div class="ai-phrases-section" *ngIf="book.data.verse.ai?.key_phrases?.length">
+          <h3>Key Phrases</h3>
+          <div class="ai-phrase-list">
+            <div *ngFor="let phrase of book.data.verse.ai.key_phrases" class="ai-phrase-item">
+              <span class="ai-phrase-ar" lang="ar" dir="rtl">{{ phrase.phrase_ar }}</span>
+              <span class="ai-phrase-en">{{ phrase.phrase_en }}</span>
+              <span class="ai-phrase-category">{{ phrase.category.replace('_', ' ') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Content: Similar Hadiths -->
+        <div class="ai-similar-section" *ngIf="book.data.verse.ai?.similar_content_hints?.length">
+          <h3>Related Narrations</h3>
+          <div class="ai-similar-list">
+            <div *ngFor="let hint of book.data.verse.ai.similar_content_hints" class="ai-similar-item">
+              <span class="ai-similar-theme">{{ hint.theme.replace('_', ' ') }}</span>
+              <p class="ai-similar-desc">{{ hint.description }}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Cross-validation -->
         <div class="validation-section" *ngIf="book.data.cross_validation as cv">
           <div class="validation-badge" [class.verified]="cv.status === 'verified'" [class.unverified]="cv.status !== 'verified'">

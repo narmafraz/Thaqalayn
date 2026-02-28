@@ -104,6 +104,57 @@ export class SeoService {
     });
   }
 
+  setVerseDetailPageWithAi(
+    bookIndex: string,
+    verseIndex: number,
+    partType: string,
+    chapterTitle: string,
+    aiSeoQuestion?: string,
+    aiSummary?: string,
+    translationText?: string,
+  ): void {
+    const path = '/books/' + bookIndex;
+    const segments = bookIndex.split(':');
+    const bookSlug = segments[0];
+    const bookName = bookSlug === 'quran' ? 'Holy Quran' : bookSlug === 'al-kafi' ? 'Al-Kafi' : bookSlug;
+    const title = `${partType} ${verseIndex} - ${chapterTitle} - ${bookName}`;
+
+    // Use AI SEO question as description if available, else summary, else translation
+    const description = aiSeoQuestion
+      || aiSummary
+      || (translationText
+        ? translationText.substring(0, 160) + (translationText.length > 160 ? '...' : '')
+        : `Read ${partType} ${verseIndex} from ${chapterTitle} in ${bookName} with translations on Thaqalayn.`);
+
+    const jsonLd: Record<string, unknown> = {
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: title,
+      url: BASE_URL + path,
+      description,
+      inLanguage: ['ar', 'en'],
+      isPartOf: {
+        '@type': 'Book',
+        name: bookName,
+        url: BASE_URL + '/books/' + bookSlug,
+      },
+    };
+
+    // Add FAQ structured data if we have an AI question + summary
+    if (aiSeoQuestion && aiSummary) {
+      jsonLd['mainEntity'] = {
+        '@type': 'Question',
+        name: aiSeoQuestion,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: aiSummary,
+        },
+      };
+    }
+
+    this.setPageMeta({ title, description, url: BASE_URL + path, type: 'article', jsonLd });
+  }
+
   setVerseDetailPage(
     bookIndex: string,
     verseIndex: number,

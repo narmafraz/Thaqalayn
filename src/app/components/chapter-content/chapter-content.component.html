@@ -66,6 +66,26 @@
               </span>
             </ng-container>
           </div>
+          <div class="ai-badges" *ngIf="verse.ai?.content_type || verse.ai?.tags?.length">
+            <span class="ai-content-type-chip" *ngIf="verse.ai?.content_type">
+              {{ getContentTypeLabel(verse.ai.content_type) }}
+            </span>
+            <span class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags">
+              {{ tag }}
+            </span>
+          </div>
+          <div class="ai-quran-refs" *ngIf="verse.ai?.related_quran?.length">
+            <span class="ai-quran-label">Quran:</span>
+            <span *ngFor="let qref of verse.ai.related_quran" class="ai-quran-ref">
+              <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
+                 [fragment]="getQuranRefFragment(qref.ref)"
+                 queryParamsHandling="preserve"
+                 class="ai-quran-link">
+                {{ qref.ref }}
+              </a>
+              <span [class]="'ai-quran-rel ai-quran-rel-' + qref.relationship">{{ qref.relationship }}</span>
+            </span>
+          </div>
           <div class="related">
             <ng-container *ngIf="verse.relations as relations">
               <div *ngFor="let relation of relations | keyvalue" class="perRel">

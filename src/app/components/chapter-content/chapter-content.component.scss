@@ -466,3 +466,101 @@ mat-mdc-card {
     background: rgba(85, 139, 47, 0.1);
   }
 }
+
+// AI content badges
+.ai-badges {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.ai-content-type-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 500;
+  background-color: #ede7f6;
+  color: #4527a0;
+  text-transform: capitalize;
+}
+
+.ai-tag-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 400;
+  background-color: var(--table-stripe, #f5f5f5);
+  color: var(--text-secondary, #616161);
+  text-transform: capitalize;
+}
+
+:host-context(body.dark-theme) {
+  .ai-content-type-chip {
+    background-color: rgba(69, 39, 160, 0.2);
+  }
+  .ai-tag-chip {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+// AI Quran cross-references
+.ai-quran-refs {
+  grid-column: 2 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.ai-quran-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+}
+
+.ai-quran-ref {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ai-quran-link {
+  font-size: 11px;
+  color: var(--link-color, #673ab7);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.ai-quran-rel {
+  font-size: 9px;
+  padding: 0 4px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.ai-quran-rel-explicit {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.ai-quran-rel-thematic {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
+
+:host-context(body.dark-theme) {
+  .ai-quran-rel-explicit {
+    background-color: rgba(46, 125, 50, 0.2);
+  }
+  .ai-quran-rel-thematic {
+    background-color: rgba(21, 101, 192, 0.2);
+  }
+}

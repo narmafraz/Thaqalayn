@@ -48,13 +48,14 @@ describe('AI Content interfaces', () => {
           has_chain: false,
           narrators: [],
         },
-        translations: {
-          en: {
-            text: 'In the name of Allah, the Beneficent, the Merciful',
-            summary: 'The opening phrase of the Quran.',
-            key_terms: { 'الرَّحْمَن': 'The Most Gracious' },
-            seo_question: 'What does Bismillah mean?',
-          },
+        summaries: {
+          en: 'The opening phrase of the Quran.',
+        },
+        key_terms: {
+          en: { 'الرَّحْمَن': 'The Most Gracious' },
+        },
+        seo_questions: {
+          en: 'What does Bismillah mean?',
         },
         chunks: [
           {
@@ -80,7 +81,7 @@ describe('AI Content interfaces', () => {
       expect(ai.diacritized_text).toContain('بِسْمِ');
       expect(ai.word_analysis.length).toBe(1);
       expect(ai.word_analysis[0].pos).toBe('PREP');
-      expect(ai.translations.en.summary).toContain('opening');
+      expect(ai.summaries.en).toContain('opening');
       expect(ai.chunks.length).toBe(1);
       expect(ai.topics.length).toBe(2);
       expect(ai.key_phrases.length).toBe(1);
@@ -277,14 +278,13 @@ describe('AI Content interfaces', () => {
   });
 
   describe('AiTranslationEntry', () => {
-    it('should contain text, summary, key_terms, and seo_question', () => {
+    it('should contain summary, key_terms, and seo_question', () => {
       const entry: AiTranslationEntry = {
-        text: 'A full translation of the hadith.',
         summary: 'This hadith discusses the importance of knowledge.',
         key_terms: { 'العِلْم': 'Knowledge', 'العَقْل': 'Intellect/Reason' },
         seo_question: 'What does Islam say about the importance of knowledge?',
       };
-      expect(entry.text).toBeDefined();
+      expect(entry.summary).toBeDefined();
       expect(Object.keys(entry.key_terms).length).toBe(2);
     });
   });

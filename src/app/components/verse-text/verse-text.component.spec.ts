@@ -72,13 +72,14 @@ describe('VerseTextComponent', () => {
         translations: { en: 'The Imam said' },
       },
     ],
-    translations: {
-      en: {
-        text: 'Full translation',
-        summary: 'A summary of the hadith.',
-        key_terms: { 'العِلْم': 'Knowledge' },
-        seo_question: 'What does this hadith teach?',
-      },
+    summaries: {
+      en: 'A summary of the hadith.',
+    },
+    key_terms: {
+      en: { 'العِلْم': 'Knowledge' },
+    },
+    seo_questions: {
+      en: 'What does this hadith teach?',
     },
   };
 

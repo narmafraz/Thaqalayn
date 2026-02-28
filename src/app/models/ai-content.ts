@@ -69,7 +69,6 @@ export interface IsnadMatn {
 }
 
 export interface AiTranslationEntry {
-  text: string;
   summary: string;
   key_terms: Record<string, string>;
   seo_question: string;
@@ -79,7 +78,7 @@ export type ChunkType = 'isnad' | 'opening' | 'body' | 'quran_quote' | 'closing'
 
 export interface Chunk {
   chunk_type: ChunkType;
-  arabic_text: string;
+  arabic_text?: string;
   word_start: number;
   word_end: number;
   translations: Partial<WordTranslations>;
@@ -102,6 +101,11 @@ export interface SimilarContentHint {
 
 // The full AI content block attached to each verse
 export interface AiContent {
+  ai_attribution?: {
+    model: string;
+    generated_date: string;
+    pipeline_version: string;
+  };
   diacritized_text?: string;
   diacritics_status?: DiacriticsStatus;
   diacritics_changes?: (string | DiacriticsChange)[];
@@ -115,4 +119,27 @@ export interface AiContent {
   topics?: string[];
   key_phrases?: KeyPhrase[];
   similar_content_hints?: SimilarContentHint[];
+  summaries?: Partial<Record<AiLanguage, string>>;
+  key_terms?: Partial<Record<AiLanguage, Record<string, string>>>;
+  seo_questions?: Partial<Record<AiLanguage, string>>;
+}
+
+/** Reconstruct full AI translation text for a language by concatenating chunk translations. */
+export function getAiTranslationText(ai: AiContent, lang: AiLanguage): string[] | undefined {
+  if (!ai?.chunks) return undefined;
+  const parts = ai.chunks
+    .map(c => c.translations?.[lang])
+    .filter((t): t is string => !!t);
+  return parts.length > 0 ? [parts.join(' ')] : undefined;
+}
+
+/** Check if a translation ID is an AI translation (e.g., "en.ai"). */
+export function isAiTranslation(translationId: string): boolean {
+  return translationId?.endsWith('.ai') ?? false;
+}
+
+/** Extract language code from AI translation ID (e.g., "en.ai" → "en"). */
+export function getAiLang(translationId: string): AiLanguage | undefined {
+  if (!isAiTranslation(translationId)) return undefined;
+  return translationId.replace('.ai', '') as AiLanguage;
 }

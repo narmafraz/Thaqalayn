@@ -1,7 +1,7 @@
 import { ViewportScroller } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ContentType } from '@app/models/ai-content';
+import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
 import { Book, ChapterContent, Crumb, Verse } from '@app/models';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
@@ -355,9 +355,16 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   }
 
   getFirstTranslation(verse: Verse): string[] | null {
-    if (!verse.translations) return null;
-    const keys = Object.keys(verse.translations);
-    return keys.length > 0 ? verse.translations[keys[0]] : null;
+    if (verse.translations) {
+      const keys = Object.keys(verse.translations);
+      if (keys.length > 0) return verse.translations[keys[0]];
+    }
+    // Fall back to AI translation if no human translations
+    if (verse.ai?.chunks) {
+      const aiText = getAiTranslationText(verse.ai, 'en');
+      if (aiText) return aiText;
+    }
+    return null;
   }
 
   private static readonly CONTENT_TYPE_LABELS: Record<ContentType, string> = {

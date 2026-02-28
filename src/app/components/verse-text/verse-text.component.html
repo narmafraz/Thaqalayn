@@ -91,7 +91,7 @@
   <div *ngIf="showChunkedView && hasChunks" class="chunked-view">
     <div *ngFor="let chunk of chunks" class="chunk-block" [class]="'chunk-type-' + chunk.chunk_type">
       <div class="chunk-label">{{ chunk.chunk_type }}</div>
-      <p class="chunk-arabic arabic" dir="rtl" lang="ar">{{ chunk.arabic_text }}</p>
+      <p class="chunk-arabic arabic" dir="rtl" lang="ar">{{ getChunkArabicText(chunk) }}</p>
       <p class="chunk-translation" *ngIf="getChunkTranslation(chunk, (translation$ | async)?.split('.')[0] || 'en') as t">
         {{ t }}
       </p>
@@ -101,7 +101,7 @@
   <!-- Standard translation display -->
   <div *ngIf="!showChunkedView" [class.side-by-side]="(translation2$ | async)">
     <div class="translation-col">
-      <p *ngFor="let trt of verse.translations[(translation$ | async)]" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
+      <p *ngFor="let trt of getTranslationText(verse, (translation$ | async))" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
       <!-- AI translation summary -->
       <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
         <details class="ai-summary">
@@ -120,7 +120,7 @@
       </div>
     </div>
     <div class="translation-col translation-col-2" *ngIf="(translation2$ | async) as t2">
-      <p *ngFor="let trt of verse.translations[t2]" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
+      <p *ngFor="let trt of getTranslationText(verse, t2)" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
     </div>
   </div>
 </div>

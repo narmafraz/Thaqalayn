@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
-import { AiLanguage, AiTranslationEntry, Chunk, ContentType, IsnadMatn, WordAnalysisEntry } from '@app/models/ai-content';
+import { AiLanguage, AiTranslationEntry, Chunk, ContentType, IsnadMatn, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { Verse } from '@app/models';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -76,12 +76,48 @@ export class VerseTextComponent {
   }
 
   get aiTranslation(): AiTranslationEntry | undefined {
-    const lang = this.wordAnalysisLang;
-    return this.verse?.ai?.translations?.[lang];
+    return this.getAiTranslationForLang(this.wordAnalysisLang);
   }
 
   getAiTranslationForLang(lang: string): AiTranslationEntry | undefined {
-    return this.verse?.ai?.translations?.[lang as AiLanguage];
+    const ai = this.verse?.ai;
+    if (!ai) return undefined;
+    const l = lang as AiLanguage;
+    // Try dissolved fields first (lean format from merger)
+    const summary = ai.summaries?.[l];
+    const key_terms = ai.key_terms?.[l];
+    const seo_question = ai.seo_questions?.[l];
+    if (summary || key_terms || seo_question) {
+      return {
+        summary: summary || '',
+        key_terms: key_terms || {},
+        seo_question: seo_question || '',
+      };
+    }
+    // Fall back to legacy translations object (pre-merger format)
+    return ai.translations?.[l];
+  }
+
+  getTranslationText(verse: Verse, translationId: string): string[] | undefined {
+    if (!translationId) return undefined;
+    // Try human translation first
+    if (verse.translations?.[translationId]) {
+      return verse.translations[translationId];
+    }
+    // Try AI translation (reconstruct from chunks)
+    if (isAiTranslation(translationId) && verse.ai) {
+      const lang = getAiLang(translationId);
+      return lang ? getAiTranslationText(verse.ai, lang) : undefined;
+    }
+    return undefined;
+  }
+
+  getChunkArabicText(chunk: Chunk): string {
+    // Use arabic_text if present, otherwise reconstruct from word_analysis
+    if (chunk.arabic_text) return chunk.arabic_text;
+    const wa = this.verse?.ai?.word_analysis;
+    if (!wa) return '';
+    return wa.slice(chunk.word_start, chunk.word_end).map(e => e.word).join(' ');
   }
 
   getChunkTranslation(chunk: Chunk, lang: string): string {

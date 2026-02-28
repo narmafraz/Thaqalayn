@@ -2,36 +2,110 @@
   <h1>{{ 'topics.title' | translate }}</h1>
   <p class="subtitle">{{ 'topics.description' | translate }}</p>
 
-  <div class="search-box">
-    <mat-icon>search</mat-icon>
-    <input
-      type="text"
-      [placeholder]="'topics.searchPlaceholder' | translate"
-      [ngModel]="searchQuery"
-      (ngModelChange)="filterTopics($event)"
-      class="search-input">
+  <!-- Tab buttons -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'books'" (click)="setActiveTab('books')">
+      <mat-icon>menu_book</mat-icon> Books
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'ai-topics'" (click)="setActiveTab('ai-topics')">
+      <mat-icon>auto_awesome</mat-icon> AI Topics
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'phrases'" (click)="setActiveTab('phrases')">
+      <mat-icon>format_quote</mat-icon> Key Phrases
+    </button>
   </div>
 
-  <div *ngIf="filteredCategories.length === 0 && categories.length > 0" class="no-results">
-    {{ 'search.noResults' | translate }}
-  </div>
+  <!-- Books Tab (existing) -->
+  <ng-container *ngIf="activeTab === 'books'">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        [placeholder]="'topics.searchPlaceholder' | translate"
+        [ngModel]="searchQuery"
+        (ngModelChange)="filterTopics($event)"
+        class="search-input">
+    </div>
 
-  <section *ngFor="let category of filteredCategories" class="topic-category">
-    <h2>
-      <mat-icon class="category-icon">{{ category.icon }}</mat-icon>
-      {{ category.name }}
-    </h2>
+    <div *ngIf="filteredCategories.length === 0 && categories.length > 0" class="no-results">
+      {{ 'search.noResults' | translate }}
+    </div>
 
-    <div class="topic-grid">
-      <a *ngFor="let topic of category.topics"
-         [routerLink]="['/books', topic.path.substring(7)]"
-         class="topic-card">
-        <div class="topic-title">{{ topic.title }}</div>
-        <div class="topic-arabic" *ngIf="topic.arabicTitle">{{ topic.arabicTitle }}</div>
-        <div class="topic-meta">
-          <span *ngIf="topic.chapterCount > 0">{{ topic.chapterCount }} {{ 'topics.chapters' | translate }}</span>
+    <section *ngFor="let category of filteredCategories" class="topic-category">
+      <h2>
+        <mat-icon class="category-icon">{{ category.icon }}</mat-icon>
+        {{ category.name }}
+      </h2>
+
+      <div class="topic-grid">
+        <a *ngFor="let topic of category.topics"
+           [routerLink]="['/books', topic.path.substring(7)]"
+           class="topic-card">
+          <div class="topic-title">{{ topic.title }}</div>
+          <div class="topic-arabic" *ngIf="topic.arabicTitle">{{ topic.arabicTitle }}</div>
+          <div class="topic-meta">
+            <span *ngIf="topic.chapterCount > 0">{{ topic.chapterCount }} {{ 'topics.chapters' | translate }}</span>
+          </div>
+        </a>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- AI Topics Tab -->
+  <ng-container *ngIf="activeTab === 'ai-topics'">
+    <div *ngIf="aiTopicsLoading" class="ai-loading">
+      <mat-spinner diameter="24"></mat-spinner>
+      Loading AI topic taxonomy...
+    </div>
+
+    <ng-container *ngIf="!aiTopicsLoading && aiTopicsAvailable">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search AI topics..."
+          [ngModel]="aiSearchQuery"
+          (ngModelChange)="filterAiTopics($event)"
+          class="search-input">
+      </div>
+
+      <div *ngIf="filteredAiCategories.length === 0" class="no-results">
+        {{ 'search.noResults' | translate }}
+      </div>
+
+      <section *ngFor="let cat of filteredAiCategories" class="ai-topic-category">
+        <h2 class="ai-cat-header" (click)="toggleAiCategory(cat)">
+          <mat-icon class="category-icon">{{ cat.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+          <span class="ai-cat-label">{{ cat.label }}</span>
+          <span class="ai-cat-count">{{ cat.totalCount }} hadiths</span>
+        </h2>
+
+        <div class="ai-subtopic-list" *ngIf="cat.expanded">
+          <a *ngFor="let st of cat.subtopics"
+             [routerLink]="['/search']"
+             [queryParams]="{q: 'topic:' + st.key}"
+             class="ai-subtopic-card">
+            <div class="ai-subtopic-name">{{ st.label }}</div>
+            <div class="ai-subtopic-count">{{ st.count }} hadiths</div>
+          </a>
         </div>
+      </section>
+    </ng-container>
+
+    <div *ngIf="!aiTopicsLoading && !aiTopicsAvailable" class="ai-coming-soon">
+      <mat-icon>auto_awesome</mat-icon>
+      <p>AI topic classification is coming soon. Topics will be automatically generated from hadith analysis.</p>
+    </div>
+  </ng-container>
+
+  <!-- Key Phrases Tab (links to /phrases) -->
+  <ng-container *ngIf="activeTab === 'phrases'">
+    <div class="ai-coming-soon phrases-redirect">
+      <mat-icon>format_quote</mat-icon>
+      <p>Browse key Islamic phrases found across hadiths.</p>
+      <a routerLink="/phrases" class="phrases-link">
+        <mat-icon>arrow_forward</mat-icon> View Key Phrases
       </a>
     </div>
-  </section>
+  </ng-container>
 </div>

@@ -485,6 +485,12 @@ mat-mdc-card {
   background-color: #ede7f6;
   color: #4527a0;
   text-transform: capitalize;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
 }
 
 .ai-tag-chip {
@@ -496,6 +502,12 @@ mat-mdc-card {
   background-color: var(--table-stripe, #f5f5f5);
   color: var(--text-secondary, #616161);
   text-transform: capitalize;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
 }
 
 :host-context(body.dark-theme) {

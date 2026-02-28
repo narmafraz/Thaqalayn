@@ -317,6 +317,11 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     return text.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
+  /** Strip Arabic diacritics for use as URL key */
+  stripDiacritics(text: string): string {
+    return text.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06E8]/g, '');
+  }
+
   getQuranRefLink(ref: string): string {
     const parts = ref.split(':');
     return parts.length >= 1 ? 'quran:' + parts[0] : '';

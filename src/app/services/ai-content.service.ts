@@ -12,6 +12,7 @@ export interface TopicTaxonomyEntry {
 export type TopicTaxonomy = Record<string, Record<string, TopicTaxonomyEntry>>;
 
 export interface PhraseIndexEntry {
+  phrase_ar: string;
   phrase_en: string;
   category: string;
   paths: string[];

@@ -292,6 +292,17 @@ export class SearchService {
     return this.slugToDisplayName(match[1]);
   }
 
+  /** Parse a filtered query with prefix syntax (tag:xxx, type:xxx, topic:xxx).
+   *  Returns { prefix, value } if a filter prefix is found, or null for plain queries.
+   */
+  parseFilteredQuery(query: string): { prefix: string; value: string } | null {
+    const match = query.match(/^(tag|type|topic):(.+)$/);
+    if (match) {
+      return { prefix: match[1], value: match[2].trim() };
+    }
+    return null;
+  }
+
   private normalizeArabic(text: string): string {
     if (!text) return '';
     return text

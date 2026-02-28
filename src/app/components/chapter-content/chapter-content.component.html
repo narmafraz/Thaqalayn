@@ -67,12 +67,18 @@
             </ng-container>
           </div>
           <div class="ai-badges" *ngIf="verse.ai?.content_type || verse.ai?.tags?.length">
-            <span class="ai-content-type-chip" *ngIf="verse.ai?.content_type">
+            <a class="ai-content-type-chip" *ngIf="verse.ai?.content_type"
+               [routerLink]="['/search']"
+               [queryParams]="{q: 'type:' + verse.ai.content_type}"
+               queryParamsHandling="merge">
               {{ getContentTypeLabel(verse.ai.content_type) }}
-            </span>
-            <span class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags">
+            </a>
+            <a class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags"
+               [routerLink]="['/search']"
+               [queryParams]="{q: 'tag:' + tag}"
+               queryParamsHandling="merge">
               {{ formatLabel(tag) }}
-            </span>
+            </a>
           </div>
           <div class="ai-quran-refs" *ngIf="verse.ai?.related_quran?.length">
             <span class="ai-quran-label">Quran:</span>

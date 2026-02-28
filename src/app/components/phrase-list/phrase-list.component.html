@@ -1,0 +1,46 @@
+<div class="content mat-elevation-z8">
+  <h1>Key Phrases</h1>
+  <p class="subtitle">Common Islamic multi-word expressions found across hadiths</p>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="24"></mat-spinner>
+    Loading phrases...
+  </div>
+
+  <ng-container *ngIf="!loading && available">
+    <p class="phrase-count">{{ totalPhrases }} phrases found</p>
+
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search phrases..."
+        [ngModel]="searchQuery"
+        (ngModelChange)="filterPhrases($event)"
+        class="search-input">
+    </div>
+
+    <div *ngIf="filteredCategories.length === 0" class="no-results">
+      No phrases match your search.
+    </div>
+
+    <section *ngFor="let cat of filteredCategories" class="phrase-category">
+      <h2>{{ cat.label }}</h2>
+
+      <div class="phrase-grid">
+        <a *ngFor="let phrase of cat.phrases"
+           [routerLink]="['/phrases', phrase.key]"
+           class="phrase-card">
+          <div class="phrase-ar" lang="ar" dir="rtl">{{ phrase.phraseAr }}</div>
+          <div class="phrase-en">{{ phrase.phraseEn }}</div>
+          <div class="phrase-meta">{{ phrase.count }} hadith{{ phrase.count !== 1 ? 's' : '' }}</div>
+        </a>
+      </div>
+    </section>
+  </ng-container>
+
+  <div *ngIf="!loading && !available" class="coming-soon">
+    <mat-icon>format_quote</mat-icon>
+    <p>Key phrase index is coming soon. Phrases will be extracted from AI hadith analysis.</p>
+  </div>
+</div>

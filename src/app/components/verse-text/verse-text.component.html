@@ -72,12 +72,20 @@
           </ng-container>
         </ng-container>
       </p>
-      <!-- Diacritized or original text -->
+      <!-- Diacritized or original text, with optional phrase highlighting -->
       <ng-container *ngIf="showDiacritics && hasAiText; else originalText">
-        <p class="verseText arabic" dir="rtl">{{ diacritizedText }}</p>
+        <p *ngIf="hasKeyPhrases; else plainDiacritics" class="verseText arabic" dir="rtl" [innerHTML]="highlightPhrases(diacritizedText)"></p>
+        <ng-template #plainDiacritics>
+          <p class="verseText arabic" dir="rtl">{{ diacritizedText }}</p>
+        </ng-template>
       </ng-container>
       <ng-template #originalText>
-        <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="txt"></p>
+        <ng-container *ngIf="hasKeyPhrases; else noHighlight">
+          <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="highlightPhrases(txt)"></p>
+        </ng-container>
+        <ng-template #noHighlight>
+          <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="txt"></p>
+        </ng-template>
       </ng-template>
     </ng-template>
   </div>

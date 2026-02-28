@@ -307,3 +307,16 @@
     color: var(--text-primary, #333);
   }
 }
+
+// Key phrase highlighting
+:host ::ng-deep .key-phrase {
+  background: rgba(103, 58, 183, 0.1);
+  border-radius: 2px;
+  padding: 0 2px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(103, 58, 183, 0.22);
+  }
+}

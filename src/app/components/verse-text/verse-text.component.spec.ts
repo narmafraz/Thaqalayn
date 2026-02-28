@@ -8,6 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { VerseTextComponent } from './verse-text.component';
 import { Verse } from '@app/models';
 import { AiContent } from '@app/models/ai-content';
+import { AiPreferencesService } from '@app/services/ai-preferences.service';
 
 describe('VerseTextComponent', () => {
   let component: VerseTextComponent;
@@ -239,6 +240,25 @@ describe('VerseTextComponent', () => {
     expect(component.matnArabicText).toBe('قال الإمام');
   });
 
+  it('should initialize toggle states from AiPreferencesService', () => {
+    const prefs = TestBed.inject(AiPreferencesService);
+    prefs.set('showDiacritizedByDefault', true);
+    prefs.set('showIsnadSeparation', false);
+    prefs.set('wordByWordDefaultLang', 'fr');
+
+    // Re-create component to pick up new prefs
+    const newFixture = TestBed.createComponent(VerseTextComponent);
+    const newComponent = newFixture.componentInstance;
+    newComponent.verse = mockVerse;
+
+    expect(newComponent.showDiacritics).toBe(true);
+    expect(newComponent.showIsnadSeparation).toBe(false);
+    expect(newComponent.wordAnalysisLang).toBe('fr');
+
+    // Reset prefs to defaults for other tests
+    prefs.reset();
+  });
+
   it('should get AI translation from flat summaries/key_terms/seo_questions fields', () => {
     const aiFlat: AiContent = {
       summaries: { en: 'A flat summary' },
@@ -251,5 +271,42 @@ describe('VerseTextComponent', () => {
     expect(entry!.summary).toBe('A flat summary');
     expect(entry!.key_terms['term']).toBe('meaning');
     expect(entry!.seo_question).toBe('A question?');
+  });
+
+  it('should detect hasKeyPhrases when key_phrases present', () => {
+    const aiWithPhrases: AiContent = {
+      key_phrases: [
+        { phrase_ar: 'بسم الله', phrase_en: 'In the name of Allah', category: 'quranic_echo' },
+      ],
+    };
+    component.verse = { ...mockVerse, ai: aiWithPhrases };
+    expect(component.hasKeyPhrases).toBe(true);
+  });
+
+  it('should detect no key phrases when absent', () => {
+    component.verse = mockVerse;
+    expect(component.hasKeyPhrases).toBe(false);
+  });
+
+  it('should highlight key phrases in Arabic text', () => {
+    const aiWithPhrases: AiContent = {
+      key_phrases: [
+        { phrase_ar: 'الرحمن الرحيم', phrase_en: 'Most Gracious Most Merciful', category: 'quranic_echo' },
+      ],
+    };
+    component.verse = { ...mockVerse, ai: aiWithPhrases };
+    const result = component.highlightPhrases('بسم الله الرحمن الرحيم');
+    // Should be SafeHtml — convert to string for testing
+    const html = (result as any).changingThisBreaksApplicationSecurity || result.toString();
+    expect(html).toContain('<mark class="key-phrase"');
+    expect(html).toContain('الرحمن الرحيم');
+  });
+
+  it('should return plain text when no key phrases', () => {
+    component.verse = mockVerse;
+    const result = component.highlightPhrases('بسم الله');
+    const html = (result as any).changingThisBreaksApplicationSecurity || result.toString();
+    expect(html).not.toContain('<mark');
+    expect(html).toContain('بسم الله');
   });
 });

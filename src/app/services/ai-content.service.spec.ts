@@ -67,7 +67,7 @@ describe('AiContentService', () => {
 
   it('should load phrases index', (done) => {
     const mockPhrases = {
-      'بسم الله': { phrase_en: 'In the name of Allah', category: 'prophetic_formula', paths: ['/books/quran:1'] },
+      'بسم الله': { phrase_ar: 'بِسْمِ اللَّهِ', phrase_en: 'In the name of Allah', category: 'prophetic_formula', paths: ['/books/quran:1'] },
     };
 
     service.getPhrases().subscribe(result => {

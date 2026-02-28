@@ -10,6 +10,8 @@ import { DownloadComponent } from '../../components/download/download.component'
 import { BookmarksComponent } from '../../components/bookmarks/bookmarks.component';
 import { SearchResultsComponent } from '../../components/search-results/search-results.component';
 import { TopicsComponent } from '../../components/topics/topics.component';
+import { PhraseListComponent } from '../../components/phrase-list/phrase-list.component';
+import { PhraseDetailComponent } from '../../components/phrase-detail/phrase-detail.component';
 
 const routes: Routes = [
   { path: 'about', component: AboutComponent },
@@ -18,6 +20,8 @@ const routes: Routes = [
   { path: 'bookmarks', component: BookmarksComponent },
   { path: 'search', component: SearchResultsComponent },
   { path: 'topics', component: TopicsComponent },
+  { path: 'phrases', component: PhraseListComponent },
+  { path: 'phrases/:phraseAr', component: PhraseDetailComponent },
 ];
 
 @NgModule({
@@ -28,6 +32,8 @@ const routes: Routes = [
     BookmarksComponent,
     SearchResultsComponent,
     TopicsComponent,
+    PhraseListComponent,
+    PhraseDetailComponent,
   ],
   imports: [
     SharedModule,

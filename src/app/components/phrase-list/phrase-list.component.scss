@@ -1,0 +1,130 @@
+.content {
+  display: flex;
+  border-radius: 5px;
+  color: var(--text-secondary, #666);
+  margin-top: 15px;
+  padding: 10px;
+  flex-direction: column;
+}
+
+.subtitle {
+  margin-bottom: 8px;
+  color: var(--text-muted, #999);
+}
+
+.phrase-count {
+  font-size: 13px;
+  color: var(--text-muted, #999);
+  margin-bottom: 16px;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 32px;
+  color: var(--text-muted, #999);
+  justify-content: center;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  margin-bottom: 24px;
+
+  mat-icon {
+    color: var(--text-muted, #999);
+  }
+}
+
+.search-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: transparent;
+  color: var(--text-primary, #333);
+}
+
+.no-results {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted, #999);
+}
+
+.phrase-category {
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: var(--text-primary, #333);
+  }
+}
+
+.phrase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.phrase-card {
+  display: block;
+  padding: 14px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.2s, border-color 0.2s;
+
+  &:hover {
+    border-color: var(--primary-color, #673ab7);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.phrase-ar {
+  font-family: 'Scheherazade New', serif;
+  font-size: 18px;
+  margin-bottom: 6px;
+  color: var(--text-primary, #333);
+}
+
+.phrase-en {
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  margin-bottom: 4px;
+}
+
+.phrase-meta {
+  font-size: 11px;
+  color: var(--text-muted, #999);
+}
+
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-muted, #999);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    color: var(--primary-color, #673ab7);
+    opacity: 0.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .phrase-grid {
+    grid-template-columns: 1fr;
+  }
+}

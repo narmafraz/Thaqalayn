@@ -123,11 +123,20 @@
         <!-- AI Content: Tags & Content Type -->
         <div class="ai-metadata-section" *ngIf="book.data.verse.ai?.content_type || book.data.verse.ai?.tags?.length || book.data.verse.ai?.topics?.length">
           <div class="ai-badges">
-            <span class="ai-content-type-badge" *ngIf="book.data.verse.ai?.content_type">
+            <a class="ai-content-type-badge" *ngIf="book.data.verse.ai?.content_type"
+               [routerLink]="['/search']"
+               [queryParams]="{q: 'type:' + book.data.verse.ai.content_type}"
+               queryParamsHandling="merge">
               {{ getContentTypeLabel(book.data.verse.ai.content_type) }}
-            </span>
-            <span class="ai-tag-badge" *ngFor="let tag of book.data.verse.ai?.tags">{{ formatLabel(tag) }}</span>
-            <span class="ai-topic-badge" *ngFor="let topic of book.data.verse.ai?.topics">{{ formatLabel(topic) }}</span>
+            </a>
+            <a class="ai-tag-badge" *ngFor="let tag of book.data.verse.ai?.tags"
+               [routerLink]="['/search']"
+               [queryParams]="{q: 'tag:' + tag}"
+               queryParamsHandling="merge">{{ formatLabel(tag) }}</a>
+            <a class="ai-topic-badge" *ngFor="let topic of book.data.verse.ai?.topics"
+               [routerLink]="['/search']"
+               [queryParams]="{q: 'topic:' + topic}"
+               queryParamsHandling="merge">{{ formatLabel(topic) }}</a>
           </div>
         </div>
 
@@ -151,11 +160,13 @@
         <div class="ai-phrases-section" *ngIf="book.data.verse.ai?.key_phrases?.length">
           <h3>Key Phrases</h3>
           <div class="ai-phrase-list">
-            <div *ngFor="let phrase of book.data.verse.ai.key_phrases" class="ai-phrase-item">
+            <a *ngFor="let phrase of book.data.verse.ai.key_phrases"
+               class="ai-phrase-item"
+               [routerLink]="['/phrases', stripDiacritics(phrase.phrase_ar)]">
               <span class="ai-phrase-ar" lang="ar" dir="rtl">{{ phrase.phrase_ar }}</span>
               <span class="ai-phrase-en">{{ phrase.phrase_en }}</span>
               <span class="ai-phrase-category">{{ formatLabel(phrase.category) }}</span>
-            </div>
+            </a>
           </div>
         </div>
 

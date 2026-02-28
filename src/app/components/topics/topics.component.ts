@@ -3,6 +3,7 @@ import { Store } from '@ngxs/store';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { IndexState, IndexedTitles } from '@store/index/index.state';
+import { AiContentService, TopicTaxonomy } from '@app/services/ai-content.service';
 
 export interface Topic {
   path: string;
@@ -19,6 +20,14 @@ export interface TopicCategory {
   topics: Topic[];
 }
 
+export interface AiTopicCategory {
+  key: string;
+  label: string;
+  totalCount: number;
+  subtopics: { key: string; label: string; count: number; paths: string[] }[];
+  expanded: boolean;
+}
+
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-topics',
@@ -32,9 +41,22 @@ export class TopicsComponent implements OnInit, OnDestroy {
   filteredCategories: TopicCategory[] = [];
   searchQuery = '';
 
+  // AI Topics tab
+  aiTopicCategories: AiTopicCategory[] = [];
+  filteredAiCategories: AiTopicCategory[] = [];
+  aiTopicsAvailable = false;
+  aiTopicsLoading = true;
+  aiSearchQuery = '';
+
+  activeTab: 'books' | 'ai-topics' | 'phrases' = 'books';
+
   private subscriptions: Subscription[] = [];
 
-  constructor(private store: Store, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private store: Store,
+    private cdr: ChangeDetectorRef,
+    private aiContentService: AiContentService,
+  ) {}
 
   ngOnInit(): void {
     this.subscriptions.push(
@@ -51,15 +73,45 @@ export class TopicsComponent implements OnInit, OnDestroy {
           }
         })
     );
+
+    // Load AI topics
+    this.subscriptions.push(
+      this.aiContentService.getTopics().subscribe(topics => {
+        this.aiTopicsLoading = false;
+        if (topics) {
+          this.aiTopicsAvailable = true;
+          this.aiTopicCategories = this.buildAiTopicCategories(topics);
+          this.filteredAiCategories = this.aiTopicCategories;
+        }
+        this.cdr.markForCheck();
+      })
+    );
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
+  setActiveTab(tab: 'books' | 'ai-topics' | 'phrases'): void {
+    this.activeTab = tab;
+  }
+
   filterTopics(query: string): void {
     this.searchQuery = query;
     this.applyFilter();
+  }
+
+  filterAiTopics(query: string): void {
+    this.aiSearchQuery = query;
+    this.applyAiFilter();
+  }
+
+  toggleAiCategory(category: AiTopicCategory): void {
+    category.expanded = !category.expanded;
+  }
+
+  formatLabel(key: string): string {
+    return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   private applyFilter(): void {
@@ -78,6 +130,50 @@ export class TopicsComponent implements OnInit, OnDestroy {
         )
       }))
       .filter(cat => cat.topics.length > 0);
+  }
+
+  private applyAiFilter(): void {
+    const q = this.aiSearchQuery.toLowerCase().trim();
+    if (!q) {
+      this.filteredAiCategories = this.aiTopicCategories;
+      return;
+    }
+    this.filteredAiCategories = this.aiTopicCategories
+      .map(cat => ({
+        ...cat,
+        subtopics: cat.subtopics.filter(st =>
+          st.label.toLowerCase().includes(q) ||
+          st.key.toLowerCase().includes(q) ||
+          cat.label.toLowerCase().includes(q)
+        ),
+        expanded: true,
+      }))
+      .filter(cat => cat.subtopics.length > 0);
+  }
+
+  private buildAiTopicCategories(taxonomy: TopicTaxonomy): AiTopicCategory[] {
+    const categories: AiTopicCategory[] = [];
+
+    for (const [l1Key, l2s] of Object.entries(taxonomy)) {
+      const subtopics = Object.entries(l2s).map(([l2Key, entry]) => ({
+        key: l2Key,
+        label: this.formatLabel(l2Key),
+        count: entry.count,
+        paths: entry.paths,
+      }));
+
+      const totalCount = subtopics.reduce((sum, st) => sum + st.count, 0);
+
+      categories.push({
+        key: l1Key,
+        label: this.formatLabel(l1Key),
+        totalCount,
+        subtopics: subtopics.sort((a, b) => b.count - a.count),
+        expanded: false,
+      });
+    }
+
+    return categories.sort((a, b) => b.totalCount - a.totalCount);
   }
 
   private buildCategories(enIndex: IndexedTitles, arIndex: IndexedTitles | undefined): TopicCategory[] {

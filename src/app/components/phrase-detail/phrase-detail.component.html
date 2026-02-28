@@ -1,0 +1,37 @@
+<div class="content mat-elevation-z8">
+  <div class="back-link">
+    <a routerLink="/phrases">
+      <mat-icon>arrow_back</mat-icon> All Phrases
+    </a>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner diameter="24"></mat-spinner>
+    Loading phrase...
+  </div>
+
+  <ng-container *ngIf="!loading && phrase">
+    <h1 class="phrase-ar" lang="ar" dir="rtl">{{ phrase.phrase_ar || phraseKey }}</h1>
+    <p class="phrase-en">{{ phrase.phrase_en }}</p>
+    <span class="category-badge">{{ formatLabel(phrase.category) }}</span>
+
+    <h2 class="hadith-count">Found in {{ phrase.paths.length }} hadith{{ phrase.paths.length !== 1 ? 's' : '' }}</h2>
+
+    <div class="hadith-list">
+      <a *ngFor="let path of phrase.paths"
+         [routerLink]="['/books', getRouterLink(path)]"
+         queryParamsHandling="preserve"
+         class="hadith-link">
+        <mat-icon>article</mat-icon>
+        <span>{{ getPathDisplay(path) }}</span>
+      </a>
+    </div>
+  </ng-container>
+
+  <div *ngIf="!loading && notFound" class="not-found">
+    <mat-icon>search_off</mat-icon>
+    <h2>Phrase not found</h2>
+    <p>The phrase "{{ phraseKey }}" was not found in the index.</p>
+    <a routerLink="/phrases" class="back-btn">Browse all phrases</a>
+  </div>
+</div>

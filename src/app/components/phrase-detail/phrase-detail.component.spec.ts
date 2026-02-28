@@ -69,6 +69,44 @@ describe('PhraseDetailComponent', () => {
   });
 });
 
+describe('PhraseDetailComponent (XSS safety)', () => {
+  let component: PhraseDetailComponent;
+  let fixture: ComponentFixture<PhraseDetailComponent>;
+
+  beforeEach(async () => {
+    const aiContentSpy = jasmine.createSpyObj('AiContentService', ['getPhrases']);
+    aiContentSpy.getPhrases.and.returnValue(of({}));
+
+    await TestBed.configureTestingModule({
+      declarations: [PhraseDetailComponent],
+      imports: [RouterTestingModule],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      providers: [
+        { provide: AiContentService, useValue: aiContentSpy },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            paramMap: of(convertToParamMap({ phraseAr: '<script>alert("xss")</script>' })),
+          },
+        },
+      ],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(PhraseDetailComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should safely handle HTML-like phrase keys without executing them', () => {
+    // The phraseKey should contain the raw string (Angular {{ }} auto-escapes)
+    expect(component.phraseKey).toBe('<script>alert("xss")</script>');
+    // The component uses {{ phraseKey }} binding, not innerHTML, so it's safe
+    // Verify no innerHTML usage — template uses {{ }} binding only
+    const nativeEl: HTMLElement = fixture.nativeElement;
+    expect(nativeEl.querySelector('script')).toBeNull();
+  });
+});
+
 describe('PhraseDetailComponent (not found)', () => {
   let component: PhraseDetailComponent;
   let fixture: ComponentFixture<PhraseDetailComponent>;

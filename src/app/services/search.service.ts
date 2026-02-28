@@ -2,6 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { create, insert, search } from '@orama/orama';
 import { environment } from '@env/environment';
+import { AiContentService } from './ai-content.service';
+import { firstValueFrom } from 'rxjs';
 
 export type SearchMode = 'titles' | 'fulltext';
 
@@ -58,6 +60,7 @@ export class SearchService {
   private fullTextLoading: Promise<void> | null = null;
 
   private http = inject(HttpClient);
+  private aiContentService = inject(AiContentService);
 
   get isFullTextLoaded(): boolean {
     return this.fullTextLoaded;
@@ -269,6 +272,21 @@ export class SearchService {
 
   /** Combined search: titles + full text (if loaded) */
   async searchAll(query: string, mode: SearchMode = 'titles', limit = 30): Promise<SearchResult[]> {
+    // Intercept filter prefix queries (topic:, tag:, type:)
+    const filtered = this.parseFilteredQuery(query);
+    if (filtered) {
+      if (filtered.prefix === 'topic') {
+        return this.searchByTopic(filtered.value, limit);
+      }
+      // For tag: and type: — strip prefix, search the value as plain text
+      return this.searchAllPlain(filtered.value, mode, limit);
+    }
+
+    return this.searchAllPlain(query, mode, limit);
+  }
+
+  /** Plain search without filter prefix handling */
+  private async searchAllPlain(query: string, mode: SearchMode, limit: number): Promise<SearchResult[]> {
     if (mode === 'fulltext') {
       if (!this.fullTextLoaded) {
         await this.loadFullTextIndex();
@@ -284,6 +302,36 @@ export class SearchService {
     }
 
     return this.searchTitles(query, limit);
+  }
+
+  /** Search by topic using the AI topics index */
+  async searchByTopic(topicValue: string, limit = 50): Promise<SearchResult[]> {
+    const topics = await firstValueFrom(this.aiContentService.getTopics());
+    if (!topics) return [];
+
+    const normalizedValue = topicValue.toLowerCase().replace(/_/g, ' ');
+    const matchingPaths: string[] = [];
+
+    for (const [, l2s] of Object.entries(topics)) {
+      for (const [l2Key, entry] of Object.entries(l2s)) {
+        if (l2Key === topicValue || l2Key.replace(/_/g, ' ').toLowerCase().includes(normalizedValue)) {
+          matchingPaths.push(...entry.paths);
+        }
+      }
+    }
+
+    // Deduplicate and resolve chapter paths
+    const uniqueChapterPaths = [...new Set(matchingPaths.map(p => p.replace(/:\d+$/, '')))];
+
+    return uniqueChapterPaths.slice(0, limit).map(chapterPath => ({
+      path: chapterPath,
+      title: '',
+      titleAr: '',
+      snippet: `Contains hadith about "${topicValue.replace(/_/g, ' ')}"`,
+      bookName: this.bookNameFromPath(chapterPath),
+      kind: 'hadith' as const,
+      score: 1,
+    }));
   }
 
   private bookNameFromPath(path: string): string {

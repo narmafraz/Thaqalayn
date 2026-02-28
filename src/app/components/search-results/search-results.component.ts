@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
 import { InitSearchIndex, SearchQuery, SetSearchMode } from '@store/search/search.actions';
-import { SearchMode, SearchResult } from '@app/services/search.service';
+import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
 import { Observable, Subscription } from 'rxjs';
 
 interface BookFilterEntry {
@@ -29,8 +29,10 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   bookFilters: BookFilterEntry[] = [];
   activeBookFilter: string | null = null;
   filteredResults: SearchResult[] = [];
+  activeFilter: { prefix: string; value: string } | null = null;
   private allResults: SearchResult[] = [];
   private subscriptions: Subscription[] = [];
+  private searchService = inject(SearchService);
 
   constructor(private store: Store, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
@@ -41,7 +43,10 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
       this.route.queryParamMap.subscribe(params => {
         const q = params.get('q');
         if (q) {
+          this.activeFilter = this.searchService.parseFilteredQuery(q);
           this.store.dispatch(new SearchQuery(q));
+        } else {
+          this.activeFilter = null;
         }
       })
     );
@@ -87,6 +92,10 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
       .map(w => w.charAt(0).toUpperCase() + w.slice(1))
       .join('-');
     return rest ? `${name} ${rest}` : name;
+  }
+
+  formatFilterLabel(value: string): string {
+    return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   private buildBookFilters(results: SearchResult[]): void {

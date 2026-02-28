@@ -1,14 +1,33 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
 import { SearchService } from './search.service';
+import { AiContentService, TopicTaxonomy } from './ai-content.service';
 
 describe('SearchService', () => {
   let service: SearchService;
 
+  const mockTopics: TopicTaxonomy = {
+    'theology': {
+      'divine_unity': { count: 5, paths: ['/books/al-kafi:1:1:1:1', '/books/al-kafi:1:1:1:2'] },
+      'prophethood': { count: 3, paths: ['/books/al-kafi:1:2:1:1'] },
+    },
+    'ethics': {
+      'patience': { count: 2, paths: ['/books/al-kafi:2:1:1:1'] },
+    },
+  };
+
   beforeEach(() => {
+    const aiContentSpy = jasmine.createSpyObj('AiContentService', ['getTopics', 'getPhrases']);
+    aiContentSpy.getTopics.and.returnValue(of(mockTopics));
+    aiContentSpy.getPhrases.and.returnValue(of(null));
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        { provide: AiContentService, useValue: aiContentSpy },
+      ],
     });
     service = TestBed.inject(SearchService);
   });
@@ -48,6 +67,38 @@ describe('SearchService', () => {
 
     it('should not match unknown prefixes', () => {
       expect(service.parseFilteredQuery('foo:bar')).toBeNull();
+    });
+  });
+
+  describe('searchByTopic', () => {
+    it('should return results for a matching topic', async () => {
+      const results = await service.searchByTopic('divine_unity');
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].snippet).toContain('divine unity');
+      expect(results[0].kind).toBe('hadith');
+    });
+
+    it('should match topics case-insensitively', async () => {
+      const results = await service.searchByTopic('Divine_Unity');
+      expect(results.length).toBeGreaterThan(0);
+    });
+
+    it('should return empty for non-matching topic', async () => {
+      const results = await service.searchByTopic('nonexistent_topic');
+      expect(results.length).toBe(0);
+    });
+
+    it('should deduplicate chapter paths', async () => {
+      const results = await service.searchByTopic('divine_unity');
+      const paths = results.map(r => r.path);
+      expect(new Set(paths).size).toBe(paths.length);
+    });
+
+    it('should return empty when topics index is null', async () => {
+      const aiContent = TestBed.inject(AiContentService) as jasmine.SpyObj<AiContentService>;
+      aiContent.getTopics.and.returnValue(of(null));
+      const results = await service.searchByTopic('divine_unity');
+      expect(results.length).toBe(0);
     });
   });
 });

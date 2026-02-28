@@ -32,10 +32,15 @@
     <span>{{ error }}</span>
   </div>
 
+  <div *ngIf="activeFilter" class="filter-banner">
+    <mat-icon>filter_alt</mat-icon>
+    <span>Filtered by {{ activeFilter.prefix }}: <strong>{{ formatFilterLabel(activeFilter.value) }}</strong></span>
+  </div>
+
   <ng-container *ngIf="(results$ | async) as results">
     <p *ngIf="(query$ | async) as query" class="results-summary">
-      <span *ngIf="results.length > 0">{{ results.length }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
-      <span *ngIf="results.length === 0 && !(loading$ | async)">{{ 'search.noResultsFor' | translate }} "{{ query }}"</span>
+      <span *ngIf="results.length > 0">{{ results.length }} {{ 'search.resultsFor' | translate }} "{{ activeFilter ? formatFilterLabel(activeFilter.value) : query }}"</span>
+      <span *ngIf="results.length === 0 && !(loading$ | async)">{{ 'search.noResultsFor' | translate }} "{{ activeFilter ? formatFilterLabel(activeFilter.value) : query }}"</span>
     </p>
 
     <div class="book-filters" *ngIf="bookFilters.length > 1">

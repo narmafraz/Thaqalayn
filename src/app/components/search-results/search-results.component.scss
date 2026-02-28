@@ -46,6 +46,35 @@ h1 {
   }
 }
 
+.filter-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  background: var(--link-color-light, rgba(103, 58, 183, 0.08));
+  border-left: 3px solid var(--link-color, #673ab7);
+  border-radius: 4px;
+  font-size: 14px;
+  color: var(--text-primary, #333);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--link-color, #673ab7);
+  }
+
+  strong {
+    color: var(--link-color, #673ab7);
+  }
+}
+
+:host-context([dir="rtl"]) .filter-banner {
+  border-left: none;
+  border-right: 3px solid var(--link-color, #673ab7);
+}
+
 .fulltext-loading-banner {
   display: flex;
   align-items: center;

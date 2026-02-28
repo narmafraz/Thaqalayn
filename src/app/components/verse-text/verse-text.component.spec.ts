@@ -309,4 +309,34 @@ describe('VerseTextComponent', () => {
     expect(html).not.toContain('<mark');
     expect(html).toContain('بسم الله');
   });
+
+  it('should escape HTML entities in highlighted text (XSS defense)', () => {
+    const aiWithXss: AiContent = {
+      key_phrases: [
+        { phrase_ar: '<img>', phrase_en: '<script>alert("xss")</script>', category: 'quranic_echo' },
+      ],
+    };
+    component.verse = { ...mockVerse, ai: aiWithXss };
+    const result = component.highlightPhrases('test <img> text');
+    const html = (result as any).changingThisBreaksApplicationSecurity || result.toString();
+    // HTML entities should be escaped, not rendered as raw tags
+    expect(html).toContain('&lt;img&gt;');
+    expect(html).not.toContain('<img>');
+    expect(html).not.toContain('<script>');
+  });
+
+  it('should escape HTML in phrase_en data attribute (XSS defense)', () => {
+    const aiWithXss: AiContent = {
+      key_phrases: [
+        { phrase_ar: 'الله', phrase_en: '"><script>alert(1)</script>', category: 'quranic_echo' },
+      ],
+    };
+    component.verse = { ...mockVerse, ai: aiWithXss };
+    const result = component.highlightPhrases('بسم الله الرحمن');
+    const html = (result as any).changingThisBreaksApplicationSecurity || result.toString();
+    // Raw <script> tags should be escaped in the data-en attribute
+    expect(html).not.toContain('data-en=""><script>');
+    expect(html).toContain('&lt;script&gt;');
+    expect(html).toContain('&quot;');
+  });
 });

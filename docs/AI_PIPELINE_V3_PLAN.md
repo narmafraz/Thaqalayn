@@ -1,6 +1,8 @@
 # AI Pipeline v3: Efficient Generation Tool
 
-> Replaces the Claude Code agent-based orchestration with a shell-driven pipeline that minimizes AI token usage.
+> Replaces the Claude Code agent-based orchestration with a Python-driven pipeline that minimizes AI token usage.
+
+**Status**: Plan reviewed by architect agent. All critical and important issues addressed.
 
 ## Problem Statement
 
@@ -22,48 +24,63 @@ This burned through the monthly Claude Code Max subscription limit after ~3,500 
 | Fix agent (20% of verses) | ~5,000 avg | Partially |
 | **Total** | **~55,000** | **~32,250 useful** |
 
-## Solution: Shell-Driven Pipeline with Python Pre/Post Processing
+## Solution: Python Asyncio Orchestrator with `claude -p`
 
-Move all non-AI work to Python scripts. Use `claude -p` (non-interactive CLI) for generation only. The shell orchestrator manages the queue, parallelism, and retries.
+Move all non-AI work to Python. Use `claude -p` (non-interactive CLI) for generation only. A Python asyncio orchestrator manages the queue, parallelism, and retries. Runs natively on Windows (no WSL needed).
+
+### Why Python, Not Bash
+
+The architect review identified that a bash orchestrator would be strictly inferior:
+- Bash requires calling Python for every non-trivial operation (JSON parsing, stats, progress)
+- `flock` doesn't work reliably on NTFS (WSL /mnt/c/ filesystem)
+- Error handling is primitive compared to Python try/except/finally
+- Python asyncio gives structured concurrency, per-worker error tracking, graceful shutdown
+- A Python orchestrator runs natively on Windows — no WSL setup needed
+- The existing Windows venv (`.venv/Scripts/python.exe`) already has all dependencies
 
 ### Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  Shell Orchestrator (pipeline.sh)   [runs in WSL/bash]          │
-│                                                                  │
-│  Manages: queue, parallelism, retries, progress, resume         │
-│  Zero Claude tokens for orchestration                            │
-│                                                                  │
-│  Per-verse loop (parallelized across N workers):                 │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │  1. prepare_verse.py  (Python, 0 tokens)                 │   │
-│  │     - Extract verse data from source JSON                 │   │
-│  │     - Look up pre-built word dictionary                   │   │
-│  │     - Build system prompt + user message                  │   │
-│  │     - Write prompt files to tmp dir                       │   │
-│  │     - Skip if already completed                           │   │
-│  ├──────────────────────────────────────────────────────────┤   │
-│  │  2. claude -p --model sonnet (AI, ~20K tokens)           │   │
-│  │     - Reads system prompt + user message                  │   │
-│  │     - Generates structured JSON response                  │   │
-│  │     - No tools, no agent instructions, no bash            │   │
-│  ├──────────────────────────────────────────────────────────┤   │
-│  │  3. postprocess_verse.py  (Python, 0 tokens)             │   │
-│  │     - Parse JSON response                                 │   │
-│  │     - Merge AI output with pre-filled known words         │   │
-│  │     - Validate schema                                     │   │
-│  │     - Run quality review checks                           │   │
-│  │     - Strip redundant fields                              │   │
-│  │     - Save response file                                  │   │
-│  │     - Back-fill cache                                     │   │
-│  │     - Write stats                                         │   │
-│  │     - Exit 0 (clean) or exit 1 (needs fix)               │   │
-│  ├──────────────────────────────────────────────────────────┤   │
-│  │  4. IF needs fix:                                         │   │
-│  │     prepare_fix.py → claude -p --model haiku → apply_fix  │   │
-│  └──────────────────────────────────────────────────────────┘   │
+│  Python Orchestrator (pipeline.py)   [runs on Windows natively]  │
+│                                                                   │
+│  asyncio event loop with Semaphore(N) for worker limiting        │
+│  Manages: queue, parallelism, retries, progress, resume          │
+│  Zero Claude tokens for orchestration                             │
+│                                                                   │
+│  Per-verse coroutine (N concurrent):                              │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐    │
+│  │  1. prepare_verse()  (Python function, 0 tokens)         │    │
+│  │     - Extract verse data from source JSON                 │    │
+│  │     - Build system prompt + user message                  │    │
+│  │     - Identify known words from dictionary                │    │
+│  │     - Write prompt files + metadata to work dir           │    │
+│  │     - Detect single-pass vs chunked mode                  │    │
+│  │     - Skip if already completed                           │    │
+│  ├──────────────────────────────────────────────────────────┤    │
+│  │  2. asyncio.create_subprocess_exec('claude', '-p', ...)  │    │
+│  │     --model sonnet --tools "" --output-format json        │    │
+│  │     stdin=user_message, stdout=response                   │    │
+│  │     (AI generation, the only token spend)                 │    │
+│  ├──────────────────────────────────────────────────────────┤    │
+│  │  3. postprocess_verse()  (Python function, 0 tokens)     │    │
+│  │     - Parse JSON response (with fallback handling)        │    │
+│  │     - Expand array-of-arrays word format to full JSON     │    │
+│  │     - Override known words from dictionary                │    │
+│  │     - Validate schema                                     │    │
+│  │     - Run quality review checks                           │    │
+│  │     - Strip redundant fields                              │    │
+│  │     - Archive raw response + prompt                       │    │
+│  │     - Save response file + cache + stats                  │    │
+│  ├──────────────────────────────────────────────────────────┤    │
+│  │  4. IF review failed:                                     │    │
+│  │     prepare_fix() → claude -p --model haiku → apply_fix() │    │
+│  └──────────────────────────────────────────────────────────┘    │
+│                                                                   │
+│  Progress: printed every 30s + written to pipeline_session.json  │
+│  Logs: per-session log file + structured event log               │
+│  Status: queryable via `python pipeline_status.py` anytime       │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
@@ -73,16 +90,16 @@ Move all non-AI work to Python scripts. Use `claude -p` (non-interactive CLI) fo
 |-----------|--------|-------|
 | System prompt | **3,667** | Few-shot examples removed (was 12,541) |
 | User message | ~2,250 | Same as before |
-| AI output | ~12,000 | Compact format + known words excluded |
+| AI output | ~15,000 | Array-of-arrays format for word_analysis |
 | Fix pass (20%) | ~3,000 avg | Haiku, targeted fixes only |
-| **Total per verse** | **~21,000** | **Down from ~55,000 (62% reduction)** |
+| **Total per verse** | **~24,000** | **Down from ~55,000 (56% reduction)** |
 
 ### Estimated Throughput
 
-At ~21,000 tokens/verse vs ~55,000 currently:
-- Same monthly limit covers **~2.6x more verses**
-- ~3,500 verses/month → ~9,100 verses/month
-- **Full corpus (37K remaining) in ~4 months** instead of ~11
+At ~24,000 tokens/verse vs ~55,000 currently:
+- Same monthly limit covers **~2.3x more verses**
+- ~3,500 verses/month → ~8,000 verses/month
+- **Full corpus (37K remaining) in ~5 months** instead of ~11
 
 ## Token Optimizations (Detailed)
 
@@ -102,116 +119,157 @@ The system prompt is 12,541 tokens. Few-shot examples account for 8,874 (71%). A
 | Few-shot examples | 8,874 | **Remove** |
 | **Total** | **12,541 → 3,667** | |
 
-**Validation plan**: Generate 20 verses with and without few-shot examples, compare quality scores.
+**Validation plan**: Generate 20 diverse verses with and without few-shot examples. Pass criteria:
+1. No-few-shot results must have equal or fewer high/medium review warnings
+2. No new failure modes (format errors, missing fields)
+3. Spot-check 5 verses for translation quality
+4. If no-few-shot produces >2 more medium warnings per 20 verses, keep few-shot (savings aren't worth the fix cost)
 
-### Optimization 2: Pre-Built Word Translation Dictionary
+### Optimization 2: Word Translation Dictionary (Override Strategy)
 
-**Savings: ~3,000 output tokens per verse (111M total)**
+**Savings: quality improvement + ~500 output tokens via narrator templates**
 
 Analysis of 132 existing responses shows:
 - 60.7% of all word occurrences are words appearing 5+ times
 - Top 50 words (particles, common verbs, narrator formulae) cover 39% of all occurrences
-- These words always translate identically: وَ = "and", عَنْ = "from", قَالَ = "he said"
+
+**Revised approach** (per architect review): Instead of telling Claude to skip known words (which loses context and risks off-by-one errors), Claude generates ALL words normally. In postprocessing, high-confidence dictionary words are deterministically overridden. This:
+- Preserves full context for Claude's generation
+- Ensures consistency across the corpus for common words
+- Flags discrepancies (Claude disagrees with dictionary) as a quality signal
+- Is simpler and more reliable than the skip-words prompt approach
 
 **Implementation**:
-1. Build `word_translations_cache.json` from all 3,600 existing responses
-2. For each word appearing 10+ times with >95% consistent translations, add to cache
-3. `prepare_verse.py` pre-fills word_analysis for cached words
-4. Prompt tells Claude: "The following words are pre-filled. Generate word_analysis ONLY for the remaining words: [list]"
-5. `postprocess_verse.py` merges AI output with pre-filled words
-
-**Expected coverage**: ~50-60% of words pre-filled per average hadith.
+1. Build `word_translations_cache.json` from all 3,600+ existing responses
+2. For each word+POS combination appearing 10+ times with >95% consistent translations, add to cache
+3. `postprocess_verse()` overrides matching words with dictionary values
+4. Discrepancies (Claude's translation differs from dictionary) are logged for analysis
 
 ### Optimization 3: Pre-Built Narrator Templates
 
-**Savings: ~400 output tokens per hadith with known chains (15M total)**
+**Savings: ~400 output tokens per hadith with known chains**
 
 Top 20 narrator names appear in 40%+ of hadiths. Build a narrator profile library:
 - Extract from existing responses: name_ar, name_en, role, confidence
-- Pre-fill isnad_matn.narrators for recognized names
-- Claude only needs to confirm/adjust the chain structure
+- In postprocessing, validate/override narrator details for recognized names
+- Ensures consistent narrator transliterations across the corpus
 
-### Optimization 4: Compact Output Format
+### Optimization 4: Compact Output Format (Array-of-Arrays)
 
-**Savings: ~2,100 output tokens per verse (78M total)**
+**Savings: ~2,500 output tokens per verse**
 
-Instead of full JSON for word_analysis, use pipe-delimited format:
+Per architect review, pipe-delimited format is too fragile (pipes in translations, non-standard format). Instead, use **JSON array-of-arrays** for word_analysis — same savings, parseable by `json.loads()`, no escaping issues:
 
-```
+```json
 Current (verbose JSON, ~60 tokens/word):
 {"word":"قَالَ","translation":{"en":"he said","ur":"کہا",...},"pos":"V"}
 
-Compact (pipe-delimited, ~35 tokens/word):
-قَالَ|V|he said|کہا|dedi|گفت|berkata|বলেছেন|dijo|a dit|sagte|сказал|他说
+Compact (JSON array-of-arrays, ~40 tokens/word):
+["قَالَ","V","he said","کہا","dedi","گفت","berkata","বলেছেন","dijo","a dit","sagte","сказал","他说"]
 ```
 
-Python postprocessor expands to full JSON. Language order is fixed (en,ur,tr,fa,id,bn,es,fr,de,ru,zh).
+Language order is fixed (en,ur,tr,fa,id,bn,es,fr,de,ru,zh). Python postprocessor maps positional indices to language keys.
 
-This applies to word_analysis only (the largest output field at ~5,000 tokens). Other fields remain standard JSON.
+All other fields (translations, chunks, isnad_matn, etc.) use standard JSON.
+
+**Fallback**: If Claude outputs standard JSON objects instead of arrays, the postprocessor detects and handles both formats transparently. No generation is wasted.
 
 ### Optimization 5: Model Selection
-
-Use the cheapest model that produces acceptable quality:
 
 | Task | Model | Rationale |
 |------|-------|-----------|
 | Generation (all verses) | **Sonnet** | Proven identical to Opus for this task |
 | Fix pass | **Haiku** | Proven sufficient for targeted corrections |
-| Orchestration | **None** | Shell script, 0 tokens |
-
-Sonnet is likely metered more generously than Opus on Max subscription, giving better throughput per monthly limit.
+| Orchestration | **None** | Python script, 0 tokens |
 
 **Future**: Test Haiku for short verses (<50 words, ~45% of corpus). If quality holds, another major savings.
 
 ### Optimization 6: Skip Fix for Clean Verses
 
-The current pipeline always spawns a fix agent. The skip-fix optimization (already implemented in v2) skips it for ~80% of verses. The new pipeline makes this the default path — no fix call unless `postprocess_verse.py` exits with code 1.
+~80% of verses pass review on the first try. The new pipeline only calls Claude for a fix when `postprocess_verse()` detects high/medium review warnings. No fix = no second Claude call.
 
 ### Combined Savings Summary
 
 | Optimization | Input saved | Output saved | Total/verse |
 |-------------|------------|-------------|-------------|
-| Shell runner (no agent overhead) | ~13,000 | ~7,000 | ~20,000 |
+| Python orchestrator (no agent overhead) | ~13,000 | ~7,000 | ~20,000 |
 | Remove few-shot examples | ~8,874 | 0 | ~8,874 |
-| Pre-fill known words | ~500 | ~3,000 | ~3,500 |
-| Compact output format | 0 | ~2,100 | ~2,100 |
-| Narrator templates | ~200 | ~400 | ~600 |
-| **Total savings** | **~22,574** | **~12,500** | **~35,074** |
-| **Optimized per-verse** | | | **~20,000** |
+| Array-of-arrays word format | 0 | ~2,500 | ~2,500 |
+| Word dictionary (override in postprocess) | 0 | 0 | Quality improvement |
+| Narrator templates | 0 | ~400 | ~400 |
+| **Total savings** | **~21,874** | **~9,900** | **~31,774** |
+| **Optimized per-verse** | | | **~24,000** |
+
+## Chunked Processing for Long Hadiths
+
+~1,300 verses (3.4% of corpus) have >200 Arabic words and require chunked processing. The orchestrator handles this explicitly.
+
+### Detection
+
+`prepare_verse()` checks word count. If >200, it sets `mode: "chunked"` in the metadata and generates prompts for:
+1. **Structure pass** — all fields except word_analysis and chunk translations
+2. **Detail passes** — one per chunk, generating word_analysis + chunk translations
+
+### Flow for Chunked Verses
+
+```python
+async def process_chunked_verse(verse_path, work_dir, semaphore):
+    # Structure pass
+    async with semaphore:
+        await call_claude(work_dir / "structure_prompt.txt",
+                         work_dir / "structure_response.txt", model="sonnet")
+    postprocess_structure(verse_path, work_dir)
+
+    # Detail passes (sequential within this verse, but other verses run in parallel)
+    chunk_count = load_metadata(work_dir)["chunk_count"]
+    for i in range(chunk_count):
+        prepare_chunk_detail(verse_path, work_dir, i)
+        async with semaphore:
+            await call_claude(work_dir / f"chunk_{i}_prompt.txt",
+                             work_dir / f"chunk_{i}_response.txt", model="sonnet")
+
+    # Assembly
+    assemble_chunks(verse_path, work_dir)
+    postprocess_verse(verse_path, work_dir)
+```
+
+### Caching Integration
+
+The existing `ai_pipeline_cache.py` caching system is reused:
+- Structure pass results are cached at `cache/{verse_id}/structure.json`
+- Chunk detail results at `cache/{verse_id}/chunk_N.json`
+- On restart, `prepare_verse()` checks cache staleness and skips up-to-date passes
 
 ## Components to Build
 
-### 1. Word Dictionary Builder (`build_word_dictionary.py`)
+### 1. Word Dictionary Builder
 
-Scans all existing response files (samples + corpus) and builds a comprehensive word translation lookup table.
+Scans all existing response files (samples + corpus) and builds a word translation lookup table.
 
 ```python
-# Input: existing response files
 # Output: word_translations_cache.json
 {
   "version": "1.0.0",
-  "built_from": 3615,  # number of responses analyzed
+  "built_from": 3615,
   "built_at": "2026-03-06T...",
   "min_occurrences": 10,
   "min_consistency": 0.95,
   "words": {
-    "وَ": {
+    "وَ|CONJ": {  # key is word+POS to handle homographs
       "occurrences": 1178,
-      "pos": "CONJ",
       "translations": {
         "en": "and", "ur": "اور", "tr": "ve", "fa": "و",
         "id": "dan", "bn": "এবং", "es": "y", "fr": "et",
         "de": "und", "ru": "и", "zh": "和"
       }
-    },
-    ...
+    }
   }
 }
 ```
 
-**Location**: `ThaqalaynDataGenerator/app/ai_pipeline_tools.py`
+**Location**: `ThaqalaynDataGenerator/app/pipeline_cli/build_caches.py`
 
-### 2. Narrator Template Builder (`build_narrator_templates.py`)
+### 2. Narrator Template Builder
 
 Scans existing responses and builds narrator profiles.
 
@@ -224,276 +282,173 @@ Scans existing responses and builds narrator profiles.
       "name_en": "Abu Abdillah",
       "role": "imam",
       "confidence": "certain"
-    },
-    ...
+    }
   }
 }
 ```
 
-**Location**: Same module as above.
+**Location**: Same module as word dictionary builder.
 
-### 3. Verse Preparation Script (`prepare_verse.py`)
+### 3. Pipeline Core Functions
 
-Extracts verse data, builds optimized prompts, pre-fills known content.
+These are importable Python functions (not CLI scripts), called directly by the orchestrator:
 
-```bash
-python prepare_verse.py /books/al-kafi:1:1:1:1 --work-dir tmp/al-kafi_1_1_1_1/
-# Creates:
-#   tmp/al-kafi_1_1_1_1/system_prompt.txt
-#   tmp/al-kafi_1_1_1_1/user_message.txt
-#   tmp/al-kafi_1_1_1_1/prefilled.json  (known words + narrators)
-#   tmp/al-kafi_1_1_1_1/metadata.json   (verse path, word count, etc.)
-# Exit codes:
-#   0 = ready to generate
-#   2 = already completed (skip)
-#   1 = error
-```
+| Function | Purpose |
+|----------|---------|
+| `prepare_verse(verse_path, work_dir)` | Extract verse, build prompts, write to work_dir |
+| `postprocess_verse(verse_path, work_dir)` | Parse response, validate, review, save |
+| `prepare_fix(verse_path, work_dir)` | Build fix prompt from review warnings |
+| `apply_fix(verse_path, work_dir)` | Apply fix response, re-validate, save |
+| `prepare_structure(verse_path, work_dir)` | Build structure pass prompt (chunked) |
+| `prepare_chunk_detail(verse_path, work_dir, i)` | Build chunk detail prompt |
+| `assemble_chunks(verse_path, work_dir)` | Combine structure + chunks |
 
-**Location**: `ThaqalaynDataGenerator/app/pipeline_cli/prepare_verse.py`
+**Location**: `ThaqalaynDataGenerator/app/pipeline_cli/verse_processor.py`
 
-### 4. Postprocess Script (`postprocess_verse.py`)
+### 4. Python Orchestrator (`pipeline.py`)
 
-Handles everything after Claude generates the response.
+```python
+# Usage:
+#   python pipeline.py --workers 10 --model sonnet
+#   python pipeline.py --workers 5 --dry-run          # prepare only, no Claude calls
+#   python pipeline.py --workers 10 --resume           # continue from last session
+#   python pipeline.py --single /books/al-kafi:1:1:1:1 # process one verse (for testing)
 
-```bash
-python postprocess_verse.py /books/al-kafi:1:1:1:1 \
-  --work-dir tmp/al-kafi_1_1_1_1/ \
-  --response tmp/al-kafi_1_1_1_1/response.txt
-# Does:
-#   1. Parse JSON from response text (handles markdown fences, etc.)
-#   2. Expand compact format to full JSON
-#   3. Merge pre-filled words back into word_analysis
-#   4. Validate schema
-#   5. Run quality review
-#   6. Strip redundant fields
-#   7. Save to responses/ dir with wrapper
-#   8. Back-fill cache
-#   9. Write per-verse stats
-# Exit codes:
-#   0 = clean, fully complete
-#   1 = needs fix (review found high/medium issues)
-#   3 = parse error (response was not valid JSON)
-#   4 = schema validation failed after retries
-```
+import asyncio
+from pipeline_cli.verse_processor import prepare_verse, postprocess_verse, ...
 
-**Location**: `ThaqalaynDataGenerator/app/pipeline_cli/postprocess_verse.py`
+async def process_verse(verse_path: str, sem: asyncio.Semaphore, config: Config):
+    verse_id = verse_path_to_id(verse_path)
+    work_dir = config.tmp_dir / verse_id
 
-### 5. Fix Preparation Script (`prepare_fix.py`)
+    # Skip if already complete
+    if is_complete(verse_id, config):
+        return VerseResult(status="skipped")
 
-Builds a targeted fix prompt for verses that failed review.
+    # Claim work dir (acts as lock)
+    work_dir.mkdir(parents=True, exist_ok=True)
 
-```bash
-python prepare_fix.py /books/al-kafi:1:1:1:1 --work-dir tmp/al-kafi_1_1_1_1/
-# Creates:
-#   tmp/al-kafi_1_1_1_1/fix_prompt.txt
-# Exit codes:
-#   0 = fix prompt ready
-#   2 = no fix needed (passes review)
-```
+    try:
+        # Prepare (0 tokens)
+        plan = prepare_verse(verse_path, work_dir, config)
 
-### 6. Fix Application Script (`apply_fix.py`)
+        if plan.mode == "single":
+            # Single Claude call
+            async with sem:
+                raw = await call_claude(plan.system_prompt_path,
+                                       plan.user_message_path, config)
+            save_raw_response(verse_id, raw, config)
+            result = postprocess_verse(verse_path, work_dir, raw, config)
 
-Applies fix response to the existing result.
+        elif plan.mode == "chunked":
+            # Structure + chunk detail passes
+            result = await process_chunked(verse_path, work_dir, plan, sem, config)
 
-```bash
-python apply_fix.py /books/al-kafi:1:1:1:1 \
-  --work-dir tmp/al-kafi_1_1_1_1/ \
-  --fix-response tmp/al-kafi_1_1_1_1/fix_response.txt
-# Does:
-#   1. Parse fix JSON
-#   2. Merge fixes into existing result
-#   3. Re-validate
-#   4. Re-review
-#   5. Save + strip + cache + stats
-# Exit codes:
-#   0 = fixed and clean
-#   1 = still has issues (quarantine after max retries)
-```
+        # Fix pass if needed
+        if result.needs_fix:
+            fix_plan = prepare_fix(verse_path, work_dir, result, config)
+            async with sem:
+                fix_raw = await call_claude_fix(fix_plan, config)
+            save_raw_fix(verse_id, fix_raw, config)
+            result = apply_fix(verse_path, work_dir, fix_raw, config)
 
-### 7. Shell Orchestrator (`pipeline.sh`)
+        return result
 
-Bash script that manages the full pipeline. Runs in WSL.
+    except Exception as e:
+        log_error(verse_id, e)
+        return VerseResult(status="error", error=str(e))
+    finally:
+        # Cleanup tmp (artifacts already saved to permanent dirs)
+        shutil.rmtree(work_dir, ignore_errors=True)
 
-```bash
-#!/bin/bash
-# Usage: ./pipeline.sh [--workers N] [--lane fast|slow|both] [--dry-run]
-#
-# Manages parallel verse processing through the pipeline.
-# All AI work is done via `claude -p`, all other work via Python.
-#
-# Queue management:
-#   - Reads lane_queues.json for verse ordering
-#   - Tracks progress via filesystem (same as v2)
-#   - Supports resume (skips completed verses)
-#   - Supports Ctrl+C graceful shutdown
-#
-# Worker model:
-#   - N parallel background workers (default: 10)
-#   - Each worker processes one verse at a time
-#   - Workers pull from a shared queue file
-#   - File-based locking prevents duplicate processing
-#
-# Logging:
-#   - Per-worker log files in logs/worker_N.log
-#   - Summary progress to stdout every 30 seconds
-#   - Errors to stderr
+async def main(config: Config):
+    queue = load_queue(config)
+    sem = asyncio.Semaphore(config.workers)
+
+    # Progress reporter runs concurrently
+    progress_task = asyncio.create_task(progress_reporter(config))
+
+    # Process all verses with bounded concurrency
+    tasks = [process_verse(v, sem, config) for v in queue]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+
+    # Final summary
+    progress_task.cancel()
+    print_summary(results, config)
 ```
 
 **Key design decisions**:
-- Workers use `flock` for queue dequeue atomicity
-- Each worker creates `tmp/{verse_id}/` as a lock (same convention as v2)
-- Progress derived from filesystem state (response + stats files)
-- Graceful shutdown: trap SIGINT, wait for active workers to finish current verse
-- Resume: on restart, scan filesystem for state, skip completed verses
+- `asyncio.Semaphore(N)` limits concurrent Claude calls (adjustable at runtime)
+- `asyncio.Queue` replaces file-based queue (single process, no locking needed)
+- `try/finally` ensures work_dir cleanup even on crash
+- `asyncio.gather(*tasks)` enables true parallel execution
+- `call_claude()` uses `asyncio.create_subprocess_exec` for non-blocking subprocess calls
+- Progress reporter runs as a concurrent task, printing every 30s
 
-### 8. Updated System Prompt Builder
+**Location**: `ThaqalaynDataGenerator/pipeline.py`
 
-Modify `build_system_prompt()` to accept a `include_few_shot` parameter (default False for v3).
+### 5. Progress Status Script
 
-Add a `build_compact_system_prompt()` that:
-- Excludes few-shot examples
-- Adds compact output format instructions
-- Adds instructions for handling pre-filled words
-
-## Modified Prompt Design
-
-### System Prompt (Trimmed)
-
-Same as current minus few-shot examples, plus new instructions:
-
-```
-[existing instructions, glossary, word dictionary, taxonomy, key phrases]
-
-OUTPUT FORMAT:
-Generate a JSON object with the standard fields. For word_analysis, use COMPACT FORMAT:
-Each word on its own line, pipe-delimited:
-  diacritized_word|POS|en|ur|tr|fa|id|bn|es|fr|de|ru|zh
-
-Example:
-  قَالَ|V|he said|کہا|dedi|گفت|berkata|বলেছেন|dijo|a dit|sagte|сказал|他说
-
-All other fields (translations, chunks, isnad_matn, etc.) use standard JSON.
-```
-
-### User Message (With Pre-filled Words)
-
-```
-[existing verse data]
-
-PRE-FILLED WORDS (do not regenerate these):
-The following words have been pre-filled from the dictionary. They are
-already in the final output. Generate word_analysis ONLY for words NOT
-in this list.
-
-Pre-filled word indices: 0,1,4,6,7,10,11,15,18,20
-(These correspond to: وَ, عَنْ, بْنِ, قَالَ, عَنْ, مِنْ, فِي, عَلَى, اللَّهِ, إِنَّ)
-
-Generate word_analysis for the remaining words at indices: 2,3,5,8,9,12,13,14,16,17,19
-```
-
-## Queue and Parallelism
-
-### Worker Count
-
-The `claude -p` command is a synchronous blocking call. Each worker blocks until Claude responds (~30-60 seconds per verse). Running N workers means N concurrent Claude calls.
-
-Recommended starting point: **10 workers** (adjustable based on observed rate limits).
-
-### Queue Structure
-
-Reuse existing `lane_queues.json`. The orchestrator reads it and creates a `queue.txt` file with one verse path per line. Workers atomically dequeue (read + delete first line using `flock`).
-
-### Filesystem State (Same as v2)
-
-| State | Meaning |
-|-------|---------|
-| `tmp/{verse_id}/` exists, no response | Worker is actively processing |
-| Response file exists, no stats file | Needs fix pass |
-| Both response + stats file exist | Fully complete |
-| Neither exists | Not started |
-
-## WSL Environment Setup
-
-The user will run `pipeline.sh` in WSL. Required setup:
+Queryable anytime without disturbing the running pipeline:
 
 ```bash
-# 1. Install Python 3.10+ and create venv
-sudo apt update && sudo apt install python3 python3-venv python3-pip
-cd /mnt/c/Users/TrainingGR03/Documents/Projects/scripture/ThaqalaynDataGenerator
-python3 -m venv .venv-wsl
-source .venv-wsl/bin/activate
-pip install -r requirements.txt  # or: pip install pydantic beautifulsoup4
-
-# 2. Install Claude Code CLI (npm)
-# (Claude CLI must be accessible in WSL PATH)
-# Option A: Use Windows claude.exe via WSL interop
-# Option B: Install claude natively in WSL
-
-# 3. Authenticate claude
-claude auth
-
-# 4. Test
-claude -p --model sonnet "Hello, respond with just 'OK'"
+python pipeline_status.py
+# Pipeline v3 Status
+# ==================
+# Total corpus:     40,578
+# Completed:         4,862  (12.0%)
+#   - v2 (agents):   3,615
+#   - v3 (cli):      1,247
+# Remaining:        35,716
+# Quarantined:          14
+#
+# Current session:
+#   Started:         2026-03-06 08:30
+#   Verses done:     1,247
+#   Rate:            42/hr
+#   Pass rate:       94.6%
+#   ETA complete:    2026-04-20
+#
+# By book:
+#   al-kafi:        11,782/15,397 remaining
+#   ...
 ```
 
-## File Layout
+Reads from filesystem state (responses/, stats/, quarantine/) and `pipeline_session.json`.
 
+**Location**: `ThaqalaynDataGenerator/pipeline_status.py`
+
+### 6. Updated System Prompt Builder
+
+Modify `build_system_prompt()` to accept `include_few_shot=False` parameter.
+
+Add instructions for array-of-arrays word_analysis format.
+
+### 7. Configuration (`pipeline.conf`)
+
+```ini
+[pipeline]
+workers = 10
+model = sonnet
+fix_model = haiku
+max_retries = 3
+max_fix_attempts = 2
+
+[paths]
+source_data_dir = ../ThaqalaynDataSources/
+ai_content_subdir = corpus
+tmp_dir = tmp/
+
+[optimizations]
+include_few_shot = false
+use_compact_word_format = true
+use_word_dictionary = true
+use_narrator_templates = true
+
+[monitoring]
+progress_interval_seconds = 30
+stats_merge_interval = 100
 ```
-ThaqalaynDataGenerator/
-  app/
-    pipeline_cli/           # NEW: CLI scripts for v3 pipeline
-      __init__.py
-      prepare_verse.py      # Step 1: extract + build prompt
-      postprocess_verse.py  # Step 3: validate + review + save
-      prepare_fix.py        # Step 4a: build fix prompt
-      apply_fix.py          # Step 4b: apply fix + re-validate
-      build_caches.py       # One-time: build word dict + narrator templates
-      common.py             # Shared utilities (paths, JSON helpers)
-    ai_pipeline.py          # Existing (add build_compact_system_prompt)
-    ai_pipeline_review.py   # Existing (no changes)
-    ai_pipeline_cache.py    # Existing (no changes)
-  pipeline.sh               # NEW: Shell orchestrator (WSL)
-  pipeline.conf             # NEW: Configuration (workers, model, paths)
-```
-
-## Phased Rollout
-
-### Phase 1: Foundation (build tools, validate quality)
-1. Build word dictionary from existing 3,600 responses
-2. Build narrator templates from existing responses
-3. Build `prepare_verse.py` and `postprocess_verse.py`
-4. Test quality: generate 20 verses with trimmed prompt, compare to originals
-5. Validate compact format parsing works reliably
-
-### Phase 2: Shell Orchestrator
-1. Build `pipeline.sh` with single-worker mode
-2. Test end-to-end: prepare → claude -p → postprocess for 10 verses
-3. Add parallel worker support
-4. Add resume/restart logic
-5. Add progress reporting
-
-### Phase 3: Fix Pipeline
-1. Build `prepare_fix.py` and `apply_fix.py`
-2. Test on known failing verses from existing corpus
-3. Integrate into orchestrator (automatic fix after failed review)
-
-### Phase 4: Production Run
-1. Set optimal worker count based on rate limit testing
-2. Run on a batch of 100 verses, verify quality
-3. Begin full corpus generation
-4. Monitor and adjust
-
-## Risks and Mitigations
-
-| Risk | Impact | Mitigation |
-|------|--------|-----------|
-| Quality degrades without few-shot examples | Wrong output format, bad translations | Phase 1 validation: compare 20 verses side-by-side |
-| Compact format causes parsing errors | Lost output, wasted tokens | Robust parser with fallback to standard JSON |
-| `claude -p` has different behavior than agents | Missing capabilities | Test thoroughly in Phase 2; agents aren't using tools anyway for generation |
-| Rate limiting with N parallel workers | Slowdown, errors | Start with N=5, increase gradually; add backoff logic |
-| WSL/Windows path issues | File access errors | Use /mnt/c/ paths consistently; test early |
-| Pre-filled word quality drift | Wrong translations for context-dependent words | Only pre-fill words with >95% consistency; include POS tag in matching |
-| Claude CLI auth expires | Workers fail mid-run | Add auth check at startup; workers retry with backoff |
 
 ## Fault Tolerance and Resume
 
@@ -504,144 +459,94 @@ The pipeline is designed to survive crashes, interruptions, and partial failures
 Each verse goes through a sequence of discrete steps. The filesystem state after each step is well-defined:
 
 ```
-Step 0: Nothing exists                    → verse not started
-Step 1: tmp/{verse_id}/ created           → worker claimed this verse
-Step 2: tmp/{verse_id}/prompt files exist  → prepare complete, generation pending
-Step 3: tmp/{verse_id}/response.txt exists → Claude responded, postprocessing pending
-Step 4: responses/{verse_id}.json exists   → postprocessing complete
-Step 5: stats/{verse_id}.stats.json exists → fully complete (gen + optional fix)
+Step 0: Nothing exists                    -> verse not started
+Step 1: tmp/{verse_id}/ created           -> worker claimed this verse
+Step 2: tmp/{verse_id}/prompt files exist  -> prepare complete, generation pending
+Step 3: raw_responses/{verse_id}.raw.txt   -> Claude responded, postprocessing pending
+Step 4: responses/{verse_id}.json exists   -> postprocessing complete
+Step 5: stats/{verse_id}.stats.json exists -> fully complete (gen + optional fix)
 ```
 
 **If the pipeline crashes at any step**, a restart picks up correctly:
 - Steps 0-1: Worker re-claims and starts from scratch (tmp dir cleaned on claim)
-- Step 2-3: Worker sees tmp dir with partial files, re-runs from prepare
-- Step 4 (response but no stats): Needs fix pass, or stats write was interrupted — re-run postprocess
+- Step 2: Prompt files exist but no response — re-run Claude call
+- Step 3: Raw response exists — re-run postprocessing (no token spend)
+- Step 4 (response but no stats): Either needs fix or stats write was interrupted — re-run
 - Step 5: Complete, skip
-
-### Worker Crash Recovery
-
-Each worker wraps the per-verse loop in error handling:
-
-```bash
-process_verse() {
-  local verse_path="$1"
-  local verse_id=$(echo "$verse_path" | sed 's|/books/||; s/:/_/g')
-  local work_dir="$TMP_DIR/$verse_id"
-
-  # Claim: create work dir (acts as lock)
-  mkdir -p "$work_dir" || return 0  # another worker got it
-
-  # Prepare (Python)
-  python prepare_verse.py "$verse_path" --work-dir "$work_dir"
-  local prep_rc=$?
-  [ $prep_rc -eq 2 ] && { rm -rf "$work_dir"; return 0; }  # already done
-  [ $prep_rc -ne 0 ] && { log_error "$verse_id" "prepare failed"; rm -rf "$work_dir"; return 1; }
-
-  # Generate (Claude)
-  claude -p --model sonnet --tools "" \
-    --system-prompt "$(cat "$work_dir/system_prompt.txt")" \
-    < "$work_dir/user_message.txt" > "$work_dir/response.txt" 2>"$work_dir/claude_stderr.txt"
-  local claude_rc=$?
-  [ $claude_rc -ne 0 ] && { log_error "$verse_id" "claude failed (rc=$claude_rc)"; rm -rf "$work_dir"; return 1; }
-
-  # Postprocess (Python)
-  python postprocess_verse.py "$verse_path" --work-dir "$work_dir" --response "$work_dir/response.txt"
-  local post_rc=$?
-
-  if [ $post_rc -eq 1 ]; then
-    # Needs fix
-    python prepare_fix.py "$verse_path" --work-dir "$work_dir"
-    claude -p --model haiku --tools "" \
-      < "$work_dir/fix_prompt.txt" > "$work_dir/fix_response.txt" 2>"$work_dir/fix_stderr.txt"
-    python apply_fix.py "$verse_path" --work-dir "$work_dir" --fix-response "$work_dir/fix_response.txt"
-  fi
-
-  # Cleanup tmp (response is already saved to responses/)
-  rm -rf "$work_dir"
-}
-```
 
 ### Graceful Shutdown
 
-```bash
-SHUTDOWN=0
-trap 'SHUTDOWN=1; echo "Shutting down after current verses finish..."' INT TERM
+```python
+shutdown_event = asyncio.Event()
 
-# In worker loop:
-while [ $SHUTDOWN -eq 0 ]; do
-  verse=$(dequeue)
-  [ -z "$verse" ] && break  # queue empty
-  process_verse "$verse"
-done
+def signal_handler(sig, frame):
+    print("\nShutting down after current verses finish...")
+    shutdown_event.set()
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
+
+# In the worker loop, check before starting each new verse:
+if shutdown_event.is_set():
+    return  # Don't start new verses, let current ones finish
 ```
 
-Workers finish their current verse before exiting. No work is lost.
-
-### Queue Dequeue Atomicity
-
-Workers use `flock` to atomically read-and-remove from the queue file:
-
-```bash
-dequeue() {
-  local verse=""
-  (
-    flock 200
-    verse=$(head -1 "$QUEUE_FILE" 2>/dev/null)
-    if [ -n "$verse" ]; then
-      sed -i '1d' "$QUEUE_FILE"
-      echo "$verse"
-    fi
-  ) 200>"$QUEUE_FILE.lock"
-}
-```
-
-This prevents two workers from claiming the same verse.
+Workers finish their current verse before exiting. No work is lost. The `asyncio.gather()` collects all in-progress work.
 
 ### Stale Lock Detection
 
-If a worker crashes without cleaning up its tmp dir, the next restart detects it:
+On startup, the orchestrator scans for orphaned tmp dirs from a previous crashed session:
 
-```bash
-# On startup: clean stale tmp dirs (no process holding them)
-for dir in "$TMP_DIR"/*/; do
-  [ -d "$dir" ] || continue
-  verse_id=$(basename "$dir")
-  # If response exists but was already saved, clean up
-  if [ -f "$RESPONSES_DIR/${verse_id}.json" ]; then
-    rm -rf "$dir"
-  else
-    # Stale lock — re-add to queue
-    verse_path=$(cat "$dir/metadata.json" 2>/dev/null | python3 -c "import json,sys; print(json.load(sys.stdin)['verse_path'])" 2>/dev/null)
-    if [ -n "$verse_path" ]; then
-      echo "$verse_path" >> "$QUEUE_FILE"
-    fi
-    rm -rf "$dir"
-  fi
-done
+```python
+def recover_stale_locks(config):
+    for work_dir in config.tmp_dir.iterdir():
+        if not work_dir.is_dir():
+            continue
+        verse_id = work_dir.name
+        if is_complete(verse_id, config):
+            # Response + stats exist, just clean up
+            shutil.rmtree(work_dir)
+        elif has_raw_response(verse_id, config):
+            # Raw response saved but not postprocessed — re-add to queue
+            requeue(verse_id, config)
+            shutil.rmtree(work_dir)
+        else:
+            # No response at all — re-add to queue
+            requeue(verse_id, config)
+            shutil.rmtree(work_dir)
 ```
 
 ### Retry Logic
 
-- **Claude call fails** (network error, rate limit, auth): Retry up to 3 times with exponential backoff (5s, 15s, 45s)
-- **JSON parse error** (Claude returned non-JSON): Retry generation once; if still fails, quarantine
-- **Schema validation fails**: Retry generation once with a "please output valid JSON" suffix
-- **Review fails** (quality issues): Run fix pass (Haiku); if fix also fails, quarantine
-- **Max retries exceeded**: Move to `quarantine/{verse_id}.json` with error details
+| Failure | Retry Strategy | Max Attempts |
+|---------|---------------|-------------|
+| Claude call fails (network/rate limit) | Exponential backoff: 5s, 15s, 45s | 3 |
+| JSON parse error (non-JSON response) | Re-generate with "output valid JSON" suffix | 2 |
+| Schema validation fails | Re-generate | 2 |
+| Review fails (quality issues) | Fix pass with Haiku | 2 fix attempts |
+| Max retries exceeded | Quarantine with error details | — |
+
+### Cumulative Token Tracking
+
+The orchestrator tracks approximate token usage per Claude call (from `--output-format json` metadata or character-based heuristic). If approaching the monthly limit, it alerts:
+
+```
+[WARNING] Estimated monthly usage: 85% of limit. Consider reducing workers or pausing.
+```
 
 ## Auditability and Prompt/Response Archiving
 
-Every step is logged and every AI interaction is preserved for full audit trail.
+Every AI interaction is preserved for full audit trail.
 
 ### Saved Artifacts Per Verse
-
-After processing, each verse has these artifacts on disk:
 
 ```
 ThaqalaynDataSources/ai-content/corpus/
   responses/{verse_id}.json          # Final result (with wrapper + attribution)
-  stats/{verse_id}.stats.json        # Generation metrics
-  prompts/{verse_id}.prompt.json     # Archived prompt (system + user message)
-  raw_responses/{verse_id}.raw.txt   # Raw Claude output (before parsing)
+  stats/{verse_id}.stats.json        # Generation metrics + timing
+  prompts/{verse_id}.prompt.json     # Archived prompt metadata + user message
+  prompts/_system_prompt.txt         # System prompt (saved once, identical for all)
+  raw_responses/{verse_id}.raw.txt   # Raw Claude output (verbatim, before parsing)
   fix_prompts/{verse_id}.fix.json    # Fix prompt (if fix was needed)
   fix_raw/{verse_id}.fix.raw.txt     # Raw fix response (if fix was needed)
   quarantine/{verse_id}.json         # Failed verses (if quarantined)
@@ -657,23 +562,21 @@ ThaqalaynDataSources/ai-content/corpus/
   "system_prompt_hash": "sha256:abc123...",
   "system_prompt_version": "v3.0-no-fewshot",
   "user_message_hash": "sha256:def456...",
-  "prefilled_word_count": 52,
-  "total_word_count": 85,
+  "word_count": 85,
+  "mode": "single",
   "user_message": "... (full user message text) ..."
 }
 ```
-
-The system prompt is saved once (it's identical for all verses) at `prompts/_system_prompt.txt`. Each verse's prompt archive references it by hash.
 
 ### Raw Response Archive
 
 The raw Claude output is saved verbatim before any parsing or processing. This enables:
 - Debugging parse failures
-- Reprocessing with updated postprocess logic without re-generating
+- Reprocessing with updated postprocess logic without re-generating (0 tokens)
 - Auditing exactly what Claude produced
-- Cost/quality analysis
+- A `reprocess` command that re-runs postprocessing on all raw responses
 
-### Stats File Format (Extended)
+### Stats File Format
 
 ```json
 {
@@ -684,21 +587,18 @@ The raw Claude output is saved verbatim before any parsing or processing. This e
   "generation_method": "claude_cli_pipe",
   "file_size_bytes": 42000,
   "source_word_count": 85,
-  "prefilled_word_count": 52,
-  "ai_generated_word_count": 33,
   "word_analysis_count": 85,
+  "word_dict_overrides": 52,
   "content_type": "ethical_teaching",
   "chunk_count": 3,
   "narrator_count": 5,
   "has_chain": true,
+  "mode": "single",
   "validation_passed": true,
   "review_passed": true,
-  "review_warnings_high": 0,
-  "review_warnings_medium": 0,
-  "review_warnings_low": 2,
+  "review_warnings": {"high": 0, "medium": 0, "low": 2},
   "fix_needed": false,
   "fix_model": null,
-  "fix_passed": null,
   "attempts": 1,
   "quarantined": false,
   "timings": {
@@ -715,7 +615,7 @@ The raw Claude output is saved verbatim before any parsing or processing. This e
 
 ### Live Progress (Orchestrator Stdout)
 
-The orchestrator prints a progress line every 30 seconds:
+Printed every 30 seconds:
 
 ```
 [14:32:00] Progress: 1,247/37,000 (3.4%) | Rate: 42/hr | Workers: 10/10 active
@@ -725,67 +625,56 @@ The orchestrator prints a progress line every 30 seconds:
 
 ### Progress Query Script (`pipeline_status.py`)
 
-Run anytime to check progress without disturbing the pipeline:
+Run anytime (separate process) to check progress without disturbing the pipeline:
 
-```bash
+```
 python pipeline_status.py
-# Output:
-# Pipeline v3 Status
-# ==================
-# Total corpus:     40,578
-# Completed:         4,862  (12.0%)
-#   - v2 (agents):   3,615
-#   - v3 (cli):      1,247
-# Remaining:        35,716
-# Quarantined:          14
-#
-# Current session:
-#   Started:         2026-03-06 08:30
-#   Verses done:     1,247
-#   Rate:            42/hr
-#   Pass rate:       94.6%
-#   Fix rate:         4.2%
-#   Fail rate:        1.1%
-#   Active workers:  10
-#   ETA complete:    2026-04-20
-#
-# By book:
-#   al-kafi:        11,782/15,397 remaining
-#   man-la-yahduruhu: 6,382/6,382 remaining
-#   quran:           6,236/6,236 remaining (deprioritized)
-#   ...
+
+Pipeline v3 Status
+==================
+Total corpus:     40,578
+Completed:         4,862  (12.0%)
+  - v2 (agents):   3,615
+  - v3 (cli):      1,247
+Remaining:        35,716
+Quarantined:          14
+
+Current session:
+  Started:         2026-03-06 08:30
+  Verses done:     1,247
+  Rate:            42/hr
+  Pass rate:       94.6%
+  Fix rate:         4.2%
+  Fail rate:        1.1%
+  Active workers:  10
+  ETA complete:    2026-04-20
+
+By book:
+  al-kafi:        11,782/15,397 remaining
+  man-la-yahduruhu: 6,382/6,382 remaining
+  quran:           6,236/6,236 remaining (deprioritized)
+  ...
 ```
 
-**Location**: `ThaqalaynDataGenerator/app/pipeline_cli/pipeline_status.py`
-
-This script reads from:
-- `lane_queues.json` (total queue)
-- `responses/` directory (completed count)
-- `stats/` directory (stats for completed verses)
-- `quarantine/` directory (failed count)
-- `pipeline_session.json` (current session timing)
+Reads from: responses/ directory, stats/ directory, quarantine/ directory, `pipeline_session.json`.
 
 ### Session Log File
 
-The orchestrator writes a session log to `logs/pipeline_session.log`:
+Structured event log at `logs/pipeline_session.log`:
 
 ```
 2026-03-06T08:30:00 SESSION_START workers=10 model=sonnet queue_size=35716
 2026-03-06T08:30:05 VERSE_START al-kafi_1_2_1_1 worker=3
-2026-03-06T08:30:42 VERSE_DONE al-kafi_1_2_1_1 worker=3 status=pass prep=450ms gen=35000ms post=800ms
-2026-03-06T08:30:43 VERSE_START al-kafi_1_2_1_2 worker=3
-2026-03-06T08:31:15 VERSE_DONE al-kafi_1_2_1_2 worker=3 status=fix_needed prep=380ms gen=32000ms post=750ms
-2026-03-06T08:31:16 FIX_START al-kafi_1_2_1_2 worker=3
-2026-03-06T08:31:35 FIX_DONE al-kafi_1_2_1_2 worker=3 status=fixed fix_gen=18000ms
-...
-2026-03-06T14:30:00 PROGRESS done=1247 total=37000 rate=42/hr pass=94.6% eta=14.2d
-...
+2026-03-06T08:30:42 VERSE_DONE al-kafi_1_2_1_1 status=pass gen=35000ms total=36250ms
+2026-03-06T08:31:15 VERSE_DONE al-kafi_1_2_1_2 status=fix_needed gen=32000ms
+2026-03-06T08:31:35 FIX_DONE al-kafi_1_2_1_2 status=fixed fix_gen=18000ms
+2026-03-06T14:30:00 PROGRESS done=1247 total=37000 rate=42/hr pass=94.6%
 2026-03-06T16:00:00 SESSION_END verses=1523 duration=7h30m rate=42/hr
 ```
 
-### Pipeline Session State File
+### Pipeline Session State (`pipeline_session.json`)
 
-Written atomically on each progress tick (`pipeline_session.json`):
+Written atomically on each progress tick. The status script reads this for live session data.
 
 ```json
 {
@@ -801,19 +690,123 @@ Written atomically on each progress tick (`pipeline_session.json`):
   "pass_count": 1180,
   "fix_count": 53,
   "fail_count": 14,
-  "quarantine_count": 14,
-  "errors": []
+  "quarantine_count": 14
 }
+```
+
+## File Layout
+
+```
+ThaqalaynDataGenerator/
+  app/
+    pipeline_cli/              # NEW: v3 pipeline modules
+      __init__.py
+      verse_processor.py       # Core functions: prepare, postprocess, fix
+      build_caches.py          # Build word dict + narrator templates
+      common.py                # Shared utilities (paths, JSON helpers, logging)
+    ai_pipeline.py             # Existing (add v3 prompt builder options)
+    ai_pipeline_review.py      # Existing (no changes needed)
+    ai_pipeline_cache.py       # Existing (reused for chunked processing)
+  pipeline.py                  # NEW: Asyncio orchestrator (main entry point)
+  pipeline_status.py           # NEW: Progress query tool
+  pipeline.conf                # NEW: Configuration
+  scripts/                     # NEW: Reusable analysis/utility scripts
+```
+
+## Phased Rollout
+
+### Phase 0: Concurrency Test (MUST DO FIRST)
+
+Verify `claude -p` supports concurrent calls before building anything.
+
+```bash
+# Run 5 concurrent claude -p calls
+for i in 1 2 3 4 5; do
+  time claude -p --model sonnet "Say OK $i" &
+done
+wait
+```
+
+If calls serialize or error, the entire parallelism model needs rethinking.
+
+Also test: `--output-format json` (for token counts), `--json-schema` (for structured output enforcement).
+
+### Phase 1: Foundation (build tools, validate quality)
+
+1. Build word dictionary from existing 3,600+ responses
+2. Build narrator templates from existing responses
+3. Build `verse_processor.py` (prepare, postprocess, fix functions)
+4. Test quality: generate 20 diverse verses with/without few-shot examples
+   - Pass criteria: equal or fewer high/medium warnings, no new failure modes
+5. Test fix flow: pipe 10 known-failing verses through `claude -p --model haiku`
+6. Validate array-of-arrays format parsing (with fallback to standard JSON)
+
+### Phase 2: Orchestrator
+
+1. Build `pipeline.py` with single-worker mode (`--workers 1`)
+2. Test end-to-end: prepare → claude -p → postprocess for 10 verses
+3. Add parallel workers (`--workers N`) with Semaphore
+4. Add chunked processing flow for long hadiths
+5. Add resume/restart logic (stale lock recovery)
+6. Add progress reporting + session logging
+7. Build `pipeline_status.py`
+
+### Phase 3: Hardening
+
+1. Add `--dry-run` mode (prepare prompts, estimate tokens, no Claude calls)
+2. Add retry logic with exponential backoff
+3. Add quarantine handling
+4. Add cumulative token tracking + monthly limit alerting
+5. Test on 100 verses, verify quality matches v2 output
+
+### Phase 4: Production Run
+
+1. Start with 5 workers, observe rate limits
+2. Ramp up to 10 workers if stable
+3. Begin full corpus generation
+4. Monitor quality + throughput via `pipeline_status.py`
+5. Adjust workers/model as needed
+
+## Risks and Mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|-----------|
+| Quality degrades without few-shot examples | Wrong format, bad translations | Phase 1 rigorous validation with pass criteria |
+| `claude -p` rate limits concurrent calls | Throughput lower than projected | Phase 0 concurrency test; dynamic worker adjustment |
+| Array-of-arrays format not followed | Parse errors | Fallback parser handles both formats; retry on failure |
+| `claude -p` behaves differently than agents | Missing capabilities | Agents don't use tools for generation anyway; test in Phase 1 |
+| Pre-filled word overrides wrong in context | Incorrect translations for context-dependent words | Override only words with >95% consistency + matching POS; log discrepancies |
+| Claude CLI auth expires mid-run | Workers fail | Auth check at startup; retry with backoff; alert on auth errors |
+| Long hadiths chunked processing fails | ~1,300 verses broken | Explicit chunked flow design; reuse existing cache infrastructure |
+| Model version changes mid-run | Quality shift | Track model version in stats; alert on change |
 
 ## Comparison: v2 vs v3
 
 | Metric | v2 (Current) | v3 (Proposed) |
 |--------|-------------|--------------|
-| Tokens per verse | ~55,000 | ~20,000 |
-| Orchestration cost | Opus agent | 0 (bash) |
+| Tokens per verse | ~55,000 | ~24,000 |
+| Orchestration cost | Opus agent | 0 (Python) |
 | Validation cost | Claude reads Python output | 0 (Python) |
 | Workers | ~200 agents (via Claude Code) | ~10 `claude -p` calls |
-| Resume | Filesystem + agent restart | Filesystem (simpler) |
-| Monthly throughput | ~3,500 verses | ~9,100 verses |
-| Time to complete | ~11 months | ~4 months |
+| Resume | Filesystem + agent restart | Filesystem + asyncio |
+| Monthly throughput | ~3,500 verses | ~8,000 verses |
+| Time to complete | ~11 months | ~5 months |
 | Quality | Opus generation | Sonnet generation (proven equal) |
+| Platform | Windows (Claude Code) | Windows native (Python + claude CLI) |
+| Auditability | Limited (agent context lost) | Full (all prompts + raw responses saved) |
+
+## Architect Review Notes
+
+This plan was reviewed by an architect agent. Key changes incorporated:
+
+1. **Bash → Python orchestrator**: Python asyncio is strictly superior for this use case (Issue #3)
+2. **Pipe-delimited → JSON array-of-arrays**: Reliable parsing, same savings (Issue #1)
+3. **Skip words → Override in postprocessing**: Preserves context, better quality (Issue #4)
+4. **Added chunked processing design**: Explicit multi-call flow for >200-word hadiths (Issue #2)
+5. **Windows native, no WSL**: Eliminates /mnt/c/ performance issues (Issue #5)
+6. **Phase 0 concurrency test**: Must validate before building (Issue #6)
+7. **Rigorous few-shot validation criteria**: Defined pass/fail thresholds (Issue #7)
+8. **Early fix pipeline testing**: Moved from Phase 3 to Phase 1 (Issue #8)
+9. **Token tracking**: Monitor cumulative usage to avoid hitting monthly limit suddenly
+10. **Dry-run mode**: Validate prompts without spending tokens
+11. **Raw response reprocessing**: Can re-run postprocessing on archived responses (0 tokens)

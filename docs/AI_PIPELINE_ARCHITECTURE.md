@@ -8,20 +8,34 @@ This document describes the **current production implementation** of the AI cont
 
 The pipeline generates structured AI content (translations, word analysis, tagging, narrator extraction) for every verse and hadith in the corpus (~41,449 items: ~6,236 Quran verses + ~35,213 hadiths). It runs entirely through **Claude Code agents** — no API key or batch API spend. Claude Code runs Opus 4.6, so output quality is identical to the Batch API.
 
-The architecture is a **three-pass, multi-agent system** with caching and parallelization:
+The architecture is a **two-phase, per-verse agent system** with caching and adaptive parallelization:
 
 ```
-Corpus verses  ->  Extract  ->  Generate  ->  Review  ->  Fix (if needed)  ->  Strip  ->  Save
+Corpus verses  ->  [Gen Agent] Extract → Generate → Validate → Strip → Save
+                ->  [Fix Agent] Review → Fix (if needed) → Re-validate → Save
 ```
+
+Each verse gets two sequential agents. This gives each phase a fresh context window, avoids context limit crashes, and makes generation/review independently observable.
 
 ### Agent Roles
 
 | Agent | Model | File | Role |
 |-------|-------|------|------|
-| `ai-orchestrate` | Opus | `.claude/agents/ai-orchestrate.md` | Coordinates all passes across multiple verses |
-| `ai-generate` | Opus | `.claude/agents/ai-generate.md` | Pass 1: content generation (single-pass or chunked) |
-| `ai-review` | Sonnet | `.claude/agents/ai-review.md` | Pass 2: quality review (automated + expert judgment) |
-| `ai-fix` | Opus | `.claude/agents/ai-fix.md` | Pass 3: targeted field correction |
+| `ai-orchestrate` | Opus | `.claude/agents/ai-orchestrate.md` | Coordinates agents, adaptive parallelism, progress tracking |
+| `ai-generate` | Opus | `.claude/agents/ai-generate.md` | Phase 1: content generation, validation, strip, save (1 verse only) |
+| `ai-fix` | Opus | `.claude/agents/ai-fix.md` | Phase 2: review + targeted fix (1 verse only) |
+| `ai-review` | Opus | `.claude/agents/ai-review.md` | Standalone review (manual use only, not used in orchestrated runs) |
+
+### Agent Naming Convention
+
+Agents are named after the verse they process:
+- Generation: `gen-{verse_id}` (e.g., `gen-al-kafi_1_2_1_1`)
+- Review+Fix: `fix-{verse_id}` (e.g., `fix-al-kafi_1_2_1_1`)
+
+**Critical rules:**
+- **1 verse per agent** — multi-verse batches stall, crash, and lose progress
+- **Two phases per verse** — gen agent first, then fix agent (not all-generate-then-all-review)
+- **100 agents always running** — start at 100, maintain 100 by spawning replacements as agents complete
 
 ---
 
@@ -219,14 +233,38 @@ Key functions: `check_cache_staleness()`, `get_cached_or_plan()`, `invalidate_ca
 
 ## Orchestration at Scale
 
-The `ai-orchestrate` agent coordinates full corpus runs:
+The `ai-orchestrate` agent coordinates full corpus runs using a **two-phase per-verse pipeline** with adaptive parallelism:
 
-1. Reads the verse list
-2. Skips paths that already have valid response files
-3. Spawns up to **5 parallel `ai-generate` agents** at a time
-4. Each agent runs the full generate -> review -> fix cycle independently
-5. After each batch, runs `python -m app.ai_pipeline validate` to verify
-6. Failed validations queued for retry
+### Per-Verse Pipeline
+
+For each verse, the orchestrator spawns two sequential agents:
+
+1. **`gen-{verse_id}`** — Generation agent: extract → generate → validate → strip → save → cache → stats
+2. **`fix-{verse_id}`** — Review+fix agent: review → fix if needed → re-validate → re-strip → save → update stats
+
+This two-phase approach ensures:
+- Fresh context for each phase (no context limit crashes)
+- Generation and review are independently observable
+- Fix agents start clean and focus purely on quality
+
+### Parallelism
+
+The orchestrator always maintains **100 running agents**:
+
+1. **Start at 100** — Spawn 100 gen agents on session start
+2. **Maintain 100** — As agents complete, count active agents and spawn replacements to stay at 100
+3. **Log metrics every 100 completions** — Track throughput, success rate, errors in `orchestrator_settings.json`
+4. **Persist settings** — `orchestrator_settings.json` survives orchestrator restarts
+
+### Agent Naming
+
+Every agent is named after its verse: `gen-al-kafi_1_2_1_1`, `fix-al-kafi_1_2_1_1`. This makes it easy to track progress and identify failures.
+
+### Resume Safety
+
+- Agents skip verses that already have response files
+- The orchestrator recomputes remaining from filesystem on each session start
+- No manual work needed between sessions — just say "continue corpus generation"
 
 The caching system means interrupted runs resume efficiently — structure passes survive pipeline version bumps, and individual chunks can be regenerated without redoing the full hadith.
 

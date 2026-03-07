@@ -2,7 +2,9 @@
 
 > Replaces the Claude Code agent-based orchestration with a Python-driven pipeline that minimizes AI token usage.
 
-**Status**: Plan reviewed by architect agent. All critical and important issues addressed.
+**Status**: Implementation largely complete. Core pipeline operational. See status markers throughout.
+
+**Last assessed**: 2026-03-07
 
 ## Problem Statement
 
@@ -103,7 +105,7 @@ At ~24,000 tokens/verse vs ~55,000 currently:
 
 ## Token Optimizations (Detailed)
 
-### Optimization 1: Remove Few-Shot Examples from System Prompt
+### Optimization 1: Remove Few-Shot Examples from System Prompt — DONE
 
 **Savings: 8,874 input tokens per verse (328M total)**
 
@@ -125,7 +127,7 @@ The system prompt is 12,541 tokens. Few-shot examples account for 8,874 (71%). A
 3. Spot-check 5 verses for translation quality
 4. If no-few-shot produces >2 more medium warnings per 20 verses, keep few-shot (savings aren't worth the fix cost)
 
-### Optimization 2: Word Translation Dictionary (Override Strategy)
+### Optimization 2: Word Translation Dictionary (Override Strategy) — DONE
 
 **Savings: quality improvement + ~500 output tokens via narrator templates**
 
@@ -145,7 +147,7 @@ Analysis of 132 existing responses shows:
 3. `postprocess_verse()` overrides matching words with dictionary values
 4. Discrepancies (Claude's translation differs from dictionary) are logged for analysis
 
-### Optimization 3: Pre-Built Narrator Templates
+### Optimization 3: Pre-Built Narrator Templates — DONE
 
 **Savings: ~400 output tokens per hadith with known chains**
 
@@ -154,7 +156,7 @@ Top 20 narrator names appear in 40%+ of hadiths. Build a narrator profile librar
 - In postprocessing, validate/override narrator details for recognized names
 - Ensures consistent narrator transliterations across the corpus
 
-### Optimization 4: Compact Output Format (Array-of-Arrays)
+### Optimization 4: Compact Output Format (Array-of-Arrays) — DONE
 
 **Savings: ~2,500 output tokens per verse**
 
@@ -178,13 +180,18 @@ All other fields (translations, chunks, isnad_matn, etc.) use standard JSON.
 
 | Task | Model | Rationale |
 |------|-------|-----------|
-| Generation (all verses) | **Sonnet** | Proven identical to Opus for this task |
+| Generation (all verses) | **Sonnet** | Haiku fails on medium/long hadiths (JSON errors at 99+ words) |
 | Fix pass | **Haiku** | Proven sufficient for targeted corrections |
 | Orchestration | **None** | Python script, 0 tokens |
 
-**Future**: Test Haiku for short verses (<50 words, ~45% of corpus). If quality holds, another major savings.
+**Phase 1 findings (2026-03-07)**:
+- Short hadiths (<50w): Both Haiku and Sonnet PASS (4/4 each, 0 warnings). Haiku 6.2x cheaper.
+- Medium/long hadiths (99-281w): **Haiku fails 4/4** (malformed JSON, compound POS tags, truncated output). Sonnet needed.
+- Since ~45% of corpus is medium/long, using Haiku only for short would add complexity with limited savings.
+- **Decision: Use Sonnet for all generation.** Simpler, reliable across all lengths.
+- Claude wraps output in markdown code fences (` ```json ... ``` `). Postprocessor must strip these.
 
-### Optimization 6: Skip Fix for Clean Verses
+### Optimization 6: Skip Fix for Clean Verses — DONE
 
 ~80% of verses pass review on the first try. The new pipeline only calls Claude for a fix when `postprocess_verse()` detects high/medium review warnings. No fix = no second Claude call.
 
@@ -242,7 +249,7 @@ The existing `ai_pipeline_cache.py` caching system is reused:
 
 ## Components to Build
 
-### 1. Word Dictionary Builder
+### 1. Word Dictionary Builder — DONE
 
 Scans all existing response files (samples + corpus) and builds a word translation lookup table.
 
@@ -269,7 +276,9 @@ Scans all existing response files (samples + corpus) and builds a word translati
 
 **Location**: `ThaqalaynDataGenerator/app/pipeline_cli/build_caches.py`
 
-### 2. Narrator Template Builder
+Built: 609 word entries in `ai-pipeline-data/word_translations_cache.json`.
+
+### 2. Narrator Template Builder — DONE
 
 Scans existing responses and builds narrator profiles.
 
@@ -289,7 +298,9 @@ Scans existing responses and builds narrator profiles.
 
 **Location**: Same module as word dictionary builder.
 
-### 3. Pipeline Core Functions
+Built: 1,074 narrator entries in `ai-pipeline-data/narrator_templates.json`.
+
+### 3. Pipeline Core Functions — DONE
 
 These are importable Python functions (not CLI scripts), called directly by the orchestrator:
 
@@ -305,7 +316,9 @@ These are importable Python functions (not CLI scripts), called directly by the 
 
 **Location**: `ThaqalaynDataGenerator/app/pipeline_cli/verse_processor.py`
 
-### 4. Python Orchestrator (`pipeline.py`)
+Implemented: `prepare_verse`, `postprocess_verse`, `prepare_fix`, `apply_fix`, `expand_compact_words`, `strip_code_fences`, `repair_json_quotes`. Chunked functions (`prepare_structure`, `prepare_chunk_detail`, `assemble_chunks`) are NOT implemented — chunked mode is detected but not handled in the pipeline.
+
+### 4. Python Orchestrator (`pipeline.py`) — DONE
 
 ```python
 # Usage:
@@ -385,9 +398,11 @@ async def main(config: Config):
 - `call_claude()` uses `asyncio.create_subprocess_exec` for non-blocking subprocess calls
 - Progress reporter runs as a concurrent task, printing every 30s
 
-**Location**: `ThaqalaynDataGenerator/pipeline.py`
+**Location**: `ThaqalaynDataGenerator/app/pipeline_cli/pipeline.py`
 
-### 5. Progress Status Script
+Implemented: asyncio event loop, `Semaphore(N)` concurrency, `process_verse()`, `call_claude()` with retry/backoff, `recover_stale_work_dirs()`, `progress_reporter()`, graceful shutdown via `SIGINT`, `quarantine_verse()`, `--dry-run`, `--single`, `--workers`, `--max-verses`, `--book`/`--volume` filtering. Config is via dataclass + CLI args + `pipeline_settings.json` (not `pipeline.conf` as originally planned). No structured event log file (logs to console only). No cumulative token tracking / monthly limit alerting (only per-call `--max-budget-usd`).
+
+### 5. Progress Status Script — DONE
 
 Queryable anytime without disturbing the running pipeline:
 
@@ -416,15 +431,19 @@ python pipeline_status.py
 
 Reads from filesystem state (responses/, stats/, quarantine/) and `pipeline_session.json`.
 
-**Location**: `ThaqalaynDataGenerator/pipeline_status.py`
+**Location**: `ThaqalaynDataGenerator/app/pipeline_cli/pipeline_status.py`
 
-### 6. Updated System Prompt Builder
+Implemented with `--audit` flag for re-validation. Reads filesystem state for progress/quality/cost/quarantine reporting.
+
+### 6. Updated System Prompt Builder — DONE
 
 Modify `build_system_prompt()` to accept `include_few_shot=False` parameter.
 
 Add instructions for array-of-arrays word_analysis format.
 
-### 7. Configuration (`pipeline.conf`)
+Few-shot removal and compact word format instructions implemented in `build_system_prompt()`. Empty EXAMPLES section removed, key phrases trimmed to 15.
+
+### 7. Configuration (`pipeline.conf`) — REPLACED
 
 ```ini
 [pipeline]
@@ -449,6 +468,8 @@ use_narrator_templates = true
 progress_interval_seconds = 30
 stats_merge_interval = 100
 ```
+
+Configuration is handled via `PipelineConfig` dataclass + CLI arguments + `pipeline_settings.json`, not a `.conf` file. This is simpler and more Pythonic than the originally planned INI format.
 
 ## Fault Tolerance and Resume
 
@@ -534,7 +555,7 @@ The orchestrator tracks approximate token usage per Claude call (from `--output-
 [WARNING] Estimated monthly usage: 85% of limit. Consider reducing workers or pausing.
 ```
 
-## Auditability and Prompt/Response Archiving
+## Auditability and Prompt/Response Archiving — PARTIAL
 
 Every AI interaction is preserved for full audit trail.
 
@@ -542,15 +563,17 @@ Every AI interaction is preserved for full audit trail.
 
 ```
 ThaqalaynDataSources/ai-content/corpus/
-  responses/{verse_id}.json          # Final result (with wrapper + attribution)
-  stats/{verse_id}.stats.json        # Generation metrics + timing
-  prompts/{verse_id}.prompt.json     # Archived prompt metadata + user message
-  prompts/_system_prompt.txt         # System prompt (saved once, identical for all)
-  raw_responses/{verse_id}.raw.txt   # Raw Claude output (verbatim, before parsing)
-  fix_prompts/{verse_id}.fix.json    # Fix prompt (if fix was needed)
-  fix_raw/{verse_id}.fix.raw.txt     # Raw fix response (if fix was needed)
-  quarantine/{verse_id}.json         # Failed verses (if quarantined)
+  responses/{verse_id}.json          # Final result (with wrapper + attribution)    DONE
+  stats/{verse_id}.stats.json        # Generation metrics + timing                  DONE (embedded in pipeline stats)
+  prompts/{verse_id}.prompt.json     # Archived prompt metadata + user message      NOT DONE
+  prompts/_system_prompt.txt         # System prompt (saved once, identical for all) NOT DONE
+  raw_responses/{verse_id}.raw.txt   # Raw Claude output (verbatim, before parsing) DONE
+  fix_prompts/{verse_id}.fix.json    # Fix prompt (if fix was needed)               NOT DONE
+  fix_raw/{verse_id}.fix.raw.txt     # Raw fix response (if fix was needed)         NOT DONE
+  quarantine/{verse_id}.json         # Failed verses (if quarantined)               DONE
 ```
+
+**Note**: Prompt archiving (`prompts/`, `fix_prompts/`, `fix_raw/`) is not yet implemented. Raw responses and final results are saved. The `reprocess` command (re-run postprocessing on raw responses without re-generating) is not yet implemented.
 
 ### Prompt Archive Format
 
@@ -715,7 +738,7 @@ ThaqalaynDataGenerator/
 
 ## Phased Rollout
 
-### Phase 0: Concurrency Test (MUST DO FIRST)
+### Phase 0: Concurrency Test (MUST DO FIRST) — DONE
 
 Verify `claude -p` supports concurrent calls before building anything.
 
@@ -731,7 +754,9 @@ If calls serialize or error, the entire parallelism model needs rethinking.
 
 Also test: `--output-format json` (for token counts), `--json-schema` (for structured output enforcement).
 
-### Phase 1: Foundation (build tools, validate quality)
+Results documented in `ThaqalaynDataGenerator/scripts/phase0_results.md`. Concurrency confirmed working. 5 parallel calls ~12s vs ~23s sequential. Base CLI overhead ~24,500 tokens (cached). All key flags verified.
+
+### Phase 1: Foundation (build tools, validate quality) — DONE
 
 1. Build word dictionary from existing 3,600+ responses
 2. Build narrator templates from existing responses
@@ -741,25 +766,27 @@ Also test: `--output-format json` (for token counts), `--json-schema` (for struc
 5. Test fix flow: pipe 10 known-failing verses through `claude -p --model haiku`
 6. Validate array-of-arrays format parsing (with fallback to standard JSON)
 
-### Phase 2: Orchestrator
+All items complete. E2E test passed: prepare_verse → claude -p (Sonnet, 728s, $1.26) → postprocess_verse. Haiku confirmed unreliable for medium/long hadiths. Sonnet used for all generation.
 
-1. Build `pipeline.py` with single-worker mode (`--workers 1`)
-2. Test end-to-end: prepare → claude -p → postprocess for 10 verses
-3. Add parallel workers (`--workers N`) with Semaphore
-4. Add chunked processing flow for long hadiths
-5. Add resume/restart logic (stale lock recovery)
-6. Add progress reporting + session logging
-7. Build `pipeline_status.py`
+### Phase 2: Orchestrator — MOSTLY DONE
 
-### Phase 3: Hardening
+1. Build `pipeline.py` with single-worker mode (`--workers 1`) — **DONE**
+2. Test end-to-end: prepare → claude -p → postprocess for 10 verses — **DONE**
+3. Add parallel workers (`--workers N`) with Semaphore — **DONE**
+4. Add chunked processing flow for long hadiths — **NOT DONE** (detection exists, but `process_chunked`, `prepare_structure`, `prepare_chunk_detail`, `assemble_chunks` are not implemented; long hadiths will fail or fall through to single-pass mode)
+5. Add resume/restart logic (stale lock recovery) — **DONE** (`recover_stale_work_dirs()`)
+6. Add progress reporting + session logging — **PARTIAL** (progress reporter prints to console every 30s; session state saved to `pipeline_session.json`; structured event log file `logs/pipeline_session.log` NOT implemented)
+7. Build `pipeline_status.py` — **DONE** (with `--audit` flag)
 
-1. Add `--dry-run` mode (prepare prompts, estimate tokens, no Claude calls)
-2. Add retry logic with exponential backoff
-3. Add quarantine handling
-4. Add cumulative token tracking + monthly limit alerting
-5. Test on 100 verses, verify quality matches v2 output
+### Phase 3: Hardening — MOSTLY DONE
 
-### Phase 4: Production Run
+1. Add `--dry-run` mode (prepare prompts, estimate tokens, no Claude calls) — **DONE**
+2. Add retry logic with exponential backoff — **DONE** (in `call_claude()`: OSError + rate limit retries with 5s/15s/45s backoff)
+3. Add quarantine handling — **DONE** (`quarantine_verse()`)
+4. Add cumulative token tracking + monthly limit alerting — **NOT DONE** (per-call `--max-budget-usd` exists as a safety guardrail, but no cumulative tracking or monthly alerting)
+5. Test on 100 verses, verify quality matches v2 output — **DONE** (first-100 Al-Kafi: 100/100 generated, 0 schema errors)
+
+### Phase 4: Production Run — NOT STARTED
 
 1. Start with 5 workers, observe rate limits
 2. Ramp up to 10 workers if stable
@@ -810,3 +837,29 @@ This plan was reviewed by an architect agent. Key changes incorporated:
 9. **Token tracking**: Monitor cumulative usage to avoid hitting monthly limit suddenly
 10. **Dry-run mode**: Validate prompts without spending tokens
 11. **Raw response reprocessing**: Can re-run postprocessing on archived responses (0 tokens)
+
+## Remaining Work (as of 2026-03-07)
+
+### Must-have for production runs
+
+| Item | Phase | Effort | Notes |
+|------|-------|--------|-------|
+| Chunked processing in pipeline | P2.4 | Medium | `prepare_structure`, `prepare_chunk_detail`, `assemble_chunks` not implemented. ~1,300 long hadiths (3.4%) will fail without this. Could defer by filtering to <200-word hadiths first. |
+
+### Nice-to-have before production
+
+| Item | Phase | Effort | Notes |
+|------|-------|--------|-------|
+| Prompt archiving | Audit | Low | Save prompts + fix prompts for full audit trail. Currently only raw responses + final results saved. |
+| Structured event log | P2.6 | Low | `logs/pipeline_session.log` with machine-parseable events. Console logging works but isn't persistent. |
+| Cumulative token/cost tracking | P3.4 | Low | Monthly limit alerting. Currently only per-call `--max-budget-usd`. Cost is tracked in `SessionStats` per session but not across sessions. |
+| `reprocess` command | Audit | Low | Re-run postprocessing on archived raw responses. Infrastructure exists (`raw_responses/` saved), command not built. |
+| Remove `similar_content_hints` | Opt 4 | Trivial | Pending user confirmation. Saves ~50-100 output tokens/verse. |
+
+### Phase 4: Production Run (not started)
+
+1. Start with 5 workers, observe rate limits
+2. Ramp up to 10 workers if stable
+3. Begin full corpus generation (optionally filter to <200-word hadiths first to skip chunked)
+4. Monitor quality + throughput via `pipeline_status.py`
+5. Adjust workers/model as needed

@@ -46,7 +46,8 @@ Before any generation starts, reference data is loaded from `ThaqalaynDataSource
 | File | Contents | Purpose |
 |------|----------|---------|
 | `glossary.json` | ~50 Islamic terms in all 11 languages | Consistent translations (salat = prayer, taqwa = piety) |
-| `word_dictionary.json` | 29 high-frequency Arabic particles | Canonical translations for common words (wa, fi, min, etc.) |
+| `word_dictionary.json` | 29 high-frequency Arabic particles | Legacy v3 canonical translations (replaced by v4 word dictionary) |
+| `word_translations_dict_v4.json` | Corpus-wide (word, POS) → 11-lang translations | v4 word dictionary — translate each unique word once, assemble per-hadith |
 | `topic_taxonomy.json` | 14 Level 1 x ~5-8 Level 2 topics (~90 total) | Controlled vocabulary for topic assignment |
 | `key_phrases_dictionary.json` | ~160 multi-word Arabic expressions | Seed dictionary for key phrase extraction |
 | `few_shot_examples.json` | 3-5 complete input/output pairs | In-context learning examples |
@@ -89,16 +90,16 @@ Most Quran verses and shorter hadiths use single-pass. Longer hadiths (some Al-K
 | 1 | `diacritized_text` | string | Full Arabic text with complete tashkeel (vowel marks) |
 | 2 | `diacritics_status` | enum | How tashkeel was handled: added/completed/validated/corrected |
 | 3 | `diacritics_changes` | array | What corrections were made (empty if "added"/"validated") |
-| 4 | `word_analysis` | array | Per-word: diacritized form, 11-language translations, POS tag |
+| 4 | `word_tags` (v4) / `word_analysis` (v3) | array | v4: [word, POS] pairs. v3: Per-word diacritized form + 11-lang translations + POS tag |
 | 5 | `tags` | array(2-5) | Thematic tags (theology, ethics, jurisprudence, etc.) |
 | 6 | `content_type` | enum | Single classification (theological, creedal, narrative, etc.) |
 | 7 | `related_quran` | array | Quran cross-references with explicit/thematic relationship |
 | 8 | `isnad_matn` | object | Narrator chain: names, roles, confidence, isnad/matn split |
-| 9 | `translations` | object | 11 languages x {text, summary, key_terms, seo_question} |
+| 9 | `translations` | object | 11 languages x {summary, key_terms, seo_question} (v4: text reconstructed from chunks) |
 | 10 | `chunks` | array | Semantic segmentation: type, word range, per-chunk translations |
 | 11 | `topics` | array(1-5) | Level 2 topic keys from controlled vocabulary |
 | 12 | `key_phrases` | array(0-5) | Multi-word Arabic expressions with categories |
-| 13 | `similar_content_hints` | array(0-3) | Unverified thematic hints for finding parallel narrations |
+| 13 | ~~`similar_content_hints`~~ | ~~array(0-3)~~ | Removed in v4 (low value, not used downstream) |
 
 The **11 languages** are: en, ur, tr, fa, id, bn, es, fr, de, ru, zh.
 
@@ -173,15 +174,27 @@ If review returns "needs_regeneration" (fundamentally flawed), the entire genera
 
 ## Stage 7: Strip Redundant Fields
 
-`strip_redundant_fields()` removes three categories of data that can be reconstructed, achieving **~21% size reduction**:
+`strip_redundant_fields()` removes data that can be reconstructed, achieving **~21% size reduction** (v3) or more (v4):
 
 | Removed field | Reconstructed from |
 |--------------|-------------------|
 | `diacritized_text` | Joining `word_analysis[].word` with spaces |
 | `chunks[].arabic_text` | Joining `word_analysis[word_start:word_end]` words |
 | `translations[lang].text` | Concatenating `chunks[].translations[lang]` |
+| `word_analysis` (v4 only) | Rebuilt from `word_tags` + v4 word dictionary |
 
 Both `validate_result()` and `review_result()` auto-call `reconstruct_fields()` when they detect stripped input, so stripped files pass validation seamlessly.
+
+### V4 Word Dictionary Pipeline
+
+In v4, per-hadith word translation is replaced by a corpus-wide word dictionary:
+
+1. **Generation**: Model outputs `word_tags` (just `[word, POS]` pairs) instead of full `word_analysis`
+2. **Extraction**: `extract_unique_words()` collects unique (word, POS) pairs from all responses
+3. **Translation**: `build_translation_prompt()` creates batch prompts to translate words into 11 languages
+4. **Assembly**: `assemble_word_analysis()` combines `word_tags` + dictionary into full `word_analysis` format
+
+This eliminates the #1 cost driver: per-hadith word translation (46% of v3 output tokens).
 
 ---
 
@@ -195,7 +208,7 @@ The final result is saved with a wrapper:
   "ai_attribution": {
     "model": "claude-opus-4-6-20260205",
     "generated_date": "2026-02-27",
-    "pipeline_version": "2.0.0",
+    "pipeline_version": "4.0.0",
     "generation_method": "claude_code_direct"
   },
   "result": { /* 13 validated + stripped fields */ }

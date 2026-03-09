@@ -107,7 +107,7 @@
               </a>
             </div>
             <div class="ai-quran-refs" *ngIf="verse.ai?.related_quran?.length">
-              <span class="ai-quran-label">Quran:</span>
+              <span class="ai-quran-label">{{ 'book.quranRefs' | translate }}:</span>
               <span *ngFor="let qref of verse.ai.related_quran" class="ai-quran-ref">
                 <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
                    [fragment]="getQuranRefFragment(qref.ref)"

@@ -4,8 +4,10 @@ import { NgxsModule, Store } from '@ngxs/store';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { VerseTextComponent } from './verse-text.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Verse } from '@app/models';
 import { AiContent } from '@app/models/ai-content';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
@@ -86,12 +88,13 @@ describe('VerseTextComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [VerseTextComponent],
+      declarations: [VerseTextComponent, TranslatePipe],
       imports: [
         NgxsModule.forRoot([]),
         RouterTestingModule,
         FormsModule,
         MatTooltipModule,
+        HttpClientTestingModule,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();

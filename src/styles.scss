@@ -145,6 +145,11 @@ body.dark-theme {
   }
 }
 
+/* ===================== Language Picker Overlay Fix ===================== */
+.cdk-overlay-pane .mat-mdc-select-panel {
+  max-width: calc(100vw - 16px);
+}
+
 /* ===================== Base Styles ===================== */
 html, body {
   margin:0;

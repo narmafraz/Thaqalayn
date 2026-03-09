@@ -147,6 +147,7 @@ a:hover {
 
   .lang-picker {
     width: 80px;
+    max-width: calc(100vw - 16px);
     font-size: 12px;
   }
 

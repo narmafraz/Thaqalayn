@@ -50,6 +50,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // Jump to verse state
   jumpTarget: number | null = null;
 
+  // Metadata density: collapsed by default, expand per verse
+  expandedMetadata = new Set<number>();
+
   // Share as image state
   generatingImageIndex: number | null = null;
 
@@ -200,6 +203,19 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       fragment: anchor,
       queryParamsHandling: 'preserve',
     });
+  }
+
+  toggleMetadata(index: number): void {
+    if (this.expandedMetadata.has(index)) {
+      this.expandedMetadata.delete(index);
+    } else {
+      this.expandedMetadata.add(index);
+    }
+    this.cdr.markForCheck();
+  }
+
+  isMetadataExpanded(index: number): boolean {
+    return this.expandedMetadata.has(index);
   }
 
   isQuranBook(bookIndex: string): boolean {

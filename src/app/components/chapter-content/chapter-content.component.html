@@ -21,14 +21,12 @@
         </div>
       </mat-card-title>
       <mat-card-content>
-        <app-verse-text [verse]="verse"></app-verse-text>
+        <app-verse-text [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index"></app-verse-text>
       </mat-card-content>
       <mat-card-footer>
         <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
+          <!-- Primary actions row: always visible -->
           <div class="refLink">
-            <a [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index" [attr.aria-label]="'Link to verse ' + verse.local_index">
-              <mat-icon>link</mat-icon>
-            </a>
             <a [routerLink]="['/books', book.index + ':' + verse.local_index]"
                queryParamsHandling="preserve"
                [attr.aria-label]="'View ' + verse.part_type + ' ' + verse.local_index + ' details'"
@@ -41,34 +39,39 @@
                     [attr.aria-label]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
               <mat-icon>{{ isVerseBookmarked(book.index, verse) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
             </button>
-            <button class="note-icon-btn"
-                    (click)="toggleNoteEditor(book.index, verse)"
-                    [attr.aria-label]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
-              <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
+            <!-- Overflow menu for secondary actions -->
+            <button class="more-actions-btn"
+                    [matMenuTriggerFor]="verseMenu"
+                    [attr.aria-label]="'More actions'">
+              <mat-icon>more_vert</mat-icon>
             </button>
-            <button class="share-image-icon-btn"
-                    (click)="shareAsImage(book, verse, crumbs)"
-                    [disabled]="generatingImageIndex === verse.local_index"
-                    [attr.aria-label]="'Share as image'">
-              <mat-icon>{{ generatingImageIndex === verse.local_index ? 'hourglass_empty' : 'image' }}</mat-icon>
-            </button>
-            <button *ngIf="isQuranBook(book.index)"
-                    class="audio-icon-btn"
-                    (click)="toggleAudio(book.index, verse.local_index)"
-                    [attr.aria-label]="(audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'Pause' : 'Play') + ' audio'">
-              <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
-            </button>
-            <button *ngIf="isQuranBook(book.index)"
-                    class="tafsir-icon-btn"
-                    (click)="toggleTafsir(book.index, verse.local_index)"
-                    [attr.aria-label]="expandedTafsir.has(verse.local_index) ? 'Hide commentary' : 'Show commentary'">
-              <mat-icon>{{ expandedTafsir.has(verse.local_index) ? 'menu_book' : 'auto_stories' }}</mat-icon>
-            </button>
+            <mat-menu #verseMenu="matMenu">
+              <a mat-menu-item [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index">
+                <mat-icon>link</mat-icon>
+                <span>{{ 'book.copyLink' | translate }}</span>
+              </a>
+              <button mat-menu-item (click)="toggleNoteEditor(book.index, verse)">
+                <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
+                <span>{{ hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate) }}</span>
+              </button>
+              <button mat-menu-item (click)="shareAsImage(book, verse, crumbs)"
+                      [disabled]="generatingImageIndex === verse.local_index">
+                <mat-icon>{{ generatingImageIndex === verse.local_index ? 'hourglass_empty' : 'image' }}</mat-icon>
+                <span>{{ 'book.shareImage' | translate }}</span>
+              </button>
+              <button mat-menu-item *ngIf="isQuranBook(book.index)"
+                      (click)="toggleAudio(book.index, verse.local_index)">
+                <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
+                <span>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate) }}</span>
+              </button>
+              <button mat-menu-item *ngIf="isQuranBook(book.index)"
+                      (click)="toggleTafsir(book.index, verse.local_index)">
+                <mat-icon>{{ expandedTafsir.has(verse.local_index) ? 'menu_book' : 'auto_stories' }}</mat-icon>
+                <span>{{ 'book.tafsir' | translate }}</span>
+              </button>
+            </mat-menu>
           </div>
-          <div>{{ 'book.reference' | translate }}</div>
-          <div>{{getBookName(crumbs)}} {{verse.index}}</div>
-          <div>{{ 'book.inBookReference' | translate }}</div>
-          <div>{{getInBookReference(crumbs, verse)}}</div>
+          <!-- Grading badges: always visible -->
           <div class="grading-inline" *ngIf="verse.gradings?.length">
             <ng-container *ngFor="let g of verse.gradings">
               <span [class]="'grading-chip ' + parseGrading(g).cssClass"
@@ -77,46 +80,59 @@
               </span>
             </ng-container>
           </div>
-          <div class="ai-badges" *ngIf="verse.ai?.content_type || verse.ai?.tags?.length">
-            <a class="ai-content-type-chip" *ngIf="verse.ai?.content_type"
-               [routerLink]="['/search']"
-               [queryParams]="{q: 'type:' + verse.ai.content_type}"
-               queryParamsHandling="merge">
-              {{ getContentTypeLabel(verse.ai.content_type) }}
-            </a>
-            <a class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags"
-               [routerLink]="['/search']"
-               [queryParams]="{q: 'tag:' + tag}"
-               queryParamsHandling="merge">
-              {{ formatLabel(tag) }}
-            </a>
-          </div>
-          <div class="ai-quran-refs" *ngIf="verse.ai?.related_quran?.length">
-            <span class="ai-quran-label">Quran:</span>
-            <span *ngFor="let qref of verse.ai.related_quran" class="ai-quran-ref">
-              <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
-                 [fragment]="getQuranRefFragment(qref.ref)"
-                 queryParamsHandling="preserve"
-                 class="ai-quran-link">
-                {{ qref.ref }}
+          <!-- Expand/collapse toggle for secondary metadata -->
+          <button class="metadata-toggle-btn"
+                  (click)="toggleMetadata(verse.local_index)"
+                  [attr.aria-label]="isMetadataExpanded(verse.local_index) ? 'Hide details' : 'Show details'">
+            <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
+          </button>
+          <!-- Collapsible secondary metadata -->
+          <div class="secondary-metadata" *ngIf="isMetadataExpanded(verse.local_index)">
+            <div>{{ 'book.reference' | translate }}</div>
+            <div>{{getBookName(crumbs)}} {{verse.index}}</div>
+            <div>{{ 'book.inBookReference' | translate }}</div>
+            <div>{{getInBookReference(crumbs, verse)}}</div>
+            <div class="ai-badges" *ngIf="verse.ai?.content_type || verse.ai?.tags?.length">
+              <a class="ai-content-type-chip" *ngIf="verse.ai?.content_type"
+                 [routerLink]="['/search']"
+                 [queryParams]="{q: 'type:' + verse.ai.content_type}"
+                 queryParamsHandling="merge">
+                {{ getContentTypeLabel(verse.ai.content_type) }}
               </a>
-              <span [class]="'ai-quran-rel ai-quran-rel-' + qref.relationship">{{ qref.relationship }}</span>
-            </span>
-          </div>
-          <div class="related">
-            <ng-container *ngIf="verse.relations as relations">
-              <div *ngFor="let relation of relations | keyvalue" class="perRel">
-                <strong>{{relation.key}}</strong>:
-                <span *ngFor="let rLink of relation.value" class="relLinks">
-                  <app-path-link [path]="rLink"></app-path-link>
-                  <button class="compare-inline-btn"
-                          (click)="toggleCompareVerse(rLink)"
-                          [attr.aria-label]="isCompareExpanded(rLink) ? 'Hide' : 'Preview'">
-                    <mat-icon>{{ isCompareExpanded(rLink) ? 'expand_less' : 'expand_more' }}</mat-icon>
-                  </button>
-                </span>
-              </div>
-            </ng-container>
+              <a class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags"
+                 [routerLink]="['/search']"
+                 [queryParams]="{q: 'tag:' + tag}"
+                 queryParamsHandling="merge">
+                {{ formatLabel(tag) }}
+              </a>
+            </div>
+            <div class="ai-quran-refs" *ngIf="verse.ai?.related_quran?.length">
+              <span class="ai-quran-label">Quran:</span>
+              <span *ngFor="let qref of verse.ai.related_quran" class="ai-quran-ref">
+                <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
+                   [fragment]="getQuranRefFragment(qref.ref)"
+                   queryParamsHandling="preserve"
+                   class="ai-quran-link">
+                  {{ qref.ref }}
+                </a>
+                <span [class]="'ai-quran-rel ai-quran-rel-' + qref.relationship">{{ qref.relationship }}</span>
+              </span>
+            </div>
+            <div class="related">
+              <ng-container *ngIf="verse.relations as relations">
+                <div *ngFor="let relation of relations | keyvalue" class="perRel">
+                  <strong>{{relation.key}}</strong>:
+                  <span *ngFor="let rLink of relation.value" class="relLinks">
+                    <app-path-link [path]="rLink"></app-path-link>
+                    <button class="compare-inline-btn"
+                            (click)="toggleCompareVerse(rLink)"
+                            [attr.aria-label]="isCompareExpanded(rLink) ? 'Hide' : 'Preview'">
+                      <mat-icon>{{ isCompareExpanded(rLink) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    </button>
+                  </span>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
       </mat-card-footer>

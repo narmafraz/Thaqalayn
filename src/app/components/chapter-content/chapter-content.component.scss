@@ -77,22 +77,20 @@ mat-mdc-card {
   text-align: left;
   font-family: Verdana, sans-serif;
   padding-left: 15px;
-  padding-top: 15px;
+  padding-top: 10px;
   padding-right: 5px;
   padding-bottom: 10px;
   overflow: auto;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  border: 0px solid;
-  display: grid;
-  grid-template-columns: minmax(10px, auto) minmax(100px, auto) auto 1fr;
-  column-gap: 0.5em;
+  gap: 6px;
 }
 
 .refLink {
-  grid-row: 1 / span 2;
-  align-self: center;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 0px;
 
   // Shared touch target sizing for all interactive elements in verse footer
@@ -146,16 +144,13 @@ mat-mdc-card {
 }
 
 .related {
-  grid-row: 1 / span 2;
-  grid-column-start: 4;
-  margin-left: 1.2em;
+  width: 100%;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
 @media (max-width: 600px) {
   .ref {
-    grid-template-columns: auto 1fr;
     gap: 4px;
     padding-left: 8px;
     padding-right: 4px;
@@ -163,9 +158,6 @@ mat-mdc-card {
   }
 
   .related {
-    grid-row: auto;
-    grid-column: 1 / -1;
-    margin-left: 0;
     margin-top: 4px;
   }
 
@@ -290,13 +282,79 @@ mat-mdc-card {
   }
 }
 
+// More actions overflow button
+.more-actions-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-secondary, #666);
+  opacity: 0.6;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Metadata expand/collapse toggle
+.metadata-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text-secondary, #666);
+  opacity: 0.6;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+// Collapsible secondary metadata section
+.secondary-metadata {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(100px, auto) 1fr;
+  column-gap: 0.5em;
+  row-gap: 2px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 500px; }
+}
+
 // Inline grading badges
 .grading-inline {
-  grid-column: 2 / -1;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 4px;
 }
 
 .grading-chip {
@@ -546,7 +604,7 @@ mat-mdc-card {
 
 // AI content badges
 .ai-badges {
-  grid-column: 2 / -1;
+  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -598,7 +656,7 @@ mat-mdc-card {
 
 // AI Quran cross-references
 .ai-quran-refs {
-  grid-column: 2 / -1;
+  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;

@@ -19,6 +19,10 @@ describe('I18nService', () => {
       loading: 'Loading...',
       error: 'An error occurred',
     },
+    annotation: {
+      add: 'Add note',
+      save: 'Save',
+    },
     simple: 'Simple value',
   };
 
@@ -67,9 +71,52 @@ describe('I18nService', () => {
     service = TestBed.inject(I18nService);
     httpMock = TestBed.inject(HttpTestingController);
 
-    // Flush the initial HTTP request triggered by the constructor
-    const req = httpMock.expectOne(`assets/i18n/${expectedLang}.json`);
-    req.flush(initialStrings);
+    if (expectedLang === 'en') {
+      // For English, only one request is made
+      const req = httpMock.expectOne(`assets/i18n/en.json`);
+      req.flush(initialStrings);
+    } else {
+      // For non-English initial load, forkJoin makes two requests: en.json + locale.json
+      const requests = httpMock.match((r) =>
+        r.url === 'assets/i18n/en.json' || r.url === `assets/i18n/${expectedLang}.json`
+      );
+      for (const req of requests) {
+        if (req.request.url === 'assets/i18n/en.json') {
+          req.flush(mockEnStrings);
+        } else {
+          req.flush(initialStrings);
+        }
+      }
+    }
+  }
+
+  /**
+   * Helper: flushes requests after setLanguage() for a non-English language.
+   * When en is already cached, only the locale request is made.
+   * When en is NOT cached, both en.json and locale.json requests are made.
+   */
+  function flushNonEnglishLoad(
+    lang: string,
+    langStrings: Record<string, unknown>,
+    enCached: boolean = true
+  ): void {
+    if (enCached) {
+      // Only the locale request is made (en is served from cache via of())
+      const req = httpMock.expectOne(`assets/i18n/${lang}.json`);
+      req.flush(langStrings);
+    } else {
+      // Both requests are made via forkJoin
+      const requests = httpMock.match((r) =>
+        r.url === 'assets/i18n/en.json' || r.url === `assets/i18n/${lang}.json`
+      );
+      for (const req of requests) {
+        if (req.request.url === 'assets/i18n/en.json') {
+          req.flush(mockEnStrings);
+        } else {
+          req.flush(langStrings);
+        }
+      }
+    }
   }
 
   beforeEach(() => {
@@ -159,16 +206,14 @@ describe('I18nService', () => {
 
     it('should return Arabic strings after switching to Arabic', () => {
       service.setLanguage('ar');
-      const req = httpMock.expectOne('assets/i18n/ar.json');
-      req.flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       expect(service.get('nav.home')).toBe('\u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629');
     });
 
     it('should return French strings after switching to French', () => {
       service.setLanguage('fr');
-      const req = httpMock.expectOne('assets/i18n/fr.json');
-      req.flush(mockFrStrings);
+      flushNonEnglishLoad('fr', mockFrStrings);
 
       expect(service.get('nav.home')).toBe('Accueil');
     });
@@ -183,7 +228,7 @@ describe('I18nService', () => {
 
     it('should save language to localStorage', () => {
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       expect(localStorage.setItem).toHaveBeenCalledWith('thaqalayn-ui-lang', 'ar');
     });
@@ -193,7 +238,7 @@ describe('I18nService', () => {
       service.currentLang$.subscribe(lang => emissions.push(lang));
 
       service.setLanguage('fr');
-      httpMock.expectOne('assets/i18n/fr.json').flush(mockFrStrings);
+      flushNonEnglishLoad('fr', mockFrStrings);
 
       // First emission is 'en' (initial), second is 'fr'
       expect(emissions).toEqual(['en', 'fr']);
@@ -214,7 +259,7 @@ describe('I18nService', () => {
       // The initial load already happened before we subscribed, so count starts at 0.
 
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       expect(stringsChangedCount).toBe(1);
     });
@@ -238,8 +283,17 @@ describe('I18nService', () => {
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
-      const req = httpMock.expectOne('assets/i18n/fr.json');
-      req.flush(mockFrStrings);
+      // Non-English initial load: forkJoin fetches both en.json and fr.json
+      const requests = httpMock.match((r) =>
+        r.url === 'assets/i18n/en.json' || r.url === 'assets/i18n/fr.json'
+      );
+      for (const req of requests) {
+        if (req.request.url === 'assets/i18n/en.json') {
+          req.flush(mockEnStrings);
+        } else {
+          req.flush(mockFrStrings);
+        }
+      }
 
       let currentLang = '';
       service.currentLang$.subscribe(lang => currentLang = lang);
@@ -260,8 +314,17 @@ describe('I18nService', () => {
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
-      const req = httpMock.expectOne('assets/i18n/ar.json');
-      req.flush(mockArStrings);
+      // Non-English initial load: forkJoin fetches both en.json and ar.json
+      const requests = httpMock.match((r) =>
+        r.url === 'assets/i18n/en.json' || r.url === 'assets/i18n/ar.json'
+      );
+      for (const req of requests) {
+        if (req.request.url === 'assets/i18n/en.json') {
+          req.flush(mockEnStrings);
+        } else {
+          req.flush(mockArStrings);
+        }
+      }
 
       let currentLang = '';
       service.currentLang$.subscribe(lang => currentLang = lang);
@@ -293,7 +356,7 @@ describe('I18nService', () => {
 
     it('should emit true for Arabic (RTL)', () => {
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       let latestRtl = false;
       service.isRtl$.subscribe(isRtl => latestRtl = isRtl);
@@ -302,7 +365,7 @@ describe('I18nService', () => {
 
     it('should emit true for Farsi (RTL)', () => {
       service.setLanguage('fa');
-      httpMock.expectOne('assets/i18n/fa.json').flush({});
+      flushNonEnglishLoad('fa', {});
 
       let latestRtl = false;
       service.isRtl$.subscribe(isRtl => latestRtl = isRtl);
@@ -311,7 +374,7 @@ describe('I18nService', () => {
 
     it('should emit true for Urdu (RTL)', () => {
       service.setLanguage('ur');
-      httpMock.expectOne('assets/i18n/ur.json').flush({});
+      flushNonEnglishLoad('ur', {});
 
       let latestRtl = false;
       service.isRtl$.subscribe(isRtl => latestRtl = isRtl);
@@ -320,7 +383,7 @@ describe('I18nService', () => {
 
     it('should emit false for French (LTR)', () => {
       service.setLanguage('fr');
-      httpMock.expectOne('assets/i18n/fr.json').flush(mockFrStrings);
+      flushNonEnglishLoad('fr', mockFrStrings);
 
       let latestRtl = false;
       service.isRtl$.subscribe(isRtl => latestRtl = isRtl);
@@ -332,7 +395,7 @@ describe('I18nService', () => {
       service.isRtl$.subscribe(isRtl => rtlValues.push(isRtl));
 
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       // First emission: false (en), second: true (ar)
       expect(rtlValues).toEqual([false, true]);
@@ -343,7 +406,7 @@ describe('I18nService', () => {
       service.isRtl$.subscribe(isRtl => rtlValues.push(isRtl));
 
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       service.setLanguage('en');
       httpMock.expectOne('assets/i18n/en.json').flush(mockEnStrings);
@@ -373,16 +436,17 @@ describe('I18nService', () => {
       req.flush(mockArStrings);
     });
 
-    it('should replace previous strings entirely when new language loads', () => {
+    it('should merge locale strings on top of English base (locale keys override English)', () => {
       createServiceAndFlushInitialLoad();
       expect(service.get('nav.home')).toBe('Home');
 
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
+      // Arabic key should override English
       expect(service.get('nav.home')).toBe('\u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629');
-      // English strings should no longer be accessible (replaced, not merged)
-      expect(service.get('common.error')).toBe('common.error');
+      // English key missing from Arabic should still resolve via merge
+      expect(service.get('common.error')).toBe('An error occurred');
     });
   });
 
@@ -394,14 +458,11 @@ describe('I18nService', () => {
 
       service.setLanguage('ar');
 
-      // Fail the Arabic request
+      // Fail the Arabic request (en is cached, so only ar.json request exists)
       const arReq = httpMock.expectOne('assets/i18n/ar.json');
       arReq.flush('Not found', { status: 404, statusText: 'Not Found' });
 
-      // Should then try to load English as fallback
-      const enReq = httpMock.expectOne('assets/i18n/en.json');
-      enReq.flush(mockEnStrings);
-
+      // With merge strategy, cached English is used as fallback
       expect(service.get('nav.home')).toBe('Home');
     });
 
@@ -428,14 +489,10 @@ describe('I18nService', () => {
 
       service.setLanguage('fr');
 
-      // Fail French
+      // Fail French (en is cached, so only fr.json request exists)
       httpMock.expectOne('assets/i18n/fr.json').flush('Error', { status: 500, statusText: 'Error' });
 
-      // Fallback to English
-      const enReq = httpMock.expectOne('assets/i18n/en.json');
-      enReq.flush(mockEnStrings);
-
-      // Should have emitted once for the English fallback load
+      // stringsChanged$ should have been emitted (with English fallback from cache)
       expect(changedCount).toBe(1);
     });
 
@@ -446,11 +503,100 @@ describe('I18nService', () => {
       service.setLanguage('de');
       httpMock.expectOne('assets/i18n/de.json').flush('Not found', { status: 404, statusText: 'Not Found' });
 
-      // Fallback to English
-      httpMock.expectOne('assets/i18n/en.json').flush(mockEnStrings);
-
+      // English from cache is the fallback
       expect(service.get('nav.about')).toBe('About');
       expect(service.get('common.loading')).toBe('Loading...');
+    });
+  });
+
+  // ─── English Merge Strategy ────────────────────────────────────────────
+
+  describe('English merge strategy (FIX-06)', () => {
+    beforeEach(() => {
+      createServiceAndFlushInitialLoad();
+    });
+
+    it('should fall back to English for keys missing in locale', () => {
+      // mockArStrings is missing 'common.error' and 'annotation.*'
+      service.setLanguage('ar');
+      flushNonEnglishLoad('ar', mockArStrings);
+
+      // These keys exist only in English but should still resolve
+      expect(service.get('common.error')).toBe('An error occurred');
+      expect(service.get('annotation.add')).toBe('Add note');
+      expect(service.get('annotation.save')).toBe('Save');
+    });
+
+    it('should use locale value when it exists, not English', () => {
+      service.setLanguage('ar');
+      flushNonEnglishLoad('ar', mockArStrings);
+
+      // Arabic should override English where present
+      expect(service.get('nav.home')).toBe('\u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629');
+      expect(service.get('simple')).toBe('\u0642\u064A\u0645\u0629 \u0628\u0633\u064A\u0637\u0629');
+    });
+
+    it('should deep merge nested objects', () => {
+      // French has nav.home, nav.about, nav.books but no common.*
+      service.setLanguage('fr');
+      flushNonEnglishLoad('fr', mockFrStrings);
+
+      // French overrides
+      expect(service.get('nav.home')).toBe('Accueil');
+      // English fallback for missing nested keys
+      expect(service.get('common.loading')).toBe('Loading...');
+      expect(service.get('common.error')).toBe('An error occurred');
+    });
+
+    it('should never return a raw i18n key pattern when English has the key', () => {
+      service.setLanguage('fa');
+      // Farsi file with no keys at all
+      flushNonEnglishLoad('fa', {});
+
+      // All English keys should still resolve
+      const rawKeyPattern = /^(annotation|bookmark|pwa|nav|search|settings|footer|translation)\.\w+$/;
+      const testKeys = ['nav.home', 'nav.about', 'common.loading', 'annotation.add', 'annotation.save'];
+      for (const key of testKeys) {
+        const result = service.get(key);
+        expect(result).not.toMatch(rawKeyPattern);
+      }
+    });
+  });
+
+  // ─── deepMerge ─────────────────────────────────────────────────────────
+
+  describe('deepMerge', () => {
+    beforeEach(() => {
+      createServiceAndFlushInitialLoad();
+    });
+
+    it('should merge flat objects', () => {
+      const result = service.deepMerge({ a: '1', b: '2' }, { b: '3', c: '4' });
+      expect(result).toEqual({ a: '1', b: '3', c: '4' });
+    });
+
+    it('should deep merge nested objects', () => {
+      const base = { nav: { home: 'Home', about: 'About' }, other: 'x' };
+      const override = { nav: { home: 'Accueil' } };
+      const result = service.deepMerge(base, override);
+      expect(result).toEqual({ nav: { home: 'Accueil', about: 'About' }, other: 'x' });
+    });
+
+    it('should not mutate the base object', () => {
+      const base = { a: '1' };
+      service.deepMerge(base, { a: '2' });
+      expect(base.a).toBe('1');
+    });
+
+    it('should handle empty override', () => {
+      const base = { a: '1', b: { c: '2' } };
+      const result = service.deepMerge(base, {});
+      expect(result).toEqual({ a: '1', b: { c: '2' } });
+    });
+
+    it('should handle empty base', () => {
+      const result = service.deepMerge({}, { a: '1' });
+      expect(result).toEqual({ a: '1' });
     });
   });
 
@@ -473,9 +619,17 @@ describe('I18nService', () => {
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
-      // Should detect 'fr' from 'fr-FR'
-      const req = httpMock.expectOne('assets/i18n/fr.json');
-      req.flush(mockFrStrings);
+      // Should detect 'fr' from 'fr-FR' — non-English initial load: forkJoin fetches en + fr
+      const requests = httpMock.match((r) =>
+        r.url === 'assets/i18n/en.json' || r.url === 'assets/i18n/fr.json'
+      );
+      for (const req of requests) {
+        if (req.request.url === 'assets/i18n/en.json') {
+          req.flush(mockEnStrings);
+        } else {
+          req.flush(mockFrStrings);
+        }
+      }
 
       let currentLang = '';
       service.currentLang$.subscribe(lang => currentLang = lang);
@@ -505,8 +659,17 @@ describe('I18nService', () => {
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
-      const req = httpMock.expectOne('assets/i18n/ar.json');
-      req.flush(mockArStrings);
+      // Non-English initial load: forkJoin fetches en + ar
+      const requests = httpMock.match((r) =>
+        r.url === 'assets/i18n/en.json' || r.url === 'assets/i18n/ar.json'
+      );
+      for (const req of requests) {
+        if (req.request.url === 'assets/i18n/en.json') {
+          req.flush(mockEnStrings);
+        } else {
+          req.flush(mockArStrings);
+        }
+      }
 
       let currentLang = '';
       service.currentLang$.subscribe(lang => currentLang = lang);
@@ -569,10 +732,10 @@ describe('I18nService', () => {
       service.currentLang$.subscribe(lang => langs.push(lang));
 
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       service.setLanguage('fr');
-      httpMock.expectOne('assets/i18n/fr.json').flush(mockFrStrings);
+      flushNonEnglishLoad('fr', mockFrStrings);
 
       expect(langs).toEqual(['en', 'ar', 'fr']);
     });
@@ -582,13 +745,13 @@ describe('I18nService', () => {
       service.isRtl$.subscribe(isRtl => rtlValues.push(isRtl));
 
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       service.setLanguage('fr');
-      httpMock.expectOne('assets/i18n/fr.json').flush(mockFrStrings);
+      flushNonEnglishLoad('fr', mockFrStrings);
 
       service.setLanguage('fa');
-      httpMock.expectOne('assets/i18n/fa.json').flush({});
+      flushNonEnglishLoad('fa', {});
 
       // en=false, ar=true, fr=false, fa=true
       expect(rtlValues).toEqual([false, true, false, true]);
@@ -604,11 +767,11 @@ describe('I18nService', () => {
 
     it('should handle switching between multiple languages', () => {
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
       expect(service.get('nav.home')).toBe('\u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629');
 
       service.setLanguage('fr');
-      httpMock.expectOne('assets/i18n/fr.json').flush(mockFrStrings);
+      flushNonEnglishLoad('fr', mockFrStrings);
       expect(service.get('nav.home')).toBe('Accueil');
 
       service.setLanguage('en');
@@ -618,10 +781,10 @@ describe('I18nService', () => {
 
     it('should persist the last selected language in localStorage', () => {
       service.setLanguage('ar');
-      httpMock.expectOne('assets/i18n/ar.json').flush(mockArStrings);
+      flushNonEnglishLoad('ar', mockArStrings);
 
       service.setLanguage('fr');
-      httpMock.expectOne('assets/i18n/fr.json').flush(mockFrStrings);
+      flushNonEnglishLoad('fr', mockFrStrings);
 
       expect(localStorageStore['thaqalayn-ui-lang']).toBe('fr');
     });

@@ -1,0 +1,57 @@
+<!-- Chapter list skeleton: table-like rows -->
+<div class="skeleton-container" *ngIf="variant === 'chapter-list'">
+  <div class="skeleton-title skeleton-line"></div>
+  <div class="skeleton-table">
+    <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+      <div class="skeleton-line skeleton-cell-narrow"></div>
+      <div class="skeleton-line skeleton-cell-wide"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Verse list skeleton: card-like layout -->
+<div class="skeleton-container" *ngIf="variant === 'verse-list'">
+  <div class="skeleton-title skeleton-line"></div>
+  <div class="skeleton-card" *ngFor="let i of [1,2,3]">
+    <div class="skeleton-line skeleton-arabic"></div>
+    <div class="skeleton-line skeleton-english"></div>
+    <div class="skeleton-line skeleton-meta"></div>
+  </div>
+</div>
+
+<!-- Narrator skeleton: hero header + stats + list -->
+<div class="skeleton-container" *ngIf="variant === 'narrator'">
+  <div class="skeleton-hero">
+    <div class="skeleton-line skeleton-hero-title"></div>
+    <div class="skeleton-line skeleton-hero-subtitle"></div>
+  </div>
+  <div class="skeleton-stats-row">
+    <div class="skeleton-line skeleton-stat"></div>
+    <div class="skeleton-line skeleton-stat"></div>
+    <div class="skeleton-line skeleton-stat"></div>
+  </div>
+  <div class="skeleton-line skeleton-section-title"></div>
+  <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+    <div class="skeleton-line skeleton-cell-wide"></div>
+  </div>
+</div>
+
+<!-- Search skeleton: results list -->
+<div class="skeleton-container" *ngIf="variant === 'search'">
+  <div class="skeleton-search-result" *ngFor="let i of [1,2,3,4,5]">
+    <div class="skeleton-line skeleton-result-title"></div>
+    <div class="skeleton-line skeleton-result-desc"></div>
+  </div>
+</div>
+
+<!-- People list skeleton: table with rows -->
+<div class="skeleton-container" *ngIf="variant === 'people-list'">
+  <div class="skeleton-title skeleton-line"></div>
+  <div class="skeleton-table">
+    <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]">
+      <div class="skeleton-line skeleton-cell-narrow"></div>
+      <div class="skeleton-line skeleton-cell-wide"></div>
+      <div class="skeleton-line skeleton-cell-narrow"></div>
+    </div>
+  </div>
+</div>

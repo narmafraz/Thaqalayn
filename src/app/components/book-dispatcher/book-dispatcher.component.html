@@ -3,10 +3,8 @@
 </ng-container>
 
 <ng-template #content>
-  <div *ngIf="(loading$ | async)" class="loading-container">
-    <mat-spinner diameter="48"></mat-spinner>
-    <p>{{ 'common.loading' | translate }}</p>
-  </div>
+  <app-skeleton-loader *ngIf="!(book$ | async)"
+    [variant]="'chapter-list'"></app-skeleton-loader>
 
   <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
     <ng-container *ngSwitchCase="'chapter_list'">

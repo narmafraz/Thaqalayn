@@ -62,17 +62,20 @@
 
       <button mat-button (click)="sortVersePathsByLength()">{{ 'narrator.sortByLength' | translate }}</button>
 
-      <cdk-virtual-scroll-viewport #versePathsViewport itemSize="50" class="viewport">
-        <mat-table [dataSource]="versePathsDataSource">
-          <ng-container matColumnDef="path">
-            <mat-cell *matCellDef="let element">
-              <div class="path-cell"><app-path-link [path]="element.path"></app-path-link></div>
-            </mat-cell>
-          </ng-container>
+      <div class="paths-list">
+        <div *ngFor="let item of paginatedPaths" class="path-item">
+          <app-path-link [path]="item.path"></app-path-link>
+        </div>
+      </div>
 
-          <mat-row *matRowDef="let row; columns: displayedColumnsPaths;"></mat-row>
-        </mat-table>
-      </cdk-virtual-scroll-viewport>
+      <mat-paginator
+        [length]="filteredPaths.length"
+        [pageSize]="pathsPageSize"
+        [pageIndex]="pathsPage"
+        [pageSizeOptions]="[25, 50, 100]"
+        (page)="onPathsPageChange($event)"
+        [attr.aria-label]="'common.selectPage' | translate">
+      </mat-paginator>
     </section>
 
     <!-- Co-Narrators Section -->
@@ -87,48 +90,47 @@
         </mat-form-field>
       </div>
 
-      <cdk-virtual-scroll-viewport #subchainsViewport itemSize="50" class="viewport" (scrolledIndexChange)="onScroll()">
-        <mat-table [dataSource]="subchainsDataSource">
-          <ng-container matColumnDef="subchain">
-            <mat-cell *matCellDef="let element">
-              <div class="subchain-container">
-                <div class="subchain-text arabic" dir="rtl" lang="ar">
-                  <ng-container *ngFor="let narrator_id of element.value.narrator_ids; let isLast = last">
-                    <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
-                      {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}
-                    </a>
-                    <span *ngIf="!isLast" class="arrow">&#x27F5;</span>
-                  </ng-container>
-                </div>
-                <div class="verse-count" *ngIf="element.value.verse_paths">
-                  ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
-                </div>
-                <ol>
-                  <li *ngFor="let path of element.value.verse_paths">
-                    <app-path-link [path]="path"></app-path-link>
-                  </li>
-                </ol>
-              </div>
-            </mat-cell>
-          </ng-container>
+      <div class="subchains-list">
+        <div *ngFor="let element of paginatedSubchains" class="subchain-item">
+          <div class="subchain-container">
+            <div class="subchain-text arabic" dir="rtl" lang="ar">
+              <ng-container *ngFor="let narrator_id of element.value.narrator_ids; let isLast = last">
+                <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
+                  {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}
+                </a>
+                <span *ngIf="!isLast" class="arrow">&#x27F5;</span>
+              </ng-container>
+            </div>
+            <div class="verse-count" *ngIf="element.value.verse_paths">
+              ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
+            </div>
+          </div>
+          <ol class="verse-paths-list">
+            <li *ngFor="let path of getVisiblePaths(element)">
+              <app-path-link [path]="path"></app-path-link>
+            </li>
+          </ol>
+          <button *ngIf="element.value.verse_paths.length > 3"
+                  mat-button
+                  class="show-more-btn"
+                  (click)="toggleExpandSubchain(element.key)">
+            {{ isExpanded(element.key) ? ('narrator.showLess' | translate) : ('narrator.showAll' | translate) + ' ' + element.value.verse_paths.length + ' ' + ('common.verses' | translate) }}
+          </button>
+        </div>
+      </div>
 
-          <mat-row *matRowDef="let row; columns: displayedColumnsSubchains;"></mat-row>
-        </mat-table>
-      </cdk-virtual-scroll-viewport>
-
-      <!-- Pagination Controls -->
       <mat-paginator
-        [length]="subchainsDataSource.data.length"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[10, 25, 50, 100]"
-        (page)="loadNextPage()"
+        [length]="filteredSubchains.length"
+        [pageSize]="subchainsPageSize"
+        [pageIndex]="subchainsPage"
+        [pageSizeOptions]="[10, 25, 50]"
+        (page)="onSubchainsPageChange($event)"
         [attr.aria-label]="'common.selectPage' | translate">
       </mat-paginator>
     </section>
   </div>
 
-  <!-- Loading Spinner -->
-  <div class="loading-container" *ngIf="(narrator$ | async) === null">
-    <mat-spinner></mat-spinner>
-  </div>
+  <!-- Loading Skeleton -->
+  <app-skeleton-loader *ngIf="(narrator$ | async) === null"
+    [variant]="'narrator'"></app-skeleton-loader>
 </ng-template>

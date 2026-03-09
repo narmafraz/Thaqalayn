@@ -13,6 +13,7 @@ import { PathLinkComponent } from '../components/path-link/path-link.component';
 import { ErrorDisplayComponent } from '../components/error-display/error-display.component';
 import { BookTitlesComponent } from '../components/book-titles/book-titles.component';
 import { VerseTextComponent } from '../components/verse-text/verse-text.component';
+import { SkeletonLoaderComponent } from '../components/skeleton-loader/skeleton-loader.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { VerseTextComponent } from '../components/verse-text/verse-text.componen
     ErrorDisplayComponent,
     BookTitlesComponent,
     VerseTextComponent,
+    SkeletonLoaderComponent,
   ],
   imports: [
     CommonModule,
@@ -46,6 +48,7 @@ import { VerseTextComponent } from '../components/verse-text/verse-text.componen
     ErrorDisplayComponent,
     BookTitlesComponent,
     VerseTextComponent,
+    SkeletonLoaderComponent,
   ],
 })
 export class SharedModule {}

@@ -3,10 +3,8 @@
 </ng-container>
 
 <ng-template #listContent>
-  <div *ngIf="(loading$ | async)" class="loading-container">
-    <mat-spinner diameter="48"></mat-spinner>
-    <p>{{ 'common.loading' | translate }}</p>
-  </div>
+  <app-skeleton-loader *ngIf="!(narrators$ | async)"
+    [variant]="'people-list'"></app-skeleton-loader>
 
   <ng-container *ngIf="(narrators$ | async) as narrators">
     <app-book-titles [titles]="narratorsTitles"></app-book-titles>

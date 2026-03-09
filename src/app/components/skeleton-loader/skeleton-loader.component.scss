@@ -1,0 +1,141 @@
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-line {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+:host-context(.dark-theme) .skeleton-line {
+  background: linear-gradient(90deg, #333 25%, #3a3a3a 50%, #333 75%);
+  background-size: 200% 100%;
+}
+
+.skeleton-container {
+  padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+// Title placeholder
+.skeleton-title {
+  height: 28px;
+  width: 60%;
+  margin-bottom: 24px;
+}
+
+// Table skeleton
+.skeleton-table {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.skeleton-cell-narrow {
+  height: 16px;
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.skeleton-cell-wide {
+  height: 16px;
+  flex: 1;
+}
+
+// Card skeleton (verse-list)
+.skeleton-card {
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-arabic {
+  height: 24px;
+  width: 90%;
+  margin-left: auto; // RTL alignment
+}
+
+.skeleton-english {
+  height: 18px;
+  width: 75%;
+}
+
+.skeleton-meta {
+  height: 14px;
+  width: 40%;
+}
+
+// Narrator skeleton
+.skeleton-hero {
+  text-align: center;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.skeleton-hero-title {
+  height: 32px;
+  width: 50%;
+}
+
+.skeleton-hero-subtitle {
+  height: 18px;
+  width: 35%;
+}
+
+.skeleton-stats-row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.skeleton-stat {
+  height: 40px;
+  width: 100px;
+  border-radius: 8px;
+}
+
+.skeleton-section-title {
+  height: 20px;
+  width: 30%;
+  margin-bottom: 16px;
+}
+
+// Search skeleton
+.skeleton-search-result {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-result-title {
+  height: 18px;
+  width: 50%;
+}
+
+.skeleton-result-desc {
+  height: 14px;
+  width: 80%;
+}
+
+:host-context(.dark-theme) .skeleton-card {
+  border-color: var(--border-color, #444);
+}

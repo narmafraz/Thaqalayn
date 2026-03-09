@@ -9,7 +9,13 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions, MatTooltipModule } from '@angular/material/tooltip';
+
+const tooltipDefaults: MatTooltipDefaultOptions = {
+  showDelay: 300,
+  hideDelay: 0,
+  touchendHideDelay: 1500,
+};
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/routing/app-routing.module';
@@ -72,6 +78,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     })
   ],
   providers: [
+    { provide: MAT_TOOLTIP_DEFAULT_OPTIONS, useValue: tooltipDefaults },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     provideHttpClient(withInterceptorsFromDi()),
     provideClientHydration(withEventReplay())

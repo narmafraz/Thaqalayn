@@ -7,16 +7,16 @@
           <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
 
           <div class="font-controls" (click)="$event.stopPropagation()" *ngIf="fontSize$ | async as fontSize">
-            <button (click)="decreaseFontSize()" [attr.aria-label]="'settings.decreaseFont' | translate" [disabled]="fontSize <= 75">A-</button>
-            <button (click)="resetFontSize()" [attr.aria-label]="'settings.resetFont' | translate">A</button>
-            <button (click)="increaseFontSize()" [attr.aria-label]="'settings.increaseFont' | translate" [disabled]="fontSize >= 150">A+</button>
+            <button (click)="decreaseFontSize()" [attr.aria-label]="'settings.decreaseFont' | translate" [matTooltip]="'settings.decreaseFont' | translate" [disabled]="fontSize <= 75">A-</button>
+            <button (click)="resetFontSize()" [attr.aria-label]="'settings.resetFont' | translate" [matTooltip]="'settings.resetFont' | translate">A</button>
+            <button (click)="increaseFontSize()" [attr.aria-label]="'settings.increaseFont' | translate" [matTooltip]="'settings.increaseFont' | translate" [disabled]="fontSize >= 150">A+</button>
           </div>
 
-          <button class="theme-toggle" (click)="toggleTheme(); $event.stopPropagation()" [attr.aria-label]="'settings.toggleDarkMode' | translate">
+          <button class="theme-toggle" (click)="toggleTheme(); $event.stopPropagation()" [attr.aria-label]="'settings.toggleDarkMode' | translate" [matTooltip]="'settings.toggleDarkMode' | translate">
             <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
           </button>
 
-          <button class="shortcuts-btn" (click)="toggleHelp(); $event.stopPropagation()" [attr.aria-label]="'settings.showKeyboardShortcuts' | translate">
+          <button class="shortcuts-btn" (click)="toggleHelp(); $event.stopPropagation()" [attr.aria-label]="'settings.showKeyboardShortcuts' | translate" [matTooltip]="'settings.showKeyboardShortcuts' | translate">
             <mat-icon>keyboard</mat-icon>
           </button>
 

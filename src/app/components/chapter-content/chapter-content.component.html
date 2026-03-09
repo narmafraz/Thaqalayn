@@ -31,18 +31,20 @@
                queryParamsHandling="preserve"
                [attr.aria-label]="'View ' + verse.part_type + ' ' + verse.local_index + ' details'"
                class="verse-detail-link"
-               matTooltip="View hadith details">
+               [matTooltip]="'tooltip.viewDetails' | translate">
               <mat-icon>open_in_new</mat-icon>
             </a>
             <button class="bookmark-icon-btn"
                     (click)="toggleVerseBookmark(book.index, verse, crumbs)"
-                    [attr.aria-label]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
+                    [attr.aria-label]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)"
+                    [matTooltip]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
               <mat-icon>{{ isVerseBookmarked(book.index, verse) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
             </button>
             <!-- Overflow menu for secondary actions -->
             <button class="more-actions-btn"
                     [matMenuTriggerFor]="verseMenu"
-                    [attr.aria-label]="'More actions'">
+                    [attr.aria-label]="'More actions'"
+                    [matTooltip]="'tooltip.moreActions' | translate">
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #verseMenu="matMenu">
@@ -83,7 +85,8 @@
           <!-- Expand/collapse toggle for secondary metadata -->
           <button class="metadata-toggle-btn"
                   (click)="toggleMetadata(verse.local_index)"
-                  [attr.aria-label]="isMetadataExpanded(verse.local_index) ? 'Hide details' : 'Show details'">
+                  [attr.aria-label]="isMetadataExpanded(verse.local_index) ? 'Hide details' : 'Show details'"
+                  [matTooltip]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)">
             <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
           </button>
           <!-- Collapsible secondary metadata -->
@@ -126,7 +129,8 @@
                     <app-path-link [path]="rLink"></app-path-link>
                     <button class="compare-inline-btn"
                             (click)="toggleCompareVerse(rLink)"
-                            [attr.aria-label]="isCompareExpanded(rLink) ? 'Hide' : 'Preview'">
+                            [attr.aria-label]="isCompareExpanded(rLink) ? 'Hide' : 'Preview'"
+                            [matTooltip]="isCompareExpanded(rLink) ? ('tooltip.hidePreview' | translate) : ('tooltip.previewRelated' | translate)">
                       <mat-icon>{{ isCompareExpanded(rLink) ? 'expand_less' : 'expand_more' }}</mat-icon>
                     </button>
                   </span>
@@ -173,7 +177,7 @@
                 <a [routerLink]="['/books', rLink.replace('/books/', '')]" queryParamsHandling="preserve" class="compare-inline-title">
                   {{ getCompareData(rLink)?.title || rLink.replace('/books/', '') }}
                 </a>
-                <button class="compare-inline-close" (click)="toggleCompareVerse(rLink)">
+                <button class="compare-inline-close" (click)="toggleCompareVerse(rLink)" [matTooltip]="'tooltip.closeComparison' | translate">
                   <mat-icon>close</mat-icon>
                 </button>
               </div>

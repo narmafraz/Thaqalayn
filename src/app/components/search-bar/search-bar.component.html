@@ -16,14 +16,16 @@
       *ngIf="searchValue"
       class="clear-btn"
       (mousedown)="clearSearch()"
-      [attr.aria-label]="'search.clearSearch' | translate">
+      [attr.aria-label]="'search.clearSearch' | translate"
+      [matTooltip]="'search.clearSearch' | translate">
       <mat-icon>close</mat-icon>
     </button>
     <button
       *ngIf="!searchValue"
       class="search-tips-btn"
       (mousedown)="showTips = !showTips"
-      [attr.aria-label]="'search.tipsTitle' | translate">
+      [attr.aria-label]="'search.tipsTitle' | translate"
+      [matTooltip]="'search.tipsTitle' | translate">
       <mat-icon>help_outline</mat-icon>
     </button>
   </div>

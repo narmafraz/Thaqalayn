@@ -13,7 +13,7 @@
         <mat-form-field class="filter-field">
           <!-- <mat-label>Filter</mat-label> -->
           <input matInput [placeholder]="'search.filter' | translate" [(ngModel)]="filterValue" #filterInput>
-          <button *ngIf="filterValue" matSuffix mat-icon-button [attr.aria-label]="'common.clear' | translate" (click)="filterValue=''">
+          <button *ngIf="filterValue" matSuffix mat-icon-button [attr.aria-label]="'common.clear' | translate" [matTooltip]="'common.clear' | translate" (click)="filterValue=''">
             <mat-icon>close</mat-icon>
           </button>
         </mat-form-field>

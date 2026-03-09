@@ -7,7 +7,7 @@
         <a [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
            queryParamsHandling="preserve"
            class="chapter-link">
-          <mat-icon>arrow_upward</mat-icon>
+          <mat-icon [matTooltip]="'tooltip.backToChapter' | translate">arrow_upward</mat-icon>
           <span *ngIf="book.data.chapter_title?.en">{{ book.data.chapter_title.en }}</span>
         </a>
       </div>
@@ -87,7 +87,8 @@
                   <app-path-link [path]="rLink" class="relation-link"></app-path-link>
                   <button class="compare-btn" (click)="loadCompareVerse(rLink)"
                           *ngIf="!isCompareLoaded(rLink)"
-                          [attr.aria-label]="'Compare with ' + removeBookPrefix(rLink)">
+                          [attr.aria-label]="'Compare with ' + removeBookPrefix(rLink)"
+                          [matTooltip]="'tooltip.previewHadith' | translate">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 </span>

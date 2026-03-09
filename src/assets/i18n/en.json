@@ -220,6 +220,17 @@
       "error": "Error"
     }
   },
+  "tooltip": {
+    "viewDetails": "View hadith details",
+    "moreActions": "More actions",
+    "hideDetails": "Hide details",
+    "showDetails": "Show details",
+    "previewRelated": "Preview related verse",
+    "hidePreview": "Hide preview",
+    "closeComparison": "Close comparison",
+    "backToChapter": "Back to chapter",
+    "previewHadith": "Preview hadith"
+  },
   "settings": {
     "toggleDarkMode": "Toggle dark mode",
     "increaseFont": "Increase font size",

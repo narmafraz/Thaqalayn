@@ -16,7 +16,8 @@
           </a>
         </div>
         <button mat-icon-button (click)="clearProgress(rp.bookId)"
-                [attr.aria-label]="'bookmark.clearProgress' | translate">
+                [attr.aria-label]="'bookmark.clearProgress' | translate"
+                [matTooltip]="'bookmark.clearProgress' | translate">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -43,7 +44,8 @@
           </div>
         </a>
         <button mat-icon-button (click)="removeBookmark(bm.path)"
-                [attr.aria-label]="'bookmark.remove' | translate">
+                [attr.aria-label]="'bookmark.remove' | translate"
+                [matTooltip]="'bookmark.remove' | translate">
           <mat-icon>delete_outline</mat-icon>
         </button>
       </div>
@@ -69,7 +71,8 @@
           </div>
         </a>
         <button mat-icon-button (click)="deleteAnnotation(ann.path)"
-                [attr.aria-label]="'annotation.delete' | translate">
+                [attr.aria-label]="'annotation.delete' | translate"
+                [matTooltip]="'annotation.delete' | translate">
           <mat-icon>delete_outline</mat-icon>
         </button>
       </div>

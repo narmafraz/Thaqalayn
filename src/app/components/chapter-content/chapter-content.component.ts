@@ -1,5 +1,5 @@
 import { ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
 import { Book, ChapterContent, Crumb, Verse } from '@app/models';
@@ -47,6 +47,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   private touchStartY = 0;
   private currentNav: { prev: string | null; next: string | null } = { prev: null, next: null };
 
+  // Jump to verse state
+  jumpTarget: number | null = null;
+
   // Share as image state
   generatingImageIndex: number | null = null;
 
@@ -68,6 +71,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private booksService: BooksService,
     private shareCard: ShareCardService,
     private i18nService: I18nService,
+    private renderer: Renderer2,
   ) {
     this.tafsirEditions = this.tafsirService.editions;
     this.fragment$.subscribe(fragment => {
@@ -174,6 +178,28 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       this.bookmarkedPaths.delete(path);
     }
     this.cdr.markForCheck();
+  }
+
+  jumpToVerse(): void {
+    if (!this.jumpTarget) return;
+    const anchor = 'h' + this.jumpTarget;
+    this.viewportScroller.scrollToAnchor(anchor);
+
+    // Highlight the target verse card
+    const target = this.el.nativeElement.querySelector('#' + anchor);
+    if (target) {
+      const card = target.closest('mat-card');
+      if (card) {
+        this.renderer.addClass(card, 'highlight-pulse');
+        setTimeout(() => this.renderer.removeClass(card, 'highlight-pulse'), 2000);
+      }
+    }
+
+    // Update URL fragment
+    this.router.navigate([], {
+      fragment: anchor,
+      queryParamsHandling: 'preserve',
+    });
   }
 
   isQuranBook(bookIndex: string): boolean {

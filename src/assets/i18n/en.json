@@ -46,7 +46,8 @@
     "hideComparison": "Hide comparison",
     "shareImage": "Share as image",
     "showDifferences": "Show text differences",
-    "hideDifferences": "Hide differences"
+    "hideDifferences": "Hide differences",
+    "jumpToVerse": "Jump to verse"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",

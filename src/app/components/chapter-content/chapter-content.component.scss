@@ -1,3 +1,51 @@
+// Jump to verse bar
+.jump-to-verse {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--card-bg, rgba(255, 255, 255, 0.95));
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  backdrop-filter: blur(8px);
+
+  .jump-input {
+    width: 160px;
+
+    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
+  }
+}
+
+:host-context(body.dark-theme) .jump-to-verse {
+  background: var(--card-bg, rgba(48, 48, 48, 0.95));
+}
+
+@media (max-width: 600px) {
+  .jump-to-verse {
+    padding: 6px 8px;
+
+    .jump-input {
+      width: 120px;
+    }
+  }
+}
+
+// Highlight pulse animation for jump-to-verse target
+@keyframes highlight-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(103, 58, 183, 0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(103, 58, 183, 0.2); }
+  100% { box-shadow: 0 0 0 0 rgba(103, 58, 183, 0); }
+}
+
+mat-mdc-card.highlight-pulse {
+  animation: highlight-pulse 1s ease-in-out 2;
+  border-color: var(--link-color, #673ab7) !important;
+}
+
 mat-mdc-card {
   background-color: var(--card-bg, rgba(255, 255, 255, 0.5));
 	border-radius: 10px;

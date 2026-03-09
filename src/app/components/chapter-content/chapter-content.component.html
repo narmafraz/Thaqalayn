@@ -1,6 +1,17 @@
 <ng-container *ngIf="(book$ | async) as book">
   <app-settings></app-settings>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions"></app-book-titles>
+  <div class="jump-to-verse" *ngIf="book.data.verses?.length >= 20">
+    <mat-form-field appearance="outline" class="jump-input">
+      <mat-label>{{ 'book.jumpToVerse' | translate }}</mat-label>
+      <input matInput type="number" min="1" [max]="book.data.verses.length"
+             [(ngModel)]="jumpTarget" (keydown.enter)="jumpToVerse()">
+    </mat-form-field>
+    <button mat-icon-button (click)="jumpToVerse()" [disabled]="!jumpTarget"
+            [attr.aria-label]="'book.jumpToVerse' | translate">
+      <mat-icon>arrow_downward</mat-icon>
+    </button>
+  </div>
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse" [headingLevel]="2"></app-book-titles>
     <mat-card appearance="outlined" *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'">

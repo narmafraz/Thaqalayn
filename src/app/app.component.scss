@@ -215,6 +215,22 @@ a:hover {
   }
 }
 
+// Back to top button
+.back-to-top {
+  position: fixed;
+  bottom: 80px; // Above mobile bottom nav
+  right: 16px;
+  z-index: 100;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  &:hover { opacity: 1; }
+}
+
+:host-context([dir="rtl"]) .back-to-top {
+  right: auto;
+  left: 16px;
+}
+
 // Embed mode: remove background and minimize padding
 #site.embed-mode {
   background: transparent;

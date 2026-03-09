@@ -66,6 +66,11 @@
   </ng-container>
 </div>
 
+<button mat-fab class="back-to-top" *ngIf="showBackToTop"
+        (click)="scrollToTop()" [matTooltip]="'nav.backToTop' | translate">
+  <mat-icon>arrow_upward</mat-icon>
+</button>
+
 <!-- Keyboard shortcuts help overlay -->
 <div class="keyboard-help-overlay" *ngIf="helpVisible$ | async" (click)="dismissHelp()">
   <div class="keyboard-help-panel" (click)="$event.stopPropagation()">

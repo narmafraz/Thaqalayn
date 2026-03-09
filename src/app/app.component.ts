@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Book, getChapter, Narrator } from '@app/models';
 import { I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
@@ -42,6 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
   helpVisible$: Observable<boolean>;
   isEmbed$: Observable<boolean>;
   activeSection$: Observable<string>;
+  showBackToTop = false;
 
   private static readonly STATIC_TITLES: Record<string, string> = {
     '/about': 'About',
@@ -60,6 +61,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private i18n: I18nService,
     private themeService: ThemeService,
     private keyboard: KeyboardShortcutService,
+    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) platformId: object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -122,6 +124,24 @@ export class AppComponent implements OnInit, OnDestroy {
     this.keyboard.dismissHelp();
   }
 
+  scrollToTop(): void {
+    if (!this.isBrowser) return;
+    const siteEl = document.getElementById('site');
+    if (siteEl) {
+      siteEl.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  private onSiteScroll = (): void => {
+    const siteEl = document.getElementById('site');
+    if (!siteEl) return;
+    const shouldShow = siteEl.scrollTop > window.innerHeight * 2;
+    if (shouldShow !== this.showBackToTop) {
+      this.showBackToTop = shouldShow;
+      this.cdr.markForCheck();
+    }
+  };
+
   ngOnInit(): void {
     if (this.isBrowser) {
       this.subscriptions.push(
@@ -135,6 +155,12 @@ export class AppComponent implements OnInit, OnDestroy {
           document.documentElement.lang = lang;
         })
       );
+
+      // Listen for scroll events on #site for back-to-top button
+      const siteEl = document.getElementById('site');
+      if (siteEl) {
+        siteEl.addEventListener('scroll', this.onSiteScroll, { passive: true });
+      }
 
       // Handle legacy hash-based URLs (redirect #/books/quran:1 to /books/quran:1)
       if (window.location.hash.startsWith('#/')) {
@@ -216,5 +242,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    if (this.isBrowser) {
+      const siteEl = document.getElementById('site');
+      if (siteEl) {
+        siteEl.removeEventListener('scroll', this.onSiteScroll);
+      }
+    }
   }
 }

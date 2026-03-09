@@ -31,6 +31,12 @@
 .mat-mdc-row:hover {
   color:#84B8B8;
   cursor: pointer;
+  background-color: rgba(95, 153, 153, 0.08);
+  transition: background-color 0.15s ease;
+}
+
+.mat-mdc-row:active {
+  background-color: rgba(95, 153, 153, 0.15);
 }
 
 .mat-mdc-row:nth-child(even) {
@@ -47,6 +53,14 @@
 
 :host-context(body.dark-theme) .mat-mdc-row:nth-child(odd) {
   background-color: rgba(255, 255, 255, 0.03);
+}
+
+:host-context(body.dark-theme) .mat-mdc-row:hover {
+  background-color: rgba(95, 153, 153, 0.15);
+}
+
+:host-context(body.dark-theme) .mat-mdc-row:active {
+  background-color: rgba(95, 153, 153, 0.25);
 }
 
 // Not working! TODO fix

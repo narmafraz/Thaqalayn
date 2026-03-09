@@ -1,22 +1,79 @@
-a {color: #fff; }
+a { color: #fff; }
 a:visited { color: #eee; }
-.crumb-holder{
+
+.crumb-holder {
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
   mask-image: linear-gradient(to right, transparent 0, black 8px, black calc(100% - 24px), transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0, black 8px, black calc(100% - 24px), transparent 100%);
 }
+
 .crumb-holder::-webkit-scrollbar { /* WebKit */
   width: 0;
   height: 0;
 }
-.crumb-holder div{
- white-space: nowrap; /* this rule is important*/
+
+.crumb-list {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.crumb-separator {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  vertical-align: middle;
+
+  &.rtl-flip {
+    transform: scaleX(-1);
+  }
+}
+
+.crumb-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+.crumb-ellipsis {
+  cursor: pointer;
+  color: #fff;
+  padding: 0 2px;
+  flex-shrink: 0;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 768px) {
+  .crumb-item {
+    max-width: 120px;
+  }
 }
 
 @media (max-width: 360px) {
-  .crumb-holder div {
+  .crumb-list {
     font-size: 10px;
+  }
+
+  .crumb-item {
+    max-width: 80px;
+  }
+
+  .crumb-separator {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
   }
 }

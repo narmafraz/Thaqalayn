@@ -17,12 +17,19 @@ export class BreadcrumbsComponent {
   crumbs$: Observable<Crumb[]> = inject(Store).select(BooksState.getCurrentNavigatedCrumbs);
   narrator$: Observable<Narrator> = inject(Store).select(PeopleState.getCurrentNavigatedNarrator);
   currentLang$: Observable<string>;
+  isRtl$: Observable<boolean>;
+  isCollapsed = true;
 
   constructor(private store: Store, private i18nService: I18nService) {
     this.currentLang$ = this.i18nService.currentLang$;
+    this.isRtl$ = this.i18nService.isRtl$;
   }
 
   getCrumbTitle(crumb: Crumb, lang: string): string {
     return crumb.titles[lang] || crumb.titles['en'] || crumb.titles['ar'] || '';
+  }
+
+  toggleBreadcrumbs(): void {
+    this.isCollapsed = !this.isCollapsed;
   }
 }

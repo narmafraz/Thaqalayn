@@ -1,16 +1,38 @@
 <div class="crumb-holder">
-  <div>
-    <a routerLink="/" queryParamsHandling="preserve">{{ 'breadcrumb.home' | translate }}</a>
+  <div class="crumb-list">
+    <span class="crumb-item">
+      <a routerLink="/" queryParamsHandling="preserve">{{ 'breadcrumb.home' | translate }}</a>
+    </span>
     <ng-container *ngIf="(currentLang$ | async) as lang">
       <ng-container *ngIf="(crumbs$ | async) as crumbs">
-        <ng-container *ngFor="let crumb of crumbs"> » <a [routerLink]="crumb.path"
-            queryParamsHandling="preserve" [innerHTML]="getCrumbTitle(crumb, lang)"></a></ng-container>
+        <ng-container *ngIf="!isCollapsed || crumbs.length < 4">
+          <ng-container *ngFor="let crumb of crumbs">
+            <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
+            <span class="crumb-item"><a [routerLink]="crumb.path"
+                queryParamsHandling="preserve" [innerHTML]="getCrumbTitle(crumb, lang)"></a></span>
+          </ng-container>
+        </ng-container>
+        <ng-container *ngIf="isCollapsed && crumbs.length >= 4">
+          <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
+          <span class="crumb-item"><a [routerLink]="crumbs[0].path"
+              queryParamsHandling="preserve" [innerHTML]="getCrumbTitle(crumbs[0], lang)"></a></span>
+          <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
+          <span class="crumb-ellipsis" (click)="toggleBreadcrumbs()">...</span>
+          <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
+          <span class="crumb-item"><a [routerLink]="crumbs[crumbs.length - 2].path"
+              queryParamsHandling="preserve" [innerHTML]="getCrumbTitle(crumbs[crumbs.length - 2], lang)"></a></span>
+          <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
+          <span class="crumb-item"><a [routerLink]="crumbs[crumbs.length - 1].path"
+              queryParamsHandling="preserve" [innerHTML]="getCrumbTitle(crumbs[crumbs.length - 1], lang)"></a></span>
+        </ng-container>
       </ng-container>
     </ng-container>
     <ng-container *ngIf="(narrator$ | async) as narrator">
       <ng-container *ngIf="narrator.titles">
-        » <a routerLink="/people/narrators/index" queryParamsHandling="preserve">{{ 'nav.narrators' | translate }}</a>
-        » <a [routerLink]="narrator.path" queryParamsHandling="preserve" [innerHTML]="narrator.titles.ar"></a>
+        <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
+        <span class="crumb-item"><a routerLink="/people/narrators/index" queryParamsHandling="preserve">{{ 'nav.narrators' | translate }}</a></span>
+        <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
+        <span class="crumb-item"><a [routerLink]="narrator.path" queryParamsHandling="preserve" [innerHTML]="narrator.titles.ar"></a></span>
       </ng-container>
     </ng-container>
   </div>

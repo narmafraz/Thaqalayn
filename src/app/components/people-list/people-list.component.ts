@@ -76,10 +76,15 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
     this.dataSource.sortingDataAccessor = (item, property) => {
       switch (property) {
         case 'name.ar': return item.titles.ar;
+        case 'name.en': return item.titles.en || '';
         default: return item[property];
       }
     };
     this.dataSource.sort = this.sort;
+    this.dataSource.filterPredicate = (data: NarratorMetadata, filter: string) => {
+      const searchStr = ((data.titles.ar || '') + ' ' + (data.titles.en || '') + ' ' + data.index).toLowerCase();
+      return searchStr.includes(filter);
+    };
 
     const subscription = this.narrators$.pipe(
       filter(x => x !== undefined))
@@ -132,7 +137,7 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
         return ['octrta']; // one column to rule them all
       }
       columns.push('index');
-      // columns.push('name.en');
+      columns.push('name.en');
       columns.push('name.ar');
       columns.push('narrations');
       columns.push('narrated_from');

@@ -102,6 +102,12 @@
   padding-left: 55px;
 }
 
+.en-name {
+  font-size: 0.95em;
+  color: var(--text-primary, #333);
+  text-align: center;
+}
+
 @media (max-width: 600px) {
   .filter-field {
     padding: 10px 16px;

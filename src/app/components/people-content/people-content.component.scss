@@ -19,9 +19,10 @@
   }
 
   .transliteration {
-    font-size: 1.1rem;
-    color: var(--text-muted, rgba(0, 0, 0, 0.6));
-    font-style: italic;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--text-secondary, rgba(0, 0, 0, 0.7));
+    margin: 0;
   }
 }
 

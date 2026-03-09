@@ -58,9 +58,13 @@
       </button>
     </div>
 
+    <p *ngIf="filteredResults.length > 0" class="showing-count">
+      {{ 'search.showing' | translate }} {{ displayedResults.length }} {{ 'search.of' | translate }} {{ filteredResults.length }} {{ 'search.results' | translate }}
+    </p>
+
     <div class="results-list">
       <mat-card
-        *ngFor="let result of filteredResults"
+        *ngFor="let result of displayedResults"
         appearance="outlined"
         class="result-card"
         [class.hadith-result]="result.kind === 'hadith'"
@@ -80,5 +84,16 @@
         </mat-card-content>
       </mat-card>
     </div>
+
+    <div class="load-more-container" *ngIf="hasMoreResults">
+      <button class="load-more-btn" (click)="loadMore()">
+        <mat-icon>expand_more</mat-icon>
+        {{ 'search.loadMore' | translate }}
+      </button>
+    </div>
+
+    <p *ngIf="filteredResults.length > 0 && !hasMoreResults" class="showing-all">
+      {{ 'search.showingAll' | translate }} ({{ filteredResults.length }})
+    </p>
   </ng-container>
 </div>

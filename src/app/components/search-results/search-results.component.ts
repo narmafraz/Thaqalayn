@@ -30,6 +30,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   activeBookFilter: string | null = null;
   filteredResults: SearchResult[] = [];
   activeFilter: { prefix: string; value: string } | null = null;
+  displayedCount = 30;
   private allResults: SearchResult[] = [];
   private subscriptions: Subscription[] = [];
   private searchService = inject(SearchService);
@@ -54,6 +55,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.results$.subscribe(results => {
         this.allResults = results;
+        this.displayedCount = 30;
         this.buildBookFilters(results);
         this.applyFilter();
         this.cdr.markForCheck();
@@ -92,6 +94,19 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
       .map(w => w.charAt(0).toUpperCase() + w.slice(1))
       .join('-');
     return rest ? `${name} ${rest}` : name;
+  }
+
+  get displayedResults(): SearchResult[] {
+    return this.filteredResults.slice(0, this.displayedCount);
+  }
+
+  get hasMoreResults(): boolean {
+    return this.displayedCount < this.filteredResults.length;
+  }
+
+  loadMore(): void {
+    this.displayedCount += 30;
+    this.cdr.markForCheck();
   }
 
   formatFilterLabel(value: string): string {

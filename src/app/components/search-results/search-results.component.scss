@@ -262,3 +262,48 @@ h1 {
   font-size: 12px;
   color: var(--text-muted, #999);
 }
+
+.showing-count {
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  margin-bottom: 12px;
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.load-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 24px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--link-color, #673ab7);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: var(--link-color, #673ab7);
+    border-color: var(--link-color, #673ab7);
+    color: #fff;
+  }
+}
+
+.showing-all {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted, #999);
+  padding: 12px 0;
+}

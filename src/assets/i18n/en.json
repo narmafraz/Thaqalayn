@@ -92,7 +92,12 @@
     "tipMinChars": "Type at least 2 characters to start searching.",
     "tipEnter": "Press Enter to see all results on a full page.",
     "tipFuzzy": "The search engine handles minor typos automatically with fuzzy matching.",
-    "tipsClose": "Got it"
+    "tipsClose": "Got it",
+    "showing": "Showing",
+    "of": "of",
+    "results": "results",
+    "loadMore": "Load more results",
+    "showingAll": "All results shown"
   },
   "translation": {
     "selectTranslation": "Select Translation",

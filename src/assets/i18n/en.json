@@ -19,7 +19,12 @@
     "hadithNavigation": "Hadith navigation",
     "bookmarks": "Bookmarks",
     "topics": "Topics",
-    "backToTop": "Back to top"
+    "backToTop": "Back to top",
+    "explore": "Explore",
+    "quran": "The Holy Quran",
+    "quranDesc": "114 surahs with multiple translations",
+    "alKafi": "Al-Kafi",
+    "alKafiDesc": "The most comprehensive Shia hadith collection"
   },
   "book": {
     "reference": "Reference",

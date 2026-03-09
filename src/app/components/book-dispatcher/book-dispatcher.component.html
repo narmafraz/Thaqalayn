@@ -24,8 +24,23 @@
           </div>
         </div>
         <app-book-tree></app-book-tree>
+        <div class="homepage-quick-links">
+          <h2>{{ 'nav.explore' | translate }}</h2>
+          <div class="quick-links">
+            <a routerLink="/books/quran" queryParamsHandling="preserve" class="quick-link-card">
+              <mat-icon>menu_book</mat-icon>
+              <span class="quick-link-title">{{ 'nav.quran' | translate }}</span>
+              <span class="quick-link-desc">{{ 'nav.quranDesc' | translate }}</span>
+            </a>
+            <a routerLink="/books/al-kafi" queryParamsHandling="preserve" class="quick-link-card">
+              <mat-icon>auto_stories</mat-icon>
+              <span class="quick-link-title">{{ 'nav.alKafi' | translate }}</span>
+              <span class="quick-link-desc">{{ 'nav.alKafiDesc' | translate }}</span>
+            </a>
+          </div>
+        </div>
       </ng-container>
-      <app-chapter-list [book$]="book$"></app-chapter-list>
+      <app-chapter-list *ngIf="book.index !== 'books'" [book$]="book$"></app-chapter-list>
     </ng-container>
     <app-chapter-content *ngSwitchCase="'verse_list'" [book$]="book$"></app-chapter-content>
     <app-verse-detail *ngSwitchCase="'verse_detail'" [book$]="book$"></app-verse-detail>

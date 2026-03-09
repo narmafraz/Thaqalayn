@@ -143,6 +143,8 @@
 
   .subchain-text {
     flex: 1;
+    overflow-wrap: break-word;
+    min-width: 0;
 
     &.arabic {
       font-family: 'Amiri', serif;

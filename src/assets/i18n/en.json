@@ -68,7 +68,9 @@
     "deathDate": "Died",
     "teachers": "Teachers",
     "students": "Students",
-    "source": "Source"
+    "source": "Source",
+    "showAll": "Show all",
+    "showLess": "Show less"
   },
   "search": {
     "filter": "Filter",

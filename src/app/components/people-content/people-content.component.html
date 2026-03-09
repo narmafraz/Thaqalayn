@@ -55,7 +55,7 @@
       <div class="search-box">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>{{ 'narrator.searchAhadith' | translate }}</mat-label>
-          <input matInput (keyup)="applyFilter($event)" [placeholder]="'narrator.searchByPath' | translate">
+          <input matInput (keyup)="applyPathsFilter($event)" [placeholder]="'narrator.searchByPath' | translate">
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
       </div>

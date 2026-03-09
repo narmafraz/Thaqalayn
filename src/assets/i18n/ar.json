@@ -60,7 +60,9 @@
     "deathDate": "الوفاة",
     "teachers": "المشايخ",
     "students": "التلاميذ",
-    "source": "المصدر"
+    "source": "المصدر",
+    "showAll": "عرض الكل",
+    "showLess": "عرض أقل"
   },
   "search": {
     "filter": "تصفية",

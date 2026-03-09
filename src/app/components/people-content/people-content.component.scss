@@ -110,18 +110,35 @@
   }
 }
 
-.viewport {
-  height: 400px;
-  width: 100%;
-  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
-  border-radius: 4px;
+// Paths list
+.paths-list {
+  .path-item {
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+// Subchains list
+.subchains-list {
+  .subchain-item {
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
 }
 
 .subchain-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.5rem 0;
   width: 100%;
 
   .subchain-text {
@@ -137,6 +154,7 @@
     margin-left: 1rem;
     color: var(--text-muted, rgba(0, 0, 0, 0.6));
     font-size: 0.9rem;
+    white-space: nowrap;
   }
 }
 
@@ -155,8 +173,23 @@
   color: var(--text-muted, rgba(0, 0, 0, 0.6));
 }
 
-.path-cell {
-  padding: 0.5rem;
+.verse-paths-list {
+  margin: 4px 0 0;
+  padding-left: 24px;
+
+  li {
+    padding: 2px 0;
+  }
+}
+
+.show-more-btn {
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: var(--link-color, #1976d2);
+}
+
+mat-paginator {
+  margin-top: 1rem;
 }
 
 .loading-container {
@@ -164,8 +197,4 @@
   justify-content: center;
   align-items: center;
   height: 400px;
-}
-
-mat-paginator {
-  margin-top: 1rem;
 }

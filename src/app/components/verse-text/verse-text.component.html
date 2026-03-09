@@ -87,6 +87,7 @@
           <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="txt"></p>
         </ng-template>
       </ng-template>
+      <span class="quran-verse-number" *ngIf="isQuran && verseNumber" dir="rtl" lang="ar">&#xFD3E;{{ verseNumber }}&#xFD3F;</span>
     </ng-template>
   </div>
 

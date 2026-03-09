@@ -23,6 +23,8 @@ export class VerseTextComponent {
   private sanitizer = inject(DomSanitizer);
 
   @Input() verse: Verse;
+  @Input() isQuran = false;
+  @Input() verseNumber: number;
 
   // AI feature toggles (initialized from saved preferences)
   showDiacritics = this.aiPrefs.get('showDiacritizedByDefault');

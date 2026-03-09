@@ -12,6 +12,13 @@
   overflow-wrap: break-word;
 }
 
+.quran-verse-number {
+  font-size: 0.75em;
+  color: var(--text-muted, #999);
+  margin-inline-start: 4px;
+  font-family: 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif;
+}
+
 .faText {
   direction: rtl;
   text-align: justify;

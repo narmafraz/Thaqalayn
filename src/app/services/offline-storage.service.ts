@@ -48,6 +48,7 @@ export class OfflineStorageService {
 
   constructor(private http: HttpClient) {
     this.openDb();
+    this.checkDataVersion();
   }
 
   /** Get list of books available for offline download */
@@ -207,6 +208,35 @@ export class OfflineStorageService {
     }
 
     return null;
+  }
+
+  /** Check if data version has changed and clear cache if so */
+  private async checkDataVersion(): Promise<void> {
+    try {
+      const url = environment.apiBaseUrl + 'index/data_version.json';
+      const data = await this.http.get<{ version: string }>(url).toPromise();
+      if (!data?.version) return;
+
+      const db = await this.getDb();
+      const stored = await this.getFromStore<string>(db, META_STORE, '_data_version');
+      if (stored === data.version) return;
+
+      // Version changed — clear auto-cached responses (not downloaded books)
+      await this.clearStore(db, CACHE_STORE);
+      await this.putInStore(db, META_STORE, '_data_version', data.version);
+      console.log(`Data version updated: ${stored || '(none)'} → ${data.version}, cache cleared`);
+    } catch {
+      // Network error — skip version check (offline)
+    }
+  }
+
+  private clearStore(db: IDBDatabase, storeName: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(storeName, 'readwrite');
+      tx.objectStore(storeName).clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
   }
 
   // -- IndexedDB helpers --

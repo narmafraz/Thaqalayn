@@ -1,7 +1,7 @@
 <div id="site" [class.embed-mode]="isEmbed$ | async">
   <ng-container *ngIf="!(isEmbed$ | async)">
     <a class="skip-link" href="#main-content">{{ 'app.skipToContent' | translate }}</a>
-    <header id="header">
+    <header id="header" [class.header-compact]="headerCompact">
         <div class="bannerTop" routerLink="/">
           <img height="70%" src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
           <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>

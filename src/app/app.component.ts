@@ -43,6 +43,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isEmbed$: Observable<boolean>;
   activeSection$: Observable<string>;
   showBackToTop = false;
+  headerCompact = false;
 
   private static readonly STATIC_TITLES: Record<string, string> = {
     '/about': 'About',
@@ -135,9 +136,19 @@ export class AppComponent implements OnInit, OnDestroy {
   private onSiteScroll = (): void => {
     const siteEl = document.getElementById('site');
     if (!siteEl) return;
-    const shouldShow = siteEl.scrollTop > window.innerHeight * 2;
+    const scrollTop = siteEl.scrollTop;
+    const shouldShow = scrollTop > window.innerHeight * 2;
+    const shouldCompact = scrollTop > 50;
+    let changed = false;
     if (shouldShow !== this.showBackToTop) {
       this.showBackToTop = shouldShow;
+      changed = true;
+    }
+    if (shouldCompact !== this.headerCompact) {
+      this.headerCompact = shouldCompact;
+      changed = true;
+    }
+    if (changed) {
       this.cdr.markForCheck();
     }
   };

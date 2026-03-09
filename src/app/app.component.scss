@@ -214,6 +214,57 @@ a:hover {
   }
 }
 
+// Scroll-responsive compact header on mobile
+@media (max-width: 768px) {
+  #header {
+    transition: height 0.3s ease;
+  }
+
+  .bannerTop {
+    transition: height 0.3s ease, font-size 0.3s ease;
+  }
+
+  .crumbs {
+    transition: height 0.3s ease, font-size 0.3s ease, padding 0.3s ease;
+  }
+
+  #header.header-compact {
+    height: 60px;
+
+    .bannerTop {
+      height: 38px;
+      font-size: 1.5rem;
+
+      img {
+        height: 50% !important;
+      }
+    }
+
+    .crumbs {
+      height: 22px;
+      font-size: 10px;
+      padding-top: 1px;
+      padding-bottom: 2px;
+    }
+  }
+}
+
+@media (max-width: 414px) {
+  #header.header-compact {
+    height: 55px;
+
+    .bannerTop {
+      height: 35px;
+      font-size: 1.2rem;
+    }
+
+    .crumbs {
+      height: 20px;
+      font-size: 9px;
+    }
+  }
+}
+
 // Back to top button
 .back-to-top {
   position: fixed;

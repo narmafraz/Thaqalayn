@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inje
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
 import { Book, ChapterContent, Crumb, Verse } from '@app/models';
+import { I18nService } from '@app/services/i18n.service';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
 import { BooksService } from '@app/services/books.service';
@@ -52,6 +53,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // Inline compare state
   expandedCompare = new Map<string, { verse: Verse | null; title: string; loading: boolean; error: string | null }>();
 
+  // Current UI language for reference display
+  currentLang = 'en';
+
   constructor(
     private store: Store,
     private viewportScroller: ViewportScroller,
@@ -63,6 +67,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private el: ElementRef,
     private booksService: BooksService,
     private shareCard: ShareCardService,
+    private i18nService: I18nService,
   ) {
     this.tafsirEditions = this.tafsirService.editions;
     this.fragment$.subscribe(fragment => {
@@ -73,6 +78,10 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.i18nService.currentLang$.subscribe(lang => {
+      this.currentLang = lang;
+    });
+
     this.sub = this.book$.subscribe(book => {
       if (!book) return;
       // Track reading progress
@@ -130,9 +139,11 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   getInBookReference(crumbs: Crumb[], verse: Verse): string {
     let result = '';
+    const lang = this.currentLang;
 
     crumbs.forEach(crumb => {
-      result += crumb.indexed_titles.en + ' ';
+      const title = crumb.indexed_titles[lang] || crumb.indexed_titles['en'] || crumb.indexed_titles['ar'] || '';
+      result += title + ' ';
     });
 
     result += verse.part_type + ' ' + verse.local_index;
@@ -142,7 +153,8 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   getBookName(crumbs: Crumb[]): string {
     if (crumbs.length > 0) {
-      return crumbs[0].titles.en;
+      const lang = this.currentLang;
+      return crumbs[0].titles[lang] || crumbs[0].titles['en'] || crumbs[0].titles['ar'] || '';
     }
     return '';
   }

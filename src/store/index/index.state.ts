@@ -1,7 +1,8 @@
 import { State, Action, StateContext, NgxsOnInit, Selector } from '@ngxs/store';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { tap } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { LoadIndex, LoadTranslations } from './index.actions';
 import { environment } from '@env/environment';
 import { Store } from '@ngxs/store';
@@ -36,8 +37,11 @@ export class IndexState implements NgxsOnInit {
 
   ngxsOnInit(ctx: StateContext<IndexStateModel>) {
     ctx.dispatch(new LoadIndex('ar'));
+    ctx.dispatch(new LoadIndex('en'));
     const lang = this.store.selectSnapshot(RouterState.getLanguage);
-    ctx.dispatch(new LoadIndex(lang));
+    if (lang !== 'ar' && lang !== 'en') {
+      ctx.dispatch(new LoadIndex(lang));
+    }
     ctx.dispatch(new LoadTranslations());
   }
 
@@ -59,6 +63,14 @@ export class IndexState implements NgxsOnInit {
       tap((booksData) => {
         const currentBooks = ctx.getState().books;
         ctx.patchState({ books: { ...currentBooks, [action.language]: booksData } as Record<string, IndexedTitles> });
+      }),
+      catchError(() => {
+        // When a language index file 404s (e.g., books.fa.json), fall back to English index
+        const currentBooks = ctx.getState().books;
+        if (currentBooks['en'] && action.language !== 'en') {
+          ctx.patchState({ books: { ...currentBooks, [action.language]: currentBooks['en'] } });
+        }
+        return of(null);
       })
     );
   }

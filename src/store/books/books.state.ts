@@ -160,21 +160,29 @@ export class BooksState {
     let path = chapter.path;
     const crumbs = [];
     const arIndex = getBookForLanguage('ar');
+    const enIndex = getBookForLanguage('en');
     const langIndex = getBookForLanguage(language);
     while (path) {
       const arEntry = arIndex ? arIndex[path] : undefined;
+      const enEntry = enIndex ? enIndex[path] : undefined;
       const langEntry = langIndex ? langIndex[path] : undefined;
-      if (!arEntry && !langEntry) {
+      if (!arEntry && !enEntry && !langEntry) {
         break;
       }
 
-      const indexed_titles = {};
+      const indexed_titles: Record<string, string> = {};
       indexed_titles['ar'] = arEntry ? ((arEntry.part_type ?? '') + ' ' + (arEntry.local_index ?? '')) : '';
-      indexed_titles[language] = langEntry ? ((langEntry.part_type ?? '') + ' ' + (langEntry.local_index ?? '')) : '';
+      indexed_titles['en'] = enEntry ? ((enEntry.part_type ?? '') + ' ' + (enEntry.local_index ?? '')) : '';
+      if (language !== 'ar' && language !== 'en') {
+        indexed_titles[language] = langEntry ? ((langEntry.part_type ?? '') + ' ' + (langEntry.local_index ?? '')) : (indexed_titles['en'] || '');
+      }
 
-      const titles = {};
+      const titles: Record<string, string> = {};
       titles['ar'] = arEntry ? arEntry.title : '';
-      titles[language] = langEntry ? langEntry.title : '';
+      titles['en'] = enEntry ? enEntry.title : '';
+      if (language !== 'ar' && language !== 'en') {
+        titles[language] = langEntry ? langEntry.title : (titles['en'] || '');
+      }
 
       crumbs.unshift({
         path: path,

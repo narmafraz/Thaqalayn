@@ -1,9 +1,11 @@
 <div class="crumb-holder">
   <div>
     <a routerLink="/" queryParamsHandling="preserve">{{ 'breadcrumb.home' | translate }}</a>
-    <ng-container *ngIf="(crumbs$ | async) as crumbs">
-      <ng-container *ngFor="let crumb of crumbs"> » <a [routerLink]="crumb.path"
-          queryParamsHandling="preserve" [innerHTML]="crumb.titles.en"></a></ng-container>
+    <ng-container *ngIf="(currentLang$ | async) as lang">
+      <ng-container *ngIf="(crumbs$ | async) as crumbs">
+        <ng-container *ngFor="let crumb of crumbs"> » <a [routerLink]="crumb.path"
+            queryParamsHandling="preserve" [innerHTML]="getCrumbTitle(crumb, lang)"></a></ng-container>
+      </ng-container>
     </ng-container>
     <ng-container *ngIf="(narrator$ | async) as narrator">
       <ng-container *ngIf="narrator.titles">

@@ -243,6 +243,11 @@
       padding: 0;
       color: var(--link-color, #673ab7);
       opacity: 0.5;
+      min-width: 44px;
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
 
       &:hover { opacity: 1; }
 
@@ -561,11 +566,20 @@
 
 .comment-actions {
   display: flex;
-  gap: 4px;
+  gap: 0px;
   margin-top: 4px;
 
   button {
     opacity: 0.4;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
     &:hover { opacity: 1; }
   }
 

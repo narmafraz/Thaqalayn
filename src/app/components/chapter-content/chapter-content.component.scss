@@ -45,7 +45,16 @@ mat-mdc-card {
   align-self: center;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0px;
+
+  // Shared touch target sizing for all interactive elements in verse footer
+  a, button {
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 
   .verse-detail-link {
     color: var(--link-color, #673ab7);
@@ -152,6 +161,11 @@ mat-mdc-card {
   padding: 0;
   color: var(--note-accent, #ffc107);
   opacity: 0.6;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     opacity: 1;
@@ -300,6 +314,11 @@ mat-mdc-card {
   color: var(--link-color, #673ab7);
   opacity: 0.4;
   vertical-align: middle;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover { opacity: 1; }
 
@@ -346,6 +365,11 @@ mat-mdc-card {
     cursor: pointer;
     padding: 0;
     color: var(--text-secondary, #999);
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     &:hover { color: var(--text-primary, #333); }
     mat-icon { font-size: 16px; width: 16px; height: 16px; }
   }
@@ -395,6 +419,11 @@ mat-mdc-card {
   padding: 0;
   color: #00695c;
   opacity: 0.6;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     opacity: 1;

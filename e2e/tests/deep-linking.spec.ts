@@ -66,7 +66,7 @@ test.describe('Deep Linking', () => {
     await page.goto('/#/');
     await page.waitForLoadState('networkidle');
 
-    // Root should redirect to /books?lang=en
+    // Root should redirect to /books
     await expect(page).toHaveURL(/books/);
   });
 

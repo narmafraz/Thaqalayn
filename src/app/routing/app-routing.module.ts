@@ -7,7 +7,7 @@ import { BookTitlesResolver } from './book-titles-resolver';
 
 
 const routes: Routes = [
-  { path: '', redirectTo: '/books?lang=en', pathMatch: 'full' },
+  { path: '', redirectTo: '/books', pathMatch: 'full' },
   { path: 'embed/books/:index', component: EmbedVerseComponent, resolve: { titles: BookPartResolver } },
   { path: 'books', component: BookDispatcherComponent, resolve: { titles: BookTitlesResolver } },
   { path: 'books/:index', component: BookDispatcherComponent, resolve: { titles: BookPartResolver } },

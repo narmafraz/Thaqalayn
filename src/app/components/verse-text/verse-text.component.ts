@@ -153,6 +153,28 @@ export class VerseTextComponent {
     return undefined;
   }
 
+  /** Check if translation is missing for the current selection */
+  isMissingTranslation(translationId: string): boolean {
+    return !!translationId && !this.getTranslationText(this.verse, translationId);
+  }
+
+  /** Get the language name for a translation ID (e.g., 'en.qarai' -> 'English') */
+  getTranslationLangName(translationId: string): string {
+    const langCode = translationId?.split('.')[0] || '';
+    return VerseTextComponent.LANG_NAMES[langCode] || langCode;
+  }
+
+  /** Get list of available translation IDs for this verse */
+  getAvailableTranslationIds(): string[] {
+    return this.verse?.translations ? Object.keys(this.verse.translations) : [];
+  }
+
+  private static readonly LANG_NAMES: Record<string, string> = {
+    en: 'English', ar: 'Arabic', fa: 'Persian', ur: 'Urdu',
+    fr: 'French', es: 'Spanish', de: 'German', tr: 'Turkish',
+    id: 'Indonesian', bn: 'Bengali', ru: 'Russian', zh: 'Chinese',
+  };
+
   getChunkArabicText(chunk: Chunk): string {
     // Use arabic_text if present, otherwise reconstruct from word_analysis
     if (chunk.arabic_text) return chunk.arabic_text;

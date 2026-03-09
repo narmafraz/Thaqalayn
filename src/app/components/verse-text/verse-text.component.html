@@ -106,6 +106,19 @@
   <div *ngIf="!showChunkedView" [class.side-by-side]="(translation2$ | async)">
     <div class="translation-col">
       <p *ngFor="let trt of getTranslationText(verse, (translation$ | async))" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
+      <!-- Translation fallback message -->
+      <div class="translation-fallback" *ngIf="isMissingTranslation((translation$ | async))">
+        <p class="fallback-message">
+          {{ 'translation.notAvailable' | translate }}
+          <span *ngIf="getAvailableTranslationIds().length">
+            {{ 'translation.availableIn' | translate }}:
+            <ng-container *ngFor="let tid of getAvailableTranslationIds(); let isLast = last">
+              <a [routerLink]="[]" [queryParams]="{translation: tid}" queryParamsHandling="merge"
+                 class="fallback-lang-link">{{ getTranslationLangName(tid) }}</a><span *ngIf="!isLast">, </span>
+            </ng-container>
+          </span>
+        </p>
+      </div>
       <!-- AI translation summary -->
       <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
         <details class="ai-summary">

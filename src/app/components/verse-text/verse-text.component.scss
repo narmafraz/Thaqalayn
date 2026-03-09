@@ -52,6 +52,28 @@
   }
 }
 
+// Translation fallback
+.translation-fallback {
+  padding: 8px 15px;
+
+  .fallback-message {
+    font-size: 13px;
+    color: var(--text-secondary, #666);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .fallback-lang-link {
+    color: var(--link-color, #673ab7);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
 // AI feature toggles
 .ai-toggles {
   display: flex;

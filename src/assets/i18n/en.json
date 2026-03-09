@@ -18,7 +18,8 @@
     "navigateParent": "Navigate to the parent",
     "hadithNavigation": "Hadith navigation",
     "bookmarks": "Bookmarks",
-    "topics": "Topics"
+    "topics": "Topics",
+    "backToTop": "Back to top"
   },
   "book": {
     "reference": "Reference",
@@ -103,7 +104,9 @@
     "selectTranslation": "Select Translation",
     "language": "Language",
     "compare": "Compare translations",
-    "compareWith": "Compare with"
+    "compareWith": "Compare with",
+    "notAvailable": "Translation not available in this language.",
+    "availableIn": "Available in"
   },
   "common": {
     "loading": "Loading...",

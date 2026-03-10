@@ -76,7 +76,8 @@
     "viewMode": "Modo de vista",
     "viewPlain": "Texto plano",
     "viewWordByWord": "Palabra por palabra",
-    "viewParagraph": "Vista de párrafo"
+    "viewParagraph": "Vista de párrafo",
+    "viewCombined": "Palabra + Párrafo"
   },
   "narrator": {
     "narratedAhadith": "Hadices narrados",

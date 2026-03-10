@@ -76,7 +76,8 @@
     "viewMode": "দেখার মোড",
     "viewPlain": "সাধারণ পাঠ্য",
     "viewWordByWord": "শব্দে শব্দে",
-    "viewParagraph": "অনুচ্ছেদ দৃশ্য"
+    "viewParagraph": "অনুচ্ছেদ দৃশ্য",
+    "viewCombined": "শব্দ + অনুচ্ছেদ"
   },
   "narrator": {
     "narratedAhadith": "বর্ণিত হাদিস",

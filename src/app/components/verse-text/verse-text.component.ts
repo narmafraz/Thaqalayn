@@ -69,8 +69,8 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   }
 
   applyViewMode(mode: ViewMode): void {
-    this.showWordAnalysis = mode === 'word-by-word';
-    this.showChunkedView = mode === 'paragraph';
+    this.showWordAnalysis = mode === 'word-by-word' || mode === 'combined';
+    this.showChunkedView = mode === 'paragraph' || mode === 'combined';
   }
 
   toggleDiacritics(): void {
@@ -82,16 +82,12 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     this.showWordAnalysis = !this.showWordAnalysis;
     if (this.showWordAnalysis) {
       this.showDiacritics = false;
-      this.showChunkedView = false;
     }
   }
 
   toggleChunkedView(): void {
     this.localOverride = true;
     this.showChunkedView = !this.showChunkedView;
-    if (this.showChunkedView) {
-      this.showWordAnalysis = false;
-    }
   }
 
   toggleChainDiagram(): void {

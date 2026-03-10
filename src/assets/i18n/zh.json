@@ -76,7 +76,8 @@
     "viewMode": "查看模式",
     "viewPlain": "纯文本",
     "viewWordByWord": "逐词对照",
-    "viewParagraph": "段落视图"
+    "viewParagraph": "段落视图",
+    "viewCombined": "逐词 + 段落"
   },
   "narrator": {
     "narratedAhadith": "所传圣训",

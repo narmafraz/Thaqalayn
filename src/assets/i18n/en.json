@@ -85,7 +85,8 @@
     "viewMode": "View mode",
     "viewPlain": "Plain text",
     "viewWordByWord": "Word by word",
-    "viewParagraph": "Paragraph view"
+    "viewParagraph": "Paragraph view",
+    "viewCombined": "Word + Paragraph"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",

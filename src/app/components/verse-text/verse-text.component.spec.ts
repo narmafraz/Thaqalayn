@@ -342,4 +342,50 @@ describe('VerseTextComponent', () => {
     expect(html).toContain('&lt;script&gt;');
     expect(html).toContain('&quot;');
   });
+
+  // Combined view mode tests
+  it('should set both showWordAnalysis and showChunkedView when applyViewMode("combined")', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    component.applyViewMode('combined');
+    expect(component.showWordAnalysis).toBe(true);
+    expect(component.showChunkedView).toBe(true);
+  });
+
+  it('should set only showWordAnalysis for word-by-word mode', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    component.applyViewMode('word-by-word');
+    expect(component.showWordAnalysis).toBe(true);
+    expect(component.showChunkedView).toBe(false);
+  });
+
+  it('should set only showChunkedView for paragraph mode', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    component.applyViewMode('paragraph');
+    expect(component.showWordAnalysis).toBe(false);
+    expect(component.showChunkedView).toBe(true);
+  });
+
+  it('should clear both flags for plain mode', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    component.applyViewMode('combined');
+    component.applyViewMode('plain');
+    expect(component.showWordAnalysis).toBe(false);
+    expect(component.showChunkedView).toBe(false);
+  });
+
+  it('should not clear showChunkedView when toggling word analysis on', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    component.showChunkedView = true;
+    component.toggleWordAnalysis();
+    expect(component.showWordAnalysis).toBe(true);
+    expect(component.showChunkedView).toBe(true);
+  });
+
+  it('should not clear showWordAnalysis when toggling chunked view on', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    component.showWordAnalysis = true;
+    component.toggleChunkedView();
+    expect(component.showChunkedView).toBe(true);
+    expect(component.showWordAnalysis).toBe(true);
+  });
 });

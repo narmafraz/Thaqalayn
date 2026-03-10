@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { AiLanguage } from '@app/models/ai-content';
 
-export type ViewMode = 'plain' | 'word-by-word' | 'paragraph';
+export type ViewMode = 'plain' | 'word-by-word' | 'paragraph' | 'combined';
 
 export interface AiPreferences {
   showDiacritizedByDefault: boolean;

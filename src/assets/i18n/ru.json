@@ -76,7 +76,8 @@
     "viewMode": "Режим просмотра",
     "viewPlain": "Обычный текст",
     "viewWordByWord": "Слово за словом",
-    "viewParagraph": "Просмотр абзацами"
+    "viewParagraph": "Просмотр абзацами",
+    "viewCombined": "Слово + Абзац"
   },
   "narrator": {
     "narratedAhadith": "Переданные хадисы",

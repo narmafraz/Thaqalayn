@@ -76,7 +76,8 @@
     "viewMode": "Görünüm modu",
     "viewPlain": "Düz metin",
     "viewWordByWord": "Kelime kelime",
-    "viewParagraph": "Paragraf görünümü"
+    "viewParagraph": "Paragraf görünümü",
+    "viewCombined": "Kelime + Paragraf"
   },
   "narrator": {
     "narratedAhadith": "Rivayet edilen hadisler",

@@ -76,7 +76,8 @@
     "viewMode": "حالت نمایش",
     "viewPlain": "متن ساده",
     "viewWordByWord": "کلمه به کلمه",
-    "viewParagraph": "نمایش پاراگرافی"
+    "viewParagraph": "نمایش پاراگرافی",
+    "viewCombined": "کلمه + پاراگراف"
   },
   "narrator": {
     "narratedAhadith": "احادیث روایت شده",

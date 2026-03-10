@@ -26,6 +26,9 @@
       <mat-button-toggle value="paragraph" [matTooltip]="'book.viewParagraph' | translate">
         <mat-icon>view_agenda</mat-icon>
       </mat-button-toggle>
+      <mat-button-toggle value="combined" [matTooltip]="'book.viewCombined' | translate">
+        <mat-icon>dashboard</mat-icon>
+      </mat-button-toggle>
     </mat-button-toggle-group>
   </div>
   <ng-container *ngFor="let verse of book.data.verses">

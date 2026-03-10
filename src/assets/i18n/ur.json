@@ -76,7 +76,8 @@
     "viewMode": "دیکھنے کا موڈ",
     "viewPlain": "سادہ متن",
     "viewWordByWord": "لفظ بہ لفظ",
-    "viewParagraph": "پیراگراف منظر"
+    "viewParagraph": "پیراگراف منظر",
+    "viewCombined": "لفظ + پیراگراف"
   },
   "narrator": {
     "narratedAhadith": "مروی احادیث",

@@ -76,7 +76,8 @@
     "viewMode": "وضع العرض",
     "viewPlain": "نص عادي",
     "viewWordByWord": "كلمة بكلمة",
-    "viewParagraph": "عرض فقرات"
+    "viewParagraph": "عرض فقرات",
+    "viewCombined": "كلمة + فقرة"
   },
   "narrator": {
     "narratedAhadith": "الأحاديث المروية",

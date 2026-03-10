@@ -76,7 +76,8 @@
     "viewMode": "Ansichtsmodus",
     "viewPlain": "Klartext",
     "viewWordByWord": "Wort für Wort",
-    "viewParagraph": "Absatzansicht"
+    "viewParagraph": "Absatzansicht",
+    "viewCombined": "Wort + Absatz"
   },
   "narrator": {
     "narratedAhadith": "Überlieferte Ahadith",

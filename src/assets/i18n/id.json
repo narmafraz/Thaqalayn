@@ -76,7 +76,8 @@
     "viewMode": "Mode tampilan",
     "viewPlain": "Teks biasa",
     "viewWordByWord": "Kata per kata",
-    "viewParagraph": "Tampilan paragraf"
+    "viewParagraph": "Tampilan paragraf",
+    "viewCombined": "Kata + Paragraf"
   },
   "narrator": {
     "narratedAhadith": "Hadis yang diriwayatkan",

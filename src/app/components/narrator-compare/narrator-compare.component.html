@@ -12,7 +12,7 @@
           <mat-option *ngFor="let n of filteredNarratorsA" [value]="n.index">
             <span class="option-ar arabic" lang="ar">{{ n.titles?.ar }}</span>
             <span class="option-en" *ngIf="n.titles?.en"> ({{ n.titles.en }})</span>
-            <span class="option-count"> - {{ n.narrations }} {{ 'common.verses' | translate }}</span>
+            <span class="option-count"> - {{ n.narrations }} {{ 'common.hadiths' | translate }}</span>
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
@@ -27,7 +27,7 @@
           <mat-option *ngFor="let n of filteredNarratorsB" [value]="n.index">
             <span class="option-ar arabic" lang="ar">{{ n.titles?.ar }}</span>
             <span class="option-en" *ngIf="n.titles?.en"> ({{ n.titles.en }})</span>
-            <span class="option-count"> - {{ n.narrations }} {{ 'common.verses' | translate }}</span>
+            <span class="option-count"> - {{ n.narrations }} {{ 'common.hadiths' | translate }}</span>
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>

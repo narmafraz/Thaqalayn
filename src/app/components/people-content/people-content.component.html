@@ -168,7 +168,7 @@
                 </ng-container>
               </div>
               <div class="verse-count" *ngIf="element.value.verse_paths">
-                ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
+                ({{element.value.verse_paths.length}} {{ 'common.hadiths' | translate }})
               </div>
             </div>
             <ol class="verse-paths-list">
@@ -180,7 +180,7 @@
                     mat-button
                     class="show-more-btn"
                     (click)="toggleExpandSubchain(element.key)">
-              {{ isExpanded(element.key) ? ('narrator.showLess' | translate) : ('narrator.showAll' | translate) + ' ' + element.value.verse_paths.length + ' ' + ('common.verses' | translate) }}
+              {{ isExpanded(element.key) ? ('narrator.showLess' | translate) : ('narrator.showAll' | translate) + ' ' + element.value.verse_paths.length + ' ' + ('common.hadiths' | translate) }}
             </button>
           </div>
         </div>

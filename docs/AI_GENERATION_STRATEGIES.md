@@ -118,7 +118,6 @@ We tested GPT-5-mini (cheapest reasoning model) and GPT-4.1/4.1-mini (non-reason
 |-------|-------------------|----------|-----------|---------------|--------------------|----|
 | **GPT-5.4** | 57 (#2 globally) | $2.50 | $15.00 | **$0.0025/w** | **~$8.7K** | 9x cheaper |
 | **GPT-5.3 Codex** | 54 (#3 globally) | $1.75 | $14.00 | **$0.0024/w** | **~$8.4K** | 9x cheaper |
-| **GPT-5.2** | ~50 (est.) | $1.75 | $14.00 | **$0.0024/w** | **~$8.4K** | 9x cheaper |
 | **GPT-5** | ~45 (est.) | $1.25 | $10.00 | **$0.0017/w** | **~$6.0K** | 13x cheaper |
 | GPT-5-mini | 41 (#6) | $0.25 | $2.00 | $0.0002/w | ~$700 | 110x cheaper |
 | Claude CLI | — | — | — | $0.022/w | ~$76K | baseline |
@@ -346,9 +345,11 @@ Even at 70% pass rate (same as GPT-5-mini), the total cost is ~$14.5K. **This is
 
 Two strong alternatives to GPT-5.4:
 
-**GPT-5.3 Codex** (Feb 2026, Intelligence Index 54, structured/coding focus):
+**GPT-5.3 Codex** (Feb 2026, Intelligence Index 54, reasoning/coding specialist):
 - $0.875/$7.00 per M tokens (batch) → ~$8.4K for corpus
-- Structured output focus may help with our JSON schema requirements
+- 128K max output tokens (vs 16K for GPT-5.3 Chat — critical since our verses produce 10-25K+ tokens)
+- 400K context window, configurable reasoning effort (low/medium/high/xhigh)
+- Note: GPT-5.3 Chat (general-purpose) is a different model with only 16K max output — **not viable** for our task
 
 **GPT-5** (Intelligence Index ~45):
 - $0.625/$5.00 per M tokens (batch) → ~$6.0K for corpus
@@ -359,6 +360,11 @@ Two strong alternatives to GPT-5.4:
 |-------|---------------|----------------|
 | GPT-5.3 Codex | **$9.7K** | **$14.2K** |
 | GPT-5 | **$7.3K** | **$11.8K** |
+
+**Models skipped and why**:
+- **GPT-5.3 Chat**: 16K max output tokens — would truncate most verses (need 10-25K+)
+- **GPT-5.2**: Superseded by both GPT-5.3 Codex and GPT-5.4 at same/similar pricing
+- **o4-mini**: Intelligence Index 33, worse AND costlier than GPT-5-mini
 
 ### Strategy 3: Hybrid Claude CLI + Optimized OpenAI GPT-5-mini Batch
 **OpenAI cost: ~$640 | Claude cost: ~$12-15K | Quality: Good-Excellent**
@@ -539,7 +545,7 @@ GPT-5-mini pass rate: 67% → 80-85% with no code changes.
 
 ```
 Week 1:  [Benchmark Sprint — THE CRITICAL WEEK]
-         - Test GPT-5.4, GPT-5.3 Codex, GPT-5.2, GPT-5 on 15-verse benchmark (~$12 total)
+         - Test GPT-5.4, GPT-5.3 Codex, GPT-5 on 15-verse benchmark (~$9-12 total)
          - Test Gemini 2.5 Flash/Pro via free tier on same 15 verses
          - Implement deterministic chunk boundary auto-fix (see OPENAI_PIPELINE_OPTIMIZATION.md)
          - Add OpenAI structured output mode
@@ -628,9 +634,9 @@ If budget looks tight mid-process:
 ## Immediate Next Steps
 
 1. **TODAY**: Run 15-verse benchmark on **GPT-5.4** (frontier, ~$3-4 test cost)
-2. **TODAY**: Run 15-verse benchmark on **GPT-5.3 Codex** (~$3-4 test cost)
+2. **TODAY**: Run 15-verse benchmark on **GPT-5.3 Codex** (128K output, ~$3-4 test cost)
 3. **TODAY**: Run 15-verse benchmark on **GPT-5** (full, ~$2-3 test cost)
-4. **TODAY**: Implement deterministic chunk boundary auto-fix in pipeline (see [OPENAI_PIPELINE_OPTIMIZATION.md](OPENAI_PIPELINE_OPTIMIZATION.md))
+4. **TODAY**: Implement deterministic chunk boundary auto-fix (see [OPENAI_PIPELINE_OPTIMIZATION.md](OPENAI_PIPELINE_OPTIMIZATION.md))
 5. **THIS WEEK**: Add OpenAI structured output mode to pipeline
 6. **THIS WEEK**: Sign up for Google AI Studio (free), test Gemini on same 15 verses
 7. **THIS WEEK**: Build post-processing enrichment for narrator IDs and topics

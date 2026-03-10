@@ -87,8 +87,7 @@ Based on March 2026 model landscape:
 | Model | Intelligence Index* | Input/1M | Output/1M | Batch (50% off) | Context | Why Test |
 |-------|-------------------|----------|-----------|------------------|---------|----------|
 | **GPT-5.4** | 57 (#2 globally) | $2.50 | $15.00 | $1.25/$7.50 | 1M | Frontier; may match Claude quality |
-| **GPT-5.3 Codex** | 54 (#3 globally) | $1.75 | $14.00 | $0.875/$7.00 | 400K | Near-frontier; coding/structured focus |
-| **GPT-5.2** | ~50 (est.) | $1.75 | $14.00 | $0.875/$7.00 | 400K | Strong reasoning |
+| **GPT-5.3 Codex** | 54 (#3 globally) | $1.75 | $14.00 | $0.875/$7.00 | 400K (128K out) | Reasoning specialist; 128K max output |
 | **GPT-5** | ~45 (est.) | $1.25 | $10.00 | $0.625/$5.00 | 400K | Good balance |
 | **GPT-5-mini** | 41 (#6) | $0.25 | $2.00 | $0.125/$1.00 | 400K | Already tested (67% baseline) |
 
@@ -99,6 +98,8 @@ Based on March 2026 model landscape:
 | Model | Why Skip |
 |-------|----------|
 | **o4-mini** | Intelligence Index 33 vs GPT-5-mini's 41; more expensive ($1.10/$4.40 vs $0.25/$2.00); OpenAI themselves recommend GPT-5-mini instead |
+| **GPT-5.3 Chat** | Max output only 16K tokens — our verses need 10-25K+; would truncate most results |
+| **GPT-5.2** | Superseded by GPT-5.3 Codex and GPT-5.4 at same/similar pricing |
 | **GPT-4.1** | Fatal word_tags truncation (7% pass rate in our tests); architectural limit, not fixable |
 | **GPT-4.1-mini** | Same truncation issue family as GPT-4.1; untested but likely same problem |
 | **GPT-4.1-nano** | Same family; too weak for 11-language structured output |

@@ -37,20 +37,12 @@
 
           <!-- Mobile: search + hamburger only -->
           <div class="header-mobile-controls">
-            <button class="mobile-search-btn" (click)="mobileSearchOpen = !mobileSearchOpen; $event.stopPropagation()"
-                    [attr.aria-label]="'search.placeholder' | translate">
-              <mat-icon>search</mat-icon>
-            </button>
+            <app-search-bar class="mobile-header-search" (click)="$event.stopPropagation()"></app-search-bar>
             <button class="mobile-menu-btn" (click)="mobileMenuOpen = !mobileMenuOpen; $event.stopPropagation()"
                     [attr.aria-label]="'nav.menu' | translate">
               <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
             </button>
           </div>
-        </div>
-
-        <!-- Mobile search bar (expandable) -->
-        <div class="mobile-search-expanded" *ngIf="mobileSearchOpen" (click)="$event.stopPropagation()">
-          <app-search-bar class="mobile-search-bar"></app-search-bar>
         </div>
 
         <nav class="crumbs" aria-label="Breadcrumb"><app-breadcrumbs></app-breadcrumbs></nav>

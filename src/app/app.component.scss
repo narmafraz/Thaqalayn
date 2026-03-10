@@ -76,6 +76,8 @@
 .header-mobile-controls {
   display: none;
   margin-inline-start: auto;
+  flex: 1;
+  min-width: 0;
   gap: 4px;
   align-items: center;
 
@@ -93,6 +95,12 @@
   }
 }
 
+.mobile-header-search {
+  flex: 1;
+  min-width: 0;
+  max-width: 280px;
+}
+
 .header-search {
   margin-inline-start: auto;
 }
@@ -104,12 +112,6 @@
   text-transform: none;
   color: #fff;
   cursor: pointer;
-}
-
-// Mobile expanded search bar
-.mobile-search-expanded {
-  background: var(--header-bg, #333);
-  padding: 4px 8px;
 }
 
 // Mobile hamburger menu

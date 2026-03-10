@@ -46,7 +46,6 @@ export class AppComponent implements OnInit, OnDestroy {
   showBackToTop = false;
   headerCompact = false;
   mobileMenuOpen = false;
-  mobileSearchOpen = false;
 
   private static readonly STATIC_TITLES: Record<string, { i18nKey: string; fallback: string }> = {
     '/about': { i18nKey: 'pageTitle.about', fallback: 'About' },

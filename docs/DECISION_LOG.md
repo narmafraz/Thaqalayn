@@ -758,3 +758,94 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 **Rationale:** No cross-project changes needed. New books added to the data automatically get cards (with default styling). Enhanced metadata can be added to the lookup as needed.
 
 ---
+
+## Phase 12 Decisions
+
+### D039: Icon Size Strategy (2026-03-10)
+
+**Context:** FIX-05 applied 44px touch targets universally, making icons oversized on desktop.
+
+**Options considered:**
+1. **(A) Keep 44px everywhere** — Consistent but oversized on desktop.
+2. **(B) 44px mobile / smaller desktop via media queries** — Responsive but adds CSS complexity.
+3. **(C) Revert to original sizes** — Return to pre-FIX-05 sizes (28-36px).
+
+**Decision:** Option C — revert to original pre-FIX-05 sizes (28-36px).
+
+**Rationale:** The 44px was too aggressive and not needed on desktop. Mobile header controls are hidden (separate hamburger menu). Verse footer at 36px is still usable. Original sizes were the intended design.
+
+---
+
+### D040: Combined View Mode (2026-03-10)
+
+**Context:** Word-by-word and paragraph views were mutually exclusive.
+
+**Options considered:**
+1. **(A) Keep exclusive** — Simple but limiting.
+2. **(B) Add 'combined' fourth mode** — New ViewMode union member.
+3. **(C) Make them fully independent toggles** — Maximum flexibility but complex state.
+
+**Decision:** Option B — add 'combined' to ViewMode union type.
+
+**Rationale:** Simplest to implement while being backward-compatible with localStorage. Per-verse toggles are now independent (removed mutual exclusion), and page-level toolbar has a fourth button. Combined mode hides chunk Arabic text to avoid duplication.
+
+---
+
+### D041: AI Content Inline Placement (2026-03-10)
+
+**Context:** AI badges were in collapsed metadata section.
+
+**Options considered:**
+1. **(A) Keep collapsed** — Current state, low visibility.
+2. **(B) Move to always-visible inline position** — Badges after verse-text.
+3. **(C) Show in card header** — Prominent but clutters header.
+
+**Decision:** Option B — content type and topic badges moved to `ai-badges-inline` div after verse-text.
+
+**Rationale:** Summary/key terms were already inline in verse-text. Moving badges inline completes the "seamless AI integration" goal of AI-01. Quran cross-references remain in expandable metadata as scholarly detail.
+
+---
+
+### D042: Mobile Search Bar (2026-03-10)
+
+**Context:** Search required toggle icon on mobile.
+
+**Options considered:**
+1. **(A) Keep toggle** — Current behavior, requires extra tap.
+2. **(B) Always-visible compact inline search** — Search in mobile header.
+3. **(C) Search in hamburger menu** — Hidden but organized.
+
+**Decision:** Option B — always-visible inline search in mobile header.
+
+**Rationale:** Search is a primary action that shouldn't require extra taps. Compact styling (32px height, hidden tips button) fits within mobile banner. Hamburger menu retains settings only.
+
+---
+
+### D043: Arabic Word Popup (2026-03-10)
+
+**Context:** Users want to click Arabic words for details.
+
+**Options considered:**
+1. **(A) Only in word-by-word view** — Popup where words are already tokenized.
+2. **(B) Tokenize standard text too** — Works everywhere but complex innerHTML parsing.
+3. **(C) Dedicated explore mode** — Separate UI for word exploration.
+
+**Decision:** Option A — popup only in word-by-word view where words are already tokenized.
+
+**Rationale:** Simplest approach using existing word card infrastructure. Avoids complex innerHTML tokenization. Users who want word details enable word-by-word view. Keyboard accessible (Enter/Space to open, Escape to close).
+
+---
+
+### D044: Book Author Data Source (2026-03-10)
+
+**Context:** Need author names for book cards and headers.
+
+**Options considered:**
+1. **(A) Add to data pipeline (ThaqalaynDataGenerator)** — Cross-project change.
+2. **(B) Frontend-only constant mapping** — TypeScript constant in Angular.
+
+**Decision:** Option B — TypeScript constant `BOOK_AUTHORS` in `src/app/data/book-authors.ts`.
+
+**Rationale:** Avoids cross-project data pipeline changes. Author data is static and small (~24 entries). Can be migrated to data index later if needed. Includes English + Arabic names for all books.
+
+---

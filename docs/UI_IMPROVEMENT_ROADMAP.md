@@ -15,7 +15,7 @@ The Thaqalayn frontend successfully delivers core functionality: hierarchical bo
 
 ## Phase 1: Critical Fixes ✅ PARTIAL
 
-> **Status:** FIX-01 (loading states) improved with progress bar during navigation (2026-03-10). FIX-02 (lang param) fixed — IndexState now reads I18nService's URL-detected language. FIX-04 (narrator performance) already addressed by Phase 3 pagination. FIX-05 (touch targets) fixed — all interactive elements now meet 44px minimum. FIX-06 (i18n key leaks) fixed — added missing `ai.summary`, `ai.keyTerms`, `search.placeholder` to all 12 language files. FIX-03 (undefined references) pending — requires ThaqalaynDataGenerator changes.
+> **Status:** FIX-01 (loading states) improved with progress bar during navigation (2026-03-10). FIX-02 (lang param) fixed — IndexState now reads I18nService's URL-detected language. FIX-04 (narrator performance) already addressed by Phase 3 pagination. FIX-05 (touch targets) fixed — 44px minimum on mobile, 32px desktop (revised 2026-03-10 to avoid oversized desktop icons). FIX-06 (i18n key leaks) fixed — added missing `ai.summary`, `ai.keyTerms`, `search.placeholder` to all 12 language files. FIX-03 (undefined references) pending — requires ThaqalaynDataGenerator changes.
 
 Items that block core usability or break fundamental user stories. These should be addressed before any other work.
 
@@ -712,7 +712,7 @@ Addressing the disconnect between verse-detail and chapter-content views, fixing
 
 ## Phase 7: AI Content Integration & Word Interaction ✅ PARTIAL
 
-> **Status:** AI-01 (seamless integration) implemented (2026-03-10). Summary and key terms now visible inline instead of collapsed. AI-02 (word click popup) deferred — requires word tokenization prerequisite.
+> **Status:** AI-01 COMPLETE — summary/key terms inline in verse-text, content type/topic badges moved inline in chapter-content (FB-02). AI-02 (word click popup) COMPLETE via FB-03.
 
 Making AI-generated content seamless rather than hidden, and adding word-level interaction.
 
@@ -929,6 +929,121 @@ Additional mobile experience improvements identified by systematic mobile UX rev
 
 ---
 
+## Phase 12: Missed Feedback Items & Polish ✅ MOSTLY COMPLETE
+
+> **Status:** FB-01 (icon revert), FB-01b (combined view), FB-02 (inline AI badges), FB-03 (word popup), FB-05 (book authors), FB-06 (mobile search) all implemented (2026-03-10). FB-04 (narrator extraction) and FB-07 (UX review) pending — require cross-project work and review resources.
+>
+> **Source:** User feedback review gap analysis (2026-03-10). Items from the original user feedback that were incomplete, partially implemented, or missed entirely.
+
+### FB-01: Fix Oversized Icons on Desktop ✅ DONE
+
+**Description:** FIX-05 set all touch targets to a fixed 44px width/height universally, making action icons, AI toggle buttons, and header buttons appear oversized on desktop. The 44px target should only apply on mobile (< 768px); desktop should use 28-32px.
+
+**Source:** User observation (2026-03-10)
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Desktop action buttons use 32px min size, mobile uses 44px
+- AI toggle buttons use 28px on desktop, 44px on mobile
+- Header font/theme/shortcuts buttons use 28-32px on desktop, 44px on mobile
+- Icons inside buttons sized proportionally (16-18px)
+- No visual regression on mobile touch targets
+
+### FB-01b: Combined Word-by-Word + Paragraph View Mode ✅ DONE
+
+**Description:** Word-by-word and paragraph view were mutually exclusive. Added 'combined' mode that shows word-by-word analysis in Arabic column and chunked translations simultaneously. Fourth toggle button added to page-level toolbar.
+
+**Source:** User feedback (2026-03-10)
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+
+### FB-02: AI Summary & Key Terms Visible Inline (AI-01 Completion) ✅ DONE
+
+**Description:** AI-01 was marked as implemented but summary and key terms remain hidden in a collapsed metadata section in chapter view. Per the original spec, AI summary should appear directly below the translation text (not in a collapsible), and key terms should display as subtle inline chips below the summary.
+
+**Source:** User feedback item #6 (incomplete implementation)
+**Severity:** HIGH
+**Effort:** M (1-3 days)
+**Acceptance Criteria:**
+- AI summary text appears directly below the translation paragraph for each hadith
+- Summary is visible by default without any expand/toggle action
+- Key terms shown as small inline chips below the summary
+- Content type and topics remain as badge pills
+- User can hide AI content entirely via AI settings toggle
+- No extra vertical space consumed when AI data is unavailable
+
+### FB-03: Arabic Word Click Popup (AI-02 Implementation) ✅ DONE
+
+**Description:** Originally deferred because it requires word tokenization. Should be planned for implementation: clicking/tapping any Arabic word shows a popup with POS, translation, and root word information when AI word_analysis data is available.
+
+**Source:** User feedback item #7
+**Severity:** MEDIUM
+**Effort:** L (3-5 days) — requires tokenizing Arabic innerHTML into clickable spans
+**Prerequisites:** AI pipeline `word_analysis` data available for target verses
+**Acceptance Criteria:**
+- Click/tap Arabic word → popup near the word with POS, translation, root
+- Works on both desktop (click) and mobile (tap)
+- Graceful degradation when word_analysis unavailable
+- Popup dismissable via click outside, Escape key
+- Focus management and aria-describedby for accessibility
+
+### FB-04: Narrator Chain Extraction for All Books (DATA-01 Reminder)
+
+**Description:** Best-effort narrator chain extraction should be applied to all hadith books, not just Al-Kafi. Narrator names should be clickable links where IDs can be matched. This is tracked as DATA-01 but is listed here as a reminder that it directly addresses user feedback item #3.
+
+**Source:** User feedback item #3
+**Severity:** HIGH
+**Effort:** L (3+ days) — ThaqalaynDataGenerator parser changes
+**Cross-Project:** ThaqalaynDataGenerator + ThaqalaynData
+**Acceptance Criteria:**
+- Narrator chains extracted for all major hadith books (Four Books minimum)
+- Narrator names are clickable links to narrator profile pages
+- Non-standard chains fall back to raw text gracefully
+- Existing narrator IDs reused; new narrators added to index
+
+### FB-05: Book Authors in Index & Cards (HOME-02 / DATA-02 Reminder) ✅ DONE
+
+**Description:** Book cards on homepage and chapter-list headers should show author/compiler names. Requires adding author metadata to the book index in ThaqalaynDataGenerator. Tracked as HOME-02/DATA-02 but listed here to complete the user feedback trail.
+
+**Source:** User feedback item #12
+**Severity:** MEDIUM
+**Effort:** S-M (generator: < 1 day, Angular: < 1 day)
+**Cross-Project:** ThaqalaynDataGenerator + ThaqalaynData
+**Acceptance Criteria:**
+- Each book card on homepage shows author name
+- Chapter-list header includes author below book title
+- Localized: English + Arabic at minimum
+- Graceful fallback when author data missing
+
+### FB-06: Mobile Search Bar Always Visible ✅ DONE
+
+**Description:** On mobile, the search bar should always be visible at the top of the page (not hidden inside the hamburger menu). The hamburger menu should contain settings only, not search. Currently search requires tapping a search icon to expand.
+
+**Source:** User feedback item #4 (partial implementation)
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Mobile header always shows a compact search input or search bar
+- Search does not require opening hamburger menu
+- Hamburger menu contains settings only (language, theme, font, AI prefs, nav links)
+- Search bar is functional and styled consistently with desktop
+
+### FB-07: Comprehensive UX Review Follow-Up
+
+**Description:** User requested spinning up UI and UX reviewer teams to do a fresh review for both desktop and mobile users, informed by the user stories and feedback. This item tracks performing that follow-up review and capturing any additional findings as new roadmap items.
+
+**Source:** User request (2026-03-10)
+**Severity:** MEDIUM
+**Effort:** M (review + documentation)
+**Acceptance Criteria:**
+- Fresh desktop UX review performed on current state
+- Fresh mobile UX review performed on current state
+- New issues documented as roadmap items (Phase 13+)
+- User stories cross-referenced for completeness
+- Results shared with user for prioritization
+
+---
+
 ## Summary Matrix
 
 | Phase | Items | Effort Range | Key Theme |
@@ -944,7 +1059,8 @@ Additional mobile experience improvements identified by systematic mobile UX rev
 | Phase 9: Mobile Navigation | MOB-01 (1 item) | 0S + 1M | Mobile settings consolidation |
 | Phase 10: Data Improvements | DATA-01 to DATA-02 (2 items) | 1S + 0M + 1L | Cross-project data |
 | Phase 11: Mobile UX Polish | MUXR-04 to MUXR-10 (7 items) | 7S + 0M | Mobile experience refinement |
-| **Total** | **60 items** | **32S + 20M + 6L** | |
+| Phase 12: Missed Feedback | FB-01 to FB-07 (7 items) | 3S + 2M + 2L | Complete user feedback |
+| **Total** | **67 items** | **35S + 22M + 8L** | |
 
 ### Effort Estimates
 

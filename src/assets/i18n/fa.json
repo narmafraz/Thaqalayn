@@ -3,6 +3,10 @@
     "title": "ثقلین",
     "skipToContent": "رفتن به محتوا"
   },
+  "ai": {
+    "summary": "خلاصه",
+    "keyTerms": "اصطلاحات کلیدی"
+  },
   "nav": {
     "home": "صفحه اصلی",
     "books": "کتاب‌ها",
@@ -130,7 +134,8 @@
     "of": "از",
     "results": "نتیجه",
     "loadMore": "بارگذاری بیشتر",
-    "showingAll": "همه نتایج نمایش داده شد"
+    "showingAll": "همه نتایج نمایش داده شد",
+    "placeholder": "جستجو..."
   },
   "translation": {
     "selectTranslation": "انتخاب ترجمه",

@@ -6,6 +6,11 @@
   <app-skeleton-loader *ngIf="!(book$ | async)"
     [variant]="'chapter-list'"></app-skeleton-loader>
 
+  <!-- Loading indicator during navigation transitions -->
+  <div class="loading-bar" *ngIf="(loading$ | async) && (book$ | async)">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </div>
+
   <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
     <ng-container *ngSwitchCase="'chapter_list'">
       <ng-container *ngIf="book.index === 'books'">

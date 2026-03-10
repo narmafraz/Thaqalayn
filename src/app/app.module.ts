@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions, MatTooltipModule } from '@angular/material/tooltip';
 
 const tooltipDefaults: MatTooltipDefaultOptions = {
@@ -73,6 +74,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     MatInputModule,
     MatMenuModule,
     MatButtonToggleModule,
+    MatProgressBarModule,
     ScrollingModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),

@@ -3,6 +3,10 @@
     "title": "Thaqalayn",
     "skipToContent": "Skip to content"
   },
+  "ai": {
+    "summary": "Summary",
+    "keyTerms": "Key Terms"
+  },
   "pageTitle": {
     "about": "About",
     "bookmarks": "Bookmarks",
@@ -155,7 +159,8 @@
     "of": "of",
     "results": "results",
     "loadMore": "Load more results",
-    "showingAll": "All results shown"
+    "showingAll": "All results shown",
+    "placeholder": "Search..."
   },
   "translation": {
     "selectTranslation": "Select Translation",

@@ -230,8 +230,8 @@
   gap: 4px;
 
   button {
-    min-width: 36px;
-    height: 36px;
+    min-width: 44px;
+    height: 44px;
     border: 1px solid var(--border-color, #e0e0e0);
     border-radius: 4px;
     background: var(--bg-primary, #fff);
@@ -313,6 +313,18 @@ a:hover {
 
   .header-mobile-controls {
     display: flex;
+  }
+
+  #header {
+    height: 80px;
+  }
+
+  .bannerTop {
+    height: 55px;
+  }
+
+  .crumbs {
+    height: 25px;
   }
 }
 
@@ -482,7 +494,8 @@ a:hover {
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    padding: 6px 12px;
+    padding: 8px 12px;
+    min-height: 48px;
     text-decoration: none;
     color: var(--text-secondary, #666);
     font-size: 10px;
@@ -502,7 +515,7 @@ a:hover {
 
   // Add bottom padding to main content so it's not hidden behind bottom nav
   .main {
-    padding-bottom: 64px !important;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   // Hide text-based footer on mobile since bottom nav replaces it

@@ -307,3 +307,9 @@ h1 {
   color: var(--text-muted, #999);
   padding: 12px 0;
 }
+
+@media (max-width: 768px) {
+  .search-results-container {
+    padding: 8px;
+  }
+}

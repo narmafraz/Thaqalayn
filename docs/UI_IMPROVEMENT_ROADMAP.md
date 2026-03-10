@@ -3,7 +3,7 @@
 > **Date:** 2026-03-09
 > **Scope:** Thaqalayn Angular 19 Frontend
 > **Sources:** Desktop UX Review, Mobile UX Review, RTL/Multilingual Review, UI Design Review
-> **Total Items:** 52
+> **Total Items:** 60
 
 ---
 
@@ -13,7 +13,9 @@ The Thaqalayn frontend successfully delivers core functionality: hierarchical bo
 
 ---
 
-## Phase 1: Critical Fixes
+## Phase 1: Critical Fixes ✅ PARTIAL
+
+> **Status:** FIX-01 (loading states) improved with progress bar during navigation (2026-03-10). FIX-02 (lang param) fixed — IndexState now reads I18nService's URL-detected language. FIX-04 (narrator performance) already addressed by Phase 3 pagination. FIX-05 (touch targets) fixed — all interactive elements now meet 44px minimum. FIX-06 (i18n key leaks) fixed — added missing `ai.summary`, `ai.keyTerms`, `search.placeholder` to all 12 language files. FIX-03 (undefined references) pending — requires ThaqalaynDataGenerator changes.
 
 Items that block core usability or break fundamental user stories. These should be addressed before any other work.
 
@@ -850,11 +852,88 @@ Items requiring changes to ThaqalaynDataGenerator or data pipeline.
 
 ---
 
+## Phase 11: Mobile UX Polish
+
+> **Source:** Mobile UX Review (2026-03-10). Touch target issues (MUXR-01/02/03) addressed in FIX-05.
+
+Additional mobile experience improvements identified by systematic mobile UX review.
+
+### MUXR-04: Breadcrumb Overflow on Mobile
+
+**Description:** Breadcrumbs truncate or overflow horizontally on narrow screens (< 375px), especially for deeply nested paths like `Home > Al-Kafi > Vol 1 > Book 2 > Chapter 3`.
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Breadcrumbs scroll horizontally without wrapping
+- Last breadcrumb segment is always visible
+- Auto-scroll to show current position on navigation
+
+### MUXR-05: Header Height Optimization
+
+**Description:** Header takes 100px on mobile, which is excessive. Combined with breadcrumbs, ~130px of screen height is consumed before content begins.
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Mobile header height reduced to 70-80px
+- Compact header on scroll already implemented; verify smooth transition
+- Content area gains 20-30px of usable space
+
+### MUXR-06: Narrator Chain Horizontal Overflow
+
+**Description:** Long narrator chains overflow their container horizontally on mobile, requiring horizontal scroll or showing cut-off text.
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Narrator chains wrap properly on mobile screens
+- No horizontal scrollbar appears on verse cards due to chain text
+- Chain arrows align correctly in wrapped layout
+
+### MUXR-07: Table Column Visibility on Mobile
+
+**Description:** Chapter-list tables show all columns on mobile, causing horizontal scroll or cramped content. Low-priority columns (verse count, hadith count) should be hidden on small screens.
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- On screens < 600px, hide non-essential table columns
+- Title and number columns always visible
+- No horizontal scroll on chapter-list tables
+
+### MUXR-08: Search Results Full-Width on Mobile
+
+**Description:** Search results have excessive side margins on mobile, reducing readable width.
+**Severity:** LOW
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Search results use full available width on mobile (< 768px)
+- Cards have minimal side padding (8-12px)
+
+### MUXR-09: Bottom Navigation Safe Area
+
+**Description:** Bottom navigation may overlap with content on phones with bottom gesture bars (iOS home indicator, Android gesture nav).
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Bottom nav respects `env(safe-area-inset-bottom)` (already partially implemented)
+- Content padding accounts for both bottom nav height and safe area
+- Tested on notched/gestured device viewports
+
+### MUXR-10: Verse Card Spacing on Mobile
+
+**Description:** Verse cards have generous desktop spacing that wastes vertical space on mobile. Users must scroll more to read through a chapter.
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Verse card margins/padding reduced by ~30% on mobile (< 768px)
+- Verse text remains readable with adequate line height
+- Action buttons maintain 44px touch targets despite tighter layout
+
+---
+
 ## Summary Matrix
 
 | Phase | Items | Effort Range | Key Theme |
 |-------|-------|-------------|-----------|
-| Phase 1: Critical Fixes | FIX-01 to FIX-06 (6 items) | 4S + 2M | Unblock basic usability |
+| Phase 1: Critical Fixes ✅ PARTIAL | FIX-01 to FIX-06 (6 items) | 4S + 2M | Unblock basic usability |
 | Phase 2: UX Polish ✅ | UX-01 to UX-15 (15 items) | 10S + 5M | Reduce daily friction |
 | Phase 3: Narrator Overhaul ✅ | NAR-01 to NAR-06 (6 items) | 2S + 3M + 1L | Transform weakest section |
 | Phase 4: Design System ✅ | DS-01 to DS-06 (6 items) | 3S + 3M | Visual consistency |
@@ -864,7 +943,8 @@ Items requiring changes to ThaqalaynDataGenerator or data pipeline.
 | Phase 8: Homepage & Discovery | HOME-01 to HOME-02 (2 items) | 1S + 1M | Full book showcase |
 | Phase 9: Mobile Navigation | MOB-01 (1 item) | 0S + 1M | Mobile settings consolidation |
 | Phase 10: Data Improvements | DATA-01 to DATA-02 (2 items) | 1S + 0M + 1L | Cross-project data |
-| **Total** | **53 items** | **25S + 20M + 6L** | |
+| Phase 11: Mobile UX Polish | MUXR-04 to MUXR-10 (7 items) | 7S + 0M | Mobile experience refinement |
+| **Total** | **60 items** | **32S + 20M + 6L** | |
 
 ### Effort Estimates
 

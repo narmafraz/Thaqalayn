@@ -3,6 +3,10 @@
     "title": "Thaqalayn",
     "skipToContent": "Zum Inhalt springen"
   },
+  "ai": {
+    "summary": "Zusammenfassung",
+    "keyTerms": "Schlüsselbegriffe"
+  },
   "nav": {
     "home": "Startseite",
     "books": "Bücher",
@@ -130,7 +134,8 @@
     "of": "von",
     "results": "Ergebnisse",
     "loadMore": "Mehr laden",
-    "showingAll": "Alle Ergebnisse angezeigt"
+    "showingAll": "Alle Ergebnisse angezeigt",
+    "placeholder": "Suchen..."
   },
   "translation": {
     "selectTranslation": "Übersetzung auswählen",

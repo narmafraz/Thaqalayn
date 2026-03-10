@@ -84,6 +84,13 @@ mat-mdc-card {
 	margin: var(--space-verse-gap) var(--space-xs) var(--space-md) var(--space-xs);
 }
 
+@media (max-width: 768px) {
+  mat-mdc-card {
+    margin-bottom: 8px;
+    padding: 12px;
+  }
+}
+
 :host-context(body.dark-theme) mat-mdc-card {
   background-color: var(--card-bg);
   border-color: var(--border-color);
@@ -127,10 +134,10 @@ mat-mdc-card {
 
   // Shared touch target sizing for all interactive elements in verse footer
   a, button {
-    min-width: 36px;
-    min-height: 36px;
-    width: 36px;
-    height: 36px;
+    min-width: 44px;
+    min-height: 44px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     display: inline-flex;
     align-items: center;

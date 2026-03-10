@@ -3,6 +3,10 @@
     "title": "Thaqalayn",
     "skipToContent": "İçeriğe atla"
   },
+  "ai": {
+    "summary": "Özet",
+    "keyTerms": "Anahtar Terimler"
+  },
   "nav": {
     "home": "Ana Sayfa",
     "books": "Kitaplar",
@@ -130,7 +134,8 @@
     "of": "/",
     "results": "sonuç",
     "loadMore": "Daha fazla yükle",
-    "showingAll": "Tüm sonuçlar gösterildi"
+    "showingAll": "Tüm sonuçlar gösterildi",
+    "placeholder": "Ara..."
   },
   "translation": {
     "selectTranslation": "Çeviri seçin",

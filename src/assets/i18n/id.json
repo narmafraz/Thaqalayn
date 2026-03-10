@@ -3,6 +3,10 @@
     "title": "Thaqalayn",
     "skipToContent": "Langsung ke konten"
   },
+  "ai": {
+    "summary": "Ringkasan",
+    "keyTerms": "Istilah Kunci"
+  },
   "nav": {
     "home": "Beranda",
     "books": "Kitab",
@@ -130,7 +134,8 @@
     "of": "dari",
     "results": "hasil",
     "loadMore": "Muat lebih banyak",
-    "showingAll": "Semua hasil ditampilkan"
+    "showingAll": "Semua hasil ditampilkan",
+    "placeholder": "Cari..."
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",

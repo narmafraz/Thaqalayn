@@ -13,6 +13,12 @@
   }
 }
 
+.loading-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
 .daily-verse-card {
   margin: 16px auto;
   max-width: 800px;

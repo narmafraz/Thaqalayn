@@ -5,6 +5,7 @@ a:visited { color: #eee; }
   overflow-x: auto;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* Internet Explorer 10+ */
+  -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on iOS */
   mask-image: linear-gradient(to right, transparent 0, black 8px, black calc(100% - 24px), transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0, black 8px, black calc(100% - 24px), transparent 100%);
 }

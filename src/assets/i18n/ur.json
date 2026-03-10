@@ -3,6 +3,10 @@
     "title": "ثقلین",
     "skipToContent": "مواد پر جائیں"
   },
+  "ai": {
+    "summary": "خلاصہ",
+    "keyTerms": "کلیدی اصطلاحات"
+  },
   "nav": {
     "home": "ہوم",
     "books": "کتابیں",
@@ -130,7 +134,8 @@
     "of": "میں سے",
     "results": "نتائج",
     "loadMore": "مزید لوڈ کریں",
-    "showingAll": "تمام نتائج دکھائے گئے"
+    "showingAll": "تمام نتائج دکھائے گئے",
+    "placeholder": "تلاش..."
   },
   "translation": {
     "selectTranslation": "ترجمہ منتخب کریں",

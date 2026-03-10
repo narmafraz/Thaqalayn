@@ -3,6 +3,10 @@
     "title": "Сакалейн",
     "skipToContent": "Перейти к содержанию"
   },
+  "ai": {
+    "summary": "Резюме",
+    "keyTerms": "Ключевые термины"
+  },
   "nav": {
     "home": "Главная",
     "books": "Книги",
@@ -130,7 +134,8 @@
     "of": "из",
     "results": "результатов",
     "loadMore": "Загрузить ещё",
-    "showingAll": "Все результаты показаны"
+    "showingAll": "Все результаты показаны",
+    "placeholder": "Поиск..."
   },
   "translation": {
     "selectTranslation": "Выбрать перевод",

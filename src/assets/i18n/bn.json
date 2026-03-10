@@ -3,6 +3,10 @@
     "title": "সাকালাইন",
     "skipToContent": "বিষয়বস্তুতে যান"
   },
+  "ai": {
+    "summary": "সারাংশ",
+    "keyTerms": "মূল শব্দসমূহ"
+  },
   "nav": {
     "home": "হোম",
     "books": "কিতাব",
@@ -130,7 +134,8 @@
     "of": "এর মধ্যে",
     "results": "ফলাফল",
     "loadMore": "আরো লোড করুন",
-    "showingAll": "সব ফলাফল দেখানো হয়েছে"
+    "showingAll": "সব ফলাফল দেখানো হয়েছে",
+    "placeholder": "অনুসন্ধান..."
   },
   "translation": {
     "selectTranslation": "অনুবাদ নির্বাচন করুন",

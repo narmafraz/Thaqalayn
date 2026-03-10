@@ -7,6 +7,7 @@ import { LoadIndex, LoadTranslations } from './index.actions';
 import { environment } from '@env/environment';
 import { Store } from '@ngxs/store';
 import { RouterState } from '../router/router.state';
+import { I18nService } from '@app/services/i18n.service';
 import { Translation } from '@app/models';
 
 export interface IndexedTitleEntry {
@@ -33,12 +34,16 @@ export interface IndexStateModel {
 export class IndexState implements NgxsOnInit {
   private static readonly indexUrl = environment.apiBaseUrl + 'index';
 
-  constructor(private http: HttpClient, private store: Store) {}
+  constructor(private http: HttpClient, private store: Store, private i18n: I18nService) {}
 
   ngxsOnInit(ctx: StateContext<IndexStateModel>) {
     ctx.dispatch(new LoadIndex('ar'));
     ctx.dispatch(new LoadIndex('en'));
-    const lang = this.store.selectSnapshot(RouterState.getLanguage);
+    // Use I18nService's already-detected language (which checks URL ?lang= param)
+    // instead of RouterState which hasn't processed the first navigation yet
+    const i18nLang = this.i18n.currentLang;
+    const routerLang = this.store.selectSnapshot(RouterState.getLanguage);
+    const lang = i18nLang !== 'en' ? i18nLang : routerLang;
     if (lang !== 'ar' && lang !== 'en') {
       ctx.dispatch(new LoadIndex(lang));
     }

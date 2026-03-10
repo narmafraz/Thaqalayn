@@ -84,3 +84,11 @@
 .right-index {
   padding-left: 55px;
 }
+
+@media (max-width: 600px) {
+  .mat-column-count,
+  .mat-column-start,
+  .mat-column-end {
+    display: none;
+  }
+}

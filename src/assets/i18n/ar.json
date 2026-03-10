@@ -3,6 +3,10 @@
     "title": "الثقلين",
     "skipToContent": "انتقل إلى المحتوى"
   },
+  "ai": {
+    "summary": "ملخص",
+    "keyTerms": "المصطلحات الرئيسية"
+  },
   "nav": {
     "home": "الرئيسية",
     "books": "الكتب",
@@ -142,7 +146,8 @@
     "of": "من",
     "results": "نتيجة",
     "loadMore": "تحميل المزيد",
-    "showingAll": "تم عرض جميع النتائج"
+    "showingAll": "تم عرض جميع النتائج",
+    "placeholder": "بحث..."
   },
   "translation": {
     "selectTranslation": "اختيار الترجمة",

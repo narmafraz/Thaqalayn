@@ -3,6 +3,10 @@
     "title": "Thaqalayn",
     "skipToContent": "跳转到内容"
   },
+  "ai": {
+    "summary": "摘要",
+    "keyTerms": "关键术语"
+  },
   "nav": {
     "home": "首页",
     "books": "经典",
@@ -130,7 +134,8 @@
     "of": "/",
     "results": "条结果",
     "loadMore": "加载更多",
-    "showingAll": "已显示所有结果"
+    "showingAll": "已显示所有结果",
+    "placeholder": "搜索..."
   },
   "translation": {
     "selectTranslation": "选择翻译",

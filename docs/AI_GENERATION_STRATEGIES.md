@@ -676,3 +676,10 @@ If budget looks tight mid-process:
 ---
 
 *This document should be updated after benchmark results are available.*
+
+## Related Documents
+
+- **[BENCHMARK_SAMPLE.md](BENCHMARK_SAMPLE.md)** — The 15-verse benchmark sample with exact paths, word counts, run instructions, and success criteria
+- **[OPENAI_PIPELINE_OPTIMIZATION.md](OPENAI_PIPELINE_OPTIMIZATION.md)** — Data-driven pipeline optimizations to apply before benchmarking
+- **[AI_BACKEND_COST_ANALYSIS.md](AI_BACKEND_COST_ANALYSIS.md)** — Raw test results from GPT-5-mini, GPT-4.1, Claude Sonnet
+- **[CHAPTER_TRANSLATION_GAP.md](CHAPTER_TRANSLATION_GAP.md)** — Chapter name translation gap (~62,400 translations, ~$6 via batch)

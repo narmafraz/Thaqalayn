@@ -12,8 +12,16 @@
   .hover-card-name {
     font-family: 'Amiri', serif;
     font-size: 1.1rem;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
     line-height: 1.4;
+  }
+
+  .hover-card-name-en {
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--text-muted, rgba(0, 0, 0, 0.5));
+    margin-bottom: 6px;
+    line-height: 1.3;
   }
 
   .hover-card-stats {

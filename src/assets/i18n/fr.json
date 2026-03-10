@@ -16,7 +16,15 @@
     "navigatePrevious": "Aller au chapitre pr\u00e9c\u00e9dent",
     "navigateNext": "Aller au chapitre suivant",
     "navigateParent": "Aller au parent",
-    "hadithNavigation": "Navigation des hadiths"
+    "hadithNavigation": "Navigation des hadiths",
+    "bookmarks": "Signets",
+    "topics": "Sujets",
+    "backToTop": "Retour en haut",
+    "explore": "Explorer",
+    "quran": "Le Saint Coran",
+    "quranDesc": "114 sourates avec traductions multiples",
+    "alKafi": "Al-Kafi",
+    "alKafiDesc": "La plus compl\u00e8te collection de hadiths chiites"
   },
   "book": {
     "reference": "R\u00e9f\u00e9rence",
@@ -37,7 +45,15 @@
     "verifiedFrom": "V\u00e9rifi\u00e9 \u00e0 partir de",
     "sourceWord": "source",
     "sourcesWord": "sources",
-    "unverified": "Non v\u00e9rifi\u00e9"
+    "unverified": "Non v\u00e9rifi\u00e9",
+    "tafsir": "Commentaire (Tafsir)",
+    "crossReferences": "R\u00e9f\u00e9rences crois\u00e9es",
+    "compareAll": "Comparer tout",
+    "hideComparison": "Masquer la comparaison",
+    "shareImage": "Partager en image",
+    "showDifferences": "Afficher les diff\u00e9rences",
+    "hideDifferences": "Masquer les diff\u00e9rences",
+    "jumpToVerse": "Aller au verset"
   },
   "narrator": {
     "narratedAhadith": "Ahadiths rapport\u00e9s",
@@ -51,7 +67,25 @@
     "narrations": "Nombre de narrations",
     "narratedFrom": "Nombre de personnes cit\u00e9es",
     "narratedTo": "Nombre de personnes rapport\u00e9es",
-    "conarratorCount": "Nombre de co-narrateurs"
+    "conarratorCount": "Nombre de co-narrateurs",
+    "biography": "Biographie",
+    "era": "\u00c9poque",
+    "reliability": "Fiabilit\u00e9",
+    "birthDate": "Naissance",
+    "deathDate": "D\u00e9c\u00e8s",
+    "teachers": "Ma\u00eetres",
+    "students": "\u00c9l\u00e8ves",
+    "source": "Source",
+    "showAll": "Tout afficher",
+    "showLess": "Afficher moins",
+    "topConarrators": "Principaux co-narrateurs",
+    "showAllConarrators": "Afficher les {{count}} co-narrateurs",
+    "books": "Livres",
+    "totalNarrations": "Total des narrations",
+    "bookDistribution": "R\u00e9partition des livres",
+    "featuredImams": "Les Ahl al-Bayt",
+    "imam": "Imam",
+    "viewProfile": "Voir le profil"
   },
   "search": {
     "filter": "Filtrer",
@@ -64,11 +98,28 @@
     "modeTitles": "Titres",
     "modeFullText": "Texte int\u00e9gral",
     "loadingFullText": "Chargement de l'index de texte int\u00e9gral...",
-    "hadith": "Hadith"
+    "hadith": "Hadith",
+    "tipsTitle": "Conseils de recherche",
+    "tipMultipleWords": "Les mots multiples utilisent la logique AND. Si trop peu de r\u00e9sultats sont trouv\u00e9s, la recherche s'\u00e9largit automatiquement.",
+    "tipArabic": "Recherchez en arabe ou en anglais. Les diacritiques arabes sont ignor\u00e9s.",
+    "tipModes": "Utilisez le mode \"Titres\" pour la navigation rapide. Passez au \"Texte int\u00e9gral\" pour chercher dans le contenu.",
+    "tipMinChars": "Tapez au moins 2 caract\u00e8res pour commencer la recherche.",
+    "tipEnter": "Appuyez sur Entr\u00e9e pour voir tous les r\u00e9sultats.",
+    "tipFuzzy": "Le moteur de recherche g\u00e8re automatiquement les fautes de frappe mineures.",
+    "tipsClose": "Compris",
+    "showing": "Affichage de",
+    "of": "sur",
+    "results": "r\u00e9sultats",
+    "loadMore": "Charger plus",
+    "showingAll": "Tous les r\u00e9sultats affich\u00e9s"
   },
   "translation": {
     "selectTranslation": "S\u00e9lectionner la traduction",
-    "language": "Langue"
+    "language": "Langue",
+    "compare": "Comparer les traductions",
+    "compareWith": "Comparer avec",
+    "notAvailable": "Traduction non disponible dans cette langue.",
+    "availableIn": "Disponible en"
   },
   "common": {
     "loading": "Chargement...",
@@ -85,14 +136,83 @@
     "clear": "Effacer",
     "bookNavigation": "Navigation des livres"
   },
+  "breadcrumb": {
+    "home": "Accueil"
+  },
+  "pwa": {
+    "installPrompt": "Installez Thaqalayn pour un acc\u00e8s rapide et la lecture hors ligne",
+    "install": "Installer",
+    "updateAvailable": "Une nouvelle version est disponible",
+    "update": "Mettre \u00e0 jour",
+    "dismiss": "Plus tard"
+  },
+  "download": {
+    "title": "T\u00e9l\u00e9charger",
+    "offlineReading": "Lecture hors ligne",
+    "offlineDescription": "T\u00e9l\u00e9chargez des livres sur votre appareil pour un acc\u00e8s hors ligne.",
+    "downloadForOffline": "T\u00e9l\u00e9charger",
+    "remove": "Supprimer",
+    "openSource": "Open source et gratuit",
+    "dataPackages": "Paquets de donn\u00e9es",
+    "dataPackagesDescription": "T\u00e9l\u00e9chargez des ensembles de donn\u00e9es complets en JSON ou exportez-les en CSV."
+  },
+  "bookmark": {
+    "title": "Signets",
+    "bookmark": "Signet",
+    "bookmarked": "Ajout\u00e9 aux signets",
+    "add": "Ajouter un signet",
+    "remove": "Supprimer le signet",
+    "continueReading": "Continuer la lecture",
+    "savedBookmarks": "Signets enregistr\u00e9s",
+    "noBookmarks": "Aucun signet pour le moment. Ajoutez des signets en lisant pour les retrouver ici.",
+    "noProgress": "Aucune progression de lecture",
+    "clearProgress": "Effacer la progression",
+    "exportImport": "Exporter / Importer",
+    "export": "Exporter",
+    "import": "Importer"
+  },
+  "audio": {
+    "play": "Lecture",
+    "pause": "Pause",
+    "reciter": "R\u00e9citateur",
+    "loading": "Chargement audio...",
+    "error": "Audio non disponible"
+  },
+  "language": {
+    "picker": "Langue",
+    "en": "English",
+    "ar": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
+    "fa": "\u0641\u0627\u0631\u0633\u06cc",
+    "fr": "Fran\u00e7ais"
+  },
+  "dailyVerse": {
+    "title": "Verset du jour",
+    "readMore": "Lire la suite"
+  },
+  "annotation": {
+    "add": "Ajouter une note",
+    "edit": "Modifier la note",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "placeholder": "\u00c9crivez votre note personnelle ici...",
+    "notes": "Mes notes",
+    "noNotes": "Aucune note pour le moment. Ajoutez des notes aux versets en lisant pour les retrouver ici."
+  },
+  "topics": {
+    "title": "Sujets",
+    "description": "Parcourez les collections de hadiths par sujet.",
+    "searchPlaceholder": "Rechercher des sujets...",
+    "chapters": "chapitres"
+  },
   "discussion": {
     "title": "Discussion",
-    "noComments": "Aucun commentaire pour le moment. Soyez le premier à partager vos réflexions.",
-    "placeholder": "Partagez vos réflexions ou commentaires...",
+    "noComments": "Aucun commentaire pour le moment. Soyez le premier \u00e0 partager vos r\u00e9flexions.",
+    "placeholder": "Partagez vos r\u00e9flexions ou commentaires...",
     "post": "Publier",
     "flag": "Signaler",
     "delete": "Supprimer",
-    "signInPrompt": "Connectez-vous pour participer à la discussion."
+    "signInPrompt": "Connectez-vous pour participer \u00e0 la discussion."
   },
   "sync": {
     "title": "Synchronisation cloud",
@@ -113,14 +233,31 @@
       "error": "Erreur"
     }
   },
-  "breadcrumb": {
-    "home": "Accueil"
+  "tooltip": {
+    "viewDetails": "Voir les d\u00e9tails du hadith",
+    "moreActions": "Plus d'actions",
+    "hideDetails": "Masquer les d\u00e9tails",
+    "showDetails": "Afficher les d\u00e9tails",
+    "previewRelated": "Aper\u00e7u du verset associ\u00e9",
+    "hidePreview": "Masquer l'aper\u00e7u",
+    "closeComparison": "Fermer la comparaison",
+    "backToChapter": "Retour au chapitre",
+    "previewHadith": "Aper\u00e7u du hadith"
   },
-  "language": {
-    "picker": "Langue",
-    "en": "English",
-    "ar": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
-    "fa": "\u0641\u0627\u0631\u0633\u06cc",
-    "fr": "Fran\u00e7ais"
+  "settings": {
+    "toggleDarkMode": "Basculer le mode sombre",
+    "increaseFont": "Augmenter la taille de police",
+    "decreaseFont": "Diminuer la taille de police",
+    "resetFont": "R\u00e9initialiser la taille de police",
+    "keyboardShortcuts": "Raccourcis clavier",
+    "shortcutNextChapter": "Chapitre suivant",
+    "shortcutPrevChapter": "Chapitre pr\u00e9c\u00e9dent",
+    "shortcutParent": "Aller au parent",
+    "shortcutSearch": "Focus sur la recherche",
+    "shortcutDarkMode": "Basculer le mode sombre",
+    "shortcutHelp": "Afficher les raccourcis",
+    "shortcutClose": "Fermer / d\u00e9focaliser",
+    "pressEscToClose": "Appuyez sur \u00c9chap pour fermer",
+    "showKeyboardShortcuts": "Raccourcis clavier"
   }
 }

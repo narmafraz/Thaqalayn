@@ -16,7 +16,15 @@
     "navigatePrevious": "Önceki bölüme git",
     "navigateNext": "Sonraki bölüme git",
     "navigateParent": "Üst seviyeye git",
-    "hadithNavigation": "Hadis navigasyonu"
+    "hadithNavigation": "Hadis navigasyonu",
+    "bookmarks": "Yer İmleri",
+    "topics": "Konular",
+    "backToTop": "Başa dön",
+    "explore": "Keşfet",
+    "quran": "Kur'an-ı Kerim",
+    "quranDesc": "114 sure, çoklu çevirilerle",
+    "alKafi": "El-Kafi",
+    "alKafiDesc": "En kapsamlı Şii hadis koleksiyonu"
   },
   "book": {
     "reference": "Referans",
@@ -37,7 +45,15 @@
     "verifiedFrom": "Doğrulanmış kaynak sayısı",
     "sourceWord": "kaynak",
     "sourcesWord": "kaynak",
-    "unverified": "Doğrulanmamış"
+    "unverified": "Doğrulanmamış",
+    "tafsir": "Tefsir",
+    "crossReferences": "Çapraz referanslar",
+    "compareAll": "Tümünü karşılaştır",
+    "hideComparison": "Karşılaştırmayı gizle",
+    "shareImage": "Görsel olarak paylaş",
+    "showDifferences": "Farkları göster",
+    "hideDifferences": "Farkları gizle",
+    "jumpToVerse": "Ayete atla"
   },
   "narrator": {
     "narratedAhadith": "Rivayet edilen hadisler",
@@ -51,7 +67,25 @@
     "narrations": "Rivayet sayısı",
     "narratedFrom": "Kendisinden rivayet edilen kişi sayısı",
     "narratedTo": "Kendisine rivayet edilen kişi sayısı",
-    "conarratorCount": "Ortak ravi sayısı"
+    "conarratorCount": "Ortak ravi sayısı",
+    "biography": "Biyografi",
+    "era": "Dönem",
+    "reliability": "Güvenilirlik",
+    "birthDate": "Doğum",
+    "deathDate": "Vefat",
+    "teachers": "Hocalar",
+    "students": "Öğrenciler",
+    "source": "Kaynak",
+    "showAll": "Tümünü göster",
+    "showLess": "Daha az göster",
+    "topConarrators": "Başlıca ortak raviler",
+    "showAllConarrators": "Tüm {{count}} ortak raviyi göster",
+    "books": "Kitaplar",
+    "totalNarrations": "Toplam rivayetler",
+    "bookDistribution": "Kitap dağılımı",
+    "featuredImams": "Ehl-i Beyt",
+    "imam": "İmam",
+    "viewProfile": "Profili görüntüle"
   },
   "search": {
     "filter": "Filtre",
@@ -60,15 +94,32 @@
     "clearSearch": "Aramayı temizle",
     "noResults": "Sonuç bulunamadı",
     "noResultsFor": "Sonuç bulunamadı:",
-    "resultsFor": "results for",
-    "modeTitles": "Titles",
-    "modeFullText": "Full Text",
-    "loadingFullText": "Loading full-text index...",
-    "hadith": "Hadith"
+    "resultsFor": "sonuç",
+    "modeTitles": "Başlıklar",
+    "modeFullText": "Tam metin",
+    "loadingFullText": "Tam metin dizini yükleniyor...",
+    "hadith": "Hadis",
+    "tipsTitle": "Arama ipuçları",
+    "tipMultipleWords": "Birden fazla kelime AND mantığı kullanır. Az sonuç bulunursa otomatik olarak genişletilir.",
+    "tipArabic": "Arapça veya İngilizce arayın. Arapça harekeler göz ardı edilir.",
+    "tipModes": "Hızlı gezinme için \"Başlıklar\" modunu kullanın. İçerikte aramak için \"Tam metin\"e geçin.",
+    "tipMinChars": "Aramayı başlatmak için en az 2 karakter yazın.",
+    "tipEnter": "Tüm sonuçları görmek için Enter'a basın.",
+    "tipFuzzy": "Arama motoru küçük yazım hatalarını otomatik olarak işler.",
+    "tipsClose": "Anladım",
+    "showing": "Gösterilen",
+    "of": "/",
+    "results": "sonuç",
+    "loadMore": "Daha fazla yükle",
+    "showingAll": "Tüm sonuçlar gösterildi"
   },
   "translation": {
     "selectTranslation": "Çeviri seçin",
-    "language": "Dil"
+    "language": "Dil",
+    "compare": "Çevirileri karşılaştır",
+    "compareWith": "Karşılaştır",
+    "notAvailable": "Bu dilde çeviri mevcut değil.",
+    "availableIn": "Mevcut diller"
   },
   "common": {
     "loading": "Yükleniyor...",
@@ -88,6 +139,45 @@
   "breadcrumb": {
     "home": "Ana Sayfa"
   },
+  "pwa": {
+    "installPrompt": "Hızlı erişim ve çevrimdışı okuma için Thaqalayn'ı yükleyin",
+    "install": "Yükle",
+    "updateAvailable": "Yeni bir sürüm mevcut",
+    "update": "Güncelle",
+    "dismiss": "Sonra"
+  },
+  "download": {
+    "title": "İndir",
+    "offlineReading": "Çevrimdışı okuma",
+    "offlineDescription": "Çevrimdışı erişim için kitapları cihazınıza indirin.",
+    "downloadForOffline": "İndir",
+    "remove": "Kaldır",
+    "openSource": "Açık kaynak ve ücretsiz",
+    "dataPackages": "Veri paketleri",
+    "dataPackagesDescription": "Tam veri setlerini JSON olarak indirin veya CSV olarak dışa aktarın."
+  },
+  "bookmark": {
+    "title": "Yer İmleri",
+    "bookmark": "Yer imi",
+    "bookmarked": "Yer imi eklendi",
+    "add": "Yer imi ekle",
+    "remove": "Yer imini kaldır",
+    "continueReading": "Okumaya devam et",
+    "savedBookmarks": "Kaydedilmiş yer imleri",
+    "noBookmarks": "Henüz yer imi yok. Okurken ayetleri yer imleyin.",
+    "noProgress": "Henüz okuma ilerlemesi yok",
+    "clearProgress": "Okuma ilerlemesini temizle",
+    "exportImport": "Dışa Aktar / İçe Aktar",
+    "export": "Dışa Aktar",
+    "import": "İçe Aktar"
+  },
+  "audio": {
+    "play": "Oynat",
+    "pause": "Duraklat",
+    "reciter": "Kari",
+    "loading": "Ses yükleniyor...",
+    "error": "Ses mevcut değil"
+  },
   "language": {
     "picker": "Dil",
     "en": "English",
@@ -95,32 +185,79 @@
     "fa": "فارسی",
     "fr": "Français"
   },
+  "dailyVerse": {
+    "title": "Günün ayeti",
+    "readMore": "Devamını oku"
+  },
+  "annotation": {
+    "add": "Not ekle",
+    "edit": "Notu düzenle",
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "placeholder": "Kişisel notunuzu buraya yazın...",
+    "notes": "Notlarım",
+    "noNotes": "Henüz not yok. Okurken ayetlere not ekleyin."
+  },
+  "topics": {
+    "title": "Konular",
+    "description": "Hadis koleksiyonlarını konuya göre inceleyin.",
+    "searchPlaceholder": "Konu ara...",
+    "chapters": "bölüm"
+  },
   "discussion": {
-    "title": "Discussion",
-    "noComments": "No comments yet. Be the first to share your thoughts.",
-    "placeholder": "Share your thoughts or insights...",
-    "post": "Post",
-    "flag": "Report",
-    "delete": "Delete",
-    "signInPrompt": "Sign in to join the discussion."
+    "title": "Tartışma",
+    "noComments": "Henüz yorum yok. Düşüncelerinizi paylaşan ilk kişi olun.",
+    "placeholder": "Düşüncelerinizi veya görüşlerinizi paylaşın...",
+    "post": "Gönder",
+    "flag": "Bildir",
+    "delete": "Sil",
+    "signInPrompt": "Tartışmaya katılmak için giriş yapın."
   },
   "sync": {
-    "title": "Cloud Sync",
-    "description": "Sync your bookmarks, reading progress, and notes across devices.",
-    "signInGoogle": "Sign in with Google",
-    "signInAnonymous": "Sign in anonymously",
-    "anonymous": "Anonymous User",
-    "signOut": "Sign out",
-    "syncNow": "Sync now",
-    "push": "Push to cloud",
-    "pull": "Pull from cloud",
-    "lastSync": "Last synced",
+    "title": "Bulut senkronizasyonu",
+    "description": "Yer imlerinizi, okuma ilerlemenizi ve notlarınızı cihazlar arasında senkronize edin.",
+    "signInGoogle": "Google ile giriş yap",
+    "signInAnonymous": "Anonim giriş yap",
+    "anonymous": "Anonim kullanıcı",
+    "signOut": "Çıkış yap",
+    "syncNow": "Şimdi senkronize et",
+    "push": "Buluta yükle",
+    "pull": "Buluttan indir",
+    "lastSync": "Son senkronizasyon",
     "status": {
-      "disconnected": "Disconnected",
-      "connecting": "Connecting",
-      "synced": "Synced",
-      "syncing": "Syncing",
-      "error": "Error"
+      "disconnected": "Bağlantı kesildi",
+      "connecting": "Bağlanıyor",
+      "synced": "Senkronize edildi",
+      "syncing": "Senkronize ediliyor",
+      "error": "Hata"
     }
+  },
+  "tooltip": {
+    "viewDetails": "Hadis detaylarını görüntüle",
+    "moreActions": "Diğer işlemler",
+    "hideDetails": "Detayları gizle",
+    "showDetails": "Detayları göster",
+    "previewRelated": "İlgili ayeti önizle",
+    "hidePreview": "Önizlemeyi gizle",
+    "closeComparison": "Karşılaştırmayı kapat",
+    "backToChapter": "Bölüme dön",
+    "previewHadith": "Hadis önizlemesi"
+  },
+  "settings": {
+    "toggleDarkMode": "Karanlık modu değiştir",
+    "increaseFont": "Yazı boyutunu büyüt",
+    "decreaseFont": "Yazı boyutunu küçült",
+    "resetFont": "Yazı boyutunu sıfırla",
+    "keyboardShortcuts": "Klavye kısayolları",
+    "shortcutNextChapter": "Sonraki bölüm",
+    "shortcutPrevChapter": "Önceki bölüm",
+    "shortcutParent": "Üst seviyeye git",
+    "shortcutSearch": "Aramaya odaklan",
+    "shortcutDarkMode": "Karanlık modu değiştir",
+    "shortcutHelp": "Kısayolları göster",
+    "shortcutClose": "Kapat / odağı kaldır",
+    "pressEscToClose": "Kapatmak için Esc'ye basın",
+    "showKeyboardShortcuts": "Klavye kısayolları"
   }
 }

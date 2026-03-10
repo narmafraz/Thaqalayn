@@ -16,7 +16,15 @@
     "navigatePrevious": "رفتن به باب قبلی",
     "navigateNext": "رفتن به باب بعدی",
     "navigateParent": "رفتن به بالا",
-    "hadithNavigation": "پیمایش حدیث"
+    "hadithNavigation": "پیمایش حدیث",
+    "bookmarks": "نشانک‌ها",
+    "topics": "موضوعات",
+    "backToTop": "بازگشت به بالا",
+    "explore": "کاوش",
+    "quran": "قرآن کریم",
+    "quranDesc": "114 سوره با ترجمه‌های متعدد",
+    "alKafi": "الکافی",
+    "alKafiDesc": "جامع‌ترین مجموعه حدیثی شیعه"
   },
   "book": {
     "reference": "مرجع",
@@ -37,7 +45,15 @@
     "verifiedFrom": "تأیید شده از",
     "sourceWord": "منبع",
     "sourcesWord": "منابع",
-    "unverified": "تأیید نشده"
+    "unverified": "تأیید نشده",
+    "tafsir": "تفسیر",
+    "crossReferences": "ارجاعات متقابل",
+    "compareAll": "مقایسه همه",
+    "hideComparison": "پنهان کردن مقایسه",
+    "shareImage": "اشتراک‌گذاری به صورت تصویر",
+    "showDifferences": "نمایش تفاوت‌ها",
+    "hideDifferences": "پنهان کردن تفاوت‌ها",
+    "jumpToVerse": "رفتن به آیه"
   },
   "narrator": {
     "narratedAhadith": "احادیث روایت شده",
@@ -51,7 +67,25 @@
     "narrations": "تعداد روایات",
     "narratedFrom": "تعداد افرادی که از آنها روایت کرده",
     "narratedTo": "تعداد افرادی که برای آنها روایت کرده",
-    "conarratorCount": "تعداد هم‌راویان"
+    "conarratorCount": "تعداد هم‌راویان",
+    "biography": "زندگی‌نامه",
+    "era": "دوره",
+    "reliability": "وثاقت",
+    "birthDate": "تولد",
+    "deathDate": "وفات",
+    "teachers": "اساتید",
+    "students": "شاگردان",
+    "source": "منبع",
+    "showAll": "نمایش همه",
+    "showLess": "نمایش کمتر",
+    "topConarrators": "برترین هم‌راویان",
+    "showAllConarrators": "نمایش همه {{count}} هم‌راوی",
+    "books": "کتاب‌ها",
+    "totalNarrations": "مجموع روایات",
+    "bookDistribution": "توزیع کتاب‌ها",
+    "featuredImams": "اهل بیت",
+    "imam": "امام",
+    "viewProfile": "مشاهده پروفایل"
   },
   "search": {
     "filter": "فیلتر",
@@ -64,11 +98,28 @@
     "modeTitles": "عناوین",
     "modeFullText": "متن کامل",
     "loadingFullText": "در حال بارگذاری فهرست متن کامل...",
-    "hadith": "حدیث"
+    "hadith": "حدیث",
+    "tipsTitle": "راهنمای جستجو",
+    "tipMultipleWords": "کلمات متعدد با منطق AND جستجو می‌شوند. اگر نتایج کم باشد، به طور خودکار گسترده‌تر می‌شود.",
+    "tipArabic": "به عربی یا انگلیسی جستجو کنید. اعراب نادیده گرفته می‌شود.",
+    "tipModes": "از حالت \"عناوین\" برای پیمایش سریع استفاده کنید. برای جستجو در متن احادیث به \"متن کامل\" بروید.",
+    "tipMinChars": "حداقل ۲ حرف برای شروع جستجو تایپ کنید.",
+    "tipEnter": "Enter را فشار دهید تا همه نتایج را ببینید.",
+    "tipFuzzy": "موتور جستجو اشتباهات تایپی جزئی را به صورت خودکار مدیریت می‌کند.",
+    "tipsClose": "متوجه شدم",
+    "showing": "نمایش",
+    "of": "از",
+    "results": "نتیجه",
+    "loadMore": "بارگذاری بیشتر",
+    "showingAll": "همه نتایج نمایش داده شد"
   },
   "translation": {
     "selectTranslation": "انتخاب ترجمه",
-    "language": "زبان"
+    "language": "زبان",
+    "compare": "مقایسه ترجمه‌ها",
+    "compareWith": "مقایسه با",
+    "notAvailable": "ترجمه به این زبان موجود نیست.",
+    "availableIn": "موجود به"
   },
   "common": {
     "loading": "در حال بارگذاری...",
@@ -84,6 +135,75 @@
     "selectPage": "انتخاب صفحه",
     "clear": "پاک کردن",
     "bookNavigation": "پیمایش کتاب‌ها"
+  },
+  "breadcrumb": {
+    "home": "صفحه اصلی"
+  },
+  "pwa": {
+    "installPrompt": "ثقلین را برای دسترسی سریع و مطالعه آفلاین نصب کنید",
+    "install": "نصب",
+    "updateAvailable": "نسخه جدیدی موجود است",
+    "update": "به‌روزرسانی",
+    "dismiss": "بعداً"
+  },
+  "download": {
+    "title": "دانلود",
+    "offlineReading": "مطالعه آفلاین",
+    "offlineDescription": "کتاب‌ها را برای مطالعه بدون اتصال به اینترنت دانلود کنید.",
+    "downloadForOffline": "دانلود",
+    "remove": "حذف",
+    "openSource": "متن‌باز و رایگان",
+    "dataPackages": "بسته‌های داده",
+    "dataPackagesDescription": "مجموعه‌های کامل داده را به صورت JSON دانلود کنید یا به CSV صادر کنید."
+  },
+  "bookmark": {
+    "title": "نشانک‌ها",
+    "bookmark": "نشانک",
+    "bookmarked": "نشانک‌گذاری شد",
+    "add": "افزودن نشانک",
+    "remove": "حذف نشانک",
+    "continueReading": "ادامه مطالعه",
+    "savedBookmarks": "نشانک‌های ذخیره شده",
+    "noBookmarks": "هنوز نشانکی ندارید. آیات را هنگام مطالعه نشانک‌گذاری کنید.",
+    "noProgress": "هنوز پیشرفت مطالعه‌ای ندارید",
+    "clearProgress": "پاک کردن پیشرفت مطالعه",
+    "exportImport": "صادرات / واردات",
+    "export": "صادرات",
+    "import": "واردات"
+  },
+  "audio": {
+    "play": "پخش",
+    "pause": "توقف",
+    "reciter": "قاری",
+    "loading": "در حال بارگذاری صوت...",
+    "error": "صوت در دسترس نیست"
+  },
+  "language": {
+    "picker": "زبان",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  },
+  "dailyVerse": {
+    "title": "آیه روز",
+    "readMore": "بیشتر بخوانید"
+  },
+  "annotation": {
+    "add": "افزودن یادداشت",
+    "edit": "ویرایش یادداشت",
+    "save": "ذخیره",
+    "cancel": "لغو",
+    "delete": "حذف",
+    "placeholder": "یادداشت شخصی خود را اینجا بنویسید...",
+    "notes": "یادداشت‌های من",
+    "noNotes": "هنوز یادداشتی ندارید. هنگام مطالعه یادداشت اضافه کنید."
+  },
+  "topics": {
+    "title": "موضوعات",
+    "description": "مجموعه‌های حدیثی را بر اساس موضوع مرور کنید.",
+    "searchPlaceholder": "جستجوی موضوعات...",
+    "chapters": "باب‌ها"
   },
   "discussion": {
     "title": "بحث و گفتگو",
@@ -113,14 +233,31 @@
       "error": "خطا"
     }
   },
-  "breadcrumb": {
-    "home": "صفحه اصلی"
+  "tooltip": {
+    "viewDetails": "مشاهده جزئیات حدیث",
+    "moreActions": "اقدامات بیشتر",
+    "hideDetails": "پنهان کردن جزئیات",
+    "showDetails": "نمایش جزئیات",
+    "previewRelated": "پیش‌نمایش آیه مرتبط",
+    "hidePreview": "پنهان کردن پیش‌نمایش",
+    "closeComparison": "بستن مقایسه",
+    "backToChapter": "بازگشت به باب",
+    "previewHadith": "پیش‌نمایش حدیث"
   },
-  "language": {
-    "picker": "زبان",
-    "en": "English",
-    "ar": "العربية",
-    "fa": "فارسی",
-    "fr": "Français"
+  "settings": {
+    "toggleDarkMode": "تغییر حالت تاریک",
+    "increaseFont": "بزرگ‌تر کردن قلم",
+    "decreaseFont": "کوچک‌تر کردن قلم",
+    "resetFont": "بازنشانی اندازه قلم",
+    "keyboardShortcuts": "میانبرهای صفحه‌کلید",
+    "shortcutNextChapter": "باب بعدی",
+    "shortcutPrevChapter": "باب قبلی",
+    "shortcutParent": "رفتن به بالا",
+    "shortcutSearch": "تمرکز روی جستجو",
+    "shortcutDarkMode": "تغییر حالت تاریک",
+    "shortcutHelp": "نمایش میانبرها",
+    "shortcutClose": "بستن / لغو تمرکز",
+    "pressEscToClose": "Esc را فشار دهید تا بسته شود",
+    "showKeyboardShortcuts": "میانبرهای صفحه‌کلید"
   }
 }

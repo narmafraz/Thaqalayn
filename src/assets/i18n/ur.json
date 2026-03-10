@@ -16,7 +16,15 @@
     "navigatePrevious": "پچھلے باب پر جائیں",
     "navigateNext": "اگلے باب پر جائیں",
     "navigateParent": "اوپر جائیں",
-    "hadithNavigation": "حدیث نیویگیشن"
+    "hadithNavigation": "حدیث نیویگیشن",
+    "bookmarks": "بُک مارکس",
+    "topics": "موضوعات",
+    "backToTop": "اوپر واپس جائیں",
+    "explore": "دریافت کریں",
+    "quran": "قرآن مجید",
+    "quranDesc": "114 سورتیں متعدد تراجم کے ساتھ",
+    "alKafi": "الکافی",
+    "alKafiDesc": "سب سے جامع شیعہ حدیث مجموعہ"
   },
   "book": {
     "reference": "حوالہ",
@@ -37,7 +45,15 @@
     "verifiedFrom": "تصدیق شدہ از",
     "sourceWord": "ماخذ",
     "sourcesWord": "ماخذات",
-    "unverified": "غیر تصدیق شدہ"
+    "unverified": "غیر تصدیق شدہ",
+    "tafsir": "تفسیر",
+    "crossReferences": "کراس ریفرنسز",
+    "compareAll": "سب کا موازنہ",
+    "hideComparison": "موازنہ چھپائیں",
+    "shareImage": "تصویر کے طور پر شیئر",
+    "showDifferences": "فرق دکھائیں",
+    "hideDifferences": "فرق چھپائیں",
+    "jumpToVerse": "آیت پر جائیں"
   },
   "narrator": {
     "narratedAhadith": "مروی احادیث",
@@ -51,7 +67,25 @@
     "narrations": "روایات کی تعداد",
     "narratedFrom": "جن سے روایت کیا ان کی تعداد",
     "narratedTo": "جن کو روایت کیا ان کی تعداد",
-    "conarratorCount": "ہم راویوں کی تعداد"
+    "conarratorCount": "ہم راویوں کی تعداد",
+    "biography": "سوانح حیات",
+    "era": "دور",
+    "reliability": "وثاقت",
+    "birthDate": "پیدائش",
+    "deathDate": "وفات",
+    "teachers": "اساتذہ",
+    "students": "شاگرد",
+    "source": "ماخذ",
+    "showAll": "سب دکھائیں",
+    "showLess": "کم دکھائیں",
+    "topConarrators": "اہم ہم راوی",
+    "showAllConarrators": "تمام {{count}} ہم راوی دکھائیں",
+    "books": "کتابیں",
+    "totalNarrations": "کل روایات",
+    "bookDistribution": "کتابوں کی تقسیم",
+    "featuredImams": "اہل بیت",
+    "imam": "امام",
+    "viewProfile": "پروفائل دیکھیں"
   },
   "search": {
     "filter": "فلٹر",
@@ -60,15 +94,32 @@
     "clearSearch": "تلاش صاف کریں",
     "noResults": "کوئی نتیجہ نہیں ملا",
     "noResultsFor": "کوئی نتیجہ نہیں ملا برائے",
-    "resultsFor": "results for",
-    "modeTitles": "Titles",
-    "modeFullText": "Full Text",
-    "loadingFullText": "Loading full-text index...",
-    "hadith": "Hadith"
+    "resultsFor": "نتائج برائے",
+    "modeTitles": "عنوانات",
+    "modeFullText": "مکمل متن",
+    "loadingFullText": "مکمل متن کا اشاریہ لوڈ ہو رہا ہے...",
+    "hadith": "حدیث",
+    "tipsTitle": "تلاش کی تجاویز",
+    "tipMultipleWords": "متعدد الفاظ AND منطق استعمال کرتے ہیں۔ کم نتائج پر خود بخود وسیع ہو جاتا ہے۔",
+    "tipArabic": "عربی یا انگریزی میں تلاش کریں۔ عربی اعراب نظر انداز کیے جاتے ہیں۔",
+    "tipModes": "تیز نیویگیشن کے لیے \"عنوانات\" موڈ استعمال کریں۔ مواد میں تلاش کے لیے \"مکمل متن\" پر جائیں۔",
+    "tipMinChars": "تلاش شروع کرنے کے لیے کم از کم 2 حروف ٹائپ کریں۔",
+    "tipEnter": "تمام نتائج دیکھنے کے لیے Enter دبائیں۔",
+    "tipFuzzy": "تلاش انجن خود بخود معمولی ٹائپنگ غلطیاں سنبھالتا ہے۔",
+    "tipsClose": "سمجھ آ گیا",
+    "showing": "دکھا رہا ہے",
+    "of": "میں سے",
+    "results": "نتائج",
+    "loadMore": "مزید لوڈ کریں",
+    "showingAll": "تمام نتائج دکھائے گئے"
   },
   "translation": {
     "selectTranslation": "ترجمہ منتخب کریں",
-    "language": "زبان"
+    "language": "زبان",
+    "compare": "تراجم کا موازنہ",
+    "compareWith": "موازنہ کریں",
+    "notAvailable": "اس زبان میں ترجمہ دستیاب نہیں۔",
+    "availableIn": "دستیاب ہے"
   },
   "common": {
     "loading": "لوڈ ہو رہا ہے...",
@@ -88,6 +139,45 @@
   "breadcrumb": {
     "home": "ہوم"
   },
+  "pwa": {
+    "installPrompt": "فوری رسائی اور آف لائن پڑھنے کے لیے ثقلین انسٹال کریں",
+    "install": "انسٹال",
+    "updateAvailable": "نیا ورژن دستیاب ہے",
+    "update": "اپ ڈیٹ",
+    "dismiss": "بعد میں"
+  },
+  "download": {
+    "title": "ڈاؤن لوڈ",
+    "offlineReading": "آف لائن پڑھنا",
+    "offlineDescription": "آف لائن رسائی کے لیے کتابیں اپنے آلے پر ڈاؤن لوڈ کریں۔",
+    "downloadForOffline": "ڈاؤن لوڈ",
+    "remove": "ہٹائیں",
+    "openSource": "اوپن سورس اور مفت",
+    "dataPackages": "ڈیٹا پیکجز",
+    "dataPackagesDescription": "مکمل ڈیٹا سیٹ JSON میں ڈاؤن لوڈ کریں یا CSV میں ایکسپورٹ کریں۔"
+  },
+  "bookmark": {
+    "title": "بُک مارکس",
+    "bookmark": "بُک مارک",
+    "bookmarked": "بُک مارک ہو گیا",
+    "add": "بُک مارک شامل کریں",
+    "remove": "بُک مارک ہٹائیں",
+    "continueReading": "پڑھنا جاری رکھیں",
+    "savedBookmarks": "محفوظ بُک مارکس",
+    "noBookmarks": "ابھی کوئی بُک مارک نہیں۔ پڑھتے وقت آیات بُک مارک کریں۔",
+    "noProgress": "ابھی پڑھنے کی پیش رفت نہیں",
+    "clearProgress": "پڑھنے کی پیش رفت صاف کریں",
+    "exportImport": "ایکسپورٹ / امپورٹ",
+    "export": "ایکسپورٹ",
+    "import": "امپورٹ"
+  },
+  "audio": {
+    "play": "چلائیں",
+    "pause": "روکیں",
+    "reciter": "قاری",
+    "loading": "آڈیو لوڈ ہو رہا ہے...",
+    "error": "آڈیو دستیاب نہیں"
+  },
   "language": {
     "picker": "زبان",
     "en": "English",
@@ -95,32 +185,79 @@
     "fa": "فارسی",
     "fr": "Français"
   },
+  "dailyVerse": {
+    "title": "آج کی آیت",
+    "readMore": "مزید پڑھیں"
+  },
+  "annotation": {
+    "add": "نوٹ شامل کریں",
+    "edit": "نوٹ میں ترمیم",
+    "save": "محفوظ کریں",
+    "cancel": "منسوخ",
+    "delete": "حذف",
+    "placeholder": "اپنا ذاتی نوٹ یہاں لکھیں...",
+    "notes": "میرے نوٹس",
+    "noNotes": "ابھی کوئی نوٹ نہیں۔ پڑھتے وقت آیات پر نوٹ شامل کریں۔"
+  },
+  "topics": {
+    "title": "موضوعات",
+    "description": "موضوع کے مطابق حدیث مجموعے دیکھیں۔",
+    "searchPlaceholder": "موضوعات تلاش کریں...",
+    "chapters": "ابواب"
+  },
   "discussion": {
-    "title": "Discussion",
-    "noComments": "No comments yet. Be the first to share your thoughts.",
-    "placeholder": "Share your thoughts or insights...",
-    "post": "Post",
-    "flag": "Report",
-    "delete": "Delete",
-    "signInPrompt": "Sign in to join the discussion."
+    "title": "بحث",
+    "noComments": "ابھی کوئی تبصرہ نہیں۔ اپنے خیالات شیئر کرنے والے پہلے بنیں۔",
+    "placeholder": "اپنے خیالات یا بصیرت شیئر کریں...",
+    "post": "پوسٹ",
+    "flag": "رپورٹ",
+    "delete": "حذف",
+    "signInPrompt": "بحث میں شامل ہونے کے لیے سائن ان کریں۔"
   },
   "sync": {
-    "title": "Cloud Sync",
-    "description": "Sync your bookmarks, reading progress, and notes across devices.",
-    "signInGoogle": "Sign in with Google",
-    "signInAnonymous": "Sign in anonymously",
-    "anonymous": "Anonymous User",
-    "signOut": "Sign out",
-    "syncNow": "Sync now",
-    "push": "Push to cloud",
-    "pull": "Pull from cloud",
-    "lastSync": "Last synced",
+    "title": "کلاؤڈ سنک",
+    "description": "اپنے بُک مارکس، پڑھنے کی پیش رفت اور نوٹس آلات کے درمیان سنک کریں۔",
+    "signInGoogle": "Google سے سائن ان",
+    "signInAnonymous": "گمنام سائن ان",
+    "anonymous": "گمنام صارف",
+    "signOut": "سائن آؤٹ",
+    "syncNow": "ابھی سنک کریں",
+    "push": "کلاؤڈ پر اپ لوڈ",
+    "pull": "کلاؤڈ سے ڈاؤن لوڈ",
+    "lastSync": "آخری سنک",
     "status": {
-      "disconnected": "Disconnected",
-      "connecting": "Connecting",
-      "synced": "Synced",
-      "syncing": "Syncing",
-      "error": "Error"
+      "disconnected": "منقطع",
+      "connecting": "جوڑ رہا ہے",
+      "synced": "سنک ہو گیا",
+      "syncing": "سنک ہو رہا ہے",
+      "error": "خرابی"
     }
+  },
+  "tooltip": {
+    "viewDetails": "حدیث کی تفصیلات دیکھیں",
+    "moreActions": "مزید اعمال",
+    "hideDetails": "تفصیلات چھپائیں",
+    "showDetails": "تفصیلات دکھائیں",
+    "previewRelated": "متعلقہ آیت کا پیش نظارہ",
+    "hidePreview": "پیش نظارہ چھپائیں",
+    "closeComparison": "موازنہ بند کریں",
+    "backToChapter": "باب پر واپس",
+    "previewHadith": "حدیث کا پیش نظارہ"
+  },
+  "settings": {
+    "toggleDarkMode": "ڈارک موڈ تبدیل کریں",
+    "increaseFont": "فونٹ بڑا کریں",
+    "decreaseFont": "فونٹ چھوٹا کریں",
+    "resetFont": "فونٹ سائز ری سیٹ",
+    "keyboardShortcuts": "کی بورڈ شارٹ کٹس",
+    "shortcutNextChapter": "اگلا باب",
+    "shortcutPrevChapter": "پچھلا باب",
+    "shortcutParent": "اوپر جائیں",
+    "shortcutSearch": "تلاش پر توجہ",
+    "shortcutDarkMode": "ڈارک موڈ تبدیل کریں",
+    "shortcutHelp": "شارٹ کٹس دکھائیں",
+    "shortcutClose": "بند / توجہ ہٹائیں",
+    "pressEscToClose": "بند کرنے کے لیے Esc دبائیں",
+    "showKeyboardShortcuts": "کی بورڈ شارٹ کٹس"
   }
 }

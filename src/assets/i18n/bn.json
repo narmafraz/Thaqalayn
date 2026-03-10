@@ -16,7 +16,15 @@
     "navigatePrevious": "পূর্ববর্তী অধ্যায়ে যান",
     "navigateNext": "পরবর্তী অধ্যায়ে যান",
     "navigateParent": "উপরে যান",
-    "hadithNavigation": "হাদিস নেভিগেশন"
+    "hadithNavigation": "হাদিস নেভিগেশন",
+    "bookmarks": "বুকমার্ক",
+    "topics": "বিষয়সমূহ",
+    "backToTop": "শীর্ষে ফিরুন",
+    "explore": "অন্বেষণ",
+    "quran": "পবিত্র কুরআন",
+    "quranDesc": "১১৪টি সূরা একাধিক অনুবাদসহ",
+    "alKafi": "আল-কাফি",
+    "alKafiDesc": "সর্বাধিক ব্যাপক শিয়া হাদিস সংকলন"
   },
   "book": {
     "reference": "তথ্যসূত্র",
@@ -37,7 +45,15 @@
     "verifiedFrom": "যাচাইকৃত",
     "sourceWord": "উৎস",
     "sourcesWord": "উৎস",
-    "unverified": "অযাচাইকৃত"
+    "unverified": "অযাচাইকৃত",
+    "tafsir": "তাফসীর",
+    "crossReferences": "ক্রস-রেফারেন্স",
+    "compareAll": "সব তুলনা করুন",
+    "hideComparison": "তুলনা লুকান",
+    "shareImage": "ছবি হিসেবে শেয়ার",
+    "showDifferences": "পার্থক্য দেখান",
+    "hideDifferences": "পার্থক্য লুকান",
+    "jumpToVerse": "আয়াতে যান"
   },
   "narrator": {
     "narratedAhadith": "বর্ণিত হাদিস",
@@ -51,7 +67,25 @@
     "narrations": "বর্ণনার সংখ্যা",
     "narratedFrom": "যাদের থেকে বর্ণনা করেছেন তাদের সংখ্যা",
     "narratedTo": "যাদের কাছে বর্ণনা করেছেন তাদের সংখ্যা",
-    "conarratorCount": "সহ-বর্ণনাকারীর সংখ্যা"
+    "conarratorCount": "সহ-বর্ণনাকারীর সংখ্যা",
+    "biography": "জীবনী",
+    "era": "যুগ",
+    "reliability": "নির্ভরযোগ্যতা",
+    "birthDate": "জন্ম",
+    "deathDate": "মৃত্যু",
+    "teachers": "শিক্ষকগণ",
+    "students": "ছাত্রগণ",
+    "source": "উৎস",
+    "showAll": "সব দেখান",
+    "showLess": "কম দেখান",
+    "topConarrators": "শীর্ষ সহ-বর্ণনাকারী",
+    "showAllConarrators": "সব {{count}} সহ-বর্ণনাকারী দেখান",
+    "books": "কিতাব",
+    "totalNarrations": "মোট বর্ণনা",
+    "bookDistribution": "কিতাব বিতরণ",
+    "featuredImams": "আহলে বাইত",
+    "imam": "ইমাম",
+    "viewProfile": "প্রোফাইল দেখুন"
   },
   "search": {
     "filter": "ফিল্টার",
@@ -60,15 +94,32 @@
     "clearSearch": "অনুসন্ধান মুছুন",
     "noResults": "কোনো ফলাফল পাওয়া যায়নি",
     "noResultsFor": "কোনো ফলাফল পাওয়া যায়নি এর জন্য",
-    "resultsFor": "results for",
-    "modeTitles": "Titles",
-    "modeFullText": "Full Text",
-    "loadingFullText": "Loading full-text index...",
-    "hadith": "Hadith"
+    "resultsFor": "ফলাফল",
+    "modeTitles": "শিরোনাম",
+    "modeFullText": "পূর্ণ পাঠ্য",
+    "loadingFullText": "পূর্ণ পাঠ্য সূচক লোড হচ্ছে...",
+    "hadith": "হাদিস",
+    "tipsTitle": "অনুসন্ধান পরামর্শ",
+    "tipMultipleWords": "একাধিক শব্দ AND যুক্তি ব্যবহার করে। কম ফলাফল পাওয়া গেলে স্বয়ংক্রিয়ভাবে প্রসারিত হয়।",
+    "tipArabic": "আরবি বা ইংরেজিতে অনুসন্ধান করুন। আরবি হরকত উপেক্ষা করা হয়।",
+    "tipModes": "দ্রুত নেভিগেশনের জন্য \"শিরোনাম\" মোড ব্যবহার করুন। হাদিসের ভিতরে অনুসন্ধানের জন্য \"পূর্ণ পাঠ্য\" তে যান।",
+    "tipMinChars": "অনুসন্ধান শুরু করতে কমপক্ষে ২টি অক্ষর টাইপ করুন।",
+    "tipEnter": "সব ফলাফল দেখতে Enter চাপুন।",
+    "tipFuzzy": "অনুসন্ধান ইঞ্জিন স্বয়ংক্রিয়ভাবে ছোট টাইপো সামলায়।",
+    "tipsClose": "বুঝেছি",
+    "showing": "দেখাচ্ছে",
+    "of": "এর মধ্যে",
+    "results": "ফলাফল",
+    "loadMore": "আরো লোড করুন",
+    "showingAll": "সব ফলাফল দেখানো হয়েছে"
   },
   "translation": {
     "selectTranslation": "অনুবাদ নির্বাচন করুন",
-    "language": "ভাষা"
+    "language": "ভাষা",
+    "compare": "অনুবাদ তুলনা",
+    "compareWith": "তুলনা করুন",
+    "notAvailable": "এই ভাষায় অনুবাদ পাওয়া যায়নি।",
+    "availableIn": "পাওয়া যায়"
   },
   "common": {
     "loading": "লোড হচ্ছে...",
@@ -88,6 +139,45 @@
   "breadcrumb": {
     "home": "হোম"
   },
+  "pwa": {
+    "installPrompt": "দ্রুত অ্যাক্সেস এবং অফলাইন পড়ার জন্য সাকালাইন ইনস্টল করুন",
+    "install": "ইনস্টল",
+    "updateAvailable": "একটি নতুন সংস্করণ পাওয়া যাচ্ছে",
+    "update": "আপডেট",
+    "dismiss": "পরে"
+  },
+  "download": {
+    "title": "ডাউনলোড",
+    "offlineReading": "অফলাইন পড়া",
+    "offlineDescription": "অফলাইন অ্যাক্সেসের জন্য আপনার ডিভাইসে কিতাব ডাউনলোড করুন।",
+    "downloadForOffline": "ডাউনলোড",
+    "remove": "সরান",
+    "openSource": "ওপেন সোর্স এবং বিনামূল্যে",
+    "dataPackages": "ডেটা প্যাকেজ",
+    "dataPackagesDescription": "JSON ফাইল হিসেবে সম্পূর্ণ ডেটাসেট ডাউনলোড করুন বা CSV হিসেবে রপ্তানি করুন।"
+  },
+  "bookmark": {
+    "title": "বুকমার্ক",
+    "bookmark": "বুকমার্ক",
+    "bookmarked": "বুকমার্ক করা হয়েছে",
+    "add": "বুকমার্ক যোগ",
+    "remove": "বুকমার্ক সরান",
+    "continueReading": "পড়া চালিয়ে যান",
+    "savedBookmarks": "সংরক্ষিত বুকমার্ক",
+    "noBookmarks": "এখনো কোনো বুকমার্ক নেই। পড়ার সময় আয়াত বুকমার্ক করুন।",
+    "noProgress": "এখনো কোনো পড়ার অগ্রগতি নেই",
+    "clearProgress": "পড়ার অগ্রগতি মুছুন",
+    "exportImport": "রপ্তানি / আমদানি",
+    "export": "রপ্তানি",
+    "import": "আমদানি"
+  },
+  "audio": {
+    "play": "চালান",
+    "pause": "বিরতি",
+    "reciter": "তেলাওয়াতকারী",
+    "loading": "অডিও লোড হচ্ছে...",
+    "error": "অডিও পাওয়া যায়নি"
+  },
   "language": {
     "picker": "ভাষা",
     "en": "English",
@@ -95,32 +185,79 @@
     "fa": "فارسی",
     "fr": "Français"
   },
+  "dailyVerse": {
+    "title": "আজকের আয়াত",
+    "readMore": "আরো পড়ুন"
+  },
+  "annotation": {
+    "add": "নোট যোগ",
+    "edit": "নোট সম্পাদনা",
+    "save": "সংরক্ষণ",
+    "cancel": "বাতিল",
+    "delete": "মুছুন",
+    "placeholder": "এখানে আপনার ব্যক্তিগত নোট লিখুন...",
+    "notes": "আমার নোট",
+    "noNotes": "এখনো কোনো নোট নেই। পড়ার সময় আয়াতে নোট যোগ করুন।"
+  },
+  "topics": {
+    "title": "বিষয়সমূহ",
+    "description": "বিষয় অনুসারে হাদিস সংকলন ব্রাউজ করুন।",
+    "searchPlaceholder": "বিষয় অনুসন্ধান...",
+    "chapters": "অধ্যায়"
+  },
   "discussion": {
-    "title": "Discussion",
-    "noComments": "No comments yet. Be the first to share your thoughts.",
-    "placeholder": "Share your thoughts or insights...",
-    "post": "Post",
-    "flag": "Report",
-    "delete": "Delete",
-    "signInPrompt": "Sign in to join the discussion."
+    "title": "আলোচনা",
+    "noComments": "এখনো কোনো মন্তব্য নেই। প্রথম হয়ে আপনার মতামত জানান।",
+    "placeholder": "আপনার মতামত বা অন্তর্দৃষ্টি শেয়ার করুন...",
+    "post": "পোস্ট",
+    "flag": "রিপোর্ট",
+    "delete": "মুছুন",
+    "signInPrompt": "আলোচনায় অংশ নিতে সাইন ইন করুন।"
   },
   "sync": {
-    "title": "Cloud Sync",
-    "description": "Sync your bookmarks, reading progress, and notes across devices.",
-    "signInGoogle": "Sign in with Google",
-    "signInAnonymous": "Sign in anonymously",
-    "anonymous": "Anonymous User",
-    "signOut": "Sign out",
-    "syncNow": "Sync now",
-    "push": "Push to cloud",
-    "pull": "Pull from cloud",
-    "lastSync": "Last synced",
+    "title": "ক্লাউড সিঙ্ক",
+    "description": "আপনার বুকমার্ক, পড়ার অগ্রগতি এবং নোট ডিভাইস জুড়ে সিঙ্ক করুন।",
+    "signInGoogle": "Google দিয়ে সাইন ইন",
+    "signInAnonymous": "বেনামে সাইন ইন",
+    "anonymous": "বেনামী ব্যবহারকারী",
+    "signOut": "সাইন আউট",
+    "syncNow": "এখন সিঙ্ক করুন",
+    "push": "ক্লাউডে পাঠান",
+    "pull": "ক্লাউড থেকে আনুন",
+    "lastSync": "সর্বশেষ সিঙ্ক",
     "status": {
-      "disconnected": "Disconnected",
-      "connecting": "Connecting",
-      "synced": "Synced",
-      "syncing": "Syncing",
-      "error": "Error"
+      "disconnected": "সংযোগ বিচ্ছিন্ন",
+      "connecting": "সংযুক্ত হচ্ছে",
+      "synced": "সিঙ্ক হয়েছে",
+      "syncing": "সিঙ্ক হচ্ছে",
+      "error": "ত্রুটি"
     }
+  },
+  "tooltip": {
+    "viewDetails": "হাদিসের বিবরণ দেখুন",
+    "moreActions": "আরো কার্যক্রম",
+    "hideDetails": "বিবরণ লুকান",
+    "showDetails": "বিবরণ দেখান",
+    "previewRelated": "সম্পর্কিত আয়াত প্রিভিউ",
+    "hidePreview": "প্রিভিউ লুকান",
+    "closeComparison": "তুলনা বন্ধ করুন",
+    "backToChapter": "অধ্যায়ে ফিরুন",
+    "previewHadith": "হাদিস প্রিভিউ"
+  },
+  "settings": {
+    "toggleDarkMode": "ডার্ক মোড টগল",
+    "increaseFont": "ফন্ট বড় করুন",
+    "decreaseFont": "ফন্ট ছোট করুন",
+    "resetFont": "ফন্ট রিসেট",
+    "keyboardShortcuts": "কীবোর্ড শর্টকাট",
+    "shortcutNextChapter": "পরবর্তী অধ্যায়",
+    "shortcutPrevChapter": "পূর্ববর্তী অধ্যায়",
+    "shortcutParent": "উপরে যান",
+    "shortcutSearch": "অনুসন্ধানে ফোকাস",
+    "shortcutDarkMode": "ডার্ক মোড টগল",
+    "shortcutHelp": "শর্টকাট দেখান",
+    "shortcutClose": "বন্ধ / আনফোকাস",
+    "pressEscToClose": "বন্ধ করতে Esc চাপুন",
+    "showKeyboardShortcuts": "কীবোর্ড শর্টকাট"
   }
 }

@@ -17,7 +17,14 @@
     "navigateNext": "انتقل إلى الباب التالي",
     "navigateParent": "انتقل إلى الأعلى",
     "hadithNavigation": "تصفح الحديث",
-    "bookmarks": "الإشارات المرجعية"
+    "bookmarks": "الإشارات المرجعية",
+    "topics": "المواضيع",
+    "backToTop": "العودة إلى الأعلى",
+    "explore": "استكشاف",
+    "quran": "القرآن الكريم",
+    "quranDesc": "114 سورة مع ترجمات متعددة",
+    "alKafi": "الكافي",
+    "alKafiDesc": "أشمل مجموعة حديثية شيعية"
   },
   "book": {
     "reference": "المرجع",
@@ -38,7 +45,15 @@
     "verifiedFrom": "موثق من",
     "sourceWord": "مصدر",
     "sourcesWord": "مصادر",
-    "unverified": "غير موثق"
+    "unverified": "غير موثق",
+    "tafsir": "التفسير",
+    "crossReferences": "المراجع المتقاطعة",
+    "compareAll": "مقارنة الكل",
+    "hideComparison": "إخفاء المقارنة",
+    "shareImage": "مشاركة كصورة",
+    "showDifferences": "إظهار الاختلافات",
+    "hideDifferences": "إخفاء الاختلافات",
+    "jumpToVerse": "الانتقال إلى الآية"
   },
   "narrator": {
     "narratedAhadith": "الأحاديث المروية",
@@ -62,7 +77,15 @@
     "students": "التلاميذ",
     "source": "المصدر",
     "showAll": "عرض الكل",
-    "showLess": "عرض أقل"
+    "showLess": "عرض أقل",
+    "topConarrators": "أبرز الرواة المشتركين",
+    "showAllConarrators": "عرض جميع {{count}} من الرواة المشتركين",
+    "books": "الكتب",
+    "totalNarrations": "مجموع الروايات",
+    "bookDistribution": "توزيع الكتب",
+    "featuredImams": "أهل البيت",
+    "imam": "إمام",
+    "viewProfile": "عرض الملف الشخصي"
   },
   "search": {
     "filter": "تصفية",
@@ -75,11 +98,28 @@
     "modeTitles": "العناوين",
     "modeFullText": "النص الكامل",
     "loadingFullText": "جارٍ تحميل فهرس النص الكامل...",
-    "hadith": "حديث"
+    "hadith": "حديث",
+    "tipsTitle": "نصائح البحث",
+    "tipMultipleWords": "الكلمات المتعددة تستخدم منطق AND — البحث عن \"رحمة علم\" يجد المحتوى الذي يتضمن كلتا الكلمتين. إذا وُجدت نتائج قليلة، يتوسع تلقائياً لمطابقة أي كلمة.",
+    "tipArabic": "ابحث بالعربية أو الإنجليزية. يتم تجاهل التشكيل.",
+    "tipModes": "استخدم وضع \"العناوين\" للتنقل السريع. انتقل إلى \"النص الكامل\" للبحث داخل الأحاديث.",
+    "tipMinChars": "اكتب حرفين على الأقل لبدء البحث.",
+    "tipEnter": "اضغط Enter لعرض جميع النتائج.",
+    "tipFuzzy": "محرك البحث يتعامل مع الأخطاء الإملائية تلقائياً.",
+    "tipsClose": "فهمت",
+    "showing": "يعرض",
+    "of": "من",
+    "results": "نتيجة",
+    "loadMore": "تحميل المزيد",
+    "showingAll": "تم عرض جميع النتائج"
   },
   "translation": {
     "selectTranslation": "اختيار الترجمة",
-    "language": "اللغة"
+    "language": "اللغة",
+    "compare": "مقارنة الترجمات",
+    "compareWith": "مقارنة مع",
+    "notAvailable": "الترجمة غير متوفرة بهذه اللغة.",
+    "availableIn": "متوفرة بـ"
   },
   "common": {
     "loading": "جاري التحميل...",
@@ -112,7 +152,9 @@
     "offlineDescription": "حمّل الكتب على جهازك للقراءة بدون اتصال بالإنترنت.",
     "downloadForOffline": "تحميل",
     "remove": "حذف",
-    "openSource": "مفتوح المصدر ومجاني"
+    "openSource": "مفتوح المصدر ومجاني",
+    "dataPackages": "حزم البيانات",
+    "dataPackagesDescription": "حمّل مجموعات البيانات الكاملة كملفات JSON أو صدّرها كـ CSV لاستخدامها في مشاريعك وأبحاثك."
   },
   "bookmark": {
     "title": "الإشارات المرجعية",
@@ -128,6 +170,40 @@
     "exportImport": "تصدير / استيراد",
     "export": "تصدير",
     "import": "استيراد"
+  },
+  "audio": {
+    "play": "تشغيل",
+    "pause": "إيقاف",
+    "reciter": "القارئ",
+    "loading": "جاري تحميل الصوت...",
+    "error": "الصوت غير متوفر"
+  },
+  "language": {
+    "picker": "اللغة",
+    "en": "English",
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
+  },
+  "dailyVerse": {
+    "title": "آية اليوم",
+    "readMore": "اقرأ المزيد"
+  },
+  "annotation": {
+    "add": "إضافة ملاحظة",
+    "edit": "تعديل الملاحظة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "placeholder": "اكتب ملاحظتك الشخصية هنا...",
+    "notes": "ملاحظاتي",
+    "noNotes": "لا توجد ملاحظات بعد. أضف ملاحظات على الآيات أثناء القراءة للعثور عليها هنا."
+  },
+  "topics": {
+    "title": "المواضيع",
+    "description": "تصفح مجموعات الأحاديث حسب الموضوع. المواضيع مستمدة من التقسيمات التقليدية لكتاب الكافي.",
+    "searchPlaceholder": "بحث في المواضيع...",
+    "chapters": "أبواب"
   },
   "discussion": {
     "title": "النقاش",
@@ -157,18 +233,31 @@
       "error": "خطأ"
     }
   },
-  "audio": {
-    "play": "تشغيل",
-    "pause": "إيقاف",
-    "reciter": "القارئ",
-    "loading": "جاري تحميل الصوت...",
-    "error": "الصوت غير متوفر"
+  "tooltip": {
+    "viewDetails": "عرض تفاصيل الحديث",
+    "moreActions": "إجراءات أخرى",
+    "hideDetails": "إخفاء التفاصيل",
+    "showDetails": "إظهار التفاصيل",
+    "previewRelated": "معاينة الآية المرتبطة",
+    "hidePreview": "إخفاء المعاينة",
+    "closeComparison": "إغلاق المقارنة",
+    "backToChapter": "العودة إلى الباب",
+    "previewHadith": "معاينة الحديث"
   },
-  "language": {
-    "picker": "اللغة",
-    "en": "English",
-    "ar": "العربية",
-    "fa": "فارسی",
-    "fr": "Français"
+  "settings": {
+    "toggleDarkMode": "تبديل الوضع الداكن",
+    "increaseFont": "تكبير الخط",
+    "decreaseFont": "تصغير الخط",
+    "resetFont": "إعادة ضبط حجم الخط",
+    "keyboardShortcuts": "اختصارات لوحة المفاتيح",
+    "shortcutNextChapter": "الباب التالي",
+    "shortcutPrevChapter": "الباب السابق",
+    "shortcutParent": "الانتقال إلى الأعلى",
+    "shortcutSearch": "التركيز على البحث",
+    "shortcutDarkMode": "تبديل الوضع الداكن",
+    "shortcutHelp": "عرض الاختصارات",
+    "shortcutClose": "إغلاق / إلغاء التركيز",
+    "pressEscToClose": "اضغط Esc للإغلاق",
+    "showKeyboardShortcuts": "اختصارات لوحة المفاتيح"
   }
 }

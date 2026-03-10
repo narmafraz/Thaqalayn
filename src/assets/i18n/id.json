@@ -16,7 +16,15 @@
     "navigatePrevious": "Ke bab sebelumnya",
     "navigateNext": "Ke bab berikutnya",
     "navigateParent": "Ke atas",
-    "hadithNavigation": "Navigasi hadis"
+    "hadithNavigation": "Navigasi hadis",
+    "bookmarks": "Penanda",
+    "topics": "Topik",
+    "backToTop": "Kembali ke atas",
+    "explore": "Jelajahi",
+    "quran": "Al-Quran",
+    "quranDesc": "114 surah dengan berbagai terjemahan",
+    "alKafi": "Al-Kafi",
+    "alKafiDesc": "Koleksi hadis Syiah paling komprehensif"
   },
   "book": {
     "reference": "Referensi",
@@ -37,7 +45,15 @@
     "verifiedFrom": "Terverifikasi dari",
     "sourceWord": "sumber",
     "sourcesWord": "sumber",
-    "unverified": "Belum terverifikasi"
+    "unverified": "Belum terverifikasi",
+    "tafsir": "Tafsir",
+    "crossReferences": "Referensi silang",
+    "compareAll": "Bandingkan semua",
+    "hideComparison": "Sembunyikan perbandingan",
+    "shareImage": "Bagikan sebagai gambar",
+    "showDifferences": "Tampilkan perbedaan",
+    "hideDifferences": "Sembunyikan perbedaan",
+    "jumpToVerse": "Loncat ke ayat"
   },
   "narrator": {
     "narratedAhadith": "Hadis yang diriwayatkan",
@@ -51,7 +67,25 @@
     "narrations": "Jumlah riwayat",
     "narratedFrom": "Jumlah orang yang diriwayatkan darinya",
     "narratedTo": "Jumlah orang yang diriwayatkan kepadanya",
-    "conarratorCount": "Jumlah perawi bersama"
+    "conarratorCount": "Jumlah perawi bersama",
+    "biography": "Biografi",
+    "era": "Era",
+    "reliability": "Keandalan",
+    "birthDate": "Lahir",
+    "deathDate": "Wafat",
+    "teachers": "Guru",
+    "students": "Murid",
+    "source": "Sumber",
+    "showAll": "Tampilkan semua",
+    "showLess": "Tampilkan lebih sedikit",
+    "topConarrators": "Perawi bersama utama",
+    "showAllConarrators": "Tampilkan semua {{count}} perawi bersama",
+    "books": "Kitab",
+    "totalNarrations": "Total riwayat",
+    "bookDistribution": "Distribusi kitab",
+    "featuredImams": "Ahlul Bait",
+    "imam": "Imam",
+    "viewProfile": "Lihat profil"
   },
   "search": {
     "filter": "Filter",
@@ -60,15 +94,32 @@
     "clearSearch": "Hapus pencarian",
     "noResults": "Tidak ada hasil ditemukan",
     "noResultsFor": "Tidak ada hasil ditemukan untuk",
-    "resultsFor": "results for",
-    "modeTitles": "Titles",
-    "modeFullText": "Full Text",
-    "loadingFullText": "Loading full-text index...",
-    "hadith": "Hadith"
+    "resultsFor": "hasil untuk",
+    "modeTitles": "Judul",
+    "modeFullText": "Teks lengkap",
+    "loadingFullText": "Memuat indeks teks lengkap...",
+    "hadith": "Hadis",
+    "tipsTitle": "Tips pencarian",
+    "tipMultipleWords": "Beberapa kata menggunakan logika AND. Jika hasil terlalu sedikit, pencarian diperluas otomatis.",
+    "tipArabic": "Cari dalam bahasa Arab atau Inggris. Diakritik Arab diabaikan.",
+    "tipModes": "Gunakan mode \"Judul\" untuk navigasi cepat. Beralih ke \"Teks lengkap\" untuk mencari di dalam konten.",
+    "tipMinChars": "Ketik minimal 2 karakter untuk memulai pencarian.",
+    "tipEnter": "Tekan Enter untuk melihat semua hasil.",
+    "tipFuzzy": "Mesin pencari menangani kesalahan ketik kecil secara otomatis.",
+    "tipsClose": "Mengerti",
+    "showing": "Menampilkan",
+    "of": "dari",
+    "results": "hasil",
+    "loadMore": "Muat lebih banyak",
+    "showingAll": "Semua hasil ditampilkan"
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",
-    "language": "Bahasa"
+    "language": "Bahasa",
+    "compare": "Bandingkan terjemahan",
+    "compareWith": "Bandingkan dengan",
+    "notAvailable": "Terjemahan tidak tersedia dalam bahasa ini.",
+    "availableIn": "Tersedia dalam"
   },
   "common": {
     "loading": "Memuat...",
@@ -88,6 +139,45 @@
   "breadcrumb": {
     "home": "Beranda"
   },
+  "pwa": {
+    "installPrompt": "Instal Thaqalayn untuk akses cepat dan membaca offline",
+    "install": "Instal",
+    "updateAvailable": "Versi baru tersedia",
+    "update": "Perbarui",
+    "dismiss": "Nanti"
+  },
+  "download": {
+    "title": "Unduh",
+    "offlineReading": "Membaca offline",
+    "offlineDescription": "Unduh kitab ke perangkat Anda untuk akses offline.",
+    "downloadForOffline": "Unduh",
+    "remove": "Hapus",
+    "openSource": "Open source dan gratis",
+    "dataPackages": "Paket data",
+    "dataPackagesDescription": "Unduh dataset lengkap sebagai JSON atau ekspor sebagai CSV."
+  },
+  "bookmark": {
+    "title": "Penanda",
+    "bookmark": "Penanda",
+    "bookmarked": "Ditandai",
+    "add": "Tambah penanda",
+    "remove": "Hapus penanda",
+    "continueReading": "Lanjutkan membaca",
+    "savedBookmarks": "Penanda tersimpan",
+    "noBookmarks": "Belum ada penanda. Tandai ayat saat membaca untuk menemukannya di sini.",
+    "noProgress": "Belum ada progres membaca",
+    "clearProgress": "Hapus progres membaca",
+    "exportImport": "Ekspor / Impor",
+    "export": "Ekspor",
+    "import": "Impor"
+  },
+  "audio": {
+    "play": "Putar",
+    "pause": "Jeda",
+    "reciter": "Qari",
+    "loading": "Memuat audio...",
+    "error": "Audio tidak tersedia"
+  },
   "language": {
     "picker": "Bahasa",
     "en": "English",
@@ -95,32 +185,79 @@
     "fa": "فارسی",
     "fr": "Français"
   },
+  "dailyVerse": {
+    "title": "Ayat hari ini",
+    "readMore": "Baca selengkapnya"
+  },
+  "annotation": {
+    "add": "Tambah catatan",
+    "edit": "Edit catatan",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "placeholder": "Tulis catatan pribadi Anda di sini...",
+    "notes": "Catatan saya",
+    "noNotes": "Belum ada catatan. Tambahkan catatan pada ayat saat membaca untuk menemukannya di sini."
+  },
+  "topics": {
+    "title": "Topik",
+    "description": "Jelajahi koleksi hadis berdasarkan topik.",
+    "searchPlaceholder": "Cari topik...",
+    "chapters": "bab"
+  },
   "discussion": {
-    "title": "Discussion",
-    "noComments": "No comments yet. Be the first to share your thoughts.",
-    "placeholder": "Share your thoughts or insights...",
-    "post": "Post",
-    "flag": "Report",
-    "delete": "Delete",
-    "signInPrompt": "Sign in to join the discussion."
+    "title": "Diskusi",
+    "noComments": "Belum ada komentar. Jadilah yang pertama berbagi pemikiran.",
+    "placeholder": "Bagikan pemikiran atau wawasan Anda...",
+    "post": "Kirim",
+    "flag": "Laporkan",
+    "delete": "Hapus",
+    "signInPrompt": "Masuk untuk bergabung dalam diskusi."
   },
   "sync": {
-    "title": "Cloud Sync",
-    "description": "Sync your bookmarks, reading progress, and notes across devices.",
-    "signInGoogle": "Sign in with Google",
-    "signInAnonymous": "Sign in anonymously",
-    "anonymous": "Anonymous User",
-    "signOut": "Sign out",
-    "syncNow": "Sync now",
-    "push": "Push to cloud",
-    "pull": "Pull from cloud",
-    "lastSync": "Last synced",
+    "title": "Sinkronisasi cloud",
+    "description": "Sinkronkan penanda, progres membaca, dan catatan Anda antar perangkat.",
+    "signInGoogle": "Masuk dengan Google",
+    "signInAnonymous": "Masuk secara anonim",
+    "anonymous": "Pengguna anonim",
+    "signOut": "Keluar",
+    "syncNow": "Sinkronkan sekarang",
+    "push": "Unggah ke cloud",
+    "pull": "Unduh dari cloud",
+    "lastSync": "Sinkronisasi terakhir",
     "status": {
-      "disconnected": "Disconnected",
-      "connecting": "Connecting",
-      "synced": "Synced",
-      "syncing": "Syncing",
+      "disconnected": "Terputus",
+      "connecting": "Menghubungkan",
+      "synced": "Tersinkronkan",
+      "syncing": "Menyinkronkan",
       "error": "Error"
     }
+  },
+  "tooltip": {
+    "viewDetails": "Lihat detail hadis",
+    "moreActions": "Tindakan lainnya",
+    "hideDetails": "Sembunyikan detail",
+    "showDetails": "Tampilkan detail",
+    "previewRelated": "Pratinjau ayat terkait",
+    "hidePreview": "Sembunyikan pratinjau",
+    "closeComparison": "Tutup perbandingan",
+    "backToChapter": "Kembali ke bab",
+    "previewHadith": "Pratinjau hadis"
+  },
+  "settings": {
+    "toggleDarkMode": "Alihkan mode gelap",
+    "increaseFont": "Perbesar ukuran font",
+    "decreaseFont": "Perkecil ukuran font",
+    "resetFont": "Reset ukuran font",
+    "keyboardShortcuts": "Pintasan keyboard",
+    "shortcutNextChapter": "Bab berikutnya",
+    "shortcutPrevChapter": "Bab sebelumnya",
+    "shortcutParent": "Ke atas",
+    "shortcutSearch": "Fokus pencarian",
+    "shortcutDarkMode": "Alihkan mode gelap",
+    "shortcutHelp": "Tampilkan pintasan",
+    "shortcutClose": "Tutup / lepas fokus",
+    "pressEscToClose": "Tekan Esc untuk menutup",
+    "showKeyboardShortcuts": "Pintasan keyboard"
   }
 }

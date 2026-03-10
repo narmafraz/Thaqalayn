@@ -16,7 +16,15 @@
     "navigatePrevious": "Перейти к предыдущей главе",
     "navigateNext": "Перейти к следующей главе",
     "navigateParent": "Перейти наверх",
-    "hadithNavigation": "Навигация по хадисам"
+    "hadithNavigation": "Навигация по хадисам",
+    "bookmarks": "Закладки",
+    "topics": "Темы",
+    "backToTop": "Наверх",
+    "explore": "Исследовать",
+    "quran": "Священный Коран",
+    "quranDesc": "114 сур с несколькими переводами",
+    "alKafi": "Аль-Кафи",
+    "alKafiDesc": "Наиболее полное шиитское собрание хадисов"
   },
   "book": {
     "reference": "Ссылка",
@@ -37,7 +45,15 @@
     "verifiedFrom": "Проверено из",
     "sourceWord": "источник",
     "sourcesWord": "источников",
-    "unverified": "Не проверено"
+    "unverified": "Не проверено",
+    "tafsir": "Комментарий (Тафсир)",
+    "crossReferences": "Перекрёстные ссылки",
+    "compareAll": "Сравнить все",
+    "hideComparison": "Скрыть сравнение",
+    "shareImage": "Поделиться как изображение",
+    "showDifferences": "Показать различия",
+    "hideDifferences": "Скрыть различия",
+    "jumpToVerse": "Перейти к аяту"
   },
   "narrator": {
     "narratedAhadith": "Переданные хадисы",
@@ -51,7 +67,25 @@
     "narrations": "Количество передач",
     "narratedFrom": "Количество тех, от кого передавал",
     "narratedTo": "Количество тех, кому передавал",
-    "conarratorCount": "Количество со-передатчиков"
+    "conarratorCount": "Количество со-передатчиков",
+    "biography": "Биография",
+    "era": "Эпоха",
+    "reliability": "Надёжность",
+    "birthDate": "Рождение",
+    "deathDate": "Смерть",
+    "teachers": "Учителя",
+    "students": "Ученики",
+    "source": "Источник",
+    "showAll": "Показать все",
+    "showLess": "Показать меньше",
+    "topConarrators": "Главные со-передатчики",
+    "showAllConarrators": "Показать всех {{count}} со-передатчиков",
+    "books": "Книги",
+    "totalNarrations": "Всего передач",
+    "bookDistribution": "Распределение по книгам",
+    "featuredImams": "Ахль аль-Байт",
+    "imam": "Имам",
+    "viewProfile": "Просмотреть профиль"
   },
   "search": {
     "filter": "Фильтр",
@@ -60,15 +94,32 @@
     "clearSearch": "Очистить поиск",
     "noResults": "Результатов не найдено",
     "noResultsFor": "Результатов не найдено для",
-    "resultsFor": "results for",
-    "modeTitles": "Titles",
-    "modeFullText": "Full Text",
-    "loadingFullText": "Loading full-text index...",
-    "hadith": "Hadith"
+    "resultsFor": "результатов для",
+    "modeTitles": "Заголовки",
+    "modeFullText": "Полный текст",
+    "loadingFullText": "Загрузка полнотекстового индекса...",
+    "hadith": "Хадис",
+    "tipsTitle": "Советы по поиску",
+    "tipMultipleWords": "Несколько слов используют логику AND. При малом количестве результатов поиск автоматически расширяется.",
+    "tipArabic": "Ищите на арабском или английском. Арабские диакритические знаки игнорируются.",
+    "tipModes": "Используйте режим \"Заголовки\" для быстрой навигации. Переключитесь на \"Полный текст\" для поиска в содержимом.",
+    "tipMinChars": "Введите минимум 2 символа для начала поиска.",
+    "tipEnter": "Нажмите Enter, чтобы увидеть все результаты.",
+    "tipFuzzy": "Поисковая система автоматически обрабатывает мелкие опечатки.",
+    "tipsClose": "Понятно",
+    "showing": "Показано",
+    "of": "из",
+    "results": "результатов",
+    "loadMore": "Загрузить ещё",
+    "showingAll": "Все результаты показаны"
   },
   "translation": {
     "selectTranslation": "Выбрать перевод",
-    "language": "Язык"
+    "language": "Язык",
+    "compare": "Сравнить переводы",
+    "compareWith": "Сравнить с",
+    "notAvailable": "Перевод недоступен на этом языке.",
+    "availableIn": "Доступно на"
   },
   "common": {
     "loading": "Загрузка...",
@@ -88,6 +139,45 @@
   "breadcrumb": {
     "home": "Главная"
   },
+  "pwa": {
+    "installPrompt": "Установите Thaqalayn для быстрого доступа и чтения офлайн",
+    "install": "Установить",
+    "updateAvailable": "Доступна новая версия",
+    "update": "Обновить",
+    "dismiss": "Позже"
+  },
+  "download": {
+    "title": "Скачать",
+    "offlineReading": "Чтение офлайн",
+    "offlineDescription": "Скачайте книги на устройство для доступа без интернета.",
+    "downloadForOffline": "Скачать",
+    "remove": "Удалить",
+    "openSource": "Открытый исходный код и бесплатно",
+    "dataPackages": "Пакеты данных",
+    "dataPackagesDescription": "Скачайте полные наборы данных в формате JSON или экспортируйте в CSV."
+  },
+  "bookmark": {
+    "title": "Закладки",
+    "bookmark": "Закладка",
+    "bookmarked": "В закладках",
+    "add": "Добавить закладку",
+    "remove": "Удалить закладку",
+    "continueReading": "Продолжить чтение",
+    "savedBookmarks": "Сохранённые закладки",
+    "noBookmarks": "Закладок пока нет. Добавляйте закладки при чтении, чтобы найти их здесь.",
+    "noProgress": "Прогресса чтения пока нет",
+    "clearProgress": "Очистить прогресс чтения",
+    "exportImport": "Экспорт / Импорт",
+    "export": "Экспорт",
+    "import": "Импорт"
+  },
+  "audio": {
+    "play": "Воспроизвести",
+    "pause": "Пауза",
+    "reciter": "Чтец",
+    "loading": "Загрузка аудио...",
+    "error": "Аудио недоступно"
+  },
   "language": {
     "picker": "Язык",
     "en": "English",
@@ -95,32 +185,79 @@
     "fa": "فارسی",
     "fr": "Français"
   },
+  "dailyVerse": {
+    "title": "Аят дня",
+    "readMore": "Читать далее"
+  },
+  "annotation": {
+    "add": "Добавить заметку",
+    "edit": "Редактировать заметку",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "placeholder": "Напишите вашу личную заметку здесь...",
+    "notes": "Мои заметки",
+    "noNotes": "Заметок пока нет. Добавляйте заметки к аятам при чтении."
+  },
+  "topics": {
+    "title": "Темы",
+    "description": "Просматривайте коллекции хадисов по темам.",
+    "searchPlaceholder": "Поиск тем...",
+    "chapters": "глав"
+  },
   "discussion": {
-    "title": "Discussion",
-    "noComments": "No comments yet. Be the first to share your thoughts.",
-    "placeholder": "Share your thoughts or insights...",
-    "post": "Post",
-    "flag": "Report",
-    "delete": "Delete",
-    "signInPrompt": "Sign in to join the discussion."
+    "title": "Обсуждение",
+    "noComments": "Комментариев пока нет. Будьте первым, кто поделится мыслями.",
+    "placeholder": "Поделитесь своими мыслями или наблюдениями...",
+    "post": "Опубликовать",
+    "flag": "Пожаловаться",
+    "delete": "Удалить",
+    "signInPrompt": "Войдите, чтобы присоединиться к обсуждению."
   },
   "sync": {
-    "title": "Cloud Sync",
-    "description": "Sync your bookmarks, reading progress, and notes across devices.",
-    "signInGoogle": "Sign in with Google",
-    "signInAnonymous": "Sign in anonymously",
-    "anonymous": "Anonymous User",
-    "signOut": "Sign out",
-    "syncNow": "Sync now",
-    "push": "Push to cloud",
-    "pull": "Pull from cloud",
-    "lastSync": "Last synced",
+    "title": "Облачная синхронизация",
+    "description": "Синхронизируйте закладки, прогресс чтения и заметки между устройствами.",
+    "signInGoogle": "Войти через Google",
+    "signInAnonymous": "Войти анонимно",
+    "anonymous": "Анонимный пользователь",
+    "signOut": "Выйти",
+    "syncNow": "Синхронизировать",
+    "push": "Загрузить в облако",
+    "pull": "Скачать из облака",
+    "lastSync": "Последняя синхронизация",
     "status": {
-      "disconnected": "Disconnected",
-      "connecting": "Connecting",
-      "synced": "Synced",
-      "syncing": "Syncing",
-      "error": "Error"
+      "disconnected": "Отключено",
+      "connecting": "Подключение",
+      "synced": "Синхронизировано",
+      "syncing": "Синхронизация",
+      "error": "Ошибка"
     }
+  },
+  "tooltip": {
+    "viewDetails": "Просмотреть детали хадиса",
+    "moreActions": "Другие действия",
+    "hideDetails": "Скрыть детали",
+    "showDetails": "Показать детали",
+    "previewRelated": "Предпросмотр связанного аята",
+    "hidePreview": "Скрыть предпросмотр",
+    "closeComparison": "Закрыть сравнение",
+    "backToChapter": "Вернуться к главе",
+    "previewHadith": "Предпросмотр хадиса"
+  },
+  "settings": {
+    "toggleDarkMode": "Переключить тёмный режим",
+    "increaseFont": "Увеличить шрифт",
+    "decreaseFont": "Уменьшить шрифт",
+    "resetFont": "Сбросить размер шрифта",
+    "keyboardShortcuts": "Горячие клавиши",
+    "shortcutNextChapter": "Следующая глава",
+    "shortcutPrevChapter": "Предыдущая глава",
+    "shortcutParent": "Перейти наверх",
+    "shortcutSearch": "Фокус на поиске",
+    "shortcutDarkMode": "Переключить тёмный режим",
+    "shortcutHelp": "Показать горячие клавиши",
+    "shortcutClose": "Закрыть / убрать фокус",
+    "pressEscToClose": "Нажмите Esc для закрытия",
+    "showKeyboardShortcuts": "Горячие клавиши"
   }
 }

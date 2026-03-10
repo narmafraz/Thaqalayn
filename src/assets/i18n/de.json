@@ -16,7 +16,15 @@
     "navigatePrevious": "Zum vorherigen Kapitel",
     "navigateNext": "Zum n\u00e4chsten Kapitel",
     "navigateParent": "Zur \u00fcbergeordneten Ebene",
-    "hadithNavigation": "Hadith-Navigation"
+    "hadithNavigation": "Hadith-Navigation",
+    "bookmarks": "Lesezeichen",
+    "topics": "Themen",
+    "backToTop": "Zur\u00fcck nach oben",
+    "explore": "Entdecken",
+    "quran": "Der Heilige Quran",
+    "quranDesc": "114 Suren mit mehreren \u00dcbersetzungen",
+    "alKafi": "Al-Kafi",
+    "alKafiDesc": "Die umfassendste schiitische Hadith-Sammlung"
   },
   "book": {
     "reference": "Referenz",
@@ -37,7 +45,15 @@
     "verifiedFrom": "Verifiziert aus",
     "sourceWord": "Quelle",
     "sourcesWord": "Quellen",
-    "unverified": "Nicht verifiziert"
+    "unverified": "Nicht verifiziert",
+    "tafsir": "Kommentar (Tafsir)",
+    "crossReferences": "Querverweise",
+    "compareAll": "Alle vergleichen",
+    "hideComparison": "Vergleich ausblenden",
+    "shareImage": "Als Bild teilen",
+    "showDifferences": "Unterschiede anzeigen",
+    "hideDifferences": "Unterschiede ausblenden",
+    "jumpToVerse": "Zum Vers springen"
   },
   "narrator": {
     "narratedAhadith": "\u00dcberlieferte Ahadith",
@@ -51,7 +67,25 @@
     "narrations": "Anzahl der \u00dcberlieferungen",
     "narratedFrom": "Anzahl der Personen, von denen \u00fcberliefert wurde",
     "narratedTo": "Anzahl der Personen, denen \u00fcberliefert wurde",
-    "conarratorCount": "Anzahl der Mit-\u00dcberlieferer"
+    "conarratorCount": "Anzahl der Mit-\u00dcberlieferer",
+    "biography": "Biografie",
+    "era": "Epoche",
+    "reliability": "Zuverl\u00e4ssigkeit",
+    "birthDate": "Geburt",
+    "deathDate": "Tod",
+    "teachers": "Lehrer",
+    "students": "Sch\u00fcler",
+    "source": "Quelle",
+    "showAll": "Alle anzeigen",
+    "showLess": "Weniger anzeigen",
+    "topConarrators": "Top Mit-\u00dcberlieferer",
+    "showAllConarrators": "Alle {{count}} Mit-\u00dcberlieferer anzeigen",
+    "books": "B\u00fccher",
+    "totalNarrations": "Gesamtzahl der \u00dcberlieferungen",
+    "bookDistribution": "Buchverteilung",
+    "featuredImams": "Die Ahl al-Bayt",
+    "imam": "Imam",
+    "viewProfile": "Profil anzeigen"
   },
   "search": {
     "filter": "Filter",
@@ -60,15 +94,32 @@
     "clearSearch": "Suche l\u00f6schen",
     "noResults": "Keine Ergebnisse gefunden",
     "noResultsFor": "Keine Ergebnisse gefunden f\u00fcr",
-    "resultsFor": "results for",
-    "modeTitles": "Titles",
-    "modeFullText": "Full Text",
-    "loadingFullText": "Loading full-text index...",
-    "hadith": "Hadith"
+    "resultsFor": "Ergebnisse f\u00fcr",
+    "modeTitles": "Titel",
+    "modeFullText": "Volltext",
+    "loadingFullText": "Volltextindex wird geladen...",
+    "hadith": "Hadith",
+    "tipsTitle": "Suchtipps",
+    "tipMultipleWords": "Mehrere W\u00f6rter verwenden AND-Logik. Bei zu wenigen Ergebnissen wird automatisch erweitert.",
+    "tipArabic": "Suchen Sie auf Arabisch oder Englisch. Arabische diakritische Zeichen werden ignoriert.",
+    "tipModes": "Verwenden Sie den Modus \"Titel\" f\u00fcr schnelle Navigation. Wechseln Sie zu \"Volltext\" f\u00fcr die Suche im Inhalt.",
+    "tipMinChars": "Geben Sie mindestens 2 Zeichen ein, um die Suche zu starten.",
+    "tipEnter": "Dr\u00fccken Sie Enter, um alle Ergebnisse anzuzeigen.",
+    "tipFuzzy": "Die Suchmaschine behandelt kleine Tippfehler automatisch.",
+    "tipsClose": "Verstanden",
+    "showing": "Zeige",
+    "of": "von",
+    "results": "Ergebnisse",
+    "loadMore": "Mehr laden",
+    "showingAll": "Alle Ergebnisse angezeigt"
   },
   "translation": {
     "selectTranslation": "\u00dcbersetzung ausw\u00e4hlen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "compare": "\u00dcbersetzungen vergleichen",
+    "compareWith": "Vergleichen mit",
+    "notAvailable": "\u00dcbersetzung in dieser Sprache nicht verf\u00fcgbar.",
+    "availableIn": "Verf\u00fcgbar in"
   },
   "common": {
     "loading": "Wird geladen...",
@@ -88,6 +139,45 @@
   "breadcrumb": {
     "home": "Startseite"
   },
+  "pwa": {
+    "installPrompt": "Installieren Sie Thaqalayn f\u00fcr schnellen Zugriff und Offline-Lesen",
+    "install": "Installieren",
+    "updateAvailable": "Eine neue Version ist verf\u00fcgbar",
+    "update": "Aktualisieren",
+    "dismiss": "Sp\u00e4ter"
+  },
+  "download": {
+    "title": "Herunterladen",
+    "offlineReading": "Offline-Lesen",
+    "offlineDescription": "Laden Sie B\u00fccher auf Ihr Ger\u00e4t f\u00fcr den Offline-Zugriff herunter.",
+    "downloadForOffline": "Herunterladen",
+    "remove": "Entfernen",
+    "openSource": "Open Source und kostenlos",
+    "dataPackages": "Datenpakete",
+    "dataPackagesDescription": "Laden Sie komplette Datens\u00e4tze als JSON herunter oder exportieren Sie sie als CSV."
+  },
+  "bookmark": {
+    "title": "Lesezeichen",
+    "bookmark": "Lesezeichen",
+    "bookmarked": "Lesezeichen gesetzt",
+    "add": "Lesezeichen hinzuf\u00fcgen",
+    "remove": "Lesezeichen entfernen",
+    "continueReading": "Weiterlesen",
+    "savedBookmarks": "Gespeicherte Lesezeichen",
+    "noBookmarks": "Noch keine Lesezeichen. Setzen Sie Lesezeichen beim Lesen.",
+    "noProgress": "Noch kein Lesefortschritt",
+    "clearProgress": "Lesefortschritt l\u00f6schen",
+    "exportImport": "Exportieren / Importieren",
+    "export": "Exportieren",
+    "import": "Importieren"
+  },
+  "audio": {
+    "play": "Abspielen",
+    "pause": "Pause",
+    "reciter": "Rezitator",
+    "loading": "Audio wird geladen...",
+    "error": "Audio nicht verf\u00fcgbar"
+  },
   "language": {
     "picker": "Sprache",
     "en": "English",
@@ -95,32 +185,79 @@
     "fa": "\u0641\u0627\u0631\u0633\u06cc",
     "fr": "Fran\u00e7ais"
   },
+  "dailyVerse": {
+    "title": "Vers des Tages",
+    "readMore": "Weiterlesen"
+  },
+  "annotation": {
+    "add": "Notiz hinzuf\u00fcgen",
+    "edit": "Notiz bearbeiten",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "L\u00f6schen",
+    "placeholder": "Schreiben Sie hier Ihre pers\u00f6nliche Notiz...",
+    "notes": "Meine Notizen",
+    "noNotes": "Noch keine Notizen. F\u00fcgen Sie beim Lesen Notizen zu Versen hinzu."
+  },
+  "topics": {
+    "title": "Themen",
+    "description": "Durchsuchen Sie Hadith-Sammlungen nach Thema.",
+    "searchPlaceholder": "Themen suchen...",
+    "chapters": "Kapitel"
+  },
   "discussion": {
-    "title": "Discussion",
-    "noComments": "No comments yet. Be the first to share your thoughts.",
-    "placeholder": "Share your thoughts or insights...",
-    "post": "Post",
-    "flag": "Report",
-    "delete": "Delete",
-    "signInPrompt": "Sign in to join the discussion."
+    "title": "Diskussion",
+    "noComments": "Noch keine Kommentare. Seien Sie der Erste, der seine Gedanken teilt.",
+    "placeholder": "Teilen Sie Ihre Gedanken oder Erkenntnisse...",
+    "post": "Ver\u00f6ffentlichen",
+    "flag": "Melden",
+    "delete": "L\u00f6schen",
+    "signInPrompt": "Melden Sie sich an, um an der Diskussion teilzunehmen."
   },
   "sync": {
-    "title": "Cloud Sync",
-    "description": "Sync your bookmarks, reading progress, and notes across devices.",
-    "signInGoogle": "Sign in with Google",
-    "signInAnonymous": "Sign in anonymously",
-    "anonymous": "Anonymous User",
-    "signOut": "Sign out",
-    "syncNow": "Sync now",
-    "push": "Push to cloud",
-    "pull": "Pull from cloud",
-    "lastSync": "Last synced",
+    "title": "Cloud-Synchronisierung",
+    "description": "Synchronisieren Sie Lesezeichen, Lesefortschritt und Notizen \u00fcber Ger\u00e4te hinweg.",
+    "signInGoogle": "Mit Google anmelden",
+    "signInAnonymous": "Anonym anmelden",
+    "anonymous": "Anonymer Benutzer",
+    "signOut": "Abmelden",
+    "syncNow": "Jetzt synchronisieren",
+    "push": "In die Cloud hochladen",
+    "pull": "Von der Cloud herunterladen",
+    "lastSync": "Letzte Synchronisierung",
     "status": {
-      "disconnected": "Disconnected",
-      "connecting": "Connecting",
-      "synced": "Synced",
-      "syncing": "Syncing",
-      "error": "Error"
+      "disconnected": "Getrennt",
+      "connecting": "Verbindung wird hergestellt",
+      "synced": "Synchronisiert",
+      "syncing": "Synchronisierung",
+      "error": "Fehler"
     }
+  },
+  "tooltip": {
+    "viewDetails": "Hadith-Details anzeigen",
+    "moreActions": "Weitere Aktionen",
+    "hideDetails": "Details ausblenden",
+    "showDetails": "Details anzeigen",
+    "previewRelated": "Verwandten Vers ansehen",
+    "hidePreview": "Vorschau ausblenden",
+    "closeComparison": "Vergleich schlie\u00dfen",
+    "backToChapter": "Zur\u00fcck zum Kapitel",
+    "previewHadith": "Hadith-Vorschau"
+  },
+  "settings": {
+    "toggleDarkMode": "Dunkelmodus umschalten",
+    "increaseFont": "Schriftgr\u00f6\u00dfe erh\u00f6hen",
+    "decreaseFont": "Schriftgr\u00f6\u00dfe verringern",
+    "resetFont": "Schriftgr\u00f6\u00dfe zur\u00fccksetzen",
+    "keyboardShortcuts": "Tastenkombinationen",
+    "shortcutNextChapter": "N\u00e4chstes Kapitel",
+    "shortcutPrevChapter": "Vorheriges Kapitel",
+    "shortcutParent": "Zur \u00fcbergeordneten Ebene",
+    "shortcutSearch": "Suche fokussieren",
+    "shortcutDarkMode": "Dunkelmodus umschalten",
+    "shortcutHelp": "Tastenkombinationen anzeigen",
+    "shortcutClose": "Schlie\u00dfen / Fokus entfernen",
+    "pressEscToClose": "Esc dr\u00fccken zum Schlie\u00dfen",
+    "showKeyboardShortcuts": "Tastenkombinationen"
   }
 }

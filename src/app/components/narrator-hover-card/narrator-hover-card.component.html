@@ -3,6 +3,7 @@
      [style.top.px]="positionY"
      *ngIf="narrator">
   <div class="hover-card-name arabic" lang="ar" dir="rtl">{{ narrator.titles?.ar }}</div>
+  <div class="hover-card-name-en" *ngIf="narrator.titles?.en">{{ narrator.titles?.en }}</div>
   <div class="hover-card-stats">
     <span class="hover-card-stat">{{ narrator.narrations }} {{ 'common.verses' | translate }}</span>
   </div>

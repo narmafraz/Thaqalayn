@@ -789,7 +789,9 @@ Expanding the homepage to properly showcase all available books.
 
 ---
 
-## Phase 9: Mobile Navigation & Settings
+## Phase 9: Mobile Navigation & Settings ✅ COMPLETE
+
+> **Status:** MOB-01 implemented (2026-03-10). Mobile hamburger menu with consolidated settings (navigation, dark mode, font size, language). Desktop controls unchanged. 484 unit tests passing.
 
 Consolidating scattered settings and improving mobile navigation.
 

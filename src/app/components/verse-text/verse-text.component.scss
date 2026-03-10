@@ -127,6 +127,60 @@
   background: rgba(46, 125, 50, 0.2);
 }
 
+// Chain diagram
+.chain-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px;
+}
+
+.chain-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.narrator-node {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+  }
+
+  &.plain {
+    border-style: dashed;
+    font-style: italic;
+    font-size: var(--type-caption-size, 0.875rem);
+  }
+}
+
+.chain-arrow {
+  display: flex;
+  justify-content: center;
+  color: var(--text-muted, #999);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .narrator-node {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 // Isnad/Matn separation
 .isnad-text {
   color: var(--text-secondary, #888) !important;

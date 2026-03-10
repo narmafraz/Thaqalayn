@@ -1,6 +1,12 @@
 <div class="textrow">
   <!-- AI feature toggles -->
-  <div class="ai-toggles" *ngIf="hasAiText || hasWordAnalysis || hasChunks">
+  <div class="ai-toggles" *ngIf="hasAiText || hasWordAnalysis || hasChunks || hasNarratorChain">
+    <button *ngIf="hasNarratorChain" class="ai-toggle-btn" (click)="toggleChainDiagram()"
+            [class.active]="showChainDiagram"
+            [attr.aria-label]="showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"
+            matTooltip="{{ 'narrator.chainDiagram' | translate }}">
+      <mat-icon>{{ showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
+    </button>
     <button *ngIf="hasAiText" class="ai-toggle-btn" (click)="toggleDiacritics()"
             [class.active]="showDiacritics"
             [attr.aria-label]="showDiacritics ? 'Show original text' : 'Show diacritized text'"
@@ -22,6 +28,19 @@
     <span class="ai-diacritics-badge" *ngIf="showDiacritics && verse.ai?.diacritics_status">
       {{ verse.ai.diacritics_status }}
     </span>
+  </div>
+
+  <!-- Chain Diagram View -->
+  <div class="chain-diagram" *ngIf="showChainDiagram && verse?.narrator_chain?.parts">
+    <div class="chain-node" *ngFor="let part of getNarratorParts(); let last = last">
+      <a *ngIf="part.path" [routerLink]="part.path" queryParamsHandling="preserve" class="narrator-node">
+        <span class="narrator-text">{{ part.text }}</span>
+      </a>
+      <span *ngIf="!part.path" class="narrator-node plain">{{ part.text }}</span>
+      <div class="chain-arrow" *ngIf="!last">
+        <mat-icon>arrow_downward</mat-icon>
+      </div>
+    </div>
   </div>
 
   <!-- Word-by-word analysis view -->

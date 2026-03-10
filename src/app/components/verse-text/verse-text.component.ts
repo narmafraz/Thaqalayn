@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AiLanguage, AiTranslationEntry, Chunk, ContentType, IsnadMatn, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { NarratorMetadata, Verse } from '@app/models';
+import { SpecialText } from '@app/models/book';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -39,6 +40,7 @@ export class VerseTextComponent {
   showIsnadSeparation = this.aiPrefs.get('showIsnadSeparation');
   showWordAnalysis = false;
   showChunkedView = false;
+  showChainDiagram = false;
   wordAnalysisLang: AiLanguage = this.aiPrefs.get('wordByWordDefaultLang');
   activeWordIndex: number | null = null;
 
@@ -55,6 +57,19 @@ export class VerseTextComponent {
 
   toggleChunkedView(): void {
     this.showChunkedView = !this.showChunkedView;
+  }
+
+  toggleChainDiagram(): void {
+    this.showChainDiagram = !this.showChainDiagram;
+  }
+
+  /** Get narrator-kind parts from the narrator chain for the chain diagram */
+  getNarratorParts(): SpecialText[] {
+    return this.verse?.narrator_chain?.parts || [];
+  }
+
+  get hasNarratorChain(): boolean {
+    return !!this.verse?.narrator_chain?.parts?.length;
   }
 
   setActiveWord(index: number | null): void {

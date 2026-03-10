@@ -43,8 +43,8 @@
   align-items: center;
   padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-caption-weight);
   background: var(--table-stripe, #f0f0f0);
   color: var(--text-primary, #333);
 
@@ -170,7 +170,8 @@
     align-items: baseline;
 
     .bio-label {
-      font-weight: 500;
+      font-weight: var(--type-caption-weight);
+      font-size: var(--type-caption-size);
       color: var(--text-secondary, #555);
       min-width: 100px;
     }

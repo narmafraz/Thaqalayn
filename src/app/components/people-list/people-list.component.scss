@@ -108,8 +108,9 @@
   margin-bottom: 1rem;
 
   .featured-imams-title {
-    font-size: 1.2rem;
-    font-weight: 500;
+    font-size: var(--type-subheading-size);
+    font-weight: var(--type-subheading-weight);
+    line-height: var(--type-subheading-line-height);
     color: var(--text-primary, #333);
     margin: 0 0 0.75rem;
   }

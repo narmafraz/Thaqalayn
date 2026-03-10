@@ -22,6 +22,11 @@ export class I18nService {
   isRtl$: Observable<boolean>;
   stringsChanged$ = this.stringsChangedSubject.asObservable();
 
+  /** Synchronous accessor for the current language code. */
+  get currentLang(): string {
+    return this.langSubject.value;
+  }
+
   constructor(private http: HttpClient, @Inject(PLATFORM_ID) platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);
     const initialLang = this.detectLanguage();

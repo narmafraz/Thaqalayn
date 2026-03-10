@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { Book, getChapter, Narrator } from '@app/models';
 import { I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
 import { Store } from '@ngxs/store';
@@ -45,18 +46,22 @@ export class AppComponent implements OnInit, OnDestroy {
   showBackToTop = false;
   headerCompact = false;
 
-  private static readonly STATIC_TITLES: Record<string, string> = {
-    '/about': 'About',
-    '/bookmarks': 'Bookmarks',
-    '/download': 'Download',
-    '/support': 'Support',
-    '/topics': 'Topics',
+  private static readonly STATIC_TITLES: Record<string, { i18nKey: string; fallback: string }> = {
+    '/about': { i18nKey: 'pageTitle.about', fallback: 'About' },
+    '/bookmarks': { i18nKey: 'pageTitle.bookmarks', fallback: 'Bookmarks' },
+    '/download': { i18nKey: 'pageTitle.download', fallback: 'Download' },
+    '/support': { i18nKey: 'pageTitle.support', fallback: 'Support' },
+    '/topics': { i18nKey: 'pageTitle.topics', fallback: 'Topics' },
   };
+
+  /** Tracks the current page context for re-applying titles on language change. */
+  private currentPageContext: { type: string; data?: unknown } = { type: 'home' };
 
   private isBrowser: boolean;
 
   constructor(
     private seo: SeoService,
+    private titleService: Title,
     private router: Router,
     private store: Store,
     private i18n: I18nService,
@@ -189,20 +194,26 @@ export class AppComponent implements OnInit, OnDestroy {
         const url = event.urlAfterRedirects || event.url;
         const path = url.replace(/^#?\/?/, '/').split('?')[0];
 
-        for (const [route, title] of Object.entries(AppComponent.STATIC_TITLES)) {
+        for (const [route, entry] of Object.entries(AppComponent.STATIC_TITLES)) {
           if (path === route) {
-            this.seo.setStaticPage(route, title);
+            this.seo.setStaticPage(route, entry.fallback);
+            this.currentPageContext = { type: 'static', data: route };
+            this.applyLocalizedTitle();
             return;
           }
         }
 
         if (path === '/books' || path === '/' || path === '') {
           this.seo.setHomePage();
+          this.currentPageContext = { type: 'home' };
+          this.applyLocalizedTitle();
           return;
         }
 
         if (path.startsWith('/people/narrators/index')) {
           this.seo.setNarratorListPage();
+          this.currentPageContext = { type: 'narrator-list' };
+          this.applyLocalizedTitle();
           return;
         }
       })
@@ -223,6 +234,8 @@ export class AppComponent implements OnInit, OnDestroy {
             d.chapter_title?.en || '',
             translationText
           );
+          this.currentPageContext = { type: 'verse-detail', data: book };
+          this.applyLocalizedTitle();
           return;
         }
         const chapter = getChapter(book);
@@ -232,6 +245,8 @@ export class AppComponent implements OnInit, OnDestroy {
             chapter.titles.en,
             chapter.descriptions?.en
           );
+          this.currentPageContext = { type: 'book', data: book };
+          this.applyLocalizedTitle();
         }
       })
     );
@@ -246,9 +261,90 @@ export class AppComponent implements OnInit, OnDestroy {
             name,
             narrator.titles.ar
           );
+          this.currentPageContext = { type: 'narrator', data: narrator };
+          this.applyLocalizedTitle();
         }
       })
     );
+
+    // Re-apply localized document.title when language or i18n strings change
+    this.subscriptions.push(
+      this.i18n.stringsChanged$.subscribe(() => {
+        this.applyLocalizedTitle();
+      })
+    );
+  }
+
+  /**
+   * Sets document.title using the current language, without changing SEO meta tags.
+   * SEO tags remain in English (set by SeoService).
+   */
+  private applyLocalizedTitle(): void {
+    const SITE = 'Thaqalayn';
+    const lang = this.i18n.currentLang;
+    const ctx = this.currentPageContext;
+
+    let pageTitle: string | undefined;
+
+    switch (ctx.type) {
+      case 'home':
+        pageTitle = undefined; // Just site name
+        break;
+
+      case 'static': {
+        const route = ctx.data as string;
+        const entry = AppComponent.STATIC_TITLES[route];
+        if (entry) {
+          const translated = this.i18n.get(entry.i18nKey);
+          pageTitle = translated !== entry.i18nKey ? translated : entry.fallback;
+        }
+        break;
+      }
+
+      case 'narrator-list': {
+        const translated = this.i18n.get('pageTitle.narrators');
+        pageTitle = translated !== 'pageTitle.narrators' ? translated : 'Narrators';
+        break;
+      }
+
+      case 'book': {
+        const book = ctx.data as Book;
+        const chapter = getChapter(book);
+        if (chapter && chapter.titles) {
+          pageTitle = (chapter.titles as Record<string, string>)[lang]
+            || chapter.titles.en;
+        }
+        break;
+      }
+
+      case 'verse-detail': {
+        const book = ctx.data as Book;
+        if (book.kind === 'verse_detail') {
+          const d = book.data;
+          const chapterTitle = d.chapter_title
+            ? ((d.chapter_title as Record<string, string>)[lang] || d.chapter_title.en || '')
+            : '';
+          const segments = book.index.split(':');
+          const bookSlug = segments[0];
+          const bookName = bookSlug === 'quran' ? 'Holy Quran' : bookSlug === 'al-kafi' ? 'Al-Kafi' : bookSlug;
+          pageTitle = `${d.verse.part_type} ${d.verse.local_index} - ${chapterTitle} - ${bookName}`;
+        }
+        break;
+      }
+
+      case 'narrator': {
+        const narrator = ctx.data as Narrator;
+        if (narrator && narrator.titles) {
+          pageTitle = (narrator.titles as Record<string, string>)[lang]
+            || narrator.titles.en
+            || narrator.titles.ar;
+        }
+        break;
+      }
+    }
+
+    const fullTitle = pageTitle ? `${pageTitle} - ${SITE}` : SITE;
+    this.titleService.setTitle(fullTitle);
   }
 
   ngOnDestroy(): void {

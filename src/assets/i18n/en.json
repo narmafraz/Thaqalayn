@@ -77,7 +77,15 @@
     "students": "Students",
     "source": "Source",
     "showAll": "Show all",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "topConarrators": "Top Co-Narrators",
+    "showAllConarrators": "Show all {{count}} co-narrators",
+    "books": "Books",
+    "totalNarrations": "Total narrations",
+    "bookDistribution": "Book Distribution",
+    "featuredImams": "The Ahl al-Bayt",
+    "imam": "Imam",
+    "viewProfile": "View profile"
   },
   "search": {
     "filter": "Filter",

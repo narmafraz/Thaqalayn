@@ -8,6 +8,22 @@
 
   <ng-container *ngIf="(narrators$ | async) as narrators">
     <app-book-titles [titles]="narratorsTitles"></app-book-titles>
+
+    <!-- Featured Imams Section (NAR-01) -->
+    <section class="featured-imams" *ngIf="featuredImams.length > 0">
+      <h2 class="featured-imams-title">{{ 'narrator.featuredImams' | translate }}</h2>
+      <div class="imam-cards-scroll">
+        <a *ngFor="let imam of featuredImams"
+           class="imam-card"
+           [routerLink]="'/people/narrators/' + imam.id">
+          <span class="imam-badge-icon" aria-hidden="true">&#9733;</span>
+          <span class="imam-name-en">{{ imam.nameEn }}</span>
+          <span class="imam-name-ar arabic" lang="ar" dir="rtl">{{ imam.nameAr }}</span>
+          <span class="imam-narrations">{{ imam.narrations | number }} {{ 'narrator.narrations' | translate }}</span>
+        </a>
+      </div>
+    </section>
+
     <div class="content">
       <div class="mat-elevation-z8">
         <mat-form-field class="filter-field">
@@ -19,12 +35,14 @@
         </mat-form-field>
 
         <table *ngIf="(displayedColumns$ | async) as displayedColumns" mat-table class="full-width-table" [dataSource]="dataSource" matSort
+          matSortActive="narrations" matSortDirection="desc"
           aria-label="Elements">
 
           <ng-container matColumnDef="octrta">
             <th mat-header-cell *matHeaderCellDef></th>
             <td mat-cell *matCellDef="let row">
               <div class="textrow titlerow">
+                <span class="imam-table-badge" *ngIf="isImam(row.index)" [title]="getImamLabel(row.index)">&#9733;</span>
                 <div class="en-name" *ngIf="row.titles.en">{{row.titles.en}}</div>
                 <div class="arabic" lang="ar" dir="rtl">{{row.titles.ar}}</div>
               </div>
@@ -46,7 +64,10 @@
           <!-- Name Column -->
           <ng-container matColumnDef="name.ar">
             <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'common.name' | translate }}</th>
-            <td mat-cell *matCellDef="let row" class="center arabic" lang="ar">{{row.titles.ar}}</td>
+            <td mat-cell *matCellDef="let row" class="center arabic" lang="ar">
+              <span class="imam-table-badge" *ngIf="isImam(row.index)" [title]="getImamLabel(row.index)">&#9733;</span>
+              {{row.titles.ar}}
+            </td>
           </ng-container>
 
           <!-- narrations Column -->

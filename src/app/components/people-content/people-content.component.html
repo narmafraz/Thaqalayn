@@ -11,6 +11,34 @@
       </h2>
     </div>
 
+    <!-- Stats Summary Section (NAR-02) -->
+    <section class="stats-section" *ngIf="totalNarrations > 0">
+      <div class="stats-pills">
+        <span class="stat-pill narrations-pill">
+          {{ 'narrator.totalNarrations' | translate }}: {{ totalNarrations | number }}
+        </span>
+        <span class="stat-pill" *ngIf="narrator.biography?.reliability"
+              [class.reliable]="narrator.biography.reliability?.includes('Thiqah') || narrator.biography.reliability?.includes('ثقة')">
+          {{ narrator.biography.reliability }}
+        </span>
+        <span class="stat-pill book-pill" *ngFor="let bd of bookDistribution">
+          {{ bd.displayName }}: {{ bd.count | number }}
+        </span>
+      </div>
+      <div class="book-distribution-chart" *ngIf="bookDistribution.length > 1">
+        <h3>{{ 'narrator.bookDistribution' | translate }}</h3>
+        <div class="distribution-bars">
+          <div class="distribution-bar-row" *ngFor="let bd of bookDistribution">
+            <span class="bar-label">{{ bd.displayName }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="bd.percentage"></div>
+            </div>
+            <span class="bar-count">{{ bd.count | number }}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Biography Section -->
     <section class="biography-section" *ngIf="narrator.biography as bio">
       <h2>{{ 'narrator.biography' | translate }}</h2>
@@ -82,51 +110,73 @@
     <section class="conarrators-section">
       <h2>{{ 'narrator.coNarrators' | translate }}</h2>
 
-      <div class="search-box">
-        <mat-form-field appearance="outline" class="w-full">
-          <mat-label>{{ 'narrator.searchCoNarrators' | translate }}</mat-label>
-          <input matInput (keyup)="applyFilter($event)" [placeholder]="'narrator.searchNarratorsPlaceholder' | translate">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
-      </div>
-
-      <div class="subchains-list">
-        <div *ngFor="let element of paginatedSubchains" class="subchain-item">
-          <div class="subchain-container">
-            <div class="subchain-text arabic" dir="rtl" lang="ar">
-              <ng-container *ngFor="let narrator_id of element.value.narrator_ids; let isLast = last">
-                <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
-                  {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}
-                </a>
-                <span *ngIf="!isLast" class="arrow">&#x27F5;</span>
-              </ng-container>
-            </div>
-            <div class="verse-count" *ngIf="element.value.verse_paths">
-              ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
-            </div>
-          </div>
-          <ol class="verse-paths-list">
-            <li *ngFor="let path of getVisiblePaths(element)">
-              <app-path-link [path]="path"></app-path-link>
-            </li>
-          </ol>
-          <button *ngIf="element.value.verse_paths.length > 3"
-                  mat-button
-                  class="show-more-btn"
-                  (click)="toggleExpandSubchain(element.key)">
-            {{ isExpanded(element.key) ? ('narrator.showLess' | translate) : ('narrator.showAll' | translate) + ' ' + element.value.verse_paths.length + ' ' + ('common.verses' | translate) }}
-          </button>
+      <!-- Top Co-Narrators Summary (NAR-04) -->
+      <div class="top-conarrators" *ngIf="topConarrators.length > 0">
+        <h3>{{ 'narrator.topConarrators' | translate }} ({{ uniqueConarratorCount }})</h3>
+        <div class="conarrator-pills">
+          <a *ngFor="let cn of topConarrators"
+             class="conarrator-pill"
+             [routerLink]="['/people/narrators/' + cn.id]">
+            <span class="conarrator-name arabic" lang="ar">{{ cn.name }}</span>
+            <span class="conarrator-count">({{ cn.count }})</span>
+          </a>
         </div>
+        <button *ngIf="uniqueConarratorCount > 10 && !showAllConarrators"
+                mat-button
+                class="show-all-conarrators-btn"
+                (click)="showAllConarrators = true">
+          {{ 'narrator.showAllConarrators' | translate: { count: uniqueConarratorCount } }}
+        </button>
       </div>
 
-      <mat-paginator
-        [length]="filteredSubchains.length"
-        [pageSize]="subchainsPageSize"
-        [pageIndex]="subchainsPage"
-        [pageSizeOptions]="[10, 25, 50]"
-        (page)="onSubchainsPageChange($event)"
-        [attr.aria-label]="'common.selectPage' | translate">
-      </mat-paginator>
+      <!-- Full subchains detail (shown when expanded or few co-narrators) -->
+      <ng-container *ngIf="showAllConarrators || uniqueConarratorCount <= 10">
+        <div class="search-box">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>{{ 'narrator.searchCoNarrators' | translate }}</mat-label>
+            <input matInput (keyup)="applyFilter($event)" [placeholder]="'narrator.searchNarratorsPlaceholder' | translate">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="subchains-list">
+          <div *ngFor="let element of paginatedSubchains" class="subchain-item">
+            <div class="subchain-container">
+              <div class="subchain-text arabic" dir="rtl" lang="ar">
+                <ng-container *ngFor="let narrator_id of element.value.narrator_ids; let isLast = last">
+                  <a [routerLink]="['/people/narrators/' + narrator_id]" class="narrator-link">
+                    {{(narratorIndex$ | async)?.[narrator_id]?.titles?.ar || narrator_id}}
+                  </a>
+                  <span *ngIf="!isLast" class="arrow">&#x27F5;</span>
+                </ng-container>
+              </div>
+              <div class="verse-count" *ngIf="element.value.verse_paths">
+                ({{element.value.verse_paths.length}} {{ 'common.verses' | translate }})
+              </div>
+            </div>
+            <ol class="verse-paths-list">
+              <li *ngFor="let path of getVisiblePaths(element)">
+                <app-path-link [path]="path"></app-path-link>
+              </li>
+            </ol>
+            <button *ngIf="element.value.verse_paths.length > 3"
+                    mat-button
+                    class="show-more-btn"
+                    (click)="toggleExpandSubchain(element.key)">
+              {{ isExpanded(element.key) ? ('narrator.showLess' | translate) : ('narrator.showAll' | translate) + ' ' + element.value.verse_paths.length + ' ' + ('common.verses' | translate) }}
+            </button>
+          </div>
+        </div>
+
+        <mat-paginator
+          [length]="filteredSubchains.length"
+          [pageSize]="subchainsPageSize"
+          [pageIndex]="subchainsPage"
+          [pageSizeOptions]="[10, 25, 50]"
+          (page)="onSubchainsPageChange($event)"
+          [attr.aria-label]="'common.selectPage' | translate">
+        </mat-paginator>
+      </ng-container>
     </section>
   </div>
 

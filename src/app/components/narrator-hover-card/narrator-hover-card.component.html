@@ -1,0 +1,12 @@
+<div class="narrator-hover-card"
+     [style.left.px]="positionX"
+     [style.top.px]="positionY"
+     *ngIf="narrator">
+  <div class="hover-card-name arabic" lang="ar" dir="rtl">{{ narrator.titles?.ar }}</div>
+  <div class="hover-card-stats">
+    <span class="hover-card-stat">{{ narrator.narrations }} {{ 'common.verses' | translate }}</span>
+  </div>
+  <a class="hover-card-link" [routerLink]="['/people/narrators/' + narratorId]" queryParamsHandling="preserve">
+    {{ 'narrator.viewProfile' | translate }}
+  </a>
+</div>

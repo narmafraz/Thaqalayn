@@ -14,6 +14,7 @@ import { ErrorDisplayComponent } from '../components/error-display/error-display
 import { BookTitlesComponent } from '../components/book-titles/book-titles.component';
 import { VerseTextComponent } from '../components/verse-text/verse-text.component';
 import { SkeletonLoaderComponent } from '../components/skeleton-loader/skeleton-loader.component';
+import { NarratorHoverCardComponent } from '../components/narrator-hover-card/narrator-hover-card.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { SkeletonLoaderComponent } from '../components/skeleton-loader/skeleton-
     BookTitlesComponent,
     VerseTextComponent,
     SkeletonLoaderComponent,
+    NarratorHoverCardComponent,
   ],
   imports: [
     CommonModule,
@@ -49,6 +51,7 @@ import { SkeletonLoaderComponent } from '../components/skeleton-loader/skeleton-
     BookTitlesComponent,
     VerseTextComponent,
     SkeletonLoaderComponent,
+    NarratorHoverCardComponent,
   ],
 })
 export class SharedModule {}

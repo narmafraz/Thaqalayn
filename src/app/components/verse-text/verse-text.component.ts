@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AiLanguage, AiTranslationEntry, Chunk, ContentType, IsnadMatn, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
-import { Verse } from '@app/models';
+import { NarratorMetadata, Verse } from '@app/models';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
+import { PeopleState } from '@store/people/people.state';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -15,16 +16,23 @@ import { Observable } from 'rxjs';
     standalone: false
 })
 export class VerseTextComponent {
-  translation$: Observable<string> = inject(Store).select(BooksState.getTranslationIfInBookOrDefault);
-  translationClass$: Observable<string> = inject(Store).select(BooksState.getTranslationClass);
-  translation2$: Observable<string> = inject(Store).select(BooksState.getSecondTranslation);
-  translationClass2$: Observable<string> = inject(Store).select(BooksState.getSecondTranslationClass);
+  private store = inject(Store);
+  translation$: Observable<string> = this.store.select(BooksState.getTranslationIfInBookOrDefault);
+  translationClass$: Observable<string> = this.store.select(BooksState.getTranslationClass);
+  translation2$: Observable<string> = this.store.select(BooksState.getSecondTranslation);
+  translationClass2$: Observable<string> = this.store.select(BooksState.getSecondTranslationClass);
   private aiPrefs = inject(AiPreferencesService);
   private sanitizer = inject(DomSanitizer);
 
   @Input() verse: Verse;
   @Input() isQuran = false;
   @Input() verseNumber: number;
+
+  // Narrator hover card state
+  hoveredNarrator: { id: number; narrator: NarratorMetadata | null; x: number; y: number } | null = null;
+  private hoverTimeout: ReturnType<typeof setTimeout> | null = null;
+  private narratorIndex: Record<number, NarratorMetadata> = {};
+  private narratorIndexLoaded = false;
 
   // AI feature toggles (initialized from saved preferences)
   showDiacritics = this.aiPrefs.get('showDiacritizedByDefault');
@@ -320,5 +328,87 @@ export class VerseTextComponent {
 
   private escapeAttr(text: string): string {
     return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /** Extract narrator ID from a narrator path like '/people/narrators/123' */
+  private extractNarratorId(path: string): number | null {
+    const match = path?.match(/\/people\/narrators\/(\d+)/);
+    return match ? parseInt(match[1], 10) : null;
+  }
+
+  showNarratorCard(event: MouseEvent, path: string): void {
+    const narratorId = this.extractNarratorId(path);
+    if (narratorId === null) return;
+
+    // Load narrator index if not yet loaded
+    if (!this.narratorIndexLoaded) {
+      this.narratorIndex = this.store.selectSnapshot(PeopleState.getEnrichedNarratorIndex) || {};
+      this.narratorIndexLoaded = true;
+    }
+
+    const target = event.target as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const containerRect = target.closest('.textrow')?.getBoundingClientRect();
+    const offsetX = containerRect ? rect.left - containerRect.left : rect.left;
+    const offsetY = containerRect ? rect.bottom - containerRect.top + 4 : rect.bottom + 4;
+
+    this.hoveredNarrator = {
+      id: narratorId,
+      narrator: this.narratorIndex[narratorId] || null,
+      x: offsetX,
+      y: offsetY
+    };
+  }
+
+  hideNarratorCard(): void {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+    this.hoverTimeout = setTimeout(() => {
+      this.hoveredNarrator = null;
+    }, 200);
+  }
+
+  keepNarratorCard(): void {
+    if (this.hoverTimeout) {
+      clearTimeout(this.hoverTimeout);
+      this.hoverTimeout = null;
+    }
+  }
+
+  private longPressTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  onNarratorTouchStart(event: TouchEvent, path: string): void {
+    this.longPressTimeout = setTimeout(() => {
+      const touch = event.touches[0];
+      const narratorId = this.extractNarratorId(path);
+      if (narratorId === null) return;
+
+      if (!this.narratorIndexLoaded) {
+        const store = inject(Store);
+        this.narratorIndex = store.selectSnapshot(PeopleState.getEnrichedNarratorIndex) || {};
+        this.narratorIndexLoaded = true;
+      }
+
+      const target = event.target as HTMLElement;
+      const containerRect = target.closest('.textrow')?.getBoundingClientRect();
+      const offsetX = containerRect ? touch.clientX - containerRect.left : touch.clientX;
+      const offsetY = containerRect ? touch.clientY - containerRect.top + 10 : touch.clientY + 10;
+
+      this.hoveredNarrator = {
+        id: narratorId,
+        narrator: this.narratorIndex[narratorId] || null,
+        x: offsetX,
+        y: offsetY
+      };
+    }, 500);
+  }
+
+  onNarratorTouchEnd(): void {
+    if (this.longPressTimeout) {
+      clearTimeout(this.longPressTimeout);
+      this.longPressTimeout = null;
+    }
   }
 }

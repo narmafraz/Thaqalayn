@@ -9,6 +9,33 @@ import { RouterState } from '@store/router/router.state';
 import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, takeUntil } from 'rxjs/operators';
 
+export interface ConarratorSummary {
+  id: number;
+  name: string;
+  count: number;
+}
+
+export interface BookDistribution {
+  book: string;
+  displayName: string;
+  count: number;
+  percentage: number;
+}
+
+/** Display name mapping for book path prefixes */
+const BOOK_DISPLAY_NAMES: Record<string, string> = {
+  'al-kafi': 'Al-Kafi',
+  'quran': 'Quran',
+  'tahdhib-al-ahkam': 'Tahdhib al-Ahkam',
+  'al-istibsar': 'Al-Istibsar',
+  'man-la-yahduruhu-al-faqih': 'Man La Yahduruhu al-Faqih',
+  'kitab-al-irshad': 'Kitab al-Irshad',
+  'al-amali': 'Al-Amali',
+  'kitab-sulaym-ibn-qays': 'Kitab Sulaym ibn Qays',
+  'nahj-al-balagha': 'Nahj al-Balagha',
+  'al-sahifa-al-sajjadiyya': 'Al-Sahifa al-Sajjadiyya',
+};
+
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'app-people-content',
@@ -43,10 +70,21 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
   // Expansion tracking for subchain verse paths
   expandedSubchains = new Set<string>();
 
+  // Top co-narrators (NAR-04)
+  topConarrators: ConarratorSummary[] = [];
+  uniqueConarratorCount = 0;
+  showAllConarrators = false;
+
+  // Stats summary (NAR-02)
+  totalNarrations = 0;
+  bookCount = 0;
+  bookDistribution: BookDistribution[] = [];
+
   // Filter
   private pathsFilterSubject = new Subject<string>();
   private subchainsFilterSubject = new Subject<string>();
   private narratorIndex: Record<number, NarratorMetadata> = {};
+  private currentNarratorIndex: string = '';
 
   ngOnInit() {
     // Load narrator index for filtering
@@ -106,6 +144,8 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       filter(narrator => !!narrator),
       takeUntil(this.destroy$)
     ).subscribe(narrator => {
+      this.currentNarratorIndex = narrator.index;
+
       // Process verse paths
       if (narrator.verse_paths) {
         this.allPaths = this.sortBy(narrator.verse_paths).map(path => ({ path }));
@@ -116,6 +156,9 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       this.pathsPage = 0;
       this.updatePaginatedPaths();
 
+      // Compute stats summary (NAR-02)
+      this.computeStats(narrator);
+
       // Process subchains
       if (narrator.subchains) {
         this.allSubchains = Object.entries(narrator.subchains)
@@ -125,11 +168,17 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
             const bn = b.value.narrator_ids ? b.value.narrator_ids.length : 0;
             return bn - an;
           });
+
+        // Compute top co-narrators (NAR-04)
+        this.computeTopConarrators(narrator);
       } else {
         this.allSubchains = [];
+        this.topConarrators = [];
+        this.uniqueConarratorCount = 0;
       }
       this.filteredSubchains = this.allSubchains;
       this.subchainsPage = 0;
+      this.showAllConarrators = false;
       this.expandedSubchains.clear();
       this.updatePaginatedSubchains();
 
@@ -219,5 +268,61 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       .replace(/[يى]/g, 'ي')
       .toLowerCase()
       .trim();
+  }
+
+  /** Compute top co-narrators from subchains (NAR-04) */
+  private computeTopConarrators(narrator: Narrator): void {
+    const currentId = parseInt(narrator.index, 10);
+    const conarratorCounts = new Map<number, number>();
+
+    if (narrator.subchains) {
+      for (const chain of Object.values(narrator.subchains)) {
+        if (!chain.narrator_ids) continue;
+        const verseCount = chain.verse_paths ? chain.verse_paths.length : 0;
+        for (const id of chain.narrator_ids) {
+          if (id === currentId) continue;
+          conarratorCounts.set(id, (conarratorCounts.get(id) || 0) + verseCount);
+        }
+      }
+    }
+
+    this.uniqueConarratorCount = conarratorCounts.size;
+
+    const sorted = Array.from(conarratorCounts.entries())
+      .sort((a, b) => b[1] - a[1]);
+
+    this.topConarrators = sorted.slice(0, 10).map(([id, count]) => ({
+      id,
+      name: this.narratorIndex[id]?.titles?.ar || String(id),
+      count
+    }));
+  }
+
+  /** Compute stats summary from verse_paths (NAR-02) */
+  private computeStats(narrator: Narrator): void {
+    const paths = narrator.verse_paths || [];
+    this.totalNarrations = paths.length;
+
+    const bookCounts = new Map<string, number>();
+    for (const path of paths) {
+      // path format: /books/al-kafi:1:2:3:4
+      const match = path.match(/^\/books\/([^:]+)/);
+      if (match) {
+        const book = match[1];
+        bookCounts.set(book, (bookCounts.get(book) || 0) + 1);
+      }
+    }
+
+    this.bookCount = bookCounts.size;
+    const maxCount = Math.max(...Array.from(bookCounts.values()), 1);
+
+    this.bookDistribution = Array.from(bookCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([book, count]) => ({
+        book,
+        displayName: BOOK_DISPLAY_NAMES[book] || book,
+        count,
+        percentage: (count / maxCount) * 100
+      }));
   }
 }

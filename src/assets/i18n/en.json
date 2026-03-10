@@ -33,7 +33,17 @@
     "quran": "The Holy Quran",
     "quranDesc": "114 surahs with multiple translations",
     "alKafi": "Al-Kafi",
-    "alKafiDesc": "The most comprehensive Shia hadith collection"
+    "alKafiDesc": "The most comprehensive Shia hadith collection",
+    "tahdhibDesc": "Hadith collection on Islamic jurisprudence",
+    "istibsarDesc": "Resolution of conflicting hadith traditions",
+    "faqihDesc": "Practical hadith for daily jurisprudence",
+    "irshadDesc": "Biographies of the Twelve Imams",
+    "amaliDesc": "Dictated hadith sessions by Al-Saduq",
+    "sulaimDesc": "Earliest Shia hadith compilation",
+    "nahjDesc": "Sermons, letters, and sayings of Imam Ali",
+    "sahifaDesc": "Supplications of Imam al-Sajjad",
+    "wasaelDesc": "Comprehensive jurisprudential hadith compilation",
+    "biharDesc": "Encyclopedic collection of Shia traditions"
   },
   "book": {
     "reference": "Reference",
@@ -62,7 +72,15 @@
     "shareImage": "Share as image",
     "showDifferences": "Show text differences",
     "hideDifferences": "Hide differences",
-    "jumpToVerse": "Jump to verse"
+    "jumpToVerse": "Jump to verse",
+    "jumpToHadith": "Jump to hadith",
+    "jumpToAyah": "Jump to ayah",
+    "hadithCount": "hadiths",
+    "ayahCount": "ayahs",
+    "viewMode": "View mode",
+    "viewPlain": "Plain text",
+    "viewWordByWord": "Word by word",
+    "viewParagraph": "Paragraph view"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",
@@ -157,6 +175,7 @@
     "to": "to",
     "number": "#",
     "verses": "verses",
+    "hadiths": "hadiths",
     "selectPage": "Select page",
     "clear": "Clear",
     "bookNavigation": "Book navigation"

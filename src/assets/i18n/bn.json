@@ -24,7 +24,17 @@
     "quran": "পবিত্র কুরআন",
     "quranDesc": "১১৪টি সূরা একাধিক অনুবাদসহ",
     "alKafi": "আল-কাফি",
-    "alKafiDesc": "সর্বাধিক ব্যাপক শিয়া হাদিস সংকলন"
+    "alKafiDesc": "সর্বাধিক ব্যাপক শিয়া হাদিস সংকলন",
+    "tahdhibDesc": "ইসলামি আইনশাস্ত্রের হাদিস সংকলন",
+    "istibsarDesc": "পরস্পরবিরোধী হাদিস ঐতিহ্যের সমাধান",
+    "faqihDesc": "দৈনন্দিন আইনশাস্ত্রের জন্য ব্যবহারিক হাদিস",
+    "irshadDesc": "বারো ইমামদের জীবনী",
+    "amaliDesc": "আল-সাদুকের হাদিস অধিবেশন",
+    "sulaimDesc": "প্রাচীনতম শিয়া হাদিস সংকলন",
+    "nahjDesc": "ইমাম আলীর খুতবা, চিঠি ও বাণী",
+    "sahifaDesc": "ইমাম সাজ্জাদের দোয়া সমূহ",
+    "wasaelDesc": "ব্যাপক আইনশাস্ত্র হাদিস সংকলন",
+    "biharDesc": "শিয়া ঐতিহ্যের বিশ্বকোষ"
   },
   "book": {
     "reference": "তথ্যসূত্র",
@@ -53,7 +63,15 @@
     "shareImage": "ছবি হিসেবে শেয়ার",
     "showDifferences": "পার্থক্য দেখান",
     "hideDifferences": "পার্থক্য লুকান",
-    "jumpToVerse": "আয়াতে যান"
+    "jumpToVerse": "আয়াতে যান",
+    "jumpToHadith": "হাদিসে যান",
+    "jumpToAyah": "আয়াতে যান",
+    "hadithCount": "হাদিস",
+    "ayahCount": "আয়াত",
+    "viewMode": "দেখার মোড",
+    "viewPlain": "সাধারণ পাঠ্য",
+    "viewWordByWord": "শব্দে শব্দে",
+    "viewParagraph": "অনুচ্ছেদ দৃশ্য"
   },
   "narrator": {
     "narratedAhadith": "বর্ণিত হাদিস",
@@ -132,6 +150,7 @@
     "to": "থেকে",
     "number": "#",
     "verses": "আয়াত",
+    "hadiths": "হাদিস",
     "selectPage": "পৃষ্ঠা নির্বাচন",
     "clear": "মুছুন",
     "bookNavigation": "কিতাব নেভিগেশন"

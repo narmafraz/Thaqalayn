@@ -150,6 +150,10 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     return chapterPath.replace('/books/', '');
   }
 
+  isQuranBook(bookIndex: string): boolean {
+    return bookIndex.startsWith('quran:') || bookIndex === 'quran';
+  }
+
   getNavRouterLink(path: string): string {
     return path.replace('/books/', '');
   }

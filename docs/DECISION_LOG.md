@@ -723,3 +723,38 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 - **ADV-06 (Categories):** Partially implemented. Imam/Top/All categories work now. Era-based categories need WikiShia data.
 
 ---
+
+## Phase 6-10 Decisions
+
+### D037: Phases 6-10 Planning — User Feedback + Desktop/Mobile Review Merge (2026-03-10)
+
+**Context:** User provided 13 specific UI improvement requests. Desktop UX review found 22 issues (DESK-01 through DESK-22). Mobile UX review running separately. All findings needed to be merged into actionable roadmap phases.
+
+**Decision:** Created 5 new phases (6-10) with 14 items total:
+- **Phase 6: Content Parity** (7 items) — Unify verse-detail and chapter-content, fix terminology, view mode persistence
+- **Phase 7: AI Integration** (2 items) — Seamless AI content, Arabic word click popup
+- **Phase 8: Homepage** (2 items) — Dynamic explore cards for all books, author metadata
+- **Phase 9: Mobile Navigation** (1 item) — Hamburger menu consolidation
+- **Phase 10: Data Pipeline** (2 items) — Cross-project narrator extraction, author data
+
+**Challenger review findings incorporated:**
+- PAR-01 (verse-detail parity) effort revised M→M-L; implement last in Phase 6
+- PAR-05 and PAR-06 merged (view mode service naturally includes persistence)
+- AI-02 needs word tokenization prerequisite (innerHTML→spans)
+- MOB-01 effort revised M→L (3-5 days)
+- PAR-05 should use shared service (AiPreferencesService), not @Input()
+
+### D038: HOME-01 Dynamic Explore Cards — Static Metadata Lookup (2026-03-10)
+
+**Context:** Homepage needs explore cards for ALL books, not just 2 hardcoded ones. Book index data has titles but lacks icons, descriptions, and author info.
+
+**Options considered:**
+1. Add all metadata to book index JSON (generator change, cross-project)
+2. Static lookup table in component + dynamic titles from IndexState
+3. Fully dynamic from data only (missing fields hidden)
+
+**Decision:** Option 2 — `BOOK_CARD_META` static record in book-dispatcher.component.ts with icon, description i18n key, and author data. Book titles come dynamically from IndexState. Unknown books get default icon and no description.
+
+**Rationale:** No cross-project changes needed. New books added to the data automatically get cards (with default styling). Enhanced metadata can be added to the lookup as needed.
+
+---

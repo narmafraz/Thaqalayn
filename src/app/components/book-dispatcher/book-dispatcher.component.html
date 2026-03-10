@@ -24,18 +24,19 @@
           </div>
         </div>
         <app-book-tree></app-book-tree>
-        <div class="homepage-quick-links">
+        <div class="homepage-quick-links" *ngIf="exploreCards.length > 0">
           <h2>{{ 'nav.explore' | translate }}</h2>
           <div class="quick-links">
-            <a routerLink="/books/quran" queryParamsHandling="preserve" class="quick-link-card">
-              <mat-icon>menu_book</mat-icon>
-              <span class="quick-link-title">{{ 'nav.quran' | translate }}</span>
-              <span class="quick-link-desc">{{ 'nav.quranDesc' | translate }}</span>
-            </a>
-            <a routerLink="/books/al-kafi" queryParamsHandling="preserve" class="quick-link-card">
-              <mat-icon>auto_stories</mat-icon>
-              <span class="quick-link-title">{{ 'nav.alKafi' | translate }}</span>
-              <span class="quick-link-desc">{{ 'nav.alKafiDesc' | translate }}</span>
+            <a *ngFor="let card of exploreCards"
+               [routerLink]="card.routerLink"
+               queryParamsHandling="preserve"
+               class="quick-link-card"
+               [class.featured]="card.featured">
+              <mat-icon>{{ card.icon }}</mat-icon>
+              <span class="quick-link-title">{{ card.titleEn }}</span>
+              <span class="quick-link-title-ar" lang="ar" *ngIf="card.titleAr">{{ card.titleAr }}</span>
+              <span class="quick-link-author" *ngIf="card.author">{{ card.author.en }}</span>
+              <span class="quick-link-desc" *ngIf="card.descKey">{{ card.descKey | translate }}</span>
             </a>
           </div>
         </div>

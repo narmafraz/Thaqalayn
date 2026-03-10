@@ -349,50 +349,62 @@
   }
 }
 
-// AI translation extras
+// AI translation extras — inline (AI-01: visible by default)
 .ai-translation-extra {
-  padding: 4px 15px 8px;
+  padding: 8px 15px;
   font-size: 13px;
+}
 
-  details {
-    margin-top: 6px;
-  }
+.ai-summary-inline {
+  margin-bottom: 8px;
+  line-height: 1.6;
 
-  summary {
-    cursor: pointer;
-    font-weight: 500;
+  .ai-summary-label {
+    font-weight: 600;
     font-size: 12px;
     color: var(--text-secondary, #666);
-
-    &:hover {
-      color: var(--link-color, #673ab7);
-    }
+    margin-right: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
   }
 
-  p {
-    margin: 4px 0 0;
-    line-height: 1.6;
+  .ai-summary-text {
     color: var(--text-primary, #333);
+    font-style: italic;
   }
 }
 
-.ai-key-terms {
-  .key-term {
-    display: flex;
-    gap: 8px;
+.ai-key-terms-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+
+  .ai-terms-label {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-secondary, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .key-term-chip {
+    display: inline-flex;
+    gap: 4px;
     align-items: baseline;
-    padding: 2px 0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--chip-bg, rgba(103, 58, 183, 0.08));
+    font-size: 12px;
   }
 
   .key-term-arabic {
     font-family: 'Scheherazade New', 'Traditional Arabic', serif;
     font-size: 1.1em;
     color: var(--link-color, #673ab7);
-    flex-shrink: 0;
   }
 
   .key-term-gloss {
-    font-size: 12px;
     color: var(--text-primary, #333);
   }
 }

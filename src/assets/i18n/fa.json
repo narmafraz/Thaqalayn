@@ -24,7 +24,17 @@
     "quran": "قرآن کریم",
     "quranDesc": "114 سوره با ترجمه‌های متعدد",
     "alKafi": "الکافی",
-    "alKafiDesc": "جامع‌ترین مجموعه حدیثی شیعه"
+    "alKafiDesc": "جامع‌ترین مجموعه حدیثی شیعه",
+    "tahdhibDesc": "مجموعه احادیث فقهی اسلامی",
+    "istibsarDesc": "حل تعارض روایات حدیثی",
+    "faqihDesc": "احادیث عملی برای فقه روزمره",
+    "irshadDesc": "زندگی‌نامه ائمه دوازده‌گانه",
+    "amaliDesc": "مجالس حدیث شیخ صدوق",
+    "sulaimDesc": "قدیمی‌ترین تدوین حدیث شیعه",
+    "nahjDesc": "خطبه‌ها، نامه‌ها و حکمت‌های امام علی (ع)",
+    "sahifaDesc": "دعاهای امام سجاد (ع)",
+    "wasaelDesc": "مجموعه جامع احادیث فقهی",
+    "biharDesc": "دایره‌المعارف احادیث شیعه"
   },
   "book": {
     "reference": "مرجع",
@@ -53,7 +63,15 @@
     "shareImage": "اشتراک‌گذاری به صورت تصویر",
     "showDifferences": "نمایش تفاوت‌ها",
     "hideDifferences": "پنهان کردن تفاوت‌ها",
-    "jumpToVerse": "رفتن به آیه"
+    "jumpToVerse": "رفتن به آیه",
+    "jumpToHadith": "رفتن به حدیث",
+    "jumpToAyah": "رفتن به آیه",
+    "hadithCount": "احادیث",
+    "ayahCount": "آیات",
+    "viewMode": "حالت نمایش",
+    "viewPlain": "متن ساده",
+    "viewWordByWord": "کلمه به کلمه",
+    "viewParagraph": "نمایش پاراگرافی"
   },
   "narrator": {
     "narratedAhadith": "احادیث روایت شده",
@@ -132,6 +150,7 @@
     "to": "تا",
     "number": "#",
     "verses": "آیات",
+    "hadiths": "احادیث",
     "selectPage": "انتخاب صفحه",
     "clear": "پاک کردن",
     "bookNavigation": "پیمایش کتاب‌ها"

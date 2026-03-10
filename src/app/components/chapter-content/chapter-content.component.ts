@@ -9,6 +9,7 @@ import { BookmarkService } from '@app/services/bookmark.service';
 import { BooksService } from '@app/services/books.service';
 import { ShareCardService } from '@app/services/share-card.service';
 import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
+import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RouterState } from '@store/router/router.state';
@@ -62,6 +63,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // Current UI language for reference display
   currentLang = 'en';
 
+  // View mode state
+  hasAnyAiContent = false;
+
   constructor(
     private store: Store,
     private viewportScroller: ViewportScroller,
@@ -75,6 +79,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private shareCard: ShareCardService,
     private i18nService: I18nService,
     private renderer: Renderer2,
+    private aiPrefs: AiPreferencesService,
   ) {
     this.tafsirEditions = this.tafsirService.editions;
     this.fragment$.subscribe(fragment => {
@@ -99,6 +104,8 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
         prev: book.data.nav?.prev || null,
         next: book.data.nav?.next || null,
       };
+      // Check for AI content to show view mode toolbar
+      this.checkAiContent(book);
       // Load bookmark and annotation states for all verses
       this.loadBookmarkStates(book);
       this.loadAnnotationStates(book);
@@ -143,6 +150,20 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       });
     }
   };
+
+  get currentViewMode(): ViewMode {
+    return this.aiPrefs.viewMode;
+  }
+
+  onViewModeChange(mode: ViewMode): void {
+    this.aiPrefs.setViewMode(mode);
+  }
+
+  private checkAiContent(book: ChapterContent): void {
+    this.hasAnyAiContent = book?.data?.verses?.some(
+      v => !!(v.ai?.chunks?.length || v.ai?.word_analysis?.length)
+    ) || false;
+  }
 
   getInBookReference(crumbs: Crumb[], verse: Verse): string {
     let result = '';
@@ -220,6 +241,14 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   isQuranBook(bookIndex: string): boolean {
     return bookIndex.startsWith('quran:');
+  }
+
+  getJumpLabel(bookIndex: string): string {
+    return this.isQuranBook(bookIndex) ? 'book.jumpToAyah' : 'book.jumpToHadith';
+  }
+
+  getVerseCount(book: any): number {
+    return book?.data?.verses?.filter((v: any) => v.part_type === 'Hadith' || v.part_type === 'Verse').length || 0;
   }
 
   getQuranSurah(bookIndex: string): number {

@@ -1,16 +1,32 @@
 <ng-container *ngIf="(book$ | async) as book">
   <app-settings></app-settings>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions"></app-book-titles>
-  <div class="jump-to-verse" *ngIf="book.data.verses?.length >= 20">
+  <div class="jump-to-verse" *ngIf="book.data.verses?.length >= 10">
     <mat-form-field appearance="outline" class="jump-input">
-      <mat-label>{{ 'book.jumpToVerse' | translate }}</mat-label>
-      <input matInput type="number" min="1" [max]="book.data.verses.length"
-             [(ngModel)]="jumpTarget" (keydown.enter)="jumpToVerse()">
+      <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
+      <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
+        <ng-container *ngFor="let verse of book.data.verses; let i = index">
+          <mat-option *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'"
+                      [value]="verse.local_index">
+            {{ verse.part_type }} {{ verse.local_index }}
+          </mat-option>
+        </ng-container>
+      </mat-select>
     </mat-form-field>
-    <button mat-icon-button (click)="jumpToVerse()" [disabled]="!jumpTarget"
-            [attr.aria-label]="'book.jumpToVerse' | translate">
-      <mat-icon>arrow_downward</mat-icon>
-    </button>
+  </div>
+  <div class="view-mode-toolbar" *ngIf="hasAnyAiContent">
+    <span class="toolbar-label">{{ 'book.viewMode' | translate }}:</span>
+    <mat-button-toggle-group [value]="currentViewMode" (change)="onViewModeChange($event.value)">
+      <mat-button-toggle value="plain" [matTooltip]="'book.viewPlain' | translate">
+        <mat-icon>subject</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="word-by-word" [matTooltip]="'book.viewWordByWord' | translate">
+        <mat-icon>grid_on</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="paragraph" [matTooltip]="'book.viewParagraph' | translate">
+        <mat-icon>view_agenda</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
   </div>
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse" [headingLevel]="2"></app-book-titles>
@@ -40,38 +56,42 @@
                     [matTooltip]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
               <mat-icon>{{ isVerseBookmarked(book.index, verse) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
             </button>
-            <!-- Overflow menu for secondary actions -->
-            <button class="more-actions-btn"
-                    [matMenuTriggerFor]="verseMenu"
-                    [attr.aria-label]="'More actions'"
-                    [matTooltip]="'tooltip.moreActions' | translate">
-              <mat-icon>more_vert</mat-icon>
+            <!-- Copy link -->
+            <a class="action-icon-btn"
+               [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index"
+               [attr.aria-label]="'book.copyLink' | translate"
+               [matTooltip]="'book.copyLink' | translate">
+              <mat-icon>link</mat-icon>
+            </a>
+            <!-- Add/edit note -->
+            <button class="action-icon-btn"
+                    (click)="toggleNoteEditor(book.index, verse)"
+                    [attr.aria-label]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)"
+                    [matTooltip]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
+              <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
             </button>
-            <mat-menu #verseMenu="matMenu">
-              <a mat-menu-item [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index">
-                <mat-icon>link</mat-icon>
-                <span>{{ 'book.copyLink' | translate }}</span>
-              </a>
-              <button mat-menu-item (click)="toggleNoteEditor(book.index, verse)">
-                <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
-                <span>{{ hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate) }}</span>
-              </button>
-              <button mat-menu-item (click)="shareAsImage(book, verse, crumbs)"
-                      [disabled]="generatingImageIndex === verse.local_index">
-                <mat-icon>{{ generatingImageIndex === verse.local_index ? 'hourglass_empty' : 'image' }}</mat-icon>
-                <span>{{ 'book.shareImage' | translate }}</span>
-              </button>
-              <button mat-menu-item *ngIf="isQuranBook(book.index)"
-                      (click)="toggleAudio(book.index, verse.local_index)">
-                <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
-                <span>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate) }}</span>
-              </button>
-              <button mat-menu-item *ngIf="isQuranBook(book.index)"
-                      (click)="toggleTafsir(book.index, verse.local_index)">
-                <mat-icon>{{ expandedTafsir.has(verse.local_index) ? 'menu_book' : 'auto_stories' }}</mat-icon>
-                <span>{{ 'book.tafsir' | translate }}</span>
-              </button>
-            </mat-menu>
+            <!-- Share as image -->
+            <button class="action-icon-btn"
+                    (click)="shareAsImage(book, verse, crumbs)"
+                    [disabled]="generatingImageIndex === verse.local_index"
+                    [attr.aria-label]="'book.shareImage' | translate"
+                    [matTooltip]="'book.shareImage' | translate">
+              <mat-icon>{{ generatingImageIndex === verse.local_index ? 'hourglass_empty' : 'image' }}</mat-icon>
+            </button>
+            <!-- Audio play (Quran only) -->
+            <button class="action-icon-btn audio-icon-btn" *ngIf="isQuranBook(book.index)"
+                    (click)="toggleAudio(book.index, verse.local_index)"
+                    [attr.aria-label]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate)"
+                    [matTooltip]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate)">
+              <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
+            </button>
+            <!-- Tafsir (Quran only) -->
+            <button class="action-icon-btn tafsir-icon-btn" *ngIf="isQuranBook(book.index)"
+                    (click)="toggleTafsir(book.index, verse.local_index)"
+                    [attr.aria-label]="'book.tafsir' | translate"
+                    [matTooltip]="'book.tafsir' | translate">
+              <mat-icon>{{ expandedTafsir.has(verse.local_index) ? 'menu_book' : 'auto_stories' }}</mat-icon>
+            </button>
           </div>
           <!-- Grading badges: always visible -->
           <div class="grading-inline" *ngIf="verse.gradings?.length">

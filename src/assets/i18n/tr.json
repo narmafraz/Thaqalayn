@@ -24,7 +24,17 @@
     "quran": "Kur'an-ı Kerim",
     "quranDesc": "114 sure, çoklu çevirilerle",
     "alKafi": "El-Kafi",
-    "alKafiDesc": "En kapsamlı Şii hadis koleksiyonu"
+    "alKafiDesc": "En kapsamlı Şii hadis koleksiyonu",
+    "tahdhibDesc": "İslam fıkhı üzerine hadis koleksiyonu",
+    "istibsarDesc": "Çelişen hadis rivayetlerinin çözümü",
+    "faqihDesc": "Günlük fıkıh için pratik hadisler",
+    "irshadDesc": "On İki İmamın biyografileri",
+    "amaliDesc": "Şeyh Saduk hadis dersleri",
+    "sulaimDesc": "En eski Şii hadis derlemesi",
+    "nahjDesc": "İmam Ali hutbeleri, mektupları ve sözleri",
+    "sahifaDesc": "İmam Seccad duaları",
+    "wasaelDesc": "Kapsamlı fıkhi hadis derlemesi",
+    "biharDesc": "Şii rivayetlerin ansiklopedisi"
   },
   "book": {
     "reference": "Referans",
@@ -53,7 +63,15 @@
     "shareImage": "Görsel olarak paylaş",
     "showDifferences": "Farkları göster",
     "hideDifferences": "Farkları gizle",
-    "jumpToVerse": "Ayete atla"
+    "jumpToVerse": "Ayete atla",
+    "jumpToHadith": "Hadise atla",
+    "jumpToAyah": "Ayete atla",
+    "hadithCount": "hadis",
+    "ayahCount": "ayet",
+    "viewMode": "Görünüm modu",
+    "viewPlain": "Düz metin",
+    "viewWordByWord": "Kelime kelime",
+    "viewParagraph": "Paragraf görünümü"
   },
   "narrator": {
     "narratedAhadith": "Rivayet edilen hadisler",
@@ -132,6 +150,7 @@
     "to": "-",
     "number": "#",
     "verses": "ayet",
+    "hadiths": "hadis",
     "selectPage": "Sayfa seçin",
     "clear": "Temizle",
     "bookNavigation": "Kitap navigasyonu"

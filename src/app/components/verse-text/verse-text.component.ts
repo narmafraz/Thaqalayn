@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AiLanguage, AiTranslationEntry, Chunk, ContentType, IsnadMatn, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { NarratorMetadata, Verse } from '@app/models';
 import { SpecialText } from '@app/models/book';
-import { AiPreferencesService } from '@app/services/ai-preferences.service';
+import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -16,7 +17,7 @@ import { Observable } from 'rxjs';
     styleUrls: ['./verse-text.component.scss'],
     standalone: false
 })
-export class VerseTextComponent {
+export class VerseTextComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   translation$: Observable<string> = this.store.select(BooksState.getTranslationIfInBookOrDefault);
   translationClass$: Observable<string> = this.store.select(BooksState.getTranslationClass);
@@ -24,6 +25,9 @@ export class VerseTextComponent {
   translationClass2$: Observable<string> = this.store.select(BooksState.getSecondTranslationClass);
   private aiPrefs = inject(AiPreferencesService);
   private sanitizer = inject(DomSanitizer);
+  private cdr = inject(ChangeDetectorRef);
+  private destroy$ = new Subject<void>();
+  private localOverride = false;
 
   @Input() verse: Verse;
   @Input() isQuran = false;
@@ -44,19 +48,50 @@ export class VerseTextComponent {
   wordAnalysisLang: AiLanguage = this.aiPrefs.get('wordByWordDefaultLang');
   activeWordIndex: number | null = null;
 
+  ngOnInit(): void {
+    this.aiPrefs.viewMode$.pipe(takeUntil(this.destroy$)).subscribe(mode => {
+      if (!this.localOverride) {
+        // PAR-07: Default to paragraph view when AI chunks are available and user hasn't set a preference
+        if (mode === 'plain' && this.verse?.ai?.chunks?.length > 1) {
+          this.showChunkedView = true;
+          this.showWordAnalysis = false;
+        } else {
+          this.applyViewMode(mode);
+        }
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  applyViewMode(mode: ViewMode): void {
+    this.showWordAnalysis = mode === 'word-by-word';
+    this.showChunkedView = mode === 'paragraph';
+  }
+
   toggleDiacritics(): void {
     this.showDiacritics = !this.showDiacritics;
   }
 
   toggleWordAnalysis(): void {
+    this.localOverride = true;
     this.showWordAnalysis = !this.showWordAnalysis;
     if (this.showWordAnalysis) {
       this.showDiacritics = false;
+      this.showChunkedView = false;
     }
   }
 
   toggleChunkedView(): void {
+    this.localOverride = true;
     this.showChunkedView = !this.showChunkedView;
+    if (this.showChunkedView) {
+      this.showWordAnalysis = false;
+    }
   }
 
   toggleChainDiagram(): void {

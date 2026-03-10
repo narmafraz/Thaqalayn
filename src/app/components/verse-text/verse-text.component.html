@@ -152,20 +152,18 @@
           </span>
         </p>
       </div>
-      <!-- AI translation summary -->
+      <!-- AI translation extras: summary and key terms (AI-01: visible by default, not collapsed) -->
       <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
-        <details class="ai-summary">
-          <summary>{{ 'ai.summary' | translate }}</summary>
-          <p>{{ aiT.summary }}</p>
-        </details>
-        <div class="ai-key-terms" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
-          <details>
-            <summary>{{ 'ai.keyTerms' | translate }}</summary>
-            <div class="key-term" *ngFor="let term of aiT.key_terms | keyvalue">
-              <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
-              <span class="key-term-gloss">{{ term.value }}</span>
-            </div>
-          </details>
+        <div class="ai-summary-inline" *ngIf="aiT.summary">
+          <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
+          <span class="ai-summary-text">{{ aiT.summary }}</span>
+        </div>
+        <div class="ai-key-terms-inline" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
+          <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
+          <span class="key-term-chip" *ngFor="let term of aiT.key_terms | keyvalue">
+            <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
+            <span class="key-term-gloss">{{ term.value }}</span>
+          </span>
         </div>
       </div>
     </div>

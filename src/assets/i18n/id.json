@@ -24,7 +24,17 @@
     "quran": "Al-Quran",
     "quranDesc": "114 surah dengan berbagai terjemahan",
     "alKafi": "Al-Kafi",
-    "alKafiDesc": "Koleksi hadis Syiah paling komprehensif"
+    "alKafiDesc": "Koleksi hadis Syiah paling komprehensif",
+    "tahdhibDesc": "Koleksi hadis tentang fikih Islam",
+    "istibsarDesc": "Penyelesaian riwayat hadis yang bertentangan",
+    "faqihDesc": "Hadis praktis untuk fikih sehari-hari",
+    "irshadDesc": "Biografi Dua Belas Imam",
+    "amaliDesc": "Sesi hadis yang didiktekan oleh Al-Saduq",
+    "sulaimDesc": "Kompilasi hadis Syiah tertua",
+    "nahjDesc": "Khotbah, surat, dan ucapan Imam Ali",
+    "sahifaDesc": "Doa-doa Imam al-Sajjad",
+    "wasaelDesc": "Kompilasi hadis fikih yang komprehensif",
+    "biharDesc": "Ensiklopedia tradisi Syiah"
   },
   "book": {
     "reference": "Referensi",
@@ -53,7 +63,15 @@
     "shareImage": "Bagikan sebagai gambar",
     "showDifferences": "Tampilkan perbedaan",
     "hideDifferences": "Sembunyikan perbedaan",
-    "jumpToVerse": "Loncat ke ayat"
+    "jumpToVerse": "Loncat ke ayat",
+    "jumpToHadith": "Loncat ke hadis",
+    "jumpToAyah": "Loncat ke ayat",
+    "hadithCount": "hadis",
+    "ayahCount": "ayat",
+    "viewMode": "Mode tampilan",
+    "viewPlain": "Teks biasa",
+    "viewWordByWord": "Kata per kata",
+    "viewParagraph": "Tampilan paragraf"
   },
   "narrator": {
     "narratedAhadith": "Hadis yang diriwayatkan",
@@ -132,6 +150,7 @@
     "to": "hingga",
     "number": "#",
     "verses": "ayat",
+    "hadiths": "hadis",
     "selectPage": "Pilih halaman",
     "clear": "Hapus",
     "bookNavigation": "Navigasi kitab"

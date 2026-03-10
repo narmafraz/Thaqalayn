@@ -603,23 +603,273 @@ New capabilities that add significant value but require substantial implementati
 
 ---
 
+## Phase 6: Content Parity & Terminology ✅ COMPLETE
+
+> **Status:** All 7 items implemented (2026-03-10). PAR-01 verse-detail uses app-verse-text, PAR-02 contextual terminology, PAR-03 jump-to dropdown, PAR-04 flattened actions, PAR-05 page-level view mode with persistence, PAR-07 paragraph default. Build passing.
+
+Addressing the disconnect between verse-detail and chapter-content views, fixing terminology, and improving action visibility.
+
+### PAR-01: Verse Detail — Use `<app-verse-text>` for Full Feature Parity ⚠️ IMPLEMENT LAST IN PHASE
+
+**Description:** The verse-detail component renders Arabic text directly (`<p *ngFor="let txt of book.data.verse.text">`) instead of using `<app-verse-text>`. This means verse-detail completely lacks: word-by-word analysis, chunked/paragraph view, chain diagram, isnad/matn separation, narrator hover cards, diacritics toggle, and phrase highlighting. Users who click into a hadith detail lose all the AI-enhanced reading features available in chapter view.
+
+**Implementation notes (from challenger review):**
+- Split into two parts: (a) Replace Arabic text rendering with `<app-verse-text [verse]="book.data.verse">`, removing duplicate narrator chain rendering. (b) Reconcile translation display — either let `<app-verse-text>` handle translations (remove verse-detail's section) or pass a flag to suppress `<app-verse-text>` translation rendering.
+- Risk: `[innerHTML]` sanitization differences between raw rendering and `<app-verse-text>`'s `highlightPhrases()`. Test both Quran and hadith content.
+- Implement LAST in Phase 6 so view mode service (PAR-05) is already in place.
+- Existing verse-detail unit tests and E2E tests will need updates.
+
+**Source:** User feedback item #1, Desktop review DESK-04
+**Severity:** CRITICAL
+**Effort:** M-L (2-4 days)
+**Acceptance Criteria:**
+- Verse-detail uses `<app-verse-text>` component instead of raw text rendering
+- All view modes (word-by-word, paragraph, chain diagram) work identically in verse-detail and chapter-content
+- Translation selection still works alongside `<app-verse-text>`
+- Gradings, relations, AI metadata sections remain in verse-detail (they are detail-level features)
+- Settings panel (`<app-settings>`) is accessible from verse-detail
+
+### PAR-02: Contextual Terminology — "Verse" vs "Hadith"
+
+**Description:** The UI uses "verse" terminology everywhere (jump to verse, verse count, verse paths) regardless of content type. For hadith books, "hadith" is the correct term. Only Quran content should use "verse"/"ayah".
+
+**Source:** User feedback item #5, Desktop review DESK-01/02/12
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- "Jump to verse" shows "Jump to hadith" on hadith book pages and "Jump to ayah" on Quran pages
+- Verse count labels say "hadith" for hadith books (e.g., "42 hadiths" not "42 verses")
+- i18n keys support both variants: `book.jumpToVerse` / `book.jumpToHadith` / `book.jumpToAyah`
+- Chapter-content component detects book type and uses correct terminology
+- Narrator profile paths use "hadith" not "verse"
+
+### PAR-03: Jump-to Navigation as Dropdown
+
+**Description:** The current jump-to-verse/hadith is a bare number input. Users don't know how many items exist or what numbers are valid. Replace with a dropdown/select showing the count and allowing selection.
+
+**Source:** User feedback item #10
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Jump-to control is a dropdown/autocomplete showing available numbers (1-N)
+- Dropdown header shows total count (e.g., "42 hadiths in this chapter")
+- Selecting a number scrolls to that item with highlight animation
+- Still supports direct number input (type-to-filter in autocomplete)
+- Works on mobile without excessive viewport consumption
+
+### PAR-04: Flatten Action Buttons — Remove Overflow Menu
+
+**Description:** Secondary actions (copy link, add note, share as image, audio, tafsir) are hidden behind a three-dot overflow menu. The user wants all actions visible with tooltips since there aren't many.
+
+**Source:** User feedback item #8
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- All action buttons visible inline (no overflow menu)
+- Each button has a `matTooltip` with descriptive text
+- On mobile (< 768px), icons are compact (icon-only, no text labels) but still all visible
+- Touch targets remain ≥ 44px
+- Actions: view detail, bookmark, copy link, add note, share as image, audio (Quran), tafsir (Quran)
+
+### PAR-05: Page-Level View Mode Toggle + Persistence (includes former PAR-06)
+
+**Description:** Word-by-word analysis and paragraph/chunked view toggles are per-hadith instance in chapter view. Toggling one doesn't affect others on the page. Users expect page-level control. Additionally, selected view mode should persist across chapter navigation.
+
+**Source:** User feedback items #2 and #13, Desktop review DESK-05
+**Severity:** HIGH
+**Effort:** M (1-3 days)
+
+**Implementation approach (from challenger review):**
+- Add `viewMode: 'plain' | 'word-by-word' | 'paragraph'` property to `AiPreferencesService` (persisted via localStorage).
+- `<app-verse-text>` reads view mode from the service by default. Local `overrideViewMode` property on VerseTextComponent takes precedence when set by user.
+- Page-level toolbar in chapter-content calls `aiPrefs.set('viewMode', ...)` which all verse-text instances react to.
+- Persistence across navigation is automatic since the service uses localStorage.
+
+**Acceptance Criteria:**
+- A page-level toolbar with view mode buttons (plain text / word-by-word / paragraph) appears above the verse list
+- Toggling page-level mode applies to ALL hadith on the page simultaneously
+- Individual hadith can still override the page-level setting
+- Page-level toggle only appears when AI data is available for at least one hadith
+- Selected view mode persists across chapter navigation via `AiPreferencesService`
+- On page load, chapter-content reads persisted mode and applies it to all verse-text instances
+
+### PAR-07: Paragraph View On by Default When Data Available
+
+**Description:** When AI chunked/paragraph data is available, the default view should be paragraph view instead of plain text. This showcases the AI content investment.
+
+**Source:** User feedback item #9
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- If `verse.ai.chunks` exists and is non-empty, default to chunked/paragraph view
+- User's explicit preference (from PAR-06) overrides this default
+- Plain text remains default when no AI data is available
+- First-time users see the richest available view automatically
+
+---
+
+## Phase 7: AI Content Integration & Word Interaction ✅ PARTIAL
+
+> **Status:** AI-01 (seamless integration) implemented (2026-03-10). Summary and key terms now visible inline instead of collapsed. AI-02 (word click popup) deferred — requires word tokenization prerequisite.
+
+Making AI-generated content seamless rather than hidden, and adding word-level interaction.
+
+### AI-01: Seamless AI Content Integration
+
+**Description:** AI content (summary, key terms, topics, content type) is currently shown in collapsed `<details>` accordions or hidden behind expand toggles, making it feel disconnected from the hadith text. It should be integrated naturally into the reading flow.
+
+**Source:** User feedback item #6, Desktop review DESK-07
+**Severity:** HIGH
+**Effort:** M (1-3 days)
+**Acceptance Criteria:**
+- AI summary appears directly below the translation text (not in a collapsible)
+- Key terms display as subtle inline chips below the summary
+- Content type badge is visible in the card header (not hidden in metadata)
+- Topics shown as tag pills at the bottom of the card
+- Quran references shown inline near related text (not in separate section)
+- User can still hide AI content entirely via settings toggle
+- Transition from "AI as addon" to "AI as integrated content layer"
+
+### AI-02: Arabic Word Click Popup
+
+**Description:** Users should be able to tap/click on any Arabic word in a hadith to see more detail: root word, morphological analysis, translation in selected language, and occurrences across the corpus.
+
+**Source:** User feedback item #7
+**Severity:** MEDIUM
+**Effort:** M (1-3 days)
+**Data Requirements:** Requires `verse.ai.word_analysis` data (already generated by AI pipeline for processed verses)
+
+**Implementation prerequisite (from challenger review):** Standard Arabic text is currently rendered as `<p [innerHTML]="txt">`. Individual word click handlers cannot be attached to innerHTML. A prerequisite is tokenizing Arabic text into clickable `<span>` elements per word when `word_analysis` data is available. This is a non-trivial template change in `verse-text.component`.
+
+**Acceptance Criteria:**
+- Clicking/tapping an Arabic word opens a popup/tooltip showing: word, POS, translation, root (if available)
+- Popup appears near the tapped word (not blocking other text)
+- Works on both desktop (click) and mobile (tap)
+- Only functional when AI word_analysis data is available for that verse
+- Popup dismisses on click outside, tap elsewhere, or Escape key (keyboard accessible)
+- If word_analysis is unavailable, clicking does nothing (graceful degradation)
+- Focus management: popup receives focus, aria-describedby links word to popup
+
+---
+
+## Phase 8: Homepage & Book Discovery ✅ PARTIAL
+
+> **Status:** HOME-01 (dynamic explore cards) implemented (2026-03-10). All books from IndexState shown with icons, Arabic titles, authors. HOME-02 (author metadata in index) pending — requires ThaqalaynDataGenerator changes.
+
+Expanding the homepage to properly showcase all available books.
+
+### HOME-01: Explore Cards for All Books
+
+**Description:** The homepage "Explore" section has only 2 hardcoded cards (Quran and Al-Kafi). The app serves 24+ books. All books should be discoverable from the homepage.
+
+**Source:** User feedback item #11, Desktop review DESK-03
+**Severity:** HIGH
+**Effort:** M (1-3 days)
+**Acceptance Criteria:**
+- Explore section shows cards for ALL books in the collection
+- Cards are generated dynamically from the book index (not hardcoded)
+- Each card shows: book name (English + Arabic), icon, brief description
+- Cards are arranged in a responsive grid (2 columns mobile, 3-4 desktop)
+- Quran and the Four Books (Al-Kafi, Tahdhib, Istibsar, Man La Yahduruh) are visually prioritized (larger or first)
+- Cards link to the book's root page
+
+### HOME-02: Book Authors in Cards and Lists
+
+**Description:** Book cards and chapter-list tables don't show author information. Users should see who wrote/compiled each book for scholarly context.
+
+**Source:** User feedback item #12
+**Severity:** MEDIUM
+**Effort:** S (< 1 day) for Angular, M for data
+**Data Requirements:** Author names need to be added to book index JSON. Some are available in `books.en.json` descriptions, others need to be added in ThaqalaynDataGenerator.
+**Acceptance Criteria:**
+- Each book card on homepage shows the author/compiler name
+- Chapter-list header shows author name below book title
+- Author names are localized (English + Arabic at minimum)
+- Fallback: if no author data, field is simply hidden
+
+---
+
+## Phase 9: Mobile Navigation & Settings
+
+Consolidating scattered settings and improving mobile navigation.
+
+### MOB-01: Mobile Hamburger Menu with Consolidated Settings
+
+**Description:** On mobile, the search box in the header and other icons (font size, dark mode, language) are not visible or are scattered across the UI. Settings controls appear in different places (header, settings component, AI settings). Need a unified hamburger menu.
+
+**Source:** User feedback item #4, Desktop review DESK-06
+**Severity:** HIGH
+**Effort:** L (3-5 days) — revised up from M per challenger review
+**Acceptance Criteria:**
+- Mobile (< 768px): header shows only logo/title + hamburger icon + search icon
+- Hamburger menu slides in from the side with ALL settings consolidated:
+  - Language selection
+  - Dark mode toggle
+  - Font size controls
+  - AI content preferences
+  - Navigation links (Home, Narrators, Bookmarks, About)
+- Search icon opens an expandable search bar in the header
+- Settings component is hidden on mobile (replaced by hamburger menu contents)
+- Smooth slide animation, closes on outside tap or swipe
+
+---
+
+## Phase 10: Cross-Project Data Improvements
+
+Items requiring changes to ThaqalaynDataGenerator or data pipeline.
+
+### DATA-01: Narrator Chain Extraction for All Books
+
+**Description:** Currently narrator chains (isnad) are only extracted for Al-Kafi. The same extraction should be applied best-effort to all hadith books in the collection (Tahdhib, Istibsar, Man La Yahduruh, etc.).
+
+**Source:** User feedback item #3
+**Severity:** HIGH
+**Effort:** L (3+ days) — requires generator parser changes per book
+**Cross-Project:** ThaqalaynDataGenerator parser changes + ThaqalaynData regeneration
+**Acceptance Criteria:**
+- Narrator chains extracted for all major hadith books (at minimum the Four Books)
+- Extraction is best-effort: non-standard chains fall back to raw text
+- Narrator IDs are linked where possible (reusing existing narrator index)
+- New narrator entries created for previously unseen narrators
+- Angular app displays chains identically regardless of source book
+
+### DATA-02: Book Author Metadata in Index
+
+**Description:** The book index (`books.en.json`) lacks author/compiler metadata. This is needed for HOME-02 and chapter-list headers.
+
+**Source:** User feedback item #12
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Cross-Project:** ThaqalaynDataGenerator + ThaqalaynData
+**Acceptance Criteria:**
+- `books.en.json` (and other language variants) include `author` field per book entry
+- Author data: `{ "en": "Sheikh al-Kulayni", "ar": "الشيخ الكليني" }`
+- All 24+ books have author information populated
+
+---
+
 ## Summary Matrix
 
 | Phase | Items | Effort Range | Key Theme |
 |-------|-------|-------------|-----------|
 | Phase 1: Critical Fixes | FIX-01 to FIX-06 (6 items) | 4S + 2M | Unblock basic usability |
-| Phase 2: UX Polish | UX-01 to UX-15 (15 items) | 10S + 5M | Reduce daily friction |
-| Phase 3: Narrator Overhaul | NAR-01 to NAR-06 (6 items) + 8 new user stories | 2S + 3M + 1L | Transform weakest section |
-| Phase 4: Design System | DS-01 to DS-06 (6 items) | 3S + 3M | Visual consistency |
-| Phase 5: Advanced Features | ADV-01 to ADV-06 (6 items) | 0S + 2M + 4L | New capabilities |
-| **Total** | **39 items + 8 new user stories** | **19S + 15M + 5L** | |
+| Phase 2: UX Polish ✅ | UX-01 to UX-15 (15 items) | 10S + 5M | Reduce daily friction |
+| Phase 3: Narrator Overhaul ✅ | NAR-01 to NAR-06 (6 items) | 2S + 3M + 1L | Transform weakest section |
+| Phase 4: Design System ✅ | DS-01 to DS-06 (6 items) | 3S + 3M | Visual consistency |
+| Phase 5: Advanced Features ✅ | ADV-01 to ADV-06 (6 items) | 0S + 2M + 4L | New capabilities |
+| Phase 6: Content Parity | PAR-01 to PAR-07 (7 items) | 4S + 3M | Unified reading experience |
+| Phase 7: AI Integration | AI-01 to AI-02 (2 items) | 0S + 2M | Seamless AI content |
+| Phase 8: Homepage & Discovery | HOME-01 to HOME-02 (2 items) | 1S + 1M | Full book showcase |
+| Phase 9: Mobile Navigation | MOB-01 (1 item) | 0S + 1M | Mobile settings consolidation |
+| Phase 10: Data Improvements | DATA-01 to DATA-02 (2 items) | 1S + 0M + 1L | Cross-project data |
+| **Total** | **53 items** | **25S + 20M + 6L** | |
 
 ### Effort Estimates
 
-- **S (< 1 day):** 19 items
-- **M (1-3 days):** 15 items
-- **L (3+ days):** 5 items
-- **Estimated total:** ~65-90 developer-days
+- **S (< 1 day):** 25 items
+- **M (1-3 days):** 20 items
+- **L (3+ days):** 6 items
+- **Estimated total:** ~85-120 developer-days
 
 ### User Story Status Corrections
 
@@ -645,3 +895,6 @@ Several items require changes in ThaqalaynDataGenerator or ThaqalaynData in addi
 | NAR-03 | Include hadith preview text in narrator JSON | Regenerate narrator files |
 | ADV-01 | Source and structure rijal reliability data | Add to narrator JSON |
 | ADV-06 | Add category tags to narrator data | Regenerate narrator index |
+| DATA-01 | Extend narrator chain extraction to all books | Regenerate all book JSON |
+| DATA-02 | Add author metadata to book index | Regenerate index files |
+| HOME-02 | Author data in book index | Deploy updated index |

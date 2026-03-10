@@ -24,6 +24,38 @@
   background: var(--card-bg, rgba(48, 48, 48, 0.95));
 }
 
+// View mode toolbar
+.view-mode-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px var(--space-xs) 16px;
+
+  .toolbar-label {
+    font-size: 14px;
+    color: var(--text-secondary, rgba(0, 0, 0, 0.6));
+  }
+
+  mat-button-toggle-group {
+    height: 36px;
+
+    mat-button-toggle {
+      height: 36px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .view-mode-toolbar {
+    gap: 6px;
+    margin: 6px 8px 12px;
+
+    .toolbar-label {
+      font-size: 12px;
+    }
+  }
+}
+
 @media (max-width: 600px) {
   .jump-to-verse {
     padding: 6px 8px;
@@ -89,17 +121,26 @@ mat-mdc-card {
 
 .refLink {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 0px;
+  gap: 2px;
+  flex-wrap: wrap;
 
   // Shared touch target sizing for all interactive elements in verse footer
   a, button {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px;
+    min-height: 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
   }
 
   .verse-detail-link {
@@ -109,17 +150,10 @@ mat-mdc-card {
     &:hover {
       opacity: 1;
     }
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
   }
 
   .bookmark-icon-btn,
-  .audio-icon-btn,
-  .share-image-icon-btn {
+  .action-icon-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -131,15 +165,18 @@ mat-mdc-card {
       opacity: 1;
     }
 
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
     }
   }
 
   .audio-icon-btn {
     color: #1976d2;
+  }
+
+  .tafsir-icon-btn {
+    color: #00695c;
   }
 }
 
@@ -282,30 +319,6 @@ mat-mdc-card {
   }
 }
 
-// More actions overflow button
-.more-actions-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: var(--text-secondary, #666);
-  opacity: 0.6;
-  min-width: 44px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-}
 
 // Metadata expand/collapse toggle
 .metadata-toggle-btn {

@@ -24,7 +24,17 @@
     "quran": "القرآن الكريم",
     "quranDesc": "114 سورة مع ترجمات متعددة",
     "alKafi": "الكافي",
-    "alKafiDesc": "أشمل مجموعة حديثية شيعية"
+    "alKafiDesc": "أشمل مجموعة حديثية شيعية",
+    "tahdhibDesc": "مجموعة أحاديث في الفقه الإسلامي",
+    "istibsarDesc": "حل التعارض بين الأحاديث",
+    "faqihDesc": "أحاديث عملية للفقه اليومي",
+    "irshadDesc": "سير الأئمة الاثني عشر",
+    "amaliDesc": "مجالس إملاء الحديث للشيخ الصدوق",
+    "sulaimDesc": "أقدم تدوين للحديث الشيعي",
+    "nahjDesc": "خطب ورسائل وحكم الإمام علي (ع)",
+    "sahifaDesc": "أدعية الإمام السجاد (ع)",
+    "wasaelDesc": "موسوعة حديثية فقهية شاملة",
+    "biharDesc": "موسوعة الأحاديث الشيعية"
   },
   "book": {
     "reference": "المرجع",
@@ -53,7 +63,15 @@
     "shareImage": "مشاركة كصورة",
     "showDifferences": "إظهار الاختلافات",
     "hideDifferences": "إخفاء الاختلافات",
-    "jumpToVerse": "الانتقال إلى الآية"
+    "jumpToVerse": "الانتقال إلى الآية",
+    "jumpToHadith": "الانتقال إلى الحديث",
+    "jumpToAyah": "الانتقال إلى الآية",
+    "hadithCount": "أحاديث",
+    "ayahCount": "آيات",
+    "viewMode": "وضع العرض",
+    "viewPlain": "نص عادي",
+    "viewWordByWord": "كلمة بكلمة",
+    "viewParagraph": "عرض فقرات"
   },
   "narrator": {
     "narratedAhadith": "الأحاديث المروية",
@@ -144,6 +162,7 @@
     "to": "إلى",
     "number": "#",
     "verses": "آيات",
+    "hadiths": "أحاديث",
     "selectPage": "اختيار الصفحة",
     "clear": "مسح",
     "bookNavigation": "تصفح الكتب"

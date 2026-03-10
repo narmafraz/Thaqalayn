@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { AiLanguage } from '@app/models/ai-content';
+
+export type ViewMode = 'plain' | 'word-by-word' | 'paragraph';
 
 export interface AiPreferences {
   showDiacritizedByDefault: boolean;
@@ -8,6 +11,7 @@ export interface AiPreferences {
   showIsnadSeparation: boolean;
   showAiTranslationDisclaimer: boolean;
   wordByWordDefaultLang: AiLanguage;
+  viewMode: ViewMode;
 }
 
 const STORAGE_KEY = 'thaqalayn_ai_preferences';
@@ -19,14 +23,19 @@ const DEFAULTS: AiPreferences = {
   showIsnadSeparation: true,
   showAiTranslationDisclaimer: true,
   wordByWordDefaultLang: 'en',
+  viewMode: 'plain',
 };
 
 @Injectable({ providedIn: 'root' })
 export class AiPreferencesService {
   private prefs: AiPreferences;
+  private viewModeSubject: BehaviorSubject<ViewMode>;
+  viewMode$ = new BehaviorSubject<ViewMode>('plain').asObservable();
 
   constructor() {
     this.prefs = this.load();
+    this.viewModeSubject = new BehaviorSubject<ViewMode>(this.prefs.viewMode || 'plain');
+    this.viewMode$ = this.viewModeSubject.asObservable();
   }
 
   get preferences(): AiPreferences {
@@ -42,9 +51,20 @@ export class AiPreferencesService {
     this.save();
   }
 
+  get viewMode(): ViewMode {
+    return this.prefs.viewMode || 'plain';
+  }
+
+  setViewMode(mode: ViewMode): void {
+    this.prefs.viewMode = mode;
+    this.save();
+    this.viewModeSubject.next(mode);
+  }
+
   reset(): void {
     this.prefs = { ...DEFAULTS };
     this.save();
+    this.viewModeSubject.next(this.prefs.viewMode);
   }
 
   private load(): AiPreferences {

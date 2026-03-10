@@ -24,7 +24,17 @@
     "quran": "قرآن مجید",
     "quranDesc": "114 سورتیں متعدد تراجم کے ساتھ",
     "alKafi": "الکافی",
-    "alKafiDesc": "سب سے جامع شیعہ حدیث مجموعہ"
+    "alKafiDesc": "سب سے جامع شیعہ حدیث مجموعہ",
+    "tahdhibDesc": "اسلامی فقہ پر احادیث کا مجموعہ",
+    "istibsarDesc": "متعارض احادیث کی تطبیق",
+    "faqihDesc": "روزمرہ فقہ کے لیے عملی احادیث",
+    "irshadDesc": "بارہ اماموں کی سوانح حیات",
+    "amaliDesc": "شیخ صدوق کی املائی مجالس",
+    "sulaimDesc": "شیعہ حدیث کی قدیم ترین تدوین",
+    "nahjDesc": "امام علی (ع) کے خطبات، خطوط اور اقوال",
+    "sahifaDesc": "امام سجاد (ع) کی دعائیں",
+    "wasaelDesc": "فقہی احادیث کا جامع مجموعہ",
+    "biharDesc": "شیعہ روایات کا دائرۃ المعارف"
   },
   "book": {
     "reference": "حوالہ",
@@ -53,7 +63,15 @@
     "shareImage": "تصویر کے طور پر شیئر",
     "showDifferences": "فرق دکھائیں",
     "hideDifferences": "فرق چھپائیں",
-    "jumpToVerse": "آیت پر جائیں"
+    "jumpToVerse": "آیت پر جائیں",
+    "jumpToHadith": "حدیث پر جائیں",
+    "jumpToAyah": "آیت پر جائیں",
+    "hadithCount": "احادیث",
+    "ayahCount": "آیات",
+    "viewMode": "دیکھنے کا موڈ",
+    "viewPlain": "سادہ متن",
+    "viewWordByWord": "لفظ بہ لفظ",
+    "viewParagraph": "پیراگراف منظر"
   },
   "narrator": {
     "narratedAhadith": "مروی احادیث",
@@ -132,6 +150,7 @@
     "to": "تا",
     "number": "#",
     "verses": "آیات",
+    "hadiths": "احادیث",
     "selectPage": "صفحہ منتخب کریں",
     "clear": "صاف",
     "bookNavigation": "کتابوں کی نیویگیشن"

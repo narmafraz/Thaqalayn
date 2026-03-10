@@ -24,7 +24,17 @@
     "quran": "古兰经",
     "quranDesc": "114章，附多种翻译",
     "alKafi": "卡菲",
-    "alKafiDesc": "最全面的什叶派圣训集"
+    "alKafiDesc": "最全面的什叶派圣训集",
+    "tahdhibDesc": "伊斯兰法学圣训集",
+    "istibsarDesc": "矛盾圣训传述的解决",
+    "faqihDesc": "日常法学实用圣训",
+    "irshadDesc": "十二位伊玛目传记",
+    "amaliDesc": "萨杜克口述圣训集",
+    "sulaimDesc": "最早的什叶派圣训汇编",
+    "nahjDesc": "伊玛目阿里的布道、书信和格言",
+    "sahifaDesc": "伊玛目萨贾德的祈祷词",
+    "wasaelDesc": "综合法学圣训汇编",
+    "biharDesc": "什叶派传统百科全书"
   },
   "book": {
     "reference": "引用",
@@ -53,7 +63,15 @@
     "shareImage": "以图片分享",
     "showDifferences": "显示差异",
     "hideDifferences": "隐藏差异",
-    "jumpToVerse": "跳转到经文"
+    "jumpToVerse": "跳转到经文",
+    "jumpToHadith": "跳转到圣训",
+    "jumpToAyah": "跳转到经文",
+    "hadithCount": "段圣训",
+    "ayahCount": "节经文",
+    "viewMode": "查看模式",
+    "viewPlain": "纯文本",
+    "viewWordByWord": "逐词对照",
+    "viewParagraph": "段落视图"
   },
   "narrator": {
     "narratedAhadith": "所传圣训",
@@ -132,6 +150,7 @@
     "to": "至",
     "number": "#",
     "verses": "节",
+    "hadiths": "段圣训",
     "selectPage": "选择页面",
     "clear": "清除",
     "bookNavigation": "经典导航"

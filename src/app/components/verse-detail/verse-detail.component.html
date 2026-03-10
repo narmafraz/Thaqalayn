@@ -23,23 +23,11 @@
       </mat-card-header>
 
       <mat-card-content>
-        <!-- Arabic text -->
-        <div class="arabic-section" lang="ar">
-          <p *ngIf="book.data.verse.narrator_chain" class="narrator-chain arabic" dir="rtl">
-            <ng-container *ngFor="let npart of book.data.verse.narrator_chain.parts" [ngSwitch]="npart.kind">
-              <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve" class="narrator-link">{{npart.text}}</a>
-              <ng-container *ngSwitchDefault>{{npart.text}}</ng-container>
-            </ng-container>
-          </p>
-          <p *ngFor="let txt of book.data.verse.text" class="verse-arabic arabic" dir="rtl" [innerHTML]="txt"></p>
-        </div>
-
-        <!-- Translation -->
-        <div class="translation-section" *ngIf="book.data.verse.translations as translations">
-          <p *ngFor="let trt of translations[(translation$ | async)]"
-             [class]="'verse-translation ' + (translationClass$ | async)"
-             [innerHTML]="trt"></p>
-        </div>
+        <!-- PAR-01: Use app-verse-text for full feature parity (word-by-word, paragraph view, chain diagram, etc.) -->
+        <app-verse-text [verse]="book.data.verse"
+                        [isQuran]="isQuranBook(book.index)"
+                        [verseNumber]="book.data.verse.local_index">
+        </app-verse-text>
 
         <!-- Gradings (from verse or detail-level data) -->
         <div class="gradings-section" *ngIf="book.data.verse?.gradings?.length || book.data.gradings">

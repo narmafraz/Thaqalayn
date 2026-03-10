@@ -199,6 +199,7 @@
 
 // Word-by-word analysis
 .word-analysis-grid {
+  position: relative;
   padding: 8px 15px;
 }
 
@@ -270,6 +271,84 @@
   margin-top: 2px;
 }
 
+// Word detail popup
+.word-popup {
+  position: absolute;
+  z-index: 1000;
+  transform: translateX(-50%);
+  min-width: 180px;
+  max-width: 280px;
+  padding: 12px 14px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  direction: ltr;
+  text-align: center;
+
+  .word-popup-arabic {
+    font-family: 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif;
+    font-size: 1.6em;
+    line-height: 1.8;
+    color: var(--text-primary, #333);
+    margin-bottom: 6px;
+  }
+
+  .word-popup-pos {
+    margin-bottom: 8px;
+  }
+
+  .word-popup-pos-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .word-popup-translation {
+    margin-bottom: 4px;
+  }
+
+  .word-popup-lang-label {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary, #999);
+    margin-bottom: 2px;
+  }
+
+  .word-popup-trans-text {
+    font-size: 14px;
+    color: var(--text-primary, #333);
+  }
+
+  .word-popup-close {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: var(--text-secondary, #999);
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+
+    &:hover {
+      color: var(--text-primary, #333);
+    }
+  }
+}
+
+:host-context(body.dark-theme) .word-popup {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
 @media (max-width: 600px) {
   .word-card {
     min-width: 50px;
@@ -283,6 +362,12 @@
   .word-translation {
     font-size: 10px;
     max-width: 70px;
+  }
+
+  .word-popup {
+    min-width: 160px;
+    max-width: 240px;
+    padding: 10px 12px;
   }
 }
 

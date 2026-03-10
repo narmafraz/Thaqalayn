@@ -64,11 +64,35 @@
       <div *ngFor="let entry of wordAnalysis; let i = index"
            class="word-card"
            [class.active]="activeWordIndex === i"
-           (click)="setActiveWord(i)">
+           (click)="setActiveWord(i, $event)"
+           role="button"
+           tabindex="0"
+           (keydown.enter)="setActiveWord(i, $event)"
+           (keydown.space)="setActiveWord(i, $event)"
+           [attr.aria-expanded]="activeWordIndex === i"
+           [attr.aria-label]="entry.word + ' - ' + getPosLabel(entry.pos)">
         <span class="word-arabic">{{ entry.word }}</span>
         <span class="word-translation" dir="ltr">{{ entry.translation[wordAnalysisLang] }}</span>
         <span class="word-pos" [style.color]="getPosColor(entry.pos)">{{ getPosLabel(entry.pos) }}</span>
       </div>
+    </div>
+    <!-- Word detail popup -->
+    <div class="word-popup" *ngIf="wordPopup"
+         [style.left.px]="wordPopup.x"
+         [style.top.px]="wordPopup.y"
+         role="dialog"
+         aria-label="Word details">
+      <div class="word-popup-arabic" lang="ar" dir="rtl">{{ wordPopup.entry.word }}</div>
+      <div class="word-popup-pos">
+        <span class="word-popup-pos-badge" [style.background-color]="getPosColor(wordPopup.entry.pos)">
+          {{ getPosLabel(wordPopup.entry.pos) }}
+        </span>
+      </div>
+      <div class="word-popup-translation" *ngIf="wordPopup.entry.translation[wordAnalysisLang]">
+        <span class="word-popup-lang-label">{{ getWordLangLabel(wordAnalysisLang) }}</span>
+        <span class="word-popup-trans-text">{{ wordPopup.entry.translation[wordAnalysisLang] }}</span>
+      </div>
+      <button class="word-popup-close" (click)="closeWordPopup()" aria-label="Close" tabindex="0">&times;</button>
     </div>
   </div>
 

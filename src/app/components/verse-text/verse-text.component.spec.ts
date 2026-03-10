@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { NgxsModule, Store } from '@ngxs/store';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { ChangeDetectionStrategy, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
@@ -97,7 +97,11 @@ describe('VerseTextComponent', () => {
         HttpClientTestingModule,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    }).compileComponents();
+    })
+    .overrideComponent(VerseTextComponent, {
+      set: { changeDetection: ChangeDetectionStrategy.Default }
+    })
+    .compileComponents();
 
     fixture = TestBed.createComponent(VerseTextComponent);
     component = fixture.componentInstance;
@@ -387,5 +391,118 @@ describe('VerseTextComponent', () => {
     component.toggleChunkedView();
     expect(component.showChunkedView).toBe(true);
     expect(component.showWordAnalysis).toBe(true);
+  });
+
+  // FB-03: Word click popup tests
+  describe('word click popup', () => {
+    beforeEach(() => {
+      component.verse = { ...mockVerse, ai: mockAi };
+      fixture.detectChanges(); // triggers ngOnInit
+      // Set showWordAnalysis AFTER ngOnInit (which may reset it via viewMode$)
+      component.showWordAnalysis = true;
+      fixture.detectChanges();
+    });
+
+    it('should open popup when clicking a word card with event', () => {
+      // Create a mock event with a target element
+      const mockTarget = document.createElement('div');
+      mockTarget.classList.add('word-card');
+      const mockGrid = document.createElement('div');
+      mockGrid.classList.add('word-analysis-grid');
+      mockGrid.appendChild(mockTarget);
+      document.body.appendChild(mockGrid);
+
+      const mockEvent = {
+        currentTarget: mockTarget,
+      } as unknown as MouseEvent;
+
+      component.setActiveWord(0, mockEvent);
+      expect(component.activeWordIndex).toBe(0);
+      expect(component.wordPopup).toBeTruthy();
+      expect(component.wordPopup!.entry.word).toBe('بِسْمِ');
+      expect(component.wordPopup!.entry.pos).toBe('PREP');
+
+      document.body.removeChild(mockGrid);
+    });
+
+    it('should close popup when clicking the same word again', () => {
+      component.activeWordIndex = 0;
+      component.wordPopup = { entry: mockAi.word_analysis![0], x: 0, y: 0 };
+
+      component.setActiveWord(0);
+      expect(component.activeWordIndex).toBeNull();
+      expect(component.wordPopup).toBeNull();
+    });
+
+    it('should close popup on Escape key', () => {
+      component.wordPopup = { entry: mockAi.word_analysis![0], x: 0, y: 0 };
+      component.activeWordIndex = 0;
+
+      component.onEscapeKey();
+      expect(component.wordPopup).toBeNull();
+      expect(component.activeWordIndex).toBeNull();
+    });
+
+    it('should not error on Escape when no popup is open', () => {
+      component.wordPopup = null;
+      expect(() => component.onEscapeKey()).not.toThrow();
+    });
+
+    it('should close popup via closeWordPopup()', () => {
+      component.wordPopup = { entry: mockAi.word_analysis![0], x: 0, y: 0 };
+      component.activeWordIndex = 0;
+
+      component.closeWordPopup();
+      expect(component.wordPopup).toBeNull();
+      expect(component.activeWordIndex).toBeNull();
+    });
+
+    it('should show correct word data in popup', () => {
+      component.wordPopup = { entry: mockAi.word_analysis![1], x: 100, y: 200 };
+      component.activeWordIndex = 1;
+      fixture.detectChanges();
+
+      const popupEl = fixture.nativeElement.querySelector('.word-popup');
+      expect(popupEl).toBeTruthy();
+
+      const arabicEl = popupEl.querySelector('.word-popup-arabic');
+      expect(arabicEl.textContent.trim()).toBe('اللَّهِ');
+
+      const posEl = popupEl.querySelector('.word-popup-pos-badge');
+      expect(posEl.textContent.trim()).toBe('Noun');
+    });
+
+    it('should show translation in selected language', () => {
+      component.wordAnalysisLang = 'en';
+      component.wordPopup = { entry: mockAi.word_analysis![1], x: 100, y: 200 };
+      component.activeWordIndex = 1;
+      fixture.detectChanges();
+
+      const transEl = fixture.nativeElement.querySelector('.word-popup-trans-text');
+      expect(transEl.textContent.trim()).toBe('Allah');
+    });
+
+    it('should render word cards with accessibility attributes', () => {
+      fixture.detectChanges();
+      const cards = fixture.nativeElement.querySelectorAll('.word-card');
+      expect(cards.length).toBe(2);
+
+      const firstCard = cards[0];
+      expect(firstCard.getAttribute('role')).toBe('button');
+      expect(firstCard.getAttribute('tabindex')).toBe('0');
+      expect(firstCard.getAttribute('aria-expanded')).toBe('false');
+      expect(firstCard.getAttribute('aria-label')).toContain('بِسْمِ');
+      expect(firstCard.getAttribute('aria-label')).toContain('Prep');
+    });
+
+    it('should have close button in popup', () => {
+      component.wordPopup = { entry: mockAi.word_analysis![0], x: 0, y: 0 };
+      component.activeWordIndex = 0;
+      fixture.detectChanges();
+
+      const closeBtn = fixture.nativeElement.querySelector('.word-popup-close');
+      expect(closeBtn).toBeTruthy();
+      expect(closeBtn.getAttribute('aria-label')).toBe('Close');
+    });
   });
 });

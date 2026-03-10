@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AiLanguage, AiTranslationEntry, Chunk, ContentType, IsnadMatn, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { NarratorMetadata, Verse } from '@app/models';
@@ -40,6 +40,8 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   private narratorIndexLoaded = false;
 
   // AI feature toggles (initialized from saved preferences)
+  private elementRef = inject(ElementRef);
+
   showDiacritics = this.aiPrefs.get('showDiacritizedByDefault');
   showIsnadSeparation = this.aiPrefs.get('showIsnadSeparation');
   showWordAnalysis = false;
@@ -47,6 +49,9 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   showChainDiagram = false;
   wordAnalysisLang: AiLanguage = this.aiPrefs.get('wordByWordDefaultLang');
   activeWordIndex: number | null = null;
+
+  // Word popup state
+  wordPopup: { entry: WordAnalysisEntry; x: number; y: number } | null = null;
 
   ngOnInit(): void {
     this.aiPrefs.viewMode$.pipe(takeUntil(this.destroy$)).subscribe(mode => {
@@ -103,8 +108,76 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return !!this.verse?.narrator_chain?.parts?.length;
   }
 
-  setActiveWord(index: number | null): void {
-    this.activeWordIndex = this.activeWordIndex === index ? null : index;
+  setActiveWord(index: number | null, event?: MouseEvent): void {
+    if (this.activeWordIndex === index) {
+      this.activeWordIndex = null;
+      this.wordPopup = null;
+      return;
+    }
+    this.activeWordIndex = index;
+    if (index !== null && event) {
+      const entry = this.wordAnalysis[index];
+      if (entry) {
+        const target = event.currentTarget as HTMLElement;
+        const containerRect = target.closest('.word-analysis-grid')?.getBoundingClientRect();
+        const cardRect = target.getBoundingClientRect();
+        if (containerRect) {
+          // Position popup below the card, centered horizontally
+          const x = cardRect.left - containerRect.left + cardRect.width / 2;
+          const y = cardRect.bottom - containerRect.top + 8;
+          this.wordPopup = { entry, x, y };
+        } else {
+          this.wordPopup = { entry, x: cardRect.left, y: cardRect.bottom + 8 };
+        }
+      }
+    } else {
+      this.wordPopup = null;
+    }
+  }
+
+  closeWordPopup(): void {
+    this.activeWordIndex = null;
+    this.wordPopup = null;
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.wordPopup) {
+      this.closeWordPopup();
+      this.cdr.markForCheck();
+    }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.wordPopup) return;
+    // Check if the click is inside the word-analysis-grid
+    const target = event.target as HTMLElement;
+    const grid = this.elementRef.nativeElement.querySelector('.word-analysis-grid');
+    if (grid && !grid.contains(target)) {
+      this.closeWordPopup();
+      this.cdr.markForCheck();
+    }
+  }
+
+  /** Get all translations for the active popup word */
+  getPopupTranslations(): { lang: string; label: string; text: string }[] {
+    if (!this.wordPopup) return [];
+    const t = this.wordPopup.entry.translation;
+    if (!t) return [];
+    return [
+      { lang: this.wordAnalysisLang, label: this.getWordLangLabel(this.wordAnalysisLang), text: t[this.wordAnalysisLang] || '' }
+    ].filter(item => !!item.text);
+  }
+
+  private static readonly WORD_LANG_LABELS: Record<string, string> = {
+    en: 'English', ur: 'Urdu', tr: 'Turkish', fa: 'Persian',
+    id: 'Indonesian', bn: 'Bengali', es: 'Spanish', fr: 'French',
+    de: 'German', ru: 'Russian', zh: 'Chinese',
+  };
+
+  getWordLangLabel(lang: string): string {
+    return VerseTextComponent.WORD_LANG_LABELS[lang] || lang;
   }
 
   get hasAiText(): boolean {

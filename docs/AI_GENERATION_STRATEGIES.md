@@ -108,7 +108,51 @@ Assuming corpus average of ~60 Arabic words/verse (weighted by length distributi
 | GPT-5-mini batch | ~$0.0002/w | 3.48M words | **~$700** |
 | GPT-5-mini batch (short only) | ~$0.0002/w | 0.88M words | **~$176** |
 
-**Critical insight**: Claude CLI's per-word cost is **~100x** OpenAI's. The question is entirely about quality, not cost. Every verse we can acceptably process with OpenAI saves ~$1.20.
+**Critical insight**: Claude CLI's per-word cost is **~100x** GPT-5-mini's. The question is entirely about quality, not cost. Every verse we can acceptably process with OpenAI saves ~$1.20.
+
+### Frontier OpenAI Models: The Untested Opportunity
+
+We tested GPT-5-mini (cheapest reasoning model) and GPT-4.1/4.1-mini (non-reasoning). We have **not tested** OpenAI's more capable models, which are still dramatically cheaper than Claude CLI:
+
+| Model | Type | Input/1M | Output/1M | Batch $/word* | 58K Corpus (batch) | vs Claude CLI |
+|-------|------|----------|-----------|---------------|--------------------|----|
+| **GPT-5.2** | Frontier reasoning | $1.75 | $14.00 | **$0.0024/w** | **~$8.4K** | 9x cheaper |
+| **GPT-5** | Reasoning | $1.25 | $10.00 | **$0.0017/w** | **~$6.0K** | 13x cheaper |
+| **o4-mini** | Reasoning (small) | $1.10 | $4.40 | **$0.0008/w** | **~$2.8K** | 28x cheaper |
+| GPT-5-mini | Reasoning (tiny) | $0.25 | $2.00 | $0.0002/w | ~$700 | 110x cheaper |
+| Claude CLI | — | — | — | $0.022/w | ~$76K | baseline |
+
+*Batch pricing (50% off), assuming 60-word average verse with ~20K output tokens
+
+**GPT-5.2 is OpenAI's most capable model** (400K context, frontier reasoning). At $8.4K for the entire corpus via batch API, it's well within our OpenAI budget. If its quality approaches Claude Sonnet for Islamic scholarly content — correct narrator IDs, Quran cross-references, faithful translations, scholarly summaries — it would be the single best strategy.
+
+**GPT-5** is the next tier down. At $6K for the full corpus, it balances capability and cost. It has "30% fewer response-level errors than GPT-5.1" per OpenAI.
+
+**o4-mini** is a reasoning model at $2.8K batch for the corpus. Being a dedicated reasoning model (not a general LLM), it may handle complex structured output differently.
+
+**Why these haven't been tested**: The original analysis focused on the cheapest viable option (GPT-5-mini) and the known models (GPT-4.1). The quality gap between GPT-5-mini (67% pass, poor scholarly depth) and Claude Sonnet (87% pass, excellent) is large — but that gap may shrink substantially with GPT-5 or GPT-5.2.
+
+**Key question**: Does GPT-5.2's superior reasoning close the quality gap on:
+1. Narrator identification (wrong IDs was GPT-5-mini's #1 quality issue)
+2. Quran cross-references (often empty with GPT-5-mini)
+3. Scholarly summary depth (generic vs contextual)
+4. Word_tags structural correctness (chunk boundary errors)
+
+Academic research (ACL 2025) found GPT-4 "fails to capture some religion-based terms accurately" for Islamic content. But GPT-5.2 is a generational leap — it may handle this domain better. The only way to know is to **test all three on the 15-verse benchmark**.
+
+**Budget impact of frontier models**:
+
+| Scenario | Model | Corpus Cost | + Fix Pass (15%) | Total | Budget Left |
+|----------|-------|-------------|------------------|-------|-------------|
+| GPT-5.2 at 90% pass | GPT-5.2 batch | $8.4K | $1.3K fixes | **$9.7K** | $20K buffer |
+| GPT-5.2 at 80% pass | GPT-5.2 batch | $8.4K | $2.5K fixes | **$10.9K** | $19K buffer |
+| GPT-5 at 85% pass | GPT-5 batch | $6.0K | $1.3K fixes | **$7.3K** | $23K buffer |
+| GPT-5 at 70% pass + Claude fix | GPT-5 batch + Claude CLI | $6.0K + $12K | — | **$18K** | $12K buffer |
+| GPT-5-mini at 85% (optimized) | GPT-5-mini batch + Claude CLI | $0.7K + $12K | — | **$12.7K** | $17K buffer |
+
+Even in the worst case (GPT-5.2 at 80% pass), the total is $10.9K with $19K left over. In the best case (GPT-5 at 85%), it's $7.3K with $23K buffer for quality improvements, additional languages, or fix passes.
+
+**This is the #1 thing to test this week.**
 
 ---
 
@@ -275,10 +319,42 @@ Calibrate validation for "good enough" rather than "Claude-quality":
 
 ## Strategies (20 Total, Constrained to Available Resources)
 
-### Strategy 1: Hybrid Claude CLI + Optimized OpenAI Batch ⭐ MOST PRACTICAL
+### Strategy 1: OpenAI GPT-5.2 Frontier Model (Batch) ⭐ HIGHEST POTENTIAL
+**Cost: ~$8.4K batch | $/word: $0.0024 | Quality: Unknown (MUST TEST)**
+
+GPT-5.2 is OpenAI's most capable model — a generational leap over GPT-5-mini. At batch pricing it's **9x cheaper than Claude CLI** while being OpenAI's flagship reasoning model:
+
+- **400K context window** — no chunking needed for any verse
+- **Frontier reasoning** — may match Claude on narrator IDs, Quran refs, scholarly depth
+- **Structured output support** — JSON schema enforcement available
+- **Batch API**: 50% off → $0.875/$7.00 per M tokens
+
+| Pass Rate | Corpus Cost | + Claude CLI Fix | Total | Budget Left |
+|-----------|------------|------------------|-------|-------------|
+| 90% pass | $8.4K | $1.3K (5.4K failures) | **$9.7K** | $20K |
+| 80% pass | $8.4K | $2.5K (10.8K failures) | **$10.9K** | $19K |
+| 70% pass | $8.4K | $5.8K (16.2K failures) | **$14.2K** | $16K |
+
+Even at 70% pass rate (same as GPT-5-mini), the total cost is ~$14K. **This is the #1 thing to benchmark this week.**
+
+### Strategy 2: OpenAI GPT-5 (Full Model, Batch)
+**Cost: ~$6K batch | $/word: $0.0017 | Quality: Unknown (MUST TEST)**
+
+GPT-5 full at batch pricing — 13x cheaper than Claude CLI:
+- $0.625/$5.00 per M tokens (batch)
+- "30% fewer response-level errors than GPT-5.1" per OpenAI
+- May have significantly better scholarly output than GPT-5-mini
+- **If quality matches Claude**: Best cost/quality ratio of any strategy
+
+| Pass Rate | Corpus Cost | + Claude CLI Fix | Total |
+|-----------|------------|------------------|-------|
+| 85% pass | $6.0K | $1.3K | **$7.3K** |
+| 70% pass | $6.0K | $5.8K | **$11.8K** |
+
+### Strategy 3: Hybrid Claude CLI + Optimized OpenAI GPT-5-mini Batch
 **OpenAI cost: ~$640 | Claude cost: ~$12-15K | Quality: Good-Excellent**
 
-With OpenAI optimizations applied (auto-fix, structured output, relaxed validation):
+If frontier models don't test well, fall back to optimized GPT-5-mini:
 
 | Verse Type | Count | Backend | $/word | Cost | Quality |
 |-----------|-------|---------|--------|------|---------|
@@ -288,10 +364,8 @@ With OpenAI optimizations applied (auto-fix, structured output, relaxed validati
 
 - **Total**: ~$15K (well within $30K budget)
 - **Timeline**: 4-6 weeks
-- **Month 1**: OpenAI batch for all ($640) + Claude for failures ($15K)
-- **Month 2**: Fix pass + remaining quality issues ($15K buffer)
 
-### Strategy 2: Google Gemini Free Tier as Primary
+### Strategy 4: Google Gemini Free Tier as Primary
 **Cost: $0 | Quality: Unknown (needs testing)**
 
 1,000 free requests/day × 60 days = 60,000 requests — covers entire corpus.
@@ -301,17 +375,15 @@ With OpenAI optimizations applied (auto-fix, structured output, relaxed validati
 - **Mitigation**: Test on 15-verse benchmark first
 - **Fallback**: Failed verses → OpenAI batch or Claude CLI
 
-### Strategy 3: OpenAI GPT-5 (Full) for Entire Corpus
-**Cost: ~$3.5K batch | Quality: Unknown (untested, potentially excellent)**
+### Strategy 5: OpenAI o4-mini (Reasoning Model, Batch)
+**Cost: ~$2.8K batch | $/word: $0.0008 | Quality: Unknown**
 
-GPT-5 full model at batch pricing:
-- ~$0.06/verse, ~$0.001/word → $3.5K total
-- May have significantly better scholarly output than GPT-5-mini
-- Still 20x cheaper than Claude CLI
-- **Action**: Test on 15-verse benchmark immediately
-- **If quality matches Claude**: Best strategy overall
+Dedicated reasoning model at $0.55/$2.20 per M (batch) — 28x cheaper than Claude CLI:
+- Reasoning tokens may improve complex fields (narrator IDs, Quran refs)
+- Cheaper than GPT-5/5.2 but less capable
+- **Test alongside GPT-5.2 and GPT-5 on 15-verse benchmark**
 
-### Strategy 4: OpenAI Prompt Engineering + Auto-Fix Sprint
+### Strategy 6: OpenAI Prompt Engineering + Auto-Fix Sprint
 **Cost: ~$50 testing | Quality: Raises pass rate from 67% to 85%+**
 
 Zero-cost optimizations (see OpenAI Optimization section above):
@@ -323,7 +395,7 @@ Zero-cost optimizations (see OpenAI Optimization section above):
 
 **Impact**: Every 10% improvement saves ~$8K in Claude CLI re-processing.
 
-### Strategy 5: Post-Processing Enrichment Pipeline
+### Strategy 7: Post-Processing Enrichment Pipeline
 **Cost: $0 (code only) | Quality: Improves any model's output**
 
 Automate fields that don't need AI:
@@ -337,7 +409,7 @@ Automate fields that don't need AI:
 
 Reduces AI's job to translations + summaries + word_tags.
 
-### Strategy 6: Reduce Output Scope (Fewer Languages First)
+### Strategy 8: Reduce Output Scope (Fewer Languages First)
 **Cost: 50-70% token reduction | Quality: Same per language**
 
 | Phase | Languages | $/word reduction | Timeline |
@@ -350,7 +422,7 @@ Reduces AI's job to translations + summaries + word_tags.
 - Claude CLI: ~$0.010/word → entire corpus fits in $30K budget alone
 - OpenAI batch: ~$0.0001/word → entire corpus for ~$350
 
-### Strategy 7: Two-Pass: Cheap Generate + Claude Fix
+### Strategy 9: Two-Pass: Cheap Generate + Claude Fix
 **Cost: ~$640 OpenAI + $5-15K Claude | Quality: Good**
 
 1. GPT-5-mini batch for everything → ~$640
@@ -358,14 +430,7 @@ Reduces AI's job to translations + summaries + word_tags.
 3. Claude CLI re-generates only flagged verses
 4. With optimizations (85% pass): 8.7K failures × $1.39 = $12.1K → **total $12.7K**
 
-### Strategy 8: OpenAI o4-mini for Quality
-**Cost: ~$1,450 batch | Quality: Unknown (reasoning model)**
-
-- $1.10/$4.40 per M tokens, batch 50% off
-- Reasoning tokens may help with narrator IDs, Quran references
-- **Action**: Test on 15-verse benchmark alongside GPT-5 full
-
-### Strategy 9: Field-by-Field Split Generation
+### Strategy 10: Field-by-Field Split Generation
 **Cost: 30-50% savings | Quality: Same or better**
 
 | Call | Fields | Model | $/word |
@@ -379,21 +444,13 @@ Reduces AI's job to translations + summaries + word_tags.
 - Each call is smaller → fewer timeouts, higher pass rate
 - **Challenge**: Complex implementation — split prompts, merge results
 
-### Strategy 10: Gemini Free + Claude CLI Fix
+### Strategy 11: Gemini Free + Claude CLI Fix
 **Cost: $0 Gemini + $11-22K Claude | Quality: Good**
 
 1. Gemini free tier processes corpus over 60 days (1,000/day)
 2. Quality gate flags failures
 3. Claude CLI re-processes only failures (15-30%)
 4. Budget: 8K-16K failures × $1.39 = $11-22K
-
-### Strategy 11: GPT-5 (Full) for Quality-Critical Verses
-**Cost: ~$3.5K batch | Quality: Unknown**
-
-- Full GPT-5 at $0.625/$5.00 per M (batch)
-- ~$0.001/word → entire corpus for $3.5K
-- **If quality matches Claude**: Best strategy at 1/20th Claude CLI cost
-- **Action**: Test immediately
 
 ### Strategy 12: Maximize Claude CLI Efficiency
 **Cost: $30K (same budget, more words) | Quality: Excellent**
@@ -470,32 +527,33 @@ GPT-5-mini pass rate: 67% → 80-85% with no code changes.
 
 ## Recommended Combination
 
-### The Plan: "Optimize OpenAI, Claude for Failures"
+### The Plan: "Test Frontier Models First, Then Scale"
 
 ```
-Week 1:  [Setup & Optimization]
+Week 1:  [Benchmark Sprint — THE CRITICAL WEEK]
+         - Test GPT-5.2, GPT-5, o4-mini on 15-verse benchmark (~$15 total)
+         - Test Gemini 2.5 Flash/Pro via free tier on same 15 verses
          - Implement deterministic chunk boundary auto-fix (Optimization 1)
          - Add OpenAI structured output mode (Optimization 2)
-         - Remove few-shot examples from GPT-5 prompts (Optimization 3)
+         - Remove few-shot examples from GPT-5 family prompts
          - Build post-processing enrichment (narrator IDs, topics)
-         - Test GPT-5 full model + o4-mini on 15-verse benchmark
-         - Sign up for Google AI Studio (free) + implement Gemini backend
+         - DECISION: Pick primary model based on quality/cost results
 
-Week 2:  [Cheap Bulk Pass]
-         - Submit OpenAI GPT-5-mini batch for all 54K remaining verses (~$640)
-         - Start Gemini free tier: 1,000 verses/day (parallel)
-         - Run quality comparison: keep best result per verse
-         - Apply post-processing enrichment to all outputs
-         - Apply for Anthropic API credits
+Week 2:  [Bulk Pass with Best Model]
+         If GPT-5.2 or GPT-5 quality is good (>80% pass):
+           - Submit batch for all 54K remaining verses ($6-8.4K)
+           - Start Gemini free tier in parallel (1,000/day)
+         If only GPT-5-mini viable:
+           - Submit GPT-5-mini batch for all 54K (~$640)
+           - Apply post-processing enrichment to all outputs
 
-Week 3-4: [Claude CLI Month 1 — Failures]
-         - Claude CLI for OpenAI/Gemini failures
+Week 3-4: [Claude CLI Month 1 — Fix Failures]
+         - Claude CLI for verses that failed quality gate
          - Prioritize by word count: long (>80w) failures first
          - ~$15K budget → ~680K words of content
-         - Continue Gemini free tier in background
 
-Week 5-6: [Claude CLI Month 2 — Remaining]
-         - Claude CLI for remaining quality-gate failures
+Week 5-6: [Claude CLI Month 2 — Remaining + Quality]
+         - Claude CLI for remaining failures and quality improvements
          - Fix pass on verses with review warnings
          - ~$15K budget → ~680K more words
 
@@ -505,28 +563,49 @@ Week 7-8: [Completion]
          - Second language pass if budget allows
 ```
 
-### Projected Outcome
+### Projected Outcomes (by benchmark result)
+
+**Scenario A: GPT-5.2 tests at ≥85% pass rate (best case)**
 
 | Source | Verses | $/word | Cost | Quality |
 |--------|--------|--------|------|---------|
 | Already complete | 3,686 | — | $0 | Excellent |
-| OpenAI batch (pass) | ~46K (85% of 54K) | $0.0002/w | ~$640 | Good |
-| Gemini free (parallel) | ~54K (keep best) | $0/w | $0 | Unknown |
+| GPT-5.2 batch (pass) | ~46K | $0.0024/w | ~$8.4K | Good-Excellent |
+| Claude CLI (failures) | ~8K | $0.022/w | ~$6K | Excellent |
+| **Total** | **~58K** | — | **~$14.4K** | **Good-Excellent** |
+| **Budget remaining** | | | **$15.6K** | For quality fixes, extra languages |
+
+**Scenario B: GPT-5 tests at ≥80% pass rate**
+
+| Source | Verses | $/word | Cost | Quality |
+|--------|--------|--------|------|---------|
+| Already complete | 3,686 | — | $0 | Excellent |
+| GPT-5 batch (pass) | ~43K | $0.0017/w | ~$6K | Good |
+| Claude CLI (failures) | ~11K | $0.022/w | ~$9K | Excellent |
+| **Total** | **~58K** | — | **~$15K** | **Good-Excellent** |
+| **Budget remaining** | | | **$15K** | |
+
+**Scenario C: Only GPT-5-mini viable (fallback)**
+
+| Source | Verses | $/word | Cost | Quality |
+|--------|--------|--------|------|---------|
+| Already complete | 3,686 | — | $0 | Excellent |
+| GPT-5-mini batch (optimized, 85% pass) | ~46K | $0.0002/w | ~$640 | Acceptable |
 | Claude CLI (failures) | ~8K | $0.022/w | ~$11K | Excellent |
 | Claude CLI (fix pass) | ~5K | $0.010/w | ~$3K | Excellent |
 | **Total** | **~58K** | — | **~$15K** | **Good-Excellent** |
 
-**Budget remaining**: ~$15K buffer for retries, additional languages, or quality improvements.
+All three scenarios fit comfortably within the $30K budget.
 
 ### Risk Mitigation
 
 | Risk | Mitigation |
 |------|------------|
-| OpenAI optimizations don't raise pass rate | Claude CLI handles more (budget allows up to ~21K verses) |
-| Gemini quality is poor | Not on critical path; OpenAI + Claude is the primary plan |
+| GPT-5.2/GPT-5 quality no better than mini | Fall back to Scenario C (optimized GPT-5-mini + Claude) |
+| Frontier models have same structural errors | Auto-fix + structured output mode handles them |
 | Claude CLI $15K/month runs out early | Prioritize high-word-count verses (better $/word) |
 | More failures than expected | Switch to 4-language mode (60% token reduction) |
-| GPT-5 full model tests well | Switch from GPT-5-mini → better quality, ~$3.5K total (massive savings) |
+| Gemini free tier quality is excellent | Use as primary instead of OpenAI (saves entire OpenAI budget) |
 
 ### Emergency Fallback: 4-Language Mode
 
@@ -540,14 +619,16 @@ If budget looks tight mid-process:
 
 ## Immediate Next Steps
 
-1. **TODAY**: Implement deterministic chunk boundary auto-fix in pipeline (zero cost, biggest impact)
-2. **TODAY**: Test GPT-5 (full model) on 15-verse benchmark (already have OpenAI key)
-3. **THIS WEEK**: Add OpenAI structured output mode to pipeline
-4. **THIS WEEK**: Remove few-shot examples from GPT-5 family prompts
-5. **THIS WEEK**: Sign up for Google AI Studio (free), implement Gemini backend, test on benchmark
-6. **THIS WEEK**: Build post-processing enrichment for narrator IDs and topics
-7. **WEEK 2**: Submit first full OpenAI batch + start Gemini free tier
-8. **WEEK 3**: Begin Claude CLI for failures
+1. **TODAY**: Run 15-verse benchmark on **GPT-5.2** (frontier, ~$2-3 test cost)
+2. **TODAY**: Run 15-verse benchmark on **GPT-5** (full, ~$1-2 test cost)
+3. **TODAY**: Run 15-verse benchmark on **o4-mini** (~$0.50 test cost)
+4. **TODAY**: Implement deterministic chunk boundary auto-fix in pipeline
+5. **THIS WEEK**: Add OpenAI structured output mode to pipeline
+6. **THIS WEEK**: Sign up for Google AI Studio (free), test Gemini on same 15 verses
+7. **THIS WEEK**: Build post-processing enrichment for narrator IDs and topics
+8. **WEEK 1 END**: **DECISION POINT** — pick primary model based on benchmark results
+9. **WEEK 2**: Submit full corpus batch with chosen model
+10. **WEEK 3+**: Claude CLI for failures and quality improvements
 
 ---
 

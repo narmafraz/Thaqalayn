@@ -41,6 +41,20 @@
       </mat-card-title>
       <mat-card-content>
         <app-verse-text [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index"></app-verse-text>
+        <div class="ai-badges-inline" *ngIf="verse.ai?.content_type || verse.ai?.tags?.length">
+          <a class="ai-content-type-chip" *ngIf="verse.ai?.content_type"
+             [routerLink]="['/search']"
+             [queryParams]="{q: 'type:' + verse.ai.content_type}"
+             queryParamsHandling="merge">
+            {{ getContentTypeLabel(verse.ai.content_type) }}
+          </a>
+          <a class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags"
+             [routerLink]="['/search']"
+             [queryParams]="{q: 'tag:' + tag}"
+             queryParamsHandling="merge">
+            {{ formatLabel(tag) }}
+          </a>
+        </div>
       </mat-card-content>
       <mat-card-footer>
         <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
@@ -118,20 +132,6 @@
             <div>{{getBookName(crumbs)}} {{verse.index}}</div>
             <div>{{ 'book.inBookReference' | translate }}</div>
             <div>{{getInBookReference(crumbs, verse)}}</div>
-            <div class="ai-badges" *ngIf="verse.ai?.content_type || verse.ai?.tags?.length">
-              <a class="ai-content-type-chip" *ngIf="verse.ai?.content_type"
-                 [routerLink]="['/search']"
-                 [queryParams]="{q: 'type:' + verse.ai.content_type}"
-                 queryParamsHandling="merge">
-                {{ getContentTypeLabel(verse.ai.content_type) }}
-              </a>
-              <a class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags"
-                 [routerLink]="['/search']"
-                 [queryParams]="{q: 'tag:' + tag}"
-                 queryParamsHandling="merge">
-                {{ formatLabel(tag) }}
-              </a>
-            </div>
             <div class="ai-quran-refs" *ngIf="verse.ai?.related_quran?.length">
               <span class="ai-quran-label">{{ 'book.quranRefs' | translate }}:</span>
               <span *ngFor="let qref of verse.ai.related_quran" class="ai-quran-ref">

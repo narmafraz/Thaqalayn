@@ -622,13 +622,12 @@ mat-mdc-card {
   }
 }
 
-// AI content badges
-.ai-badges {
-  grid-column: 1 / -1;
+// AI content badges (inline, always visible)
+.ai-badges-inline {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-top: 4px;
+  padding: 4px 15px 8px;
 }
 
 .ai-content-type-chip {

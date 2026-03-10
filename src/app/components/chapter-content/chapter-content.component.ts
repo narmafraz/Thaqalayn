@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inje
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
 import { Book, ChapterContent, Crumb, Verse } from '@app/models';
+import { BookAuthor, getBookAuthor } from '@app/data/book-authors';
 import { I18nService } from '@app/services/i18n.service';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
@@ -66,6 +67,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // View mode state
   hasAnyAiContent = false;
 
+  // Book author metadata
+  author: BookAuthor | undefined;
+
   constructor(
     private store: Store,
     private viewportScroller: ViewportScroller,
@@ -104,6 +108,8 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
         prev: book.data.nav?.prev || null,
         next: book.data.nav?.next || null,
       };
+      // Derive book author from index
+      this.author = getBookAuthor(book.index);
       // Check for AI content to show view mode toolbar
       this.checkAiContent(book);
       // Load bookmark and annotation states for all verses

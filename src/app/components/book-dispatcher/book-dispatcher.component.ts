@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Book } from '@app/models';
+import { BOOK_AUTHORS } from '@app/data/book-authors';
 import { DailyVerse, DailyVerseService } from '@app/services/daily-verse.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -9,27 +10,26 @@ import { RouterState } from '@store/router/router.state';
 import { Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
-/** Static metadata for book explore cards (icon, description key, author) */
+/** Static metadata for book explore cards (icon, description key) */
 export interface BookCardMeta {
   icon: string;
   descKey: string;
-  author?: { en: string; ar: string };
   featured?: boolean;
 }
 
 export const BOOK_CARD_META: Record<string, BookCardMeta> = {
   'quran': { icon: 'menu_book', descKey: 'nav.quranDesc', featured: true },
-  'al-kafi': { icon: 'auto_stories', descKey: 'nav.alKafiDesc', author: { en: 'Al-Kulayni', ar: 'الكليني' }, featured: true },
-  'tahdhib-al-ahkam': { icon: 'auto_stories', descKey: 'nav.tahdhibDesc', author: { en: 'Al-Tusi', ar: 'الطوسي' }, featured: true },
-  'al-istibsar': { icon: 'auto_stories', descKey: 'nav.istibsarDesc', author: { en: 'Al-Tusi', ar: 'الطوسي' }, featured: true },
-  'man-la-yahduruhu-al-faqih': { icon: 'auto_stories', descKey: 'nav.faqihDesc', author: { en: 'Al-Saduq', ar: 'الصدوق' }, featured: true },
-  'kitab-al-irshad': { icon: 'import_contacts', descKey: 'nav.irshadDesc', author: { en: 'Al-Mufid', ar: 'المفيد' } },
-  'al-amali': { icon: 'import_contacts', descKey: 'nav.amaliDesc', author: { en: 'Al-Saduq', ar: 'الصدوق' } },
-  'kitab-sulaym-ibn-qays': { icon: 'import_contacts', descKey: 'nav.sulaimDesc', author: { en: 'Sulaym ibn Qays', ar: 'سليم بن قيس' } },
-  'nahj-al-balagha': { icon: 'format_quote', descKey: 'nav.nahjDesc', author: { en: 'Al-Sharif al-Radi', ar: 'الشريف الرضي' } },
-  'al-sahifa-al-sajjadiyya': { icon: 'self_improvement', descKey: 'nav.sahifaDesc', author: { en: 'Imam al-Sajjad', ar: 'الإمام السجاد (ع)' } },
-  'wasael-ul-shia': { icon: 'library_books', descKey: 'nav.wasaelDesc', author: { en: 'Al-Hurr al-Amili', ar: 'الحر العاملي' } },
-  'bihar-al-anwar': { icon: 'library_books', descKey: 'nav.biharDesc', author: { en: 'Al-Majlisi', ar: 'المجلسي' } },
+  'al-kafi': { icon: 'auto_stories', descKey: 'nav.alKafiDesc', featured: true },
+  'tahdhib-al-ahkam': { icon: 'auto_stories', descKey: 'nav.tahdhibDesc', featured: true },
+  'al-istibsar': { icon: 'auto_stories', descKey: 'nav.istibsarDesc', featured: true },
+  'man-la-yahduruhu-al-faqih': { icon: 'auto_stories', descKey: 'nav.faqihDesc', featured: true },
+  'kitab-al-irshad': { icon: 'import_contacts', descKey: 'nav.irshadDesc' },
+  'al-amali': { icon: 'import_contacts', descKey: 'nav.amaliDesc' },
+  'kitab-sulaym-ibn-qays': { icon: 'import_contacts', descKey: 'nav.sulaimDesc' },
+  'nahj-al-balagha': { icon: 'format_quote', descKey: 'nav.nahjDesc' },
+  'al-sahifa-al-sajjadiyya': { icon: 'self_improvement', descKey: 'nav.sahifaDesc' },
+  'wasael-ul-shia': { icon: 'library_books', descKey: 'nav.wasaelDesc' },
+  'bihar-al-anwar': { icon: 'library_books', descKey: 'nav.biharDesc' },
 };
 
 export interface ExploreCard {
@@ -94,6 +94,7 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
       const arEntry = arIndex?.[path];
       const meta = BOOK_CARD_META[slug];
 
+      const author = BOOK_AUTHORS[slug];
       cards.push({
         slug,
         routerLink: '/books/' + slug,
@@ -101,7 +102,7 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
         titleAr: arEntry?.title || '',
         icon: meta?.icon || 'book',
         descKey: meta?.descKey || '',
-        author: meta?.author,
+        author: author?.en ? author : undefined,
         featured: meta?.featured || false,
       });
     }

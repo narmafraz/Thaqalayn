@@ -40,7 +40,9 @@
               <mat-icon>{{ card.icon }}</mat-icon>
               <span class="quick-link-title">{{ card.titleEn }}</span>
               <span class="quick-link-title-ar" lang="ar" *ngIf="card.titleAr">{{ card.titleAr }}</span>
-              <span class="quick-link-author" *ngIf="card.author">{{ card.author.en }}</span>
+              <span class="quick-link-author" *ngIf="card.author">{{ card.author.en }}
+                <span lang="ar" class="quick-link-author-ar" *ngIf="card.author.ar"> - {{ card.author.ar }}</span>
+              </span>
               <span class="quick-link-desc" *ngIf="card.descKey">{{ card.descKey | translate }}</span>
             </a>
           </div>

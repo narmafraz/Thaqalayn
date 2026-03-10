@@ -9,6 +9,10 @@
       <h2 *ngIf="titles.en" [innerHTML]="titles.en"></h2>
     </ng-container>
   </div>
+  <div class="author-line" *ngIf="author?.en">
+    <span class="author-en">{{ author.en }}</span>
+    <span class="author-ar arabic" lang="ar" *ngIf="author.ar"> - {{ author.ar }}</span>
+  </div>
   <div *ngIf="verse">
     <app-verse-text [verse]="verse"></app-verse-text>
   </div>

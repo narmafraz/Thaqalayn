@@ -1,6 +1,6 @@
 <ng-container *ngIf="(book$ | async) as book">
   <app-settings></app-settings>
-  <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions"></app-book-titles>
+  <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author"></app-book-titles>
   <div class="jump-to-verse" *ngIf="book.data.verses?.length >= 10">
     <mat-form-field appearance="outline" class="jump-input">
       <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>

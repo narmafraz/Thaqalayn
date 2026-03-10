@@ -3,6 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, I
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { Chapter, ChapterList } from '@app/models';
+import { BookAuthor, getBookAuthor } from '@app/data/book-authors';
 import { combineLatest, Observable, of } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 import { ChapterListDataSource } from './chapter-list-data-source';
@@ -26,6 +27,7 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
 
   displayedColumns$: Observable<string[]>;
   mqAlias$: Observable<string>;
+  author$: Observable<BookAuthor | undefined>;
 
   constructor(
     private breakpointObserver: BreakpointObserver,
@@ -44,6 +46,13 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    // Derive author from the book index (root slug)
+    this.author$ = this.book$.pipe(
+      filter((book): book is ChapterList => !!book),
+      map(book => getBookAuthor(book.index)),
+      startWith(undefined)
+    );
+
     // Enhanced error handling for book$ observable
     this.displayedColumns$ = combineLatest([
       this.mqAlias$.pipe(startWith(this.SMALL_SCREEN_ALIAS)),

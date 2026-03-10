@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { MultiLingualText, Verse } from '@app/models';
+import { BookAuthor } from '@app/data/book-authors';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,4 +14,5 @@ export class BookTitlesComponent {
   @Input() descriptions: MultiLingualText;
   @Input() verse: Verse;
   @Input() headingLevel: 1 | 2 = 1;
+  @Input() author: BookAuthor | undefined;
 }

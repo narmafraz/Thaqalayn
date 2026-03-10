@@ -644,3 +644,44 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 **Fields deferred to word dictionary:** `root`, `is_proper_noun`, `form/wazn`, related words
 
 ---
+
+## UI Improvement Roadmap Decisions (2026-03-10)
+
+### D031: NAR-03 Hadith Preview Cards — Data Source Strategy
+
+**Context:** Narrator profiles show bare path links like `/books/al-kafi:1:2:3:4`. Need to show rich preview cards with book name, chapter title, hadith number.
+
+**Options considered:**
+1. **Modify ThaqalaynDataGenerator** — Add preview text to narrator JSON. Reliable but requires cross-project changes and data regeneration.
+2. **Lazy-fetch from books API** — Fetch chapter JSON on scroll. No generator changes but many HTTP requests for narrators with thousands of hadiths.
+3. **Client-side path parsing only** — Extract book/chapter info from path string. Better than bare links but no chapter titles.
+4. **Use IndexState book index** — `IndexState` loads `books.en.json` at startup mapping every path to title/part_type. Strip last segment from verse path to find parent chapter, look up title. Zero additional HTTP requests.
+
+**Decision:** Option 4 — Use IndexState for chapter title lookup. Create enriched preview cards in people-content component.
+
+**Rationale:**
+- Zero generator changes (single-project change)
+- Zero additional HTTP requests (index already loaded at startup)
+- Rich preview data: book name, chapter title, hadith number
+- `PathLinkComponent` already has `formatReadable()` for fallback when index not loaded yet
+- Race condition handled: show path-link format until index loads, then re-render
+
+**Risk mitigated:** IndexState timing — if user navigates directly to narrator page, index may not be loaded yet. Fallback to formatted path display.
+
+---
+
+### D032: BOOK_DISPLAY_NAMES Consolidation
+
+**Context:** `BOOK_DISPLAY_NAMES` mapping duplicated in path-link.component.ts and people-content.component.ts with different entries.
+
+**Decision:** Consolidate into `src/app/models/book-names.ts` as single source of truth.
+
+---
+
+### D033: NAR-05 English Names in Hover Cards
+
+**Context:** Hover card shows only Arabic name. `NarratorMetadata.titles` has `en` field but empty for most narrators.
+
+**Decision:** Show `titles.en` when available. Skip reliability (not in narrator index metadata). No IMAM_IDS hardcoding.
+
+---

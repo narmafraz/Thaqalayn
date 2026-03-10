@@ -710,7 +710,7 @@ Addressing the disconnect between verse-detail and chapter-content views, fixing
 
 ---
 
-## Phase 7: AI Content Integration & Word Interaction ✅ PARTIAL
+## Phase 7: AI Content Integration & Word Interaction ✅ COMPLETE
 
 > **Status:** AI-01 COMPLETE — summary/key terms inline in verse-text, content type/topic badges moved inline in chapter-content (FB-02). AI-02 (word click popup) COMPLETE via FB-03.
 
@@ -1087,13 +1087,13 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 
 ---
 
-## Phase 13: i18n Completion, Accessibility & Mobile Polish
+## Phase 13: i18n Completion, Accessibility & Mobile Polish ✅ COMPLETE
 
 > **Source:** Comprehensive UX Review (2026-03-10). Full findings in `docs/UX_REVIEW_2026_03_10.md`.
-> **Status:** PLANNED
+> **Status:** All 15 items implemented (2026-03-10). i18n: P13-01 through P13-05 and P13-12 complete. Accessibility: P13-07, P13-09, P13-10, P13-13 complete. Mobile: P13-06, P13-08, P13-11 complete. Polish: P13-14, P13-15 complete. 529 unit tests passing.
 > **Key theme:** Close the i18n gap (50+ hardcoded English strings across 7 components), fix remaining accessibility blockers, and complete mobile experience gaps.
 
-### P13-01: Internationalize About and Support Pages
+### P13-01: Internationalize About and Support Pages ✅ DONE
 
 **Description:** Both `/about` and `/support` pages contain zero i18n `translate` pipe calls. Every heading, paragraph, and link is hardcoded English. These are the only two full pages in the app completely bypassing the i18n system.
 
@@ -1106,7 +1106,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - i18n keys added to all 12 language JSON files
 - Page content reads naturally in all supported languages
 
-### P13-02: Internationalize AI Settings Panel
+### P13-02: Internationalize AI Settings Panel ✅ DONE
 
 **Description:** The settings component's AI preferences panel has 7 hardcoded English strings: "AI Feature Settings", "Show diacritized text by default", "Show content type badges", "Show topic tags", "Show isnad/matn separation", "Show AI translation disclaimer", "Word-by-word language:".
 
@@ -1118,7 +1118,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Keys added to all 12 language files
 - Settings panel usable for non-English users
 
-### P13-03: Internationalize Verse-Detail Section Headers
+### P13-03: Internationalize Verse-Detail Section Headers ✅ DONE
 
 **Description:** Three AI content section headers in verse-detail are hardcoded English: "Quran References", "Key Phrases", "Related Narrations". The rest of the component properly uses i18n.
 
@@ -1129,7 +1129,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - All three headings use `translate` pipe
 - Keys added to all 12 language files
 
-### P13-04: Internationalize Topics Page
+### P13-04: Internationalize Topics Page ✅ DONE
 
 **Description:** Topics component has hardcoded tab labels ("Books", "AI Topics", "Key Phrases"), AI topic counts ("hadiths"), "coming soon" messages, and "View Key Phrases" link text — all bypassing i18n.
 
@@ -1142,7 +1142,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - "hadiths" count label uses i18n with pluralization
 - "Coming soon" messages are translated
 
-### P13-05: Internationalize Phrase List Page
+### P13-05: Internationalize Phrase List Page ✅ DONE
 
 **Description:** The phrase-list component has zero `translate` pipe usage. "Key Phrases", subtitle, loading text, search placeholder, empty state, and coming-soon message are all hardcoded English.
 
@@ -1154,7 +1154,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - i18n keys added to all 12 language files
 - Search placeholder and empty state messages translated
 
-### P13-06: Fix AI Toggle Touch Targets on Mobile
+### P13-06: Fix AI Toggle Touch Targets on Mobile ✅ DONE
 
 **Description:** AI toggle buttons in verse-text (diacritics, word analysis, paragraph view, chain diagram) have `padding: 2px` with 16x16px icons, creating ~20px total touch area on mobile. These were not included in the FIX-05 touch target fix that addressed verse footer actions.
 
@@ -1166,7 +1166,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Desktop size remains compact (28-32px) per FB-01
 - Touch targets verified at 375px viewport width
 
-### P13-07: Add Keyboard/ARIA Support to Topic Category Headers
+### P13-07: Add Keyboard/ARIA Support to Topic Category Headers ✅ DONE
 
 **Description:** Topic category `<h2>` elements have click handlers for expand/collapse but lack `role="button"`, `tabindex="0"`, and keyboard event handlers. Screen reader and keyboard users cannot interact with collapsible topic categories.
 
@@ -1179,7 +1179,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - `aria-expanded` attribute reflects current state
 - Screen reader announces collapse/expand state
 
-### P13-08: Add AI Settings to Mobile Hamburger Menu
+### P13-08: Add AI Settings to Mobile Hamburger Menu ✅ DONE
 
 **Description:** The mobile hamburger menu consolidates navigation, dark mode, font size, and language — but omits AI content preferences. Users on mobile must locate the embedded settings component within chapter-content to toggle AI features, which is not discoverable.
 
@@ -1192,7 +1192,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Word-by-word language selector included
 - Settings persist via AiPreferencesService (same as desktop)
 
-### P13-09: Add ARIA Attributes to Discussion Section Toggle
+### P13-09: Add ARIA Attributes to Discussion Section Toggle ✅ DONE
 
 **Description:** The discussion section header in verse-detail uses a click handler on a `<div>` element to toggle the comment editor. It lacks `role="button"`, `tabindex`, `aria-expanded`, and keyboard event handlers.
 
@@ -1205,7 +1205,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Keyboard enter/space toggles the section
 - Screen reader announces the expand/collapse action
 
-### P13-10: Clamp Word-Analysis Popup to Viewport Bounds
+### P13-10: Clamp Word-Analysis Popup to Viewport Bounds ✅ DONE
 
 **Description:** The word detail popup uses absolute pixel positioning without viewport boundary checks. On narrow mobile screens (375px or less), the popup (min-width 160px) can extend beyond the viewport edge, cutting off content.
 
@@ -1218,7 +1218,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - No horizontal scroll introduced by popup display
 - Popup remains readable on 320px viewport width
 
-### P13-11: Add Narrators to Mobile Bottom Navigation
+### P13-11: Add Narrators to Mobile Bottom Navigation ✅ DONE
 
 **Description:** The bottom navigation bar has 4 items (Home, Books, Topics, Bookmarks) but omits Narrators — a major feature section. Since the footer (which has a Narrators link) is hidden on mobile in favor of the bottom nav, and the hamburger menu is a secondary action, Narrators discovery is poor on mobile.
 
@@ -1231,7 +1231,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Active state highlights correctly for narrator pages
 - If 5 items are too crowded, consider replacing Topics with Narrators (Topics is less frequently accessed)
 
-### P13-12: Internationalize Remaining Inline Strings
+### P13-12: Internationalize Remaining Inline Strings ✅ DONE
 
 **Description:** Scattered hardcoded English strings across multiple components: "Loading commentary..." (chapter-content tafsir), "Exporting..."/"Export CSV" (download), "Filtered by" (search-results), and "Not sure how to display this book part, sorry!" (book-dispatcher fallback). Each is a minor gap but they accumulate.
 
@@ -1243,7 +1243,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - i18n keys added to all 12 language files
 - Zero hardcoded English user-facing text in any template
 
-### P13-13: Keyboard Navigation for Search Dropdown Results
+### P13-13: Keyboard Navigation for Search Dropdown Results ✅ DONE
 
 **Description:** The search dropdown has `role="listbox"` and items have `role="option"`, but there is no `aria-activedescendant` tracking or arrow-key navigation. Users cannot browse search suggestions with keyboard alone.
 
@@ -1257,7 +1257,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Escape key closes the dropdown
 - `aria-activedescendant` on the input tracks the focused option
 
-### P13-14: Use Material Select for Tafsir Edition Picker
+### P13-14: Use Material Select for Tafsir Edition Picker ✅ DONE
 
 **Description:** The tafsir edition selector uses a plain `<select>` HTML element instead of `<mat-select>`, creating visual inconsistency with the rest of the UI. On mobile, native selects invoke the OS picker instead of the Material dropdown used everywhere else.
 
@@ -1270,7 +1270,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Dark mode styling inherited from global Material overrides
 - Mobile interaction consistent with other dropdowns
 
-### P13-15: Audit and Update Footer Social Link
+### P13-15: Audit and Update Footer Social Link ✅ DONE
 
 **Description:** The footer links to `https://twitter.com/ProjThaqalayn` which references the old Twitter brand. The account may be inactive. This should be audited and either updated to the X.com equivalent, replaced with an active social presence, or removed.
 

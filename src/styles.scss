@@ -375,8 +375,8 @@ kbd {
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #fff;
     border-radius: 4px;
-    min-width: 44px;
-    min-height: 44px;
+    width: 28px;
+    height: 28px;
     cursor: pointer;
     font-size: 14px;
     display: flex;
@@ -401,8 +401,6 @@ kbd {
   color: #fff;
   cursor: pointer;
   padding: 4px;
-  min-width: 44px;
-  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -428,8 +426,6 @@ kbd {
   color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   padding: 4px;
-  min-width: 44px;
-  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;

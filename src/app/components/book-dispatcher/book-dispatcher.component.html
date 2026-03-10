@@ -54,7 +54,7 @@
     <app-verse-detail *ngSwitchCase="'verse_detail'" [book$]="book$"></app-verse-detail>
     <!-- <app-verse-content *ngSwitchCase="'verse_content'" [book$]="book$"></app-verse-content> -->
     <p *ngSwitchDefault>
-      Not sure how to display this book part, sorry!
+      {{ 'book.unknownBookPart' | translate }}
     </p>
   </ng-container>
 </ng-template>

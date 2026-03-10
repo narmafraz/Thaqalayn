@@ -1,6 +1,9 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AboutComponent } from './about.component';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
 
 describe('AboutComponent', () => {
   let component: AboutComponent;
@@ -8,7 +11,9 @@ describe('AboutComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ AboutComponent ]
+      imports: [HttpClientTestingModule],
+      declarations: [ AboutComponent, TranslatePipe ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   }));

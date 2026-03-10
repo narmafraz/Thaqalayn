@@ -131,7 +131,7 @@
 
         <!-- AI Content: Quran Cross-References -->
         <div class="ai-quran-section" *ngIf="book.data.verse.ai?.related_quran?.length">
-          <h3>Quran References</h3>
+          <h3>{{ 'book.quranReferences' | translate }}</h3>
           <div class="ai-quran-list">
             <div *ngFor="let qref of book.data.verse.ai.related_quran" class="ai-quran-item">
               <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
@@ -147,7 +147,7 @@
 
         <!-- AI Content: Key Phrases -->
         <div class="ai-phrases-section" *ngIf="book.data.verse.ai?.key_phrases?.length">
-          <h3>Key Phrases</h3>
+          <h3>{{ 'book.keyPhrases' | translate }}</h3>
           <div class="ai-phrase-list">
             <a *ngFor="let phrase of book.data.verse.ai.key_phrases"
                class="ai-phrase-item"
@@ -161,7 +161,7 @@
 
         <!-- AI Content: Similar Hadiths -->
         <div class="ai-similar-section" *ngIf="book.data.verse.ai?.similar_content_hints?.length">
-          <h3>Related Narrations</h3>
+          <h3>{{ 'book.relatedNarrations' | translate }}</h3>
           <div class="ai-similar-list">
             <div *ngFor="let hint of book.data.verse.ai.similar_content_hints" class="ai-similar-item">
               <span class="ai-similar-theme">{{ formatLabel(hint.theme) }}</span>

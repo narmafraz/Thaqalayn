@@ -233,7 +233,7 @@
         </div>
         <div class="tafsir-loading" *ngIf="loadingTafsir.has(verse.local_index)">
           <mat-spinner diameter="20"></mat-spinner>
-          Loading commentary...
+          {{ 'book.loadingCommentary' | translate }}
         </div>
         <p class="tafsir-text" *ngIf="!loadingTafsir.has(verse.local_index)"
            [innerHTML]="expandedTafsir.get(verse.local_index)"></p>

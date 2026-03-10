@@ -77,7 +77,12 @@
     "viewPlain": "纯文本",
     "viewWordByWord": "逐词对照",
     "viewParagraph": "段落视图",
-    "viewCombined": "逐词 + 段落"
+    "viewCombined": "逐词 + 段落",
+    "quranReferences": "古兰经参考",
+    "keyPhrases": "关键短语",
+    "relatedNarrations": "相关传述",
+    "loadingCommentary": "正在加载注释...",
+    "unknownBookPart": "抱歉，不确定如何显示这部分！"
   },
   "narrator": {
     "narratedAhadith": "所传圣训",
@@ -136,7 +141,8 @@
     "results": "条结果",
     "loadMore": "加载更多",
     "showingAll": "已显示所有结果",
-    "placeholder": "搜索..."
+    "placeholder": "搜索...",
+    "filteredBy": "已筛选"
   },
   "translation": {
     "selectTranslation": "选择翻译",
@@ -180,7 +186,16 @@
     "remove": "删除",
     "openSource": "开源免费",
     "dataPackages": "数据包",
-    "dataPackagesDescription": "下载完整数据集为JSON格式或导出为CSV。"
+    "dataPackagesDescription": "下载完整数据集为JSON格式或导出为CSV。",
+    "exporting": "正在导出...",
+    "exportCsv": "导出CSV",
+    "openSourceDesc": "所有数据都是开源的，可从GitHub下载：",
+    "completeDataDesc": "上面的链接包含每页数据，完整书籍数据在：",
+    "generatorDesc": "数据从原始数据生成，脚本在：",
+    "apiDocs": "API文档可在以下地址获取：",
+    "apiDocsLink": "API文档",
+    "communityDesc": "如果有用并创建了项目，请告诉我们！",
+    "growthHope": "希望在您的帮助下扩展数据。"
   },
   "bookmark": {
     "title": "书签",
@@ -229,7 +244,16 @@
     "title": "主题",
     "description": "按主题浏览圣训集。",
     "searchPlaceholder": "搜索主题...",
-    "chapters": "章"
+    "chapters": "章",
+    "tabBooks": "书籍",
+    "tabAiTopics": "AI主题",
+    "tabKeyPhrases": "关键短语",
+    "loadingAiTopics": "正在加载AI主题分类...",
+    "searchAiTopics": "搜索AI主题...",
+    "hadithsCount": "圣训",
+    "aiComingSoon": "AI主题分类即将推出。",
+    "phrasesDesc": "浏览圣训中的关键伊斯兰短语。",
+    "viewKeyPhrases": "查看关键短语"
   },
   "discussion": {
     "title": "讨论",
@@ -286,6 +310,63 @@
     "pressEscToClose": "按Esc关闭",
     "showKeyboardShortcuts": "键盘快捷键",
     "title": "设置",
-    "fontSize": "字体大小"
+    "fontSize": "字体大小",
+    "ai": {
+      "title": "AI功能设置",
+      "showDiacritized": "默认显示注音文本",
+      "showBadges": "显示内容类型徽章",
+      "showTopics": "显示主题标签",
+      "showIsnad": "显示传述链/正文分离",
+      "showDisclaimer": "显示AI翻译免责声明",
+      "wordByWordLang": "逐词翻译语言："
+    }
+  },
+  "about": {
+    "title": "关于Thaqalayn项目",
+    "objectives": "目标",
+    "objective1": "在线传播阿赫勒拜特的圣训",
+    "objective2": "作为数据源：使圣训数据集开源并可供下载",
+    "objective3": "作为参考：每条圣训都应有一个可共享的唯一链接",
+    "objective4": "所有相关可用数据的聚合门户",
+    "technicalPrinciples": "技术设计原则",
+    "technicalPrinciplesIntro": "网站基于以下几个原则开发：",
+    "principle1": "显示单个页面的所有静态数据应在单个json文件中",
+    "principle2": "静态数据应可从头重现——不进行临时编辑",
+    "history": "历史",
+    "historyP1": "创建这样一个网站的想法在我脑海中至少有十年了。",
+    "historyP2": "近年来我意识到网上免费英语圣训资源的匮乏。",
+    "historyP3": "新冠疫情提供了前所未有的机会，感赞真主，项目启动了。",
+    "inspirations": "灵感来源",
+    "inspirationsIntro": "许多事情塑造了这个项目：",
+    "inspiredTo": "启发项目去",
+    "tanzilDesc": "对tanzil.net赞美不够。出色的工作。",
+    "tanzilInspired": "让数据对所有人免费开放。",
+    "sunnahDesc": "赞美真主，逊尼兄弟在传播方面领先。设计的简洁令人印象深刻。",
+    "sunnahInspired": "创建易于导航的圣训阅读网站。",
+    "staticHosting": "找不到免费的API托管",
+    "staticHostingDesc": "最初后端是REST API。没有免费数据库，转向了静态json文件。",
+    "staticHostingInspired": "保持简单并提供静态内容。",
+    "specialThanks": "特别感谢",
+    "dataSourcesThanks": "感谢将圣训数据数字化的工作。没有这些数据源会困难得多。",
+    "netlifyThanks": "实验阶段发现了netlify，非常有帮助。非常感谢。",
+    "iconsCredit": "图标制作者",
+    "iconsFrom": "来自"
+  },
+  "support": {
+    "title": "获取支持",
+    "intro": "这个GitHub开源项目的支持也通过那里提供。",
+    "siteIssue": "关于网站外观的问题",
+    "siteIssueDesc": "请查看现有问题",
+    "createNewIssue": "如未解决请创建新issue。",
+    "dataIssue": "关于网站数据的问题"
+  },
+  "phrases": {
+    "title": "关键短语",
+    "subtitle": "圣训中常见的伊斯兰多词表达",
+    "loading": "正在加载短语...",
+    "count": "找到{{count}}个短语",
+    "searchPlaceholder": "搜索短语...",
+    "noResults": "没有匹配的短语。",
+    "comingSoon": "短语索引即将推出。"
   }
 }

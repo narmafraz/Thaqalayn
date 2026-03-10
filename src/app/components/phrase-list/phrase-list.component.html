@@ -1,27 +1,27 @@
 <div class="content mat-elevation-z8">
-  <h1>Key Phrases</h1>
-  <p class="subtitle">Common Islamic multi-word expressions found across hadiths</p>
+  <h1>{{ 'phrases.title' | translate }}</h1>
+  <p class="subtitle">{{ 'phrases.subtitle' | translate }}</p>
 
   <div *ngIf="loading" class="loading">
     <mat-spinner diameter="24"></mat-spinner>
-    Loading phrases...
+    {{ 'phrases.loading' | translate }}
   </div>
 
   <ng-container *ngIf="!loading && available">
-    <p class="phrase-count">{{ totalPhrases }} phrases found</p>
+    <p class="phrase-count">{{ totalPhrases }} {{ 'phrases.title' | translate }}</p>
 
     <div class="search-box">
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Search phrases..."
+        [placeholder]="'phrases.searchPlaceholder' | translate"
         [ngModel]="searchQuery"
         (ngModelChange)="filterPhrases($event)"
         class="search-input">
     </div>
 
     <div *ngIf="filteredCategories.length === 0" class="no-results">
-      No phrases match your search.
+      {{ 'phrases.noResults' | translate }}
     </div>
 
     <section *ngFor="let cat of filteredCategories" class="phrase-category">
@@ -33,7 +33,7 @@
            class="phrase-card">
           <div class="phrase-ar" lang="ar" dir="rtl">{{ phrase.phraseAr }}</div>
           <div class="phrase-en">{{ phrase.phraseEn }}</div>
-          <div class="phrase-meta">{{ phrase.count }} hadith{{ phrase.count !== 1 ? 's' : '' }}</div>
+          <div class="phrase-meta">{{ phrase.count }} {{ phrase.count !== 1 ? ('common.hadiths' | translate) : ('book.hadith' | translate) }}</div>
         </a>
       </div>
     </section>
@@ -41,6 +41,6 @@
 
   <div *ngIf="!loading && !available" class="coming-soon">
     <mat-icon>format_quote</mat-icon>
-    <p>Key phrase index is coming soon. Phrases will be extracted from AI hadith analysis.</p>
+    <p>{{ 'phrases.comingSoon' | translate }}</p>
   </div>
 </div>

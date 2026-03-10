@@ -66,7 +66,7 @@
           <button mat-button (click)="exportAsCsv(pkg.id)" *ngIf="pkg.csvExport"
                   [disabled]="csvExporting === pkg.id">
             <mat-icon>table_chart</mat-icon>
-            {{ csvExporting === pkg.id ? 'Exporting...' : 'Export CSV' }}
+            {{ csvExporting === pkg.id ? ('download.exporting' | translate) : ('download.exportCsv' | translate) }}
           </button>
         </div>
       </div>
@@ -76,22 +76,19 @@
   <!-- Open Source Section -->
   <section>
     <h2>{{ 'download.openSource' | translate }}</h2>
-    <p>All data displayed on the site is open source and you can download it by visiting the data GitHub repository: <br>
+    <p>{{ 'download.openSourceDesc' | translate }} <br>
       <a href="https://github.com/narmafraz/ThaqalaynData" target="_blank">https://github.com/narmafraz/ThaqalaynData</a>
     </p>
-    <p>The link above contains the data per page of the site, if instead you would like the all data for one book
-      then that can be found in:
+    <p>{{ 'download.completeDataDesc' | translate }}
       <a href="https://github.com/narmafraz/ThaqalaynData/books/complete" target="_blank">https://github.com/narmafraz/ThaqalaynData/books/complete</a>
     </p>
-    <p>Also note that this data was generated from other raw data and the script used to generate it is in:
+    <p>{{ 'download.generatorDesc' | translate }}
       <a href="https://github.com/narmafraz/ThaqalaynDataGenerator" target="_blank">https://github.com/narmafraz/ThaqalaynDataGenerator</a>
     </p>
-    <p>The API documentation with endpoint reference, data models, and usage examples is available at:
-      <a href="https://github.com/narmafraz/ThaqalaynData/blob/master/API.md" target="_blank">API Documentation</a>
+    <p>{{ 'download.apiDocs' | translate }}
+      <a href="https://github.com/narmafraz/ThaqalaynData/blob/master/API.md" target="_blank">{{ 'download.apiDocsLink' | translate }}</a>
     </p>
-    <p>If this data is useful to you and you do end up creating a project using it then we would like to hear about it please!<br>
-      You can do this by contacting us through raising an issue on one of the above repositories <br>
-      and feel free to raise a Pull Request for us to link back to your project!</p>
-    <p>We hope that we can grow this data over time, hopefully with your help.</p>
+    <p>{{ 'download.communityDesc' | translate }}</p>
+    <p>{{ 'download.growthHope' | translate }}</p>
   </section>
 </div>

@@ -86,7 +86,12 @@
     "viewPlain": "Plain text",
     "viewWordByWord": "Word by word",
     "viewParagraph": "Paragraph view",
-    "viewCombined": "Word + Paragraph"
+    "viewCombined": "Word + Paragraph",
+    "quranReferences": "Quran References",
+    "keyPhrases": "Key Phrases",
+    "relatedNarrations": "Related Narrations",
+    "loadingCommentary": "Loading commentary...",
+    "unknownBookPart": "Not sure how to display this book part, sorry!"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",
@@ -161,7 +166,8 @@
     "results": "results",
     "loadMore": "Load more results",
     "showingAll": "All results shown",
-    "placeholder": "Search..."
+    "placeholder": "Search...",
+    "filteredBy": "Filtered by"
   },
   "translation": {
     "selectTranslation": "Select Translation",
@@ -205,7 +211,16 @@
     "remove": "Remove",
     "openSource": "Open Source and Free",
     "dataPackages": "Data Packages",
-    "dataPackagesDescription": "Download complete datasets as JSON files or export them as CSV for use in your own projects and research."
+    "dataPackagesDescription": "Download complete datasets as JSON files or export them as CSV for use in your own projects and research.",
+    "exporting": "Exporting...",
+    "exportCsv": "Export CSV",
+    "openSourceDesc": "All data displayed on the site is open source and you can download it by visiting the data GitHub repository:",
+    "completeDataDesc": "The link above contains the data per page of the site, if instead you would like the all data for one book then that can be found in:",
+    "generatorDesc": "Also note that this data was generated from other raw data and the script used to generate it is in:",
+    "apiDocs": "The API documentation with endpoint reference, data models, and usage examples is available at:",
+    "apiDocsLink": "API Documentation",
+    "communityDesc": "If this data is useful to you and you do end up creating a project using it then we would like to hear about it please! You can do this by contacting us through raising an issue on one of the above repositories and feel free to raise a Pull Request for us to link back to your project!",
+    "growthHope": "We hope that we can grow this data over time, hopefully with your help."
   },
   "bookmark": {
     "title": "Bookmarks",
@@ -254,7 +269,16 @@
     "title": "Topics",
     "description": "Browse hadith collections by topic. Topics are derived from the traditional book divisions of Al-Kafi.",
     "searchPlaceholder": "Search topics...",
-    "chapters": "chapters"
+    "chapters": "chapters",
+    "tabBooks": "Books",
+    "tabAiTopics": "AI Topics",
+    "tabKeyPhrases": "Key Phrases",
+    "loadingAiTopics": "Loading AI topic taxonomy...",
+    "searchAiTopics": "Search AI topics...",
+    "hadithsCount": "hadiths",
+    "aiComingSoon": "AI topic classification is coming soon. Topics will be automatically generated from hadith analysis.",
+    "phrasesDesc": "Browse key Islamic phrases found across hadiths.",
+    "viewKeyPhrases": "View Key Phrases"
   },
   "discussion": {
     "title": "Discussion",
@@ -313,11 +337,64 @@
     "title": "Settings",
     "fontSize": "Font size",
     "ai": {
-      "title": "AI Features",
+      "title": "AI Feature Settings",
       "showDiacritized": "Show diacritized text by default",
       "showContentBadges": "Show content type badges",
       "showTopicTags": "Show topic tags",
-      "showIsnadSeparation": "Show isnad/matn separation"
+      "showIsnadSeparation": "Show isnad/matn separation",
+      "showBadges": "Show content type badges",
+      "showTopics": "Show topic tags",
+      "showIsnad": "Show isnad/matn separation",
+      "showDisclaimer": "Show AI translation disclaimer",
+      "wordByWordLang": "Word-by-word language:"
     }
+  },
+  "about": {
+    "title": "About Project Thaqalayn",
+    "objectives": "Objectives",
+    "objective1": "Proliferation of ahadith of ahlulbayt online",
+    "objective2": "Act as a data source: making hadith datasets open source and available to download for others to build on top of",
+    "objective3": "Act as a reference: every hadith should have a unique link that can be shared and will bring others to the same hadith",
+    "objective4": "Act as an aggregation portal for all relevant data that becomes available",
+    "technicalPrinciples": "Technical Design Principles",
+    "technicalPrinciplesIntro": "There are a few principles that the site is developed on:",
+    "principle1": "All static data used to show a single page should be captured in a single data (json) file",
+    "principle2": "Any static data should be reproducible from scratch - No ad-hoc edits to data files, everything should be scripted",
+    "history": "History",
+    "historyP1": "Ideas of creating such a site on Quran and ahadith had been on my mind for at least a decade, and in this time I've tried several times to produce something around this concept but to no avail.",
+    "historyP2": "In recent years Ive come to realise the shortage of free English ahadith resources online.",
+    "historyP3": "COVID-19 provided an unprecedented opportunity of extra time and energy to be allocated to this project and alhamdullellah the project was kicked off.",
+    "inspirations": "Inspirations",
+    "inspirationsIntro": "There are many things that shaped the project to get it to be where it is now, here are some:",
+    "inspiredTo": "Inspired the project to",
+    "tanzilDesc": "There is not enough good things I can say about tanzil.net I think they've done an excellent job over the years to be a great resource for Quran text on the net.",
+    "tanzilInspired": "Make the data behind the site freely accessible to all.",
+    "sunnahDesc": "MashaAllah our Sunni brothers are way ahead in propagating their ahadith and making them more accessible. I was impressed by the simplicity and accessibility of the design and based the look and feel of the project on this site to get started.",
+    "sunnahInspired": "Create an easy to navigate site for reading ahadith.",
+    "staticHosting": "Not being able to find a free host for my API",
+    "staticHostingDesc": "So when I started out the backend of the site was actually a REST API. I started using by using the free tier services by Heroku, which is really good btw. But I quickly learnt that I couldn't find a free hosted database service online and the free ones came with very limited restrictions. So this led me to re-evaluate the architecture of the site, and the result was serving static json files which is pretty unconventional, but it works and I can run it for free so I'm happy. Plus I get to have all the data version controlled, which comes with other benefits like being able to have a review process for accepting changes.",
+    "staticHostingInspired": "Keep it simple and serving static content.",
+    "specialThanks": "With Special Thanks To",
+    "dataSourcesThanks": "I acknowledge and appreciate the work that the people behind these sites have done to bring hadith data into digital form, and making them widely and easily accessible. Without these data sources it would have taken a lot more time and energy to get something tangible started, so much so that it may have never taken off.",
+    "netlifyThanks": "When I was starting out I was in experimentation phase and didn't want to commit to a regular cost for hosting. Thats when I found out about netlify, which was really helpful because they had a really modern setup that allowed me to kick start the site for free! I'm really grateful that they provide this service for free, otherwise putting this live and getting the feedback and being encouraged to work on the project more would've been much slower.",
+    "iconsCredit": "Icons made by",
+    "iconsFrom": "from"
+  },
+  "support": {
+    "title": "Getting Support",
+    "intro": "This project is being run as an open source project on GitHub so support will also be through there.",
+    "siteIssue": "An issue regarding how the site looks",
+    "siteIssueDesc": "Please check existing issues on",
+    "createNewIssue": "and if your issue is not currently addressed please create a new issue.",
+    "dataIssue": "An issue to do with the data on the site"
+  },
+  "phrases": {
+    "title": "Key Phrases",
+    "subtitle": "Common Islamic multi-word expressions found across hadiths",
+    "loading": "Loading phrases...",
+    "count": "{{count}} phrases found",
+    "searchPlaceholder": "Search phrases...",
+    "noResults": "No phrases match your search.",
+    "comingSoon": "Key phrase index is coming soon. Phrases will be extracted from AI hadith analysis."
   }
 }

@@ -5,13 +5,13 @@
   <!-- Tab buttons -->
   <div class="tab-bar">
     <button class="tab-btn" [class.active]="activeTab === 'books'" (click)="setActiveTab('books')">
-      <mat-icon>menu_book</mat-icon> Books
+      <mat-icon>menu_book</mat-icon> {{ 'topics.tabBooks' | translate }}
     </button>
     <button class="tab-btn" [class.active]="activeTab === 'ai-topics'" (click)="setActiveTab('ai-topics')">
-      <mat-icon>auto_awesome</mat-icon> AI Topics
+      <mat-icon>auto_awesome</mat-icon> {{ 'topics.tabAiTopics' | translate }}
     </button>
     <button class="tab-btn" [class.active]="activeTab === 'phrases'" (click)="setActiveTab('phrases')">
-      <mat-icon>format_quote</mat-icon> Key Phrases
+      <mat-icon>format_quote</mat-icon> {{ 'topics.tabKeyPhrases' | translate }}
     </button>
   </div>
 
@@ -55,7 +55,7 @@
   <ng-container *ngIf="activeTab === 'ai-topics'">
     <div *ngIf="aiTopicsLoading" class="ai-loading">
       <mat-spinner diameter="24"></mat-spinner>
-      Loading AI topic taxonomy...
+      {{ 'topics.loadingAiTopics' | translate }}
     </div>
 
     <ng-container *ngIf="!aiTopicsLoading && aiTopicsAvailable">
@@ -63,7 +63,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search AI topics..."
+          [placeholder]="'topics.searchAiTopics' | translate"
           [ngModel]="aiSearchQuery"
           (ngModelChange)="filterAiTopics($event)"
           class="search-input">
@@ -83,7 +83,7 @@
             (keydown.space)="$event.preventDefault(); toggleAiCategory(cat)">
           <mat-icon class="category-icon">{{ cat.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
           <span class="ai-cat-label">{{ cat.label }}</span>
-          <span class="ai-cat-count">{{ cat.totalCount }} hadiths</span>
+          <span class="ai-cat-count">{{ cat.totalCount }} {{ 'topics.hadithsCount' | translate }}</span>
         </h2>
 
         <div class="ai-subtopic-list" *ngIf="cat.expanded">
@@ -92,7 +92,7 @@
              [queryParams]="{q: 'topic:' + st.key}"
              class="ai-subtopic-card">
             <div class="ai-subtopic-name">{{ st.label }}</div>
-            <div class="ai-subtopic-count">{{ st.count }} hadiths</div>
+            <div class="ai-subtopic-count">{{ st.count }} {{ 'topics.hadithsCount' | translate }}</div>
           </a>
         </div>
       </section>
@@ -100,7 +100,7 @@
 
     <div *ngIf="!aiTopicsLoading && !aiTopicsAvailable" class="ai-coming-soon">
       <mat-icon>auto_awesome</mat-icon>
-      <p>AI topic classification is coming soon. Topics will be automatically generated from hadith analysis.</p>
+      <p>{{ 'topics.aiComingSoon' | translate }}</p>
     </div>
   </ng-container>
 
@@ -108,9 +108,9 @@
   <ng-container *ngIf="activeTab === 'phrases'">
     <div class="ai-coming-soon phrases-redirect">
       <mat-icon>format_quote</mat-icon>
-      <p>Browse key Islamic phrases found across hadiths.</p>
+      <p>{{ 'topics.phrasesDesc' | translate }}</p>
       <a routerLink="/phrases" class="phrases-link">
-        <mat-icon>arrow_forward</mat-icon> View Key Phrases
+        <mat-icon>arrow_forward</mat-icon> {{ 'topics.viewKeyPhrases' | translate }}
       </a>
     </div>
   </ng-container>

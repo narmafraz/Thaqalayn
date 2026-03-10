@@ -2,10 +2,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 
 import { PhraseListComponent } from './phrase-list.component';
 import { AiContentService, PhraseIndex } from '@app/services/ai-content.service';
+import { TranslatePipe } from '@app/pipes/translate.pipe';
 
 describe('PhraseListComponent', () => {
   let component: PhraseListComponent;
@@ -37,8 +39,8 @@ describe('PhraseListComponent', () => {
     aiContentSpy.getPhrases.and.returnValue(of(mockPhrases));
 
     await TestBed.configureTestingModule({
-      declarations: [PhraseListComponent],
-      imports: [FormsModule, RouterTestingModule],
+      declarations: [PhraseListComponent, TranslatePipe],
+      imports: [FormsModule, RouterTestingModule, HttpClientTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: AiContentService, useValue: aiContentSpy },
@@ -97,8 +99,8 @@ describe('PhraseListComponent (no data)', () => {
     aiContentSpy.getPhrases.and.returnValue(of(null));
 
     await TestBed.configureTestingModule({
-      declarations: [PhraseListComponent],
-      imports: [FormsModule, RouterTestingModule],
+      declarations: [PhraseListComponent, TranslatePipe],
+      imports: [FormsModule, RouterTestingModule, HttpClientTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: AiContentService, useValue: aiContentSpy },

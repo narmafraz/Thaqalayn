@@ -25,7 +25,7 @@
 <div class="ai-settings-panel" *ngIf="showAiSettings">
   <div class="ai-settings-header">
     <mat-icon>auto_awesome</mat-icon>
-    <span>AI Feature Settings</span>
+    <span>{{ 'settings.ai.title' | translate }}</span>
     <button class="ai-settings-close" (click)="showAiSettings = false">
       <mat-icon>close</mat-icon>
     </button>
@@ -33,30 +33,30 @@
   <label class="ai-pref">
     <input type="checkbox" [checked]="aiPrefs.get('showDiacritizedByDefault')"
            (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">
-    <span>Show diacritized text by default</span>
+    <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
   </label>
   <label class="ai-pref">
     <input type="checkbox" [checked]="aiPrefs.get('showContentTypeBadges')"
            (change)="onPrefChange('showContentTypeBadges', $any($event.target).checked)">
-    <span>Show content type badges</span>
+    <span>{{ 'settings.ai.showBadges' | translate }}</span>
   </label>
   <label class="ai-pref">
     <input type="checkbox" [checked]="aiPrefs.get('showTopicTags')"
            (change)="onPrefChange('showTopicTags', $any($event.target).checked)">
-    <span>Show topic tags</span>
+    <span>{{ 'settings.ai.showTopics' | translate }}</span>
   </label>
   <label class="ai-pref">
     <input type="checkbox" [checked]="aiPrefs.get('showIsnadSeparation')"
            (change)="onPrefChange('showIsnadSeparation', $any($event.target).checked)">
-    <span>Show isnad/matn separation</span>
+    <span>{{ 'settings.ai.showIsnad' | translate }}</span>
   </label>
   <label class="ai-pref">
     <input type="checkbox" [checked]="aiPrefs.get('showAiTranslationDisclaimer')"
            (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
-    <span>Show AI translation disclaimer</span>
+    <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
   </label>
   <label class="ai-pref">
-    <span>Word-by-word language:</span>
+    <span>{{ 'settings.ai.wordByWordLang' | translate }}</span>
     <select [ngModel]="wordLang" (ngModelChange)="onPrefChange('wordByWordDefaultLang', $event)" class="ai-lang-select">
       <option value="en">English</option>
       <option value="ur">اردو</option>

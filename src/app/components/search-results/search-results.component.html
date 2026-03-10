@@ -34,7 +34,7 @@
 
   <div *ngIf="activeFilter" class="filter-banner">
     <mat-icon>filter_alt</mat-icon>
-    <span>Filtered by {{ activeFilter.prefix }}: <strong>{{ formatFilterLabel(activeFilter.value) }}</strong></span>
+    <span>{{ 'search.filteredBy' | translate }} {{ activeFilter.prefix }}: <strong>{{ formatFilterLabel(activeFilter.value) }}</strong></span>
   </div>
 
   <ng-container *ngIf="(results$ | async) as results">

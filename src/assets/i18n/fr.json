@@ -77,7 +77,12 @@
     "viewPlain": "Texte brut",
     "viewWordByWord": "Mot par mot",
     "viewParagraph": "Vue en paragraphe",
-    "viewCombined": "Mot + Paragraphe"
+    "viewCombined": "Mot + Paragraphe",
+    "quranReferences": "Références coraniques",
+    "keyPhrases": "Phrases clés",
+    "relatedNarrations": "Narrations associées",
+    "loadingCommentary": "Chargement du commentaire...",
+    "unknownBookPart": "Nous ne savons pas afficher cette partie, désolé !"
   },
   "narrator": {
     "narratedAhadith": "Ahadiths rapportés",
@@ -136,7 +141,8 @@
     "results": "résultats",
     "loadMore": "Charger plus",
     "showingAll": "Tous les résultats affichés",
-    "placeholder": "Rechercher..."
+    "placeholder": "Rechercher...",
+    "filteredBy": "Filtré par"
   },
   "translation": {
     "selectTranslation": "Sélectionner la traduction",
@@ -180,7 +186,16 @@
     "remove": "Supprimer",
     "openSource": "Open source et gratuit",
     "dataPackages": "Paquets de données",
-    "dataPackagesDescription": "Téléchargez des ensembles de données complets en JSON ou exportez-les en CSV."
+    "dataPackagesDescription": "Téléchargez des ensembles de données complets en JSON ou exportez-les en CSV.",
+    "exporting": "Exportation...",
+    "exportCsv": "Exporter CSV",
+    "openSourceDesc": "Toutes les données sont open source et téléchargeables depuis GitHub :",
+    "completeDataDesc": "Le lien contient les données par page, pour un livre complet :",
+    "generatorDesc": "Ces données ont été générées depuis des données brutes, le script est dans :",
+    "apiDocs": "Documentation de l'API disponible à :",
+    "apiDocsLink": "Documentation de l'API",
+    "communityDesc": "Si utile et vous créez un projet, nous aimerions en entendre parler !",
+    "growthHope": "Nous espérons enrichir ces données avec votre aide."
   },
   "bookmark": {
     "title": "Signets",
@@ -229,7 +244,16 @@
     "title": "Sujets",
     "description": "Parcourez les collections de hadiths par sujet.",
     "searchPlaceholder": "Rechercher des sujets...",
-    "chapters": "chapitres"
+    "chapters": "chapitres",
+    "tabBooks": "Livres",
+    "tabAiTopics": "Sujets IA",
+    "tabKeyPhrases": "Phrases clés",
+    "loadingAiTopics": "Chargement de la taxonomie IA...",
+    "searchAiTopics": "Rechercher sujets IA...",
+    "hadithsCount": "hadiths",
+    "aiComingSoon": "Classification IA des sujets arrive bientôt.",
+    "phrasesDesc": "Parcourez les phrases islamiques clés des hadiths.",
+    "viewKeyPhrases": "Voir les phrases clés"
   },
   "discussion": {
     "title": "Discussion",
@@ -286,6 +310,63 @@
     "pressEscToClose": "Appuyez sur Échap pour fermer",
     "showKeyboardShortcuts": "Raccourcis clavier",
     "title": "Paramètres",
-    "fontSize": "Taille de police"
+    "fontSize": "Taille de police",
+    "ai": {
+      "title": "Paramètres des fonctionnalités IA",
+      "showDiacritized": "Afficher le texte diacritisé par défaut",
+      "showBadges": "Afficher les badges de type de contenu",
+      "showTopics": "Afficher les étiquettes de sujets",
+      "showIsnad": "Afficher la séparation isnad/matn",
+      "showDisclaimer": "Afficher l'avertissement de traduction IA",
+      "wordByWordLang": "Langue mot à mot :"
+    }
+  },
+  "about": {
+    "title": "À propos du Projet Thaqalayn",
+    "objectives": "Objectifs",
+    "objective1": "Diffusion des ahadiths d'Ahlulbayt en ligne",
+    "objective2": "Source de données : rendre les ensembles de données de hadiths open source et téléchargeables",
+    "objective3": "Comme référence : chaque hadith doit avoir un lien unique partageable",
+    "objective4": "Portail d'agrégation pour toutes les données pertinentes",
+    "technicalPrinciples": "Principes de conception technique",
+    "technicalPrinciplesIntro": "Le site est développé sur quelques principes :",
+    "principle1": "Toutes les données statiques pour une page doivent être dans un seul fichier json",
+    "principle2": "Les données statiques doivent être reproductibles - pas de modifications ad-hoc",
+    "history": "Histoire",
+    "historyP1": "L'idée de créer un tel site était dans mon esprit depuis au moins une décennie.",
+    "historyP2": "Ces dernières années, j'ai réalisé le manque de ressources gratuites de hadiths en anglais.",
+    "historyP3": "Le COVID-19 a fourni une opportunité sans précédent et alhamdulillah le projet a été lancé.",
+    "inspirations": "Inspirations",
+    "inspirationsIntro": "De nombreuses choses ont façonné le projet :",
+    "inspiredTo": "A inspiré le projet à",
+    "tanzilDesc": "Je ne peux pas dire assez de bonnes choses sur tanzil.net. Excellent travail.",
+    "tanzilInspired": "Rendre les données librement accessibles à tous.",
+    "sunnahDesc": "MashaAllah nos frères sunnites sont en avance. La simplicité du design m'a impressionné.",
+    "sunnahInspired": "Créer un site facile à naviguer pour lire les ahadiths.",
+    "staticHosting": "Ne pas trouver d'hébergement gratuit pour l'API",
+    "staticHostingDesc": "Au début le backend était une API REST avec Heroku. Sans base de données gratuite, je suis passé aux fichiers json statiques.",
+    "staticHostingInspired": "Garder les choses simples et servir du contenu statique.",
+    "specialThanks": "Avec des remerciements spéciaux à",
+    "dataSourcesThanks": "J'apprécie le travail de numérisation des données. Sans ces sources, cela aurait été beaucoup plus difficile.",
+    "netlifyThanks": "En phase d'expérimentation j'ai découvert netlify, très utile. Très reconnaissant.",
+    "iconsCredit": "Icônes créées par",
+    "iconsFrom": "de"
+  },
+  "support": {
+    "title": "Obtenir de l'aide",
+    "intro": "Ce projet open source sur GitHub fournit le support là-bas.",
+    "siteIssue": "Problème d'apparence du site",
+    "siteIssueDesc": "Vérifiez les problèmes existants sur",
+    "createNewIssue": "Si non résolu, créez un nouveau ticket.",
+    "dataIssue": "Problème lié aux données du site"
+  },
+  "phrases": {
+    "title": "Phrases clés",
+    "subtitle": "Expressions islamiques courantes à plusieurs mots dans les hadiths",
+    "loading": "Chargement des phrases...",
+    "count": "{{count}} phrases trouvées",
+    "searchPlaceholder": "Rechercher des phrases...",
+    "noResults": "Aucune phrase ne correspond.",
+    "comingSoon": "Index des phrases arrive bientôt."
   }
 }

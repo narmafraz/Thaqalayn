@@ -77,7 +77,12 @@
     "viewPlain": "Düz metin",
     "viewWordByWord": "Kelime kelime",
     "viewParagraph": "Paragraf görünümü",
-    "viewCombined": "Kelime + Paragraf"
+    "viewCombined": "Kelime + Paragraf",
+    "quranReferences": "Kur'an Referansları",
+    "keyPhrases": "Anahtar İfadeler",
+    "relatedNarrations": "İlgili Rivayetler",
+    "loadingCommentary": "Tefsir yükleniyor...",
+    "unknownBookPart": "Bu bölümü nasıl görüntüleyeceğimizi bilmiyoruz, üzgünüz!"
   },
   "narrator": {
     "narratedAhadith": "Rivayet edilen hadisler",
@@ -136,7 +141,8 @@
     "results": "sonuç",
     "loadMore": "Daha fazla yükle",
     "showingAll": "Tüm sonuçlar gösterildi",
-    "placeholder": "Ara..."
+    "placeholder": "Ara...",
+    "filteredBy": "Filtreleme"
   },
   "translation": {
     "selectTranslation": "Çeviri seçin",
@@ -180,7 +186,16 @@
     "remove": "Kaldır",
     "openSource": "Açık kaynak ve ücretsiz",
     "dataPackages": "Veri paketleri",
-    "dataPackagesDescription": "Tam veri setlerini JSON olarak indirin veya CSV olarak dışa aktarın."
+    "dataPackagesDescription": "Tam veri setlerini JSON olarak indirin veya CSV olarak dışa aktarın.",
+    "exporting": "Dışa aktarılıyor...",
+    "exportCsv": "CSV Dışa Aktar",
+    "openSourceDesc": "Tüm veriler açık kaynak ve GitHub'dan indirilebilir:",
+    "completeDataDesc": "Bağlantı sayfa verilerini içerir, bir kitabın tamamı için:",
+    "generatorDesc": "Bu veriler ham verilerden oluşturuldu, betik:",
+    "apiDocs": "API belgeleri mevcuttur:",
+    "apiDocsLink": "API Belgeleri",
+    "communityDesc": "Faydalıysa ve proje oluşturduysanız, duymak isteriz!",
+    "growthHope": "Yardımınızla verileri büyütmeyi umuyoruz."
   },
   "bookmark": {
     "title": "Yer İmleri",
@@ -229,7 +244,16 @@
     "title": "Konular",
     "description": "Hadis koleksiyonlarını konuya göre inceleyin.",
     "searchPlaceholder": "Konu ara...",
-    "chapters": "bölüm"
+    "chapters": "bölüm",
+    "tabBooks": "Kitaplar",
+    "tabAiTopics": "Yapay Zeka Konuları",
+    "tabKeyPhrases": "Anahtar İfadeler",
+    "loadingAiTopics": "Yapay zeka konuları yükleniyor...",
+    "searchAiTopics": "Yapay zeka konularını ara...",
+    "hadithsCount": "hadis",
+    "aiComingSoon": "Yapay zeka konu sınıflandırması yakında.",
+    "phrasesDesc": "Hadislerdeki İslami ifadeleri inceleyin.",
+    "viewKeyPhrases": "Anahtar İfadeleri Görüntüle"
   },
   "discussion": {
     "title": "Tartışma",
@@ -286,6 +310,63 @@
     "pressEscToClose": "Kapatmak için Esc'ye basın",
     "showKeyboardShortcuts": "Klavye kısayolları",
     "title": "Ayarlar",
-    "fontSize": "Yazı boyutu"
+    "fontSize": "Yazı boyutu",
+    "ai": {
+      "title": "Yapay Zeka Özellik Ayarları",
+      "showDiacritized": "Varsayılan olarak harekeli metni göster",
+      "showBadges": "İçerik türü rozetlerini göster",
+      "showTopics": "Konu etiketlerini göster",
+      "showIsnad": "İsnad/metin ayrımını göster",
+      "showDisclaimer": "Yapay zeka çeviri uyarısını göster",
+      "wordByWordLang": "Kelime kelime dil:"
+    }
+  },
+  "about": {
+    "title": "Thaqalayn Projesi Hakkında",
+    "objectives": "Hedefler",
+    "objective1": "Ehlibeyt hadislerinin çevrimiçi yayılması",
+    "objective2": "Veri kaynağı: hadis veri setlerini açık kaynak ve indirilebilir hale getirmek",
+    "objective3": "Referans olarak: her hadisin paylaşılabilir benzersiz bir bağlantısı olmalı",
+    "objective4": "Mevcut tüm ilgili veriler için toplama portalı",
+    "technicalPrinciples": "Teknik Tasarım İlkeleri",
+    "technicalPrinciplesIntro": "Site birkaç ilke üzerine geliştirilmiştir:",
+    "principle1": "Bir sayfanın tüm statik verileri tek bir json dosyasında olmalıdır",
+    "principle2": "Statik veriler sıfırdan yeniden oluşturulabilir olmalı - ad-hoc düzenleme yok",
+    "history": "Tarihçe",
+    "historyP1": "Böyle bir site oluşturma fikri en az on yıldır aklımdaydı.",
+    "historyP2": "Son yıllarda ücretsiz İngilizce hadis kaynaklarının azlığını fark ettim.",
+    "historyP3": "COVID-19 benzeri görülmemiş bir fırsat sağladı ve elhamdülillah proje başlatıldı.",
+    "inspirations": "İlhamlar",
+    "inspirationsIntro": "Projeyi şekillendiren birçok şey var:",
+    "inspiredTo": "Projeye ilham verdi",
+    "tanzilDesc": "tanzil.net hakkında yeterince iyi şey söyleyemem. Harika iş.",
+    "tanzilInspired": "Verileri herkes için ücretsiz erişilebilir kılmak.",
+    "sunnahDesc": "MaşaAllah Sünni kardeşlerimiz ileride. Tasarımın sadeliği etkileyiciydi.",
+    "sunnahInspired": "Hadis okumak için kolay bir site oluşturmak.",
+    "staticHosting": "API için ücretsiz host bulamamak",
+    "staticHostingDesc": "Başlangıçta backend Heroku ile REST API'ydı. Ücretsiz veritabanı bulamadım ve statik json dosyalarına geçtim.",
+    "staticHostingInspired": "Basit tutmak ve statik içerik sunmak.",
+    "specialThanks": "Özel Teşekkürlerle",
+    "dataSourcesThanks": "Hadis verilerinin dijitalleştirilmesi çalışmalarını takdir ediyorum. Bu kaynaklar olmadan çok daha zor olurdu.",
+    "netlifyThanks": "Deneme aşamasında netlify'ı keşfettim, çok yardımcı oldu. Çok minnettarım.",
+    "iconsCredit": "Simgeler yapan",
+    "iconsFrom": "kaynağı"
+  },
+  "support": {
+    "title": "Destek Alma",
+    "intro": "Bu açık kaynak projesi GitHub'da yürütülüyor, destek de oradan.",
+    "siteIssue": "Sitenin görünümüyle ilgili sorun",
+    "siteIssueDesc": "Lütfen mevcut sorunları kontrol edin",
+    "createNewIssue": "Çözülmediyse yeni bir sorun oluşturun.",
+    "dataIssue": "Sitedeki verilerle ilgili sorun"
+  },
+  "phrases": {
+    "title": "Anahtar İfadeler",
+    "subtitle": "Hadislerde yaygın çok kelimeli İslami ifadeler",
+    "loading": "İfadeler yükleniyor...",
+    "count": "{{count}} ifade bulundu",
+    "searchPlaceholder": "İfade ara...",
+    "noResults": "Eşleşen ifade yok.",
+    "comingSoon": "İfade dizini yakında."
   }
 }

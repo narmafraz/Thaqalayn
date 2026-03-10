@@ -77,7 +77,12 @@
     "viewPlain": "Teks biasa",
     "viewWordByWord": "Kata per kata",
     "viewParagraph": "Tampilan paragraf",
-    "viewCombined": "Kata + Paragraf"
+    "viewCombined": "Kata + Paragraf",
+    "quranReferences": "Referensi Al-Quran",
+    "keyPhrases": "Frasa Kunci",
+    "relatedNarrations": "Riwayat Terkait",
+    "loadingCommentary": "Memuat tafsir...",
+    "unknownBookPart": "Maaf, tidak yakin bagaimana menampilkan bagian ini!"
   },
   "narrator": {
     "narratedAhadith": "Hadis yang diriwayatkan",
@@ -136,7 +141,8 @@
     "results": "hasil",
     "loadMore": "Muat lebih banyak",
     "showingAll": "Semua hasil ditampilkan",
-    "placeholder": "Cari..."
+    "placeholder": "Cari...",
+    "filteredBy": "Difilter berdasarkan"
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",
@@ -180,7 +186,16 @@
     "remove": "Hapus",
     "openSource": "Open source dan gratis",
     "dataPackages": "Paket data",
-    "dataPackagesDescription": "Unduh dataset lengkap sebagai JSON atau ekspor sebagai CSV."
+    "dataPackagesDescription": "Unduh dataset lengkap sebagai JSON atau ekspor sebagai CSV.",
+    "exporting": "Mengekspor...",
+    "exportCsv": "Ekspor CSV",
+    "openSourceDesc": "Semua data open source dan dapat diunduh dari GitHub:",
+    "completeDataDesc": "Tautan berisi data per halaman, untuk satu buku lengkap:",
+    "generatorDesc": "Data ini dihasilkan dari data mentah, skripnya di:",
+    "apiDocs": "Dokumentasi API tersedia di:",
+    "apiDocsLink": "Dokumentasi API",
+    "communityDesc": "Jika berguna dan membuat proyek, kami ingin mendengarnya!",
+    "growthHope": "Semoga data ini berkembang dengan bantuan Anda."
   },
   "bookmark": {
     "title": "Penanda",
@@ -229,7 +244,16 @@
     "title": "Topik",
     "description": "Jelajahi koleksi hadis berdasarkan topik.",
     "searchPlaceholder": "Cari topik...",
-    "chapters": "bab"
+    "chapters": "bab",
+    "tabBooks": "Buku",
+    "tabAiTopics": "Topik AI",
+    "tabKeyPhrases": "Frasa Kunci",
+    "loadingAiTopics": "Memuat taksonomi topik AI...",
+    "searchAiTopics": "Cari topik AI...",
+    "hadithsCount": "hadis",
+    "aiComingSoon": "Klasifikasi topik AI segera hadir.",
+    "phrasesDesc": "Jelajahi frasa Islam utama dari hadis.",
+    "viewKeyPhrases": "Lihat Frasa Kunci"
   },
   "discussion": {
     "title": "Diskusi",
@@ -286,6 +310,63 @@
     "pressEscToClose": "Tekan Esc untuk menutup",
     "showKeyboardShortcuts": "Pintasan keyboard",
     "title": "Pengaturan",
-    "fontSize": "Ukuran huruf"
+    "fontSize": "Ukuran huruf",
+    "ai": {
+      "title": "Pengaturan Fitur AI",
+      "showDiacritized": "Tampilkan teks diakritik secara default",
+      "showBadges": "Tampilkan lencana jenis konten",
+      "showTopics": "Tampilkan tag topik",
+      "showIsnad": "Tampilkan pemisahan isnad/matan",
+      "showDisclaimer": "Tampilkan disclaimer terjemahan AI",
+      "wordByWordLang": "Bahasa kata per kata:"
+    }
+  },
+  "about": {
+    "title": "Tentang Proyek Thaqalayn",
+    "objectives": "Tujuan",
+    "objective1": "Penyebaran hadis ahlulbait secara online",
+    "objective2": "Sumber data: menjadikan dataset hadis open source dan tersedia untuk diunduh",
+    "objective3": "Sebagai referensi: setiap hadis harus memiliki tautan unik yang dapat dibagikan",
+    "objective4": "Portal agregasi untuk semua data relevan yang tersedia",
+    "technicalPrinciples": "Prinsip Desain Teknis",
+    "technicalPrinciplesIntro": "Situs dikembangkan berdasarkan beberapa prinsip:",
+    "principle1": "Semua data statis untuk satu halaman harus dalam satu file json",
+    "principle2": "Data statis harus dapat direproduksi dari awal - tanpa pengeditan ad-hoc",
+    "history": "Sejarah",
+    "historyP1": "Ide untuk membuat situs seperti ini sudah ada di pikiran saya selama setidaknya satu dekade.",
+    "historyP2": "Dalam beberapa tahun terakhir saya menyadari kurangnya sumber hadis Inggris gratis.",
+    "historyP3": "COVID-19 memberikan kesempatan tak terduga dan alhamdulillah proyek ini dimulai.",
+    "inspirations": "Inspirasi",
+    "inspirationsIntro": "Banyak hal yang membentuk proyek ini:",
+    "inspiredTo": "Menginspirasi proyek untuk",
+    "tanzilDesc": "Tidak bisa mengatakan cukup hal baik tentang tanzil.net. Pekerjaan luar biasa.",
+    "tanzilInspired": "Membuat data dapat diakses secara gratis oleh semua.",
+    "sunnahDesc": "MasyaAllah saudara Sunni jauh lebih maju. Saya terkesan dengan kesederhanaan desainnya.",
+    "sunnahInspired": "Membuat situs yang mudah dinavigasi untuk membaca hadis.",
+    "staticHosting": "Tidak dapat menemukan host gratis untuk API",
+    "staticHostingDesc": "Awalnya backend adalah REST API dengan Heroku. Tanpa database gratis, saya beralih ke file json statis.",
+    "staticHostingInspired": "Menjaga kesederhanaan dan menyajikan konten statis.",
+    "specialThanks": "Dengan Terima Kasih Khusus Kepada",
+    "dataSourcesThanks": "Saya menghargai kerja digitalisasi data hadis. Tanpa sumber ini akan jauh lebih sulit.",
+    "netlifyThanks": "Dalam fase eksperimen saya menemukan netlify yang sangat membantu. Sangat berterima kasih.",
+    "iconsCredit": "Ikon dibuat oleh",
+    "iconsFrom": "dari"
+  },
+  "support": {
+    "title": "Mendapatkan Dukungan",
+    "intro": "Proyek open source di GitHub ini menyediakan dukungan di sana.",
+    "siteIssue": "Masalah tampilan situs",
+    "siteIssueDesc": "Silakan periksa masalah yang ada di",
+    "createNewIssue": "Jika belum ditangani, buat issue baru.",
+    "dataIssue": "Masalah terkait data situs"
+  },
+  "phrases": {
+    "title": "Frasa Kunci",
+    "subtitle": "Ekspresi Islam multi-kata umum dalam hadis",
+    "loading": "Memuat frasa...",
+    "count": "{{count}} frasa ditemukan",
+    "searchPlaceholder": "Cari frasa...",
+    "noResults": "Tidak ada frasa yang cocok.",
+    "comingSoon": "Indeks frasa segera hadir."
   }
 }

@@ -495,6 +495,51 @@ describe('VerseTextComponent', () => {
       expect(firstCard.getAttribute('aria-label')).toContain('Prep');
     });
 
+    it('should clamp popup position to viewport bounds (P13-10)', () => {
+      // Create a mock grid at the right edge of the viewport
+      const mockTarget = document.createElement('div');
+      mockTarget.classList.add('word-card');
+      const mockGrid = document.createElement('div');
+      mockGrid.classList.add('word-analysis-grid');
+      mockGrid.appendChild(mockTarget);
+      document.body.appendChild(mockGrid);
+
+      // Mock getBoundingClientRect to simulate a card near the right edge
+      spyOn(mockTarget, 'getBoundingClientRect').and.returnValue({
+        left: window.innerWidth - 50,
+        right: window.innerWidth - 10,
+        top: 100,
+        bottom: 130,
+        width: 40,
+        height: 30,
+        x: window.innerWidth - 50,
+        y: 100,
+        toJSON: () => {},
+      } as DOMRect);
+
+      spyOn(mockGrid, 'getBoundingClientRect').and.returnValue({
+        left: 0,
+        right: window.innerWidth,
+        top: 50,
+        bottom: 500,
+        width: window.innerWidth,
+        height: 450,
+        x: 0,
+        y: 50,
+        toJSON: () => {},
+      } as DOMRect);
+
+      const mockEvent = { currentTarget: mockTarget } as unknown as MouseEvent;
+      component.setActiveWord(0, mockEvent);
+
+      expect(component.wordPopup).toBeTruthy();
+      // The x position should be clamped so the popup doesn't overflow
+      const maxX = window.innerWidth - 200 / 2 - 8;
+      expect(component.wordPopup!.x).toBeLessThanOrEqual(maxX);
+
+      document.body.removeChild(mockGrid);
+    });
+
     it('should have close button in popup', () => {
       component.wordPopup = { entry: mockAi.word_analysis![0], x: 0, y: 0 };
       component.activeWordIndex = 0;

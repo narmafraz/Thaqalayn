@@ -244,7 +244,13 @@
 
       <!-- Discussion Panel -->
       <div *ngIf="discussionEnabled" class="discussion-section">
-        <div class="discussion-header" (click)="showCommentEditor = !showCommentEditor">
+        <div class="discussion-header"
+             role="button"
+             tabindex="0"
+             [attr.aria-expanded]="showCommentEditor"
+             (click)="showCommentEditor = !showCommentEditor"
+             (keydown.enter)="showCommentEditor = !showCommentEditor"
+             (keydown.space)="$event.preventDefault(); showCommentEditor = !showCommentEditor">
           <mat-icon>forum</mat-icon>
           <span>{{ 'discussion.title' | translate }}</span>
           <mat-icon class="expand-icon">{{ showCommentEditor ? 'expand_less' : 'expand_more' }}</mat-icon>

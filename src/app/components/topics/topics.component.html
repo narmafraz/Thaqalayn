@@ -74,7 +74,13 @@
       </div>
 
       <section *ngFor="let cat of filteredAiCategories" class="ai-topic-category">
-        <h2 class="ai-cat-header" (click)="toggleAiCategory(cat)">
+        <h2 class="ai-cat-header"
+            role="button"
+            tabindex="0"
+            [attr.aria-expanded]="cat.expanded"
+            (click)="toggleAiCategory(cat)"
+            (keydown.enter)="toggleAiCategory(cat)"
+            (keydown.space)="$event.preventDefault(); toggleAiCategory(cat)">
           <mat-icon class="category-icon">{{ cat.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
           <span class="ai-cat-label">{{ cat.label }}</span>
           <span class="ai-cat-count">{{ cat.totalCount }} hadiths</span>

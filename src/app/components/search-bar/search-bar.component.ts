@@ -25,6 +25,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   searchValue = '';
   showDropdown = false;
   showTips = false;
+  activeResultIndex = -1;
   private searchSubject = new Subject<string>();
   private subscriptions: Subscription[] = [];
 
@@ -55,6 +56,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   onSearchInput(value: string): void {
     this.searchValue = value;
     this.showTips = false;
+    this.activeResultIndex = -1;
     this.searchSubject.next(value);
   }
 
@@ -94,9 +96,47 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     }
   }
 
+  onKeyDown(event: KeyboardEvent): void {
+    if (!this.showDropdown) return;
+
+    // We need current results synchronously for arrow key navigation
+    const results = this.store.selectSnapshot(SearchState.getResults) || [];
+    const visibleCount = Math.min(results.length, 8);
+
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        this.activeResultIndex = this.activeResultIndex < visibleCount - 1
+          ? this.activeResultIndex + 1
+          : 0;
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        this.activeResultIndex = this.activeResultIndex > 0
+          ? this.activeResultIndex - 1
+          : visibleCount - 1;
+        break;
+      case 'Enter':
+        if (this.activeResultIndex >= 0 && this.activeResultIndex < visibleCount) {
+          event.preventDefault();
+          this.selectResult(results[this.activeResultIndex]);
+        }
+        break;
+      case 'Escape':
+        this.showDropdown = false;
+        this.activeResultIndex = -1;
+        break;
+    }
+  }
+
+  getActiveDescendantId(): string | null {
+    return this.activeResultIndex >= 0 ? `search-result-${this.activeResultIndex}` : null;
+  }
+
   clearSearch(): void {
     this.searchValue = '';
     this.showDropdown = false;
+    this.activeResultIndex = -1;
     this.store.dispatch(new ClearSearch());
   }
 }

@@ -4,13 +4,19 @@
     <input
       #searchInput
       type="text"
+      role="combobox"
       [placeholder]="'search.searchBooksAndChapters' | translate"
       [value]="searchValue"
       (input)="onSearchInput($any($event.target).value)"
-      (keydown.enter)="onSearchSubmit()"
+      (keydown)="onKeyDown($event)"
+      (keydown.enter)="activeResultIndex < 0 && onSearchSubmit()"
       (focus)="onFocus()"
       (blur)="onBlur()"
       [attr.aria-label]="'search.search' | translate"
+      [attr.aria-expanded]="showDropdown"
+      [attr.aria-activedescendant]="getActiveDescendantId()"
+      aria-autocomplete="list"
+      aria-controls="search-results-listbox"
       autocomplete="off">
     <button
       *ngIf="searchValue"
@@ -43,15 +49,18 @@
     <button class="tips-close-btn" (mousedown)="showTips = false">{{ 'search.tipsClose' | translate }}</button>
   </div>
 
-  <div class="search-dropdown" *ngIf="showDropdown" role="listbox">
+  <div class="search-dropdown" *ngIf="showDropdown" role="listbox" id="search-results-listbox">
     <div *ngIf="(loading$ | async)" class="dropdown-loading">
       <mat-spinner diameter="20"></mat-spinner>
     </div>
     <ng-container *ngIf="(results$ | async) as results">
       <div
-        *ngFor="let result of results | slice:0:8"
+        *ngFor="let result of results | slice:0:8; let i = index"
         class="dropdown-item"
+        [class.active]="i === activeResultIndex"
         role="option"
+        [id]="'search-result-' + i"
+        [attr.aria-selected]="i === activeResultIndex"
         (mousedown)="selectResult(result)">
         <div class="result-title">
           {{ result.title || result.titleAr }}

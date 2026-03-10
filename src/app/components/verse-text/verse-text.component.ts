@@ -121,14 +121,31 @@ export class VerseTextComponent implements OnInit, OnDestroy {
         const target = event.currentTarget as HTMLElement;
         const containerRect = target.closest('.word-analysis-grid')?.getBoundingClientRect();
         const cardRect = target.getBoundingClientRect();
+        let x: number;
+        let y: number;
         if (containerRect) {
           // Position popup below the card, centered horizontally
-          const x = cardRect.left - containerRect.left + cardRect.width / 2;
-          const y = cardRect.bottom - containerRect.top + 8;
-          this.wordPopup = { entry, x, y };
+          x = cardRect.left - containerRect.left + cardRect.width / 2;
+          y = cardRect.bottom - containerRect.top + 8;
         } else {
-          this.wordPopup = { entry, x: cardRect.left, y: cardRect.bottom + 8 };
+          x = cardRect.left;
+          y = cardRect.bottom + 8;
         }
+        // Clamp popup to viewport bounds
+        const popupWidth = 200;
+        const popupHeight = 200;
+        if (containerRect) {
+          const maxX = containerRect.width - popupWidth / 2 - 8;
+          x = Math.max(popupWidth / 2 + 8, Math.min(x, maxX));
+          const maxY = window.innerHeight - containerRect.top - popupHeight - 16;
+          y = Math.min(y, maxY);
+        } else {
+          const maxX = window.innerWidth - popupWidth - 16;
+          x = Math.max(8, Math.min(x, maxX));
+          const maxY = window.innerHeight - popupHeight;
+          y = Math.min(y, maxY);
+        }
+        this.wordPopup = { entry, x, y };
       }
     } else {
       this.wordPopup = null;

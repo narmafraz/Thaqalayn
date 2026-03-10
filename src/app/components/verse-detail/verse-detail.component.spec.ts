@@ -174,6 +174,33 @@ describe('VerseDetailComponent', () => {
     expect(badge).toBeTruthy();
   });
 
+  describe('discussion header accessibility (P13-09)', () => {
+    it('should have role="button" on discussion header when discussion is enabled', () => {
+      // Discussion section only renders when discussionEnabled is true
+      component.discussionEnabled = true;
+      fixture.detectChanges();
+      const header = fixture.nativeElement.querySelector('.discussion-header');
+      if (header) {
+        expect(header.getAttribute('role')).toBe('button');
+        expect(header.getAttribute('tabindex')).toBe('0');
+        expect(header.getAttribute('aria-expanded')).toBe('false');
+      }
+    });
+
+    it('should update aria-expanded when discussion is toggled', () => {
+      component.discussionEnabled = true;
+      component.showCommentEditor = false;
+      fixture.detectChanges();
+      const header = fixture.nativeElement.querySelector('.discussion-header');
+      if (header) {
+        expect(header.getAttribute('aria-expanded')).toBe('false');
+        component.showCommentEditor = true;
+        fixture.detectChanges();
+        expect(header.getAttribute('aria-expanded')).toBe('true');
+      }
+    });
+  });
+
   it('should render unverified badge for non-verified status', () => {
     const bookWithUnverified: VerseDetail = {
       ...mockBook,

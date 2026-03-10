@@ -97,6 +97,62 @@ describe('TopicsComponent', () => {
   it('should format labels', () => {
     expect(component.formatLabel('divine_attributes')).toBe('Divine Attributes');
   });
+
+  describe('AI category header keyboard accessibility', () => {
+    beforeEach(() => {
+      component.setActiveTab('ai-topics');
+      fixture.detectChanges();
+    });
+
+    it('should render AI category headers with role="button"', () => {
+      const headers = fixture.nativeElement.querySelectorAll('.ai-cat-header');
+      expect(headers.length).toBeGreaterThan(0);
+      headers.forEach((header: HTMLElement) => {
+        expect(header.getAttribute('role')).toBe('button');
+      });
+    });
+
+    it('should render AI category headers with tabindex="0"', () => {
+      const headers = fixture.nativeElement.querySelectorAll('.ai-cat-header');
+      headers.forEach((header: HTMLElement) => {
+        expect(header.getAttribute('tabindex')).toBe('0');
+      });
+    });
+
+    it('should render AI category headers with aria-expanded="false" initially', () => {
+      const headers = fixture.nativeElement.querySelectorAll('.ai-cat-header');
+      headers.forEach((header: HTMLElement) => {
+        expect(header.getAttribute('aria-expanded')).toBe('false');
+      });
+    });
+
+    it('should update aria-expanded when category is toggled', () => {
+      const cat = component.filteredAiCategories[0];
+      component.toggleAiCategory(cat);
+      // OnPush component needs markForCheck; simulate by triggering CD on the fixture
+      (component as any).cdr.markForCheck();
+      fixture.detectChanges();
+      const header = fixture.nativeElement.querySelector('.ai-cat-header');
+      expect(header.getAttribute('aria-expanded')).toBe('true');
+    });
+
+    it('should toggle category on Enter key', () => {
+      const header = fixture.nativeElement.querySelector('.ai-cat-header') as HTMLElement;
+      const cat = component.filteredAiCategories[0];
+      expect(cat.expanded).toBe(false);
+      header.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+      expect(cat.expanded).toBe(true);
+    });
+
+    it('should toggle category on Space key', () => {
+      const header = fixture.nativeElement.querySelector('.ai-cat-header') as HTMLElement;
+      const cat = component.filteredAiCategories[0];
+      expect(cat.expanded).toBe(false);
+      const event = new KeyboardEvent('keydown', { key: ' ', cancelable: true });
+      header.dispatchEvent(event);
+      expect(cat.expanded).toBe(true);
+    });
+  });
 });
 
 describe('TopicsComponent (no AI data)', () => {

@@ -307,7 +307,9 @@ High-value improvements to existing features that reduce friction for daily user
 
 ---
 
-## Phase 3: Narrator Pages Overhaul
+## Phase 3: Narrator Pages Overhaul ✅ COMPLETE
+
+> **Status:** All 6 items implemented (2026-03-10). NAR-01 gold Imam styling, NAR-02 stats summary, NAR-03 preview cards with IndexState chapter titles, NAR-04 co-narrators collapse, NAR-05 hover cards with English names, NAR-06 teacher/student lists. 484 unit tests passing.
 
 Dedicated improvements to the narrator list and profile pages, which are currently the weakest part of the UI.
 
@@ -414,7 +416,9 @@ The following stories should be added under section "5. Narrator & People":
 
 ---
 
-## Phase 4: Design System and Modernization
+## Phase 4: Design System and Modernization ✅ COMPLETE
+
+> **Status:** All 6 items implemented (2026-03-10). DS-01 spacing system, DS-02 type scale, DS-03 casing normalization, DS-04 topic card hover states, DS-05 already done (chevrons), DS-06 localized page titles. 484 unit tests passing.
 
 Visual refresh establishing consistent patterns across the application.
 
@@ -503,11 +507,15 @@ Visual refresh establishing consistent patterns across the application.
 
 ---
 
-## Phase 5: Advanced Features
+## Phase 5: Advanced Features ✅ MOSTLY COMPLETE
+
+> **Status:** 4 of 6 items implemented (2026-03-10). ADV-03 narrator comparison, ADV-04 chain diagram, ADV-05 advanced filters (partial: count/range filters), ADV-06 category browsing (Imams/Top/All). 484 unit tests passing. ADV-01 (reliability ratings) and ADV-02 (network graph) deferred — see notes below.
 
 New capabilities that add significant value but require substantial implementation effort.
 
-### ADV-01: Narrator Reliability Ratings and Multi-Scholar Gradings
+### ADV-01: Narrator Reliability Ratings and Multi-Scholar Gradings ⏳ DEFERRED
+
+> **Deferral reason:** ADV-01a (display WikiShia reliability) is ready in Angular — the template already conditionally renders reliability badges with color coding. It just needs the WikiShia enrichment pipeline to be run against production data (`enrich_narrators(scrape=True)` in ThaqalaynDataGenerator). ADV-01b (multi-scholar gradings from Najashi, Tusi, Khoei) is deferred indefinitely — no machine-readable rijal data source has been identified. This is a data sourcing research project, not an engineering task.
 
 **Description:** Display rijal (narrator science) reliability ratings on narrator profiles. Show gradings from multiple scholars where available, with an aggregated reliability indicator.
 
@@ -521,7 +529,9 @@ New capabilities that add significant value but require substantial implementati
 - Individual scholar gradings shown in expandable section
 - Color coding matches hadith grading convention (green=reliable, yellow=acceptable, red=weak)
 
-### ADV-02: Interactive Narrator Network Graph
+### ADV-02: Interactive Narrator Network Graph ⏳ DEFERRED
+
+> **Deferral reason:** High complexity (requires Cytoscape.js library ~85KB), niche audience, and the co-narration data needed for meaningful graph edges already exists but the feature has the lowest impact-to-effort ratio. Recommended for a future phase when the narrator biography data is enriched.
 
 **Description:** A visual graph showing narrator relationships (teacher-student, co-narration) with interactive exploration. Users can click nodes to navigate to profiles.
 

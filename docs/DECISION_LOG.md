@@ -685,3 +685,41 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 **Decision:** Show `titles.en` when available. Skip reliability (not in narrator index metadata). No IMAM_IDS hardcoding.
 
 ---
+
+### D034: Phase 4 DS-01 Spacing — Incremental vs Sweeping (2026-03-10)
+
+**Context:** Architect proposed touching 30+ SCSS files to replace all ad-hoc spacing with CSS custom properties.
+
+**Options considered:**
+1. **Sweeping rewrite** — Touch all 30+ files. High regression risk, no visual regression testing setup.
+2. **Incremental approach** — Define variables, apply to the most visible components only.
+
+**Decision:** Option 2 — Incremental. Define the spacing scale in `:root`, apply to core layout files (styles.scss, app.component.scss, chapter-content, verse-text). Leave low-impact files for future cleanup.
+
+**Rationale:** The main risk of Option 1 (subtle layout regressions across 30+ files) far outweighed the benefit (consistency in files users rarely see). Applying to the 4-5 most visible files covers ~80% of the user-facing impact.
+
+---
+
+### D035: Phase 4 DS-02 Font — Keep Akzidenz, Add Type Scale (2026-03-10)
+
+**Context:** Architect proposed replacing Akzidenz Roman with Inter font.
+
+**Decision:** Keep Akzidenz Roman (existing font), add type scale CSS custom properties. Inter replacement deferred until font files can be acquired.
+
+**Rationale:** Cannot download Inter font files in the current environment. The type scale (heading/subheading/body/caption/overline size/weight/line-height variables) provides the main benefit regardless of the specific font face used.
+
+---
+
+### D036: Phase 5 Feature Scoping (2026-03-10)
+
+**Context:** 6 advanced features proposed. Some require external data that doesn't exist yet.
+
+**Decisions:**
+- **ADV-01 (Reliability Ratings):** Split into a (WikiShia display) and b (multi-scholar). ADV-01a is already implemented in Angular template — just needs WikiShia enrichment pipeline to run. ADV-01b deferred — no machine-readable rijal data source exists.
+- **ADV-02 (Network Graph):** Deferred. High complexity, requires Cytoscape.js (~85KB), niche audience. Lowest impact-to-effort ratio.
+- **ADV-03 (Comparison):** Implemented. Zero data dependencies, pure Angular.
+- **ADV-04 (Chain Diagram):** Implemented. CSS flexbox vertical diagram, no library needed.
+- **ADV-05 (Advanced Search):** Partially implemented. Count/range filters work now. Reliability/era filters need WikiShia data.
+- **ADV-06 (Categories):** Partially implemented. Imam/Top/All categories work now. Era-based categories need WikiShia data.
+
+---

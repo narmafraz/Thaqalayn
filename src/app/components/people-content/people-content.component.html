@@ -91,8 +91,19 @@
       <button mat-button (click)="sortVersePathsByLength()">{{ 'narrator.sortByLength' | translate }}</button>
 
       <div class="paths-list">
-        <div *ngFor="let item of paginatedPaths" class="path-item">
-          <app-path-link [path]="item.path"></app-path-link>
+        <div *ngFor="let preview of paginatedPreviews" class="hadith-preview-card">
+          <a [routerLink]="splitOnLastColon(preview.path)[0]"
+             queryParamsHandling="preserve"
+             [fragment]="'h' + splitOnLastColon(preview.path)[1]"
+             class="preview-link">
+            <div class="preview-header">
+              <mat-icon class="preview-icon">menu_book</mat-icon>
+              <span class="book-name">{{ preview.bookName }}</span>
+              <span class="hadith-num" *ngIf="preview.hadithNumber">#{{ preview.hadithNumber }}</span>
+            </div>
+            <div class="preview-chapter" *ngIf="preview.chapterTitle">{{ preview.chapterTitle }}</div>
+            <div class="preview-volume" *ngIf="preview.volumeLabel">{{ preview.volumeLabel }}</div>
+          </a>
         </div>
       </div>
 

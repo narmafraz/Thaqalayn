@@ -1,17 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { BOOK_DISPLAY_NAMES } from '@app/models';
 
-/** Book display name mapping */
-const BOOK_NAMES: Record<string, string> = {
-  'al-kafi': 'Al-Kafi',
-  'quran': 'Quran',
-  'man-la-yahduruhu-al-faqih': 'Man La Yahduruhu al-Faqih',
-  'tahdhib-al-ahkam': 'Tahdhib al-Ahkam',
-  'al-istibsar': 'Al-Istibsar',
-  'wasael-ul-shia': 'Wasael ul-Shia',
-  'bihar-al-anwar': 'Bihar al-Anwar',
-  'nahj-al-balagha': 'Nahj al-Balagha',
-  'kitab-al-irshad': 'Kitab al-Irshad',
-};
+const BOOK_NAMES = BOOK_DISPLAY_NAMES;
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,

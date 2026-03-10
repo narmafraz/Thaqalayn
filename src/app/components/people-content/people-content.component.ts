@@ -1,13 +1,14 @@
 import { KeyValue } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
-import { ChainVerses, Narrator, NarratorMetadata } from '@app/models';
+import { BOOK_DISPLAY_NAMES, ChainVerses, Narrator, NarratorMetadata } from '@app/models';
 import { Store } from '@ngxs/store';
 import { PeopleState } from '@store/people/people.state';
 import { RetryLoadNarrator } from '@store/people/people.actions';
+import { IndexState, IndexedTitles } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
 import { Observable, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter, map, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
 
 export interface ConarratorSummary {
   id: number;
@@ -22,19 +23,14 @@ export interface BookDistribution {
   percentage: number;
 }
 
-/** Display name mapping for book path prefixes */
-const BOOK_DISPLAY_NAMES: Record<string, string> = {
-  'al-kafi': 'Al-Kafi',
-  'quran': 'Quran',
-  'tahdhib-al-ahkam': 'Tahdhib al-Ahkam',
-  'al-istibsar': 'Al-Istibsar',
-  'man-la-yahduruhu-al-faqih': 'Man La Yahduruhu al-Faqih',
-  'kitab-al-irshad': 'Kitab al-Irshad',
-  'al-amali': 'Al-Amali',
-  'kitab-sulaym-ibn-qays': 'Kitab Sulaym ibn Qays',
-  'nahj-al-balagha': 'Nahj al-Balagha',
-  'al-sahifa-al-sajjadiyya': 'Al-Sahifa al-Sajjadiyya',
-};
+export interface HadithPreviewInfo {
+  path: string;
+  bookId: string;
+  bookName: string;
+  chapterTitle: string;
+  hadithNumber: string;
+  volumeLabel: string;
+}
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,8 +53,12 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
   private allPaths: { path: string }[] = [];
   filteredPaths: { path: string }[] = [];
   paginatedPaths: { path: string }[] = [];
+  paginatedPreviews: HadithPreviewInfo[] = [];
   pathsPageSize = 50;
   pathsPage = 0;
+
+  // Index data for preview cards
+  private enIndex: IndexedTitles | null = null;
 
   // All subchains data
   private allSubchains: KeyValue<string, ChainVerses>[] = [];
@@ -92,6 +92,15 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(index => {
       this.narratorIndex = index || {};
+    });
+
+    // Load book index for hadith preview cards
+    this.store.select(IndexState.getBookForLanguage).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(getBookForLanguage => {
+      this.enIndex = getBookForLanguage('en') || null;
+      this.updatePaginatedPreviews();
+      this.cdr.markForCheck();
     });
 
     // Setup paths filter
@@ -248,6 +257,59 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
   private updatePaginatedPaths() {
     const start = this.pathsPage * this.pathsPageSize;
     this.paginatedPaths = this.filteredPaths.slice(start, start + this.pathsPageSize);
+    this.updatePaginatedPreviews();
+  }
+
+  private updatePaginatedPreviews() {
+    this.paginatedPreviews = this.paginatedPaths.map(item => this.buildPreviewInfo(item.path));
+  }
+
+  /** Build preview info for a single verse path using IndexState data */
+  private buildPreviewInfo(path: string): HadithPreviewInfo {
+    const raw = path.startsWith('/books/') ? path.slice(7) : path;
+    const parts = raw.split(':');
+    const bookId = parts[0];
+    const bookName = BOOK_DISPLAY_NAMES[bookId] || this.titleCase(bookId);
+    const hadithNumber = parts.length > 1 ? parts[parts.length - 1] : '';
+
+    // Build parent chapter path by stripping the last segment (hadith number)
+    const lastColon = path.lastIndexOf(':');
+    const chapterPath = lastColon > 0 ? path.substring(0, lastColon) : path;
+
+    // Look up chapter title from IndexState
+    let chapterTitle = '';
+    if (this.enIndex && this.enIndex[chapterPath]) {
+      chapterTitle = this.enIndex[chapterPath].title || '';
+    }
+
+    // Build volume label from segments
+    const volumeLabel = this.buildVolumeLabel(bookId, parts.slice(1, -1));
+
+    return { path, bookId, bookName, chapterTitle, hadithNumber, volumeLabel };
+  }
+
+  private buildVolumeLabel(bookId: string, segments: string[]): string {
+    if (!segments.length) return '';
+    if (bookId === 'quran') {
+      return segments.length >= 1 ? `Surah ${segments[0]}` : '';
+    }
+    if (bookId === 'al-kafi') {
+      const labels = ['Vol.', 'Book', 'Ch.'];
+      return segments.map((s, i) => `${labels[i] || ''} ${s}`).join(', ');
+    }
+    // Generic: just number the segments
+    return segments.join(':');
+  }
+
+  /** Split path on last colon for routerLink + fragment navigation */
+  splitOnLastColon(path: string): string[] {
+    const index = path.lastIndexOf(':');
+    if (index < 0) return [path, ''];
+    return [path.slice(0, index), path.slice(index + 1)];
+  }
+
+  private titleCase(str: string): string {
+    return str.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   private updatePaginatedSubchains() {

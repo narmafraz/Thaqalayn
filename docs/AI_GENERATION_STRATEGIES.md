@@ -114,45 +114,49 @@ Assuming corpus average of ~60 Arabic words/verse (weighted by length distributi
 
 We tested GPT-5-mini (cheapest reasoning model) and GPT-4.1/4.1-mini (non-reasoning). We have **not tested** OpenAI's more capable models, which are still dramatically cheaper than Claude CLI:
 
-| Model | Type | Input/1M | Output/1M | Batch $/word* | 58K Corpus (batch) | vs Claude CLI |
-|-------|------|----------|-----------|---------------|--------------------|----|
-| **GPT-5.2** | Frontier reasoning | $1.75 | $14.00 | **$0.0024/w** | **~$8.4K** | 9x cheaper |
-| **GPT-5** | Reasoning | $1.25 | $10.00 | **$0.0017/w** | **~$6.0K** | 13x cheaper |
-| **o4-mini** | Reasoning (small) | $1.10 | $4.40 | **$0.0008/w** | **~$2.8K** | 28x cheaper |
-| GPT-5-mini | Reasoning (tiny) | $0.25 | $2.00 | $0.0002/w | ~$700 | 110x cheaper |
+| Model | Intelligence Index* | Input/1M | Output/1M | Batch $/word** | 58K Corpus (batch) | vs Claude CLI |
+|-------|-------------------|----------|-----------|---------------|--------------------|----|
+| **GPT-5.4** | 57 (#2 globally) | $2.50 | $15.00 | **$0.0025/w** | **~$8.7K** | 9x cheaper |
+| **GPT-5.3 Codex** | 54 (#3 globally) | $1.75 | $14.00 | **$0.0024/w** | **~$8.4K** | 9x cheaper |
+| **GPT-5.2** | ~50 (est.) | $1.75 | $14.00 | **$0.0024/w** | **~$8.4K** | 9x cheaper |
+| **GPT-5** | ~45 (est.) | $1.25 | $10.00 | **$0.0017/w** | **~$6.0K** | 13x cheaper |
+| GPT-5-mini | 41 (#6) | $0.25 | $2.00 | $0.0002/w | ~$700 | 110x cheaper |
 | Claude CLI | — | — | — | $0.022/w | ~$76K | baseline |
 
-*Batch pricing (50% off), assuming 60-word average verse with ~20K output tokens
+*Artificial Analysis Intelligence Index (higher = better, Claude Sonnet 4.5 is ~50)
+**Batch pricing (50% off), assuming 60-word average verse with ~20K output tokens
 
-**GPT-5.2 is OpenAI's most capable model** (400K context, frontier reasoning). At $8.4K for the entire corpus via batch API, it's well within our OpenAI budget. If its quality approaches Claude Sonnet for Islamic scholarly content — correct narrator IDs, Quran cross-references, faithful translations, scholarly summaries — it would be the single best strategy.
+**GPT-5.4 is OpenAI's actual frontier model** (released March 2026, 1M context window, Intelligence Index 57 — tied #1 globally with Gemini 3.1 Pro). At $8.7K for the entire corpus via batch API, it's well within budget. GPT-5.3 Codex (released Feb 2026, structured/coding focus) is very close behind at $8.4K.
 
-**GPT-5** is the next tier down. At $6K for the full corpus, it balances capability and cost. It has "30% fewer response-level errors than GPT-5.1" per OpenAI.
+**o4-mini is NOT worth testing** — it has Intelligence Index 33 (vs GPT-5-mini's 41), costs more ($1.10/$4.40 vs $0.25/$2.00), and OpenAI themselves recommend GPT-5-mini over it. It would perform worse on our task.
 
-**o4-mini** is a reasoning model at $2.8K batch for the corpus. Being a dedicated reasoning model (not a general LLM), it may handle complex structured output differently.
+**Why these haven't been tested**: The original analysis focused on the cheapest viable option (GPT-5-mini) and the known models (GPT-4.1). The quality gap between GPT-5-mini (67% pass, poor scholarly depth) and Claude Sonnet (87% pass, excellent) is large — but that gap may shrink substantially with GPT-5.4 or GPT-5.3.
 
-**Why these haven't been tested**: The original analysis focused on the cheapest viable option (GPT-5-mini) and the known models (GPT-4.1). The quality gap between GPT-5-mini (67% pass, poor scholarly depth) and Claude Sonnet (87% pass, excellent) is large — but that gap may shrink substantially with GPT-5 or GPT-5.2.
-
-**Key question**: Does GPT-5.2's superior reasoning close the quality gap on:
+**Key question**: Does GPT-5.4's superior reasoning close the quality gap on:
 1. Narrator identification (wrong IDs was GPT-5-mini's #1 quality issue)
 2. Quran cross-references (often empty with GPT-5-mini)
 3. Scholarly summary depth (generic vs contextual)
 4. Word_tags structural correctness (chunk boundary errors)
 
-Academic research (ACL 2025) found GPT-4 "fails to capture some religion-based terms accurately" for Islamic content. But GPT-5.2 is a generational leap — it may handle this domain better. The only way to know is to **test all three on the 15-verse benchmark**.
+Academic research (ACL 2025) found GPT-4 "fails to capture some religion-based terms accurately" for Islamic content. GPT-5.4 is two generations ahead — the only way to know is to **test on the 15-verse benchmark** (~$3-4 per model).
 
 **Budget impact of frontier models**:
 
 | Scenario | Model | Corpus Cost | + Fix Pass (15%) | Total | Budget Left |
 |----------|-------|-------------|------------------|-------|-------------|
-| GPT-5.2 at 90% pass | GPT-5.2 batch | $8.4K | $1.3K fixes | **$9.7K** | $20K buffer |
-| GPT-5.2 at 80% pass | GPT-5.2 batch | $8.4K | $2.5K fixes | **$10.9K** | $19K buffer |
+| GPT-5.4 at 90% pass | GPT-5.4 batch | $8.7K | $1.3K fixes | **$10.0K** | $20K buffer |
+| GPT-5.4 at 80% pass | GPT-5.4 batch | $8.7K | $2.5K fixes | **$11.2K** | $19K buffer |
+| GPT-5.3 at 85% pass | GPT-5.3 batch | $8.4K | $1.3K fixes | **$9.7K** | $20K buffer |
 | GPT-5 at 85% pass | GPT-5 batch | $6.0K | $1.3K fixes | **$7.3K** | $23K buffer |
-| GPT-5 at 70% pass + Claude fix | GPT-5 batch + Claude CLI | $6.0K + $12K | — | **$18K** | $12K buffer |
 | GPT-5-mini at 85% (optimized) | GPT-5-mini batch + Claude CLI | $0.7K + $12K | — | **$12.7K** | $17K buffer |
 
-Even in the worst case (GPT-5.2 at 80% pass), the total is $10.9K with $19K left over. In the best case (GPT-5 at 85%), it's $7.3K with $23K buffer for quality improvements, additional languages, or fix passes.
+Even in the worst case (GPT-5.4 at 80% pass), the total is $11.2K with $19K left over.
 
-**This is the #1 thing to test this week.**
+**This is the #1 thing to test this week.** Benchmark cost: ~$11-15 total across all models.
+
+### Additional Work: Chapter Name Translations
+
+**Gap discovered**: Chapter/book names exist in only English + Arabic, but the site supports 11 languages. This means ~62,400 chapter title translations are needed (7,798 titles × 8 missing languages). Since titles are short (2-15 words), this is trivially cheap: **~$6 via GPT-5-mini batch**. See [CHAPTER_TRANSLATION_GAP.md](CHAPTER_TRANSLATION_GAP.md) for full analysis. This should be included in the same batch processing run as verse content.
 
 ---
 
@@ -319,37 +323,42 @@ Calibrate validation for "good enough" rather than "Claude-quality":
 
 ## Strategies (20 Total, Constrained to Available Resources)
 
-### Strategy 1: OpenAI GPT-5.2 Frontier Model (Batch) ⭐ HIGHEST POTENTIAL
-**Cost: ~$8.4K batch | $/word: $0.0024 | Quality: Unknown (MUST TEST)**
+### Strategy 1: OpenAI GPT-5.4 Frontier Model (Batch) ⭐ HIGHEST POTENTIAL
+**Cost: ~$8.7K batch | $/word: $0.0025 | Quality: Unknown (MUST TEST)**
 
-GPT-5.2 is OpenAI's most capable model — a generational leap over GPT-5-mini. At batch pricing it's **9x cheaper than Claude CLI** while being OpenAI's flagship reasoning model:
+GPT-5.4 is OpenAI's actual frontier model (released March 2026, Intelligence Index 57 — tied #1 globally). At batch pricing it's **9x cheaper than Claude CLI**:
 
-- **400K context window** — no chunking needed for any verse
-- **Frontier reasoning** — may match Claude on narrator IDs, Quran refs, scholarly depth
+- **1M context window** — no chunking needed for any verse
+- **Frontier reasoning** (extended thinking) — may match Claude on scholarly depth
 - **Structured output support** — JSON schema enforcement available
-- **Batch API**: 50% off → $0.875/$7.00 per M tokens
+- **Batch API**: 50% off → $1.25/$7.50 per M tokens
 
 | Pass Rate | Corpus Cost | + Claude CLI Fix | Total | Budget Left |
 |-----------|------------|------------------|-------|-------------|
-| 90% pass | $8.4K | $1.3K (5.4K failures) | **$9.7K** | $20K |
-| 80% pass | $8.4K | $2.5K (10.8K failures) | **$10.9K** | $19K |
-| 70% pass | $8.4K | $5.8K (16.2K failures) | **$14.2K** | $16K |
+| 90% pass | $8.7K | $1.3K (5.4K failures) | **$10.0K** | $20K |
+| 80% pass | $8.7K | $2.5K (10.8K failures) | **$11.2K** | $19K |
+| 70% pass | $8.7K | $5.8K (16.2K failures) | **$14.5K** | $16K |
 
-Even at 70% pass rate (same as GPT-5-mini), the total cost is ~$14K. **This is the #1 thing to benchmark this week.**
+Even at 70% pass rate (same as GPT-5-mini), the total cost is ~$14.5K. **This is the #1 thing to benchmark this week.**
 
-### Strategy 2: OpenAI GPT-5 (Full Model, Batch)
-**Cost: ~$6K batch | $/word: $0.0017 | Quality: Unknown (MUST TEST)**
+### Strategy 2: OpenAI GPT-5.3 Codex / GPT-5 (Batch)
+**Cost: ~$6-8.4K batch | $/word: $0.0017-0.0024 | Quality: Unknown (MUST TEST)**
 
-GPT-5 full at batch pricing — 13x cheaper than Claude CLI:
-- $0.625/$5.00 per M tokens (batch)
+Two strong alternatives to GPT-5.4:
+
+**GPT-5.3 Codex** (Feb 2026, Intelligence Index 54, structured/coding focus):
+- $0.875/$7.00 per M tokens (batch) → ~$8.4K for corpus
+- Structured output focus may help with our JSON schema requirements
+
+**GPT-5** (Intelligence Index ~45):
+- $0.625/$5.00 per M tokens (batch) → ~$6.0K for corpus
 - "30% fewer response-level errors than GPT-5.1" per OpenAI
-- May have significantly better scholarly output than GPT-5-mini
-- **If quality matches Claude**: Best cost/quality ratio of any strategy
+- Best cost/quality ratio if quality is sufficient
 
-| Pass Rate | Corpus Cost | + Claude CLI Fix | Total |
-|-----------|------------|------------------|-------|
-| 85% pass | $6.0K | $1.3K | **$7.3K** |
-| 70% pass | $6.0K | $5.8K | **$11.8K** |
+| Model | 85% pass total | 70% pass total |
+|-------|---------------|----------------|
+| GPT-5.3 Codex | **$9.7K** | **$14.2K** |
+| GPT-5 | **$7.3K** | **$11.8K** |
 
 ### Strategy 3: Hybrid Claude CLI + Optimized OpenAI GPT-5-mini Batch
 **OpenAI cost: ~$640 | Claude cost: ~$12-15K | Quality: Good-Excellent**
@@ -375,13 +384,12 @@ If frontier models don't test well, fall back to optimized GPT-5-mini:
 - **Mitigation**: Test on 15-verse benchmark first
 - **Fallback**: Failed verses → OpenAI batch or Claude CLI
 
-### Strategy 5: OpenAI o4-mini (Reasoning Model, Batch)
-**Cost: ~$2.8K batch | $/word: $0.0008 | Quality: Unknown**
+### Strategy 5: Chapter Name Translation Batch
+**Cost: ~$6-31 | $/word: trivial | Quality: Good (short text)**
 
-Dedicated reasoning model at $0.55/$2.20 per M (batch) — 28x cheaper than Claude CLI:
-- Reasoning tokens may improve complex fields (narrator IDs, Quran refs)
-- Cheaper than GPT-5/5.2 but less capable
-- **Test alongside GPT-5.2 and GPT-5 on 15-verse benchmark**
+Gap discovered: 7,798 chapter/book names exist only in English + Arabic but the site supports 11 languages. Need ~62,400 title translations (8 missing languages). Since titles are 2-15 words each, this is trivially cheap via GPT-5-mini batch (~$6). See [CHAPTER_TRANSLATION_GAP.md](CHAPTER_TRANSLATION_GAP.md).
+- Include in the same batch run as verse content
+- Requires: new `books.{lang}.json` index files + Angular `MultiLingualText` update
 
 ### Strategy 6: OpenAI Prompt Engineering + Auto-Fix Sprint
 **Cost: ~$50 testing | Quality: Raises pass rate from 67% to 85%+**
@@ -531,10 +539,10 @@ GPT-5-mini pass rate: 67% → 80-85% with no code changes.
 
 ```
 Week 1:  [Benchmark Sprint — THE CRITICAL WEEK]
-         - Test GPT-5.2, GPT-5, o4-mini on 15-verse benchmark (~$15 total)
+         - Test GPT-5.4, GPT-5.3 Codex, GPT-5.2, GPT-5 on 15-verse benchmark (~$12 total)
          - Test Gemini 2.5 Flash/Pro via free tier on same 15 verses
-         - Implement deterministic chunk boundary auto-fix (Optimization 1)
-         - Add OpenAI structured output mode (Optimization 2)
+         - Implement deterministic chunk boundary auto-fix (see OPENAI_PIPELINE_OPTIMIZATION.md)
+         - Add OpenAI structured output mode
          - Remove few-shot examples from GPT-5 family prompts
          - Build post-processing enrichment (narrator IDs, topics)
          - DECISION: Pick primary model based on quality/cost results
@@ -619,15 +627,15 @@ If budget looks tight mid-process:
 
 ## Immediate Next Steps
 
-1. **TODAY**: Run 15-verse benchmark on **GPT-5.2** (frontier, ~$2-3 test cost)
-2. **TODAY**: Run 15-verse benchmark on **GPT-5** (full, ~$1-2 test cost)
-3. **TODAY**: Run 15-verse benchmark on **o4-mini** (~$0.50 test cost)
-4. **TODAY**: Implement deterministic chunk boundary auto-fix in pipeline
+1. **TODAY**: Run 15-verse benchmark on **GPT-5.4** (frontier, ~$3-4 test cost)
+2. **TODAY**: Run 15-verse benchmark on **GPT-5.3 Codex** (~$3-4 test cost)
+3. **TODAY**: Run 15-verse benchmark on **GPT-5** (full, ~$2-3 test cost)
+4. **TODAY**: Implement deterministic chunk boundary auto-fix in pipeline (see [OPENAI_PIPELINE_OPTIMIZATION.md](OPENAI_PIPELINE_OPTIMIZATION.md))
 5. **THIS WEEK**: Add OpenAI structured output mode to pipeline
 6. **THIS WEEK**: Sign up for Google AI Studio (free), test Gemini on same 15 verses
 7. **THIS WEEK**: Build post-processing enrichment for narrator IDs and topics
 8. **WEEK 1 END**: **DECISION POINT** — pick primary model based on benchmark results
-9. **WEEK 2**: Submit full corpus batch with chosen model
+9. **WEEK 2**: Submit full corpus batch (verse content + chapter name translations) with chosen model
 10. **WEEK 3+**: Claude CLI for failures and quality improvements
 
 ---

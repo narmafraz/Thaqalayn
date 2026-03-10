@@ -1070,7 +1070,7 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 - Hamburger menu contains settings only (language, theme, font, AI prefs, nav links)
 - Search bar is functional and styled consistently with desktop
 
-### FB-07: Comprehensive UX Review Follow-Up
+### FB-07: Comprehensive UX Review Follow-Up ✅ DONE
 
 **Description:** User requested spinning up UI and UX reviewer teams to do a fresh review for both desktop and mobile users, informed by the user stories and feedback. This item tracks performing that follow-up review and capturing any additional findings as new roadmap items.
 
@@ -1078,11 +1078,209 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 **Severity:** MEDIUM
 **Effort:** M (review + documentation)
 **Acceptance Criteria:**
-- Fresh desktop UX review performed on current state
-- Fresh mobile UX review performed on current state
-- New issues documented as roadmap items (Phase 13+)
-- User stories cross-referenced for completeness
-- Results shared with user for prioritization
+- Fresh desktop UX review performed on current state ✅
+- Fresh mobile UX review performed on current state ✅
+- New issues documented as roadmap items (Phase 13+) ✅ See Phase 13 below
+- User stories cross-referenced for completeness ✅
+- Results shared with user for prioritization ✅
+- Full review documented in `docs/UX_REVIEW_2026_03_10.md`
+
+---
+
+## Phase 13: i18n Completion, Accessibility & Mobile Polish
+
+> **Source:** Comprehensive UX Review (2026-03-10). Full findings in `docs/UX_REVIEW_2026_03_10.md`.
+> **Status:** PLANNED
+> **Key theme:** Close the i18n gap (50+ hardcoded English strings across 7 components), fix remaining accessibility blockers, and complete mobile experience gaps.
+
+### P13-01: Internationalize About and Support Pages
+
+**Description:** Both `/about` and `/support` pages contain zero i18n `translate` pipe calls. Every heading, paragraph, and link is hardcoded English. These are the only two full pages in the app completely bypassing the i18n system.
+
+**Source:** UX Review D-01
+**Severity:** HIGH
+**Effort:** M (1-3 days) — content translation for 12 languages
+**Acceptance Criteria:**
+- All text in `about.component.html` uses `translate` pipe
+- All text in `support.component.html` uses `translate` pipe
+- i18n keys added to all 12 language JSON files
+- Page content reads naturally in all supported languages
+
+### P13-02: Internationalize AI Settings Panel
+
+**Description:** The settings component's AI preferences panel has 7 hardcoded English strings: "AI Feature Settings", "Show diacritized text by default", "Show content type badges", "Show topic tags", "Show isnad/matn separation", "Show AI translation disclaimer", "Word-by-word language:".
+
+**Source:** UX Review D-02
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- All 7 strings use `translate` pipe with new i18n keys
+- Keys added to all 12 language files
+- Settings panel usable for non-English users
+
+### P13-03: Internationalize Verse-Detail Section Headers
+
+**Description:** Three AI content section headers in verse-detail are hardcoded English: "Quran References", "Key Phrases", "Related Narrations". The rest of the component properly uses i18n.
+
+**Source:** UX Review D-03
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- All three headings use `translate` pipe
+- Keys added to all 12 language files
+
+### P13-04: Internationalize Topics Page
+
+**Description:** Topics component has hardcoded tab labels ("Books", "AI Topics", "Key Phrases"), AI topic counts ("hadiths"), "coming soon" messages, and "View Key Phrases" link text — all bypassing i18n.
+
+**Source:** UX Review D-04
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Tab labels use `translate` pipe
+- All inline strings use `translate` pipe
+- "hadiths" count label uses i18n with pluralization
+- "Coming soon" messages are translated
+
+### P13-05: Internationalize Phrase List Page
+
+**Description:** The phrase-list component has zero `translate` pipe usage. "Key Phrases", subtitle, loading text, search placeholder, empty state, and coming-soon message are all hardcoded English.
+
+**Source:** UX Review D-05
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- All text content uses `translate` pipe
+- i18n keys added to all 12 language files
+- Search placeholder and empty state messages translated
+
+### P13-06: Fix AI Toggle Touch Targets on Mobile
+
+**Description:** AI toggle buttons in verse-text (diacritics, word analysis, paragraph view, chain diagram) have `padding: 2px` with 16x16px icons, creating ~20px total touch area on mobile. These were not included in the FIX-05 touch target fix that addressed verse footer actions.
+
+**Source:** UX Review M-01
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- AI toggle buttons have 44px minimum touch target on mobile (< 768px)
+- Desktop size remains compact (28-32px) per FB-01
+- Touch targets verified at 375px viewport width
+
+### P13-07: Add Keyboard/ARIA Support to Topic Category Headers
+
+**Description:** Topic category `<h2>` elements have click handlers for expand/collapse but lack `role="button"`, `tabindex="0"`, and keyboard event handlers. Screen reader and keyboard users cannot interact with collapsible topic categories.
+
+**Source:** UX Review A-01
+**Severity:** HIGH
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Category headers have `role="button"` and `tabindex="0"`
+- `keydown.enter` and `keydown.space` trigger expand/collapse
+- `aria-expanded` attribute reflects current state
+- Screen reader announces collapse/expand state
+
+### P13-08: Add AI Settings to Mobile Hamburger Menu
+
+**Description:** The mobile hamburger menu consolidates navigation, dark mode, font size, and language — but omits AI content preferences. Users on mobile must locate the embedded settings component within chapter-content to toggle AI features, which is not discoverable.
+
+**Source:** UX Review M-03, MOB-01 acceptance criteria gap
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- AI settings section added to mobile hamburger menu below existing settings
+- Checkboxes for: diacritics default, content type badges, topic tags, isnad separation
+- Word-by-word language selector included
+- Settings persist via AiPreferencesService (same as desktop)
+
+### P13-09: Add ARIA Attributes to Discussion Section Toggle
+
+**Description:** The discussion section header in verse-detail uses a click handler on a `<div>` element to toggle the comment editor. It lacks `role="button"`, `tabindex`, `aria-expanded`, and keyboard event handlers.
+
+**Source:** UX Review A-03
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Discussion header div has `role="button"` and `tabindex="0"`
+- `aria-expanded` reflects whether comments are visible
+- Keyboard enter/space toggles the section
+- Screen reader announces the expand/collapse action
+
+### P13-10: Clamp Word-Analysis Popup to Viewport Bounds
+
+**Description:** The word detail popup uses absolute pixel positioning without viewport boundary checks. On narrow mobile screens (375px or less), the popup (min-width 160px) can extend beyond the viewport edge, cutting off content.
+
+**Source:** UX Review M-02
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Popup position is clamped to stay within the visible viewport
+- On mobile, popup centers horizontally if it would overflow
+- No horizontal scroll introduced by popup display
+- Popup remains readable on 320px viewport width
+
+### P13-11: Add Narrators to Mobile Bottom Navigation
+
+**Description:** The bottom navigation bar has 4 items (Home, Books, Topics, Bookmarks) but omits Narrators — a major feature section. Since the footer (which has a Narrators link) is hidden on mobile in favor of the bottom nav, and the hamburger menu is a secondary action, Narrators discovery is poor on mobile.
+
+**Source:** UX Review M-04
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Bottom nav includes a 5th item for Narrators (people icon)
+- Items remain evenly spaced and legible at 320px width
+- Active state highlights correctly for narrator pages
+- If 5 items are too crowded, consider replacing Topics with Narrators (Topics is less frequently accessed)
+
+### P13-12: Internationalize Remaining Inline Strings
+
+**Description:** Scattered hardcoded English strings across multiple components: "Loading commentary..." (chapter-content tafsir), "Exporting..."/"Export CSV" (download), "Filtered by" (search-results), and "Not sure how to display this book part, sorry!" (book-dispatcher fallback). Each is a minor gap but they accumulate.
+
+**Source:** UX Review D-06, D-07, D-09, D-10
+**Severity:** MEDIUM
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- All identified hardcoded strings replaced with `translate` pipe
+- i18n keys added to all 12 language files
+- Zero hardcoded English user-facing text in any template
+
+### P13-13: Keyboard Navigation for Search Dropdown Results
+
+**Description:** The search dropdown has `role="listbox"` and items have `role="option"`, but there is no `aria-activedescendant` tracking or arrow-key navigation. Users cannot browse search suggestions with keyboard alone.
+
+**Source:** UX Review A-05
+**Severity:** MEDIUM
+**Effort:** M (1-3 days)
+**Acceptance Criteria:**
+- Up/Down arrow keys navigate through dropdown results
+- Active result is visually highlighted and has `aria-selected="true"`
+- Enter key selects the active result
+- Escape key closes the dropdown
+- `aria-activedescendant` on the input tracks the focused option
+
+### P13-14: Use Material Select for Tafsir Edition Picker
+
+**Description:** The tafsir edition selector uses a plain `<select>` HTML element instead of `<mat-select>`, creating visual inconsistency with the rest of the UI. On mobile, native selects invoke the OS picker instead of the Material dropdown used everywhere else.
+
+**Source:** UX Review M-06
+**Severity:** LOW
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Tafsir edition selector uses `<mat-select>` with Material styling
+- Appearance matches the translation selector
+- Dark mode styling inherited from global Material overrides
+- Mobile interaction consistent with other dropdowns
+
+### P13-15: Audit and Update Footer Social Link
+
+**Description:** The footer links to `https://twitter.com/ProjThaqalayn` which references the old Twitter brand. The account may be inactive. This should be audited and either updated to the X.com equivalent, replaced with an active social presence, or removed.
+
+**Source:** UX Review D-11
+**Severity:** LOW
+**Effort:** S (< 1 day)
+**Acceptance Criteria:**
+- Social link verified as active or removed
+- If active, URL updated to current platform format
+- If removed, footer link list rebalanced
 
 ---
 
@@ -1095,21 +1293,22 @@ For books processed by the AI pipeline, use the structured `isnad_matn.narrators
 | Phase 3: Narrator Overhaul ✅ | NAR-01 to NAR-06 (6 items) | 2S + 3M + 1L | Transform weakest section |
 | Phase 4: Design System ✅ | DS-01 to DS-06 (6 items) | 3S + 3M | Visual consistency |
 | Phase 5: Advanced Features ✅ | ADV-01 to ADV-06 (6 items) | 0S + 2M + 4L | New capabilities |
-| Phase 6: Content Parity | PAR-01 to PAR-07 (7 items) | 4S + 3M | Unified reading experience |
-| Phase 7: AI Integration | AI-01 to AI-02 (2 items) | 0S + 2M | Seamless AI content |
-| Phase 8: Homepage & Discovery | HOME-01 to HOME-02 (2 items) | 1S + 1M | Full book showcase |
-| Phase 9: Mobile Navigation | MOB-01 (1 item) | 0S + 1M | Mobile settings consolidation |
+| Phase 6: Content Parity ✅ | PAR-01 to PAR-07 (7 items) | 4S + 3M | Unified reading experience |
+| Phase 7: AI Integration ✅ PARTIAL | AI-01 to AI-02 (2 items) | 0S + 2M | Seamless AI content |
+| Phase 8: Homepage & Discovery ✅ PARTIAL | HOME-01 to HOME-02 (2 items) | 1S + 1M | Full book showcase |
+| Phase 9: Mobile Navigation ✅ | MOB-01 (1 item) | 0S + 1M | Mobile settings consolidation |
 | Phase 10: Data Improvements | DATA-01 to DATA-02 (2 items) | 1S + 0M + 1L | Cross-project data |
 | Phase 11: Mobile UX Polish | MUXR-04 to MUXR-10 (7 items) | 7S + 0M | Mobile experience refinement |
-| Phase 12: Missed Feedback | FB-01 to FB-07 (7 items) | 3S + 2M + 2L | Complete user feedback |
-| **Total** | **67 items** | **35S + 22M + 8L** | |
+| Phase 12: Missed Feedback ✅ MOSTLY COMPLETE | FB-01 to FB-07 (7 items) | 3S + 2M + 2L | Complete user feedback |
+| Phase 13: i18n & Accessibility | P13-01 to P13-15 (15 items) | 12S + 3M | i18n completion, a11y, mobile |
+| **Total** | **82 items** | **47S + 25M + 8L** | |
 
 ### Effort Estimates
 
-- **S (< 1 day):** 25 items
-- **M (1-3 days):** 20 items
-- **L (3+ days):** 6 items
-- **Estimated total:** ~85-120 developer-days
+- **S (< 1 day):** 47 items
+- **M (1-3 days):** 25 items
+- **L (3+ days):** 8 items
+- **Estimated total:** ~105-150 developer-days
 
 ### User Story Status Corrections
 

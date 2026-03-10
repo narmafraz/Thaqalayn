@@ -224,12 +224,12 @@
         <div class="tafsir-header">
           <mat-icon class="tafsir-icon">auto_stories</mat-icon>
           <span class="tafsir-label">{{ 'book.tafsir' | translate }}</span>
-          <select class="tafsir-select"
-                  [(ngModel)]="selectedTafsirEdition"
-                  (change)="onTafsirEditionChange(book.index)"
-                  aria-label="Select tafsir edition">
-            <option *ngFor="let ed of tafsirEditions" [value]="ed.slug">{{ ed.name }}</option>
-          </select>
+          <mat-select class="tafsir-select"
+                     [(ngModel)]="selectedTafsirEdition"
+                     (selectionChange)="onTafsirEditionChange(book.index)"
+                     [attr.aria-label]="'book.tafsir' | translate">
+            <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.slug">{{ ed.name }}</mat-option>
+          </mat-select>
         </div>
         <div class="tafsir-loading" *ngIf="loadingTafsir.has(verse.local_index)">
           <mat-spinner diameter="20"></mat-spinner>

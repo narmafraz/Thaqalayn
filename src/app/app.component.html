@@ -101,6 +101,33 @@
           </mat-select>
         </div>
       </div>
+      <div class="mobile-menu-settings">
+        <h4>{{ 'settings.ai.title' | translate }}</h4>
+        <label class="mobile-setting-checkbox">
+          <input type="checkbox"
+                 [checked]="aiPrefs.get('showDiacritizedByDefault')"
+                 (change)="aiPrefs.set('showDiacritizedByDefault', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
+        </label>
+        <label class="mobile-setting-checkbox">
+          <input type="checkbox"
+                 [checked]="aiPrefs.get('showContentTypeBadges')"
+                 (change)="aiPrefs.set('showContentTypeBadges', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showContentBadges' | translate }}</span>
+        </label>
+        <label class="mobile-setting-checkbox">
+          <input type="checkbox"
+                 [checked]="aiPrefs.get('showTopicTags')"
+                 (change)="aiPrefs.set('showTopicTags', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showTopicTags' | translate }}</span>
+        </label>
+        <label class="mobile-setting-checkbox">
+          <input type="checkbox"
+                 [checked]="aiPrefs.get('showIsnadSeparation')"
+                 (change)="aiPrefs.set('showIsnadSeparation', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showIsnadSeparation' | translate }}</span>
+        </label>
+      </div>
     </aside>
   </ng-container>
   <main id="main-content" class="main">
@@ -109,7 +136,7 @@
   <ng-container *ngIf="!(isEmbed$ | async)">
     <app-install-prompt></app-install-prompt>
     <footer id="footer">
-      <a href="https://twitter.com/ProjThaqalayn" target="_blank">{{ 'nav.news' | translate }}</a> |
+      <a href="https://x.com/ProjThaqalayn" target="_blank">{{ 'nav.news' | translate }}</a> |
       <a routerLink="/topics">{{ 'nav.topics' | translate }}</a> |
       <a routerLink="/bookmarks">{{ 'nav.bookmarks' | translate }}</a> |
       <a routerLink="/download">{{ 'nav.download' | translate }}</a> |
@@ -132,6 +159,10 @@
       <a routerLink="/bookmarks" class="bottom-nav-item" [class.active]="section === 'bookmarks'" queryParamsHandling="preserve">
         <mat-icon>bookmark</mat-icon>
         <span>{{ 'nav.bookmarks' | translate }}</span>
+      </a>
+      <a routerLink="/people/narrators" class="bottom-nav-item" [class.active]="section === 'narrators'" queryParamsHandling="preserve">
+        <mat-icon>people</mat-icon>
+        <span>{{ 'nav.narrators' | translate }}</span>
       </a>
     </nav>
   </ng-container>

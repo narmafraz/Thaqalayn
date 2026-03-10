@@ -311,6 +311,13 @@
     "pressEscToClose": "Press Esc to close",
     "showKeyboardShortcuts": "Keyboard shortcuts",
     "title": "Settings",
-    "fontSize": "Font size"
+    "fontSize": "Font size",
+    "ai": {
+      "title": "AI Features",
+      "showDiacritized": "Show diacritized text by default",
+      "showContentBadges": "Show content type badges",
+      "showTopicTags": "Show topic tags",
+      "showIsnadSeparation": "Show isnad/matn separation"
+    }
   }
 }

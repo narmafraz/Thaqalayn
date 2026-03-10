@@ -4,6 +4,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Book, getChapter, Narrator } from '@app/models';
 import { I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
+import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
@@ -69,6 +70,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private themeService: ThemeService,
     private keyboard: KeyboardShortcutService,
     private cdr: ChangeDetectorRef,
+    public aiPrefs: AiPreferencesService,
     @Inject(PLATFORM_ID) platformId: object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -88,7 +90,7 @@ export class AppComponent implements OnInit, OnDestroy {
         const path = (event.urlAfterRedirects || event.url).split('?')[0];
         if (path === '/' || path === '/books') return 'home';
         if (path.startsWith('/books/')) return 'books';
-        if (path.startsWith('/people/')) return 'books';
+        if (path.startsWith('/people/')) return 'narrators';
         if (path.startsWith('/bookmarks')) return 'bookmarks';
         if (path.startsWith('/topics')) return 'topics';
         return 'home';

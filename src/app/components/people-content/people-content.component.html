@@ -9,6 +9,12 @@
       <h2 class="transliteration" *ngIf="narrator.biography?.english_transliteration">
         {{ narrator.biography.english_transliteration }}
       </h2>
+      <a mat-button class="compare-btn"
+         [routerLink]="['/people/narrators/compare']"
+         [queryParams]="{ a: narrator.index }">
+        <mat-icon>compare_arrows</mat-icon>
+        {{ 'narrator.compare' | translate }}
+      </a>
     </div>
 
     <!-- Stats Summary Section (NAR-02) -->

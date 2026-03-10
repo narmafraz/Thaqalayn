@@ -1,0 +1,167 @@
+<div class="compare-container">
+  <div class="compare-header">
+    <h1>{{ 'narrator.compare' | translate }}</h1>
+    <div class="selector-row">
+      <mat-form-field appearance="outline" class="narrator-selector">
+        <mat-label>{{ 'narrator.selectNarrator' | translate }} A</mat-label>
+        <input matInput
+               [matAutocomplete]="autoA"
+               [(ngModel)]="searchA"
+               (ngModelChange)="filterNarrators($event, 'a')">
+        <mat-autocomplete #autoA="matAutocomplete" (optionSelected)="selectNarrator($event, 'a')" [displayWith]="displayNarrator.bind(this)">
+          <mat-option *ngFor="let n of filteredNarratorsA" [value]="n.index">
+            <span class="option-ar arabic" lang="ar">{{ n.titles?.ar }}</span>
+            <span class="option-en" *ngIf="n.titles?.en"> ({{ n.titles.en }})</span>
+            <span class="option-count"> - {{ n.narrations }} {{ 'common.verses' | translate }}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="narrator-selector">
+        <mat-label>{{ 'narrator.selectNarrator' | translate }} B</mat-label>
+        <input matInput
+               [matAutocomplete]="autoB"
+               [(ngModel)]="searchB"
+               (ngModelChange)="filterNarrators($event, 'b')">
+        <mat-autocomplete #autoB="matAutocomplete" (optionSelected)="selectNarrator($event, 'b')" [displayWith]="displayNarrator.bind(this)">
+          <mat-option *ngFor="let n of filteredNarratorsB" [value]="n.index">
+            <span class="option-ar arabic" lang="ar">{{ n.titles?.ar }}</span>
+            <span class="option-en" *ngIf="n.titles?.en"> ({{ n.titles.en }})</span>
+            <span class="option-count"> - {{ n.narrations }} {{ 'common.verses' | translate }}</span>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <!-- Side-by-side cards -->
+  <div class="compare-cards" *ngIf="narratorA && narratorB">
+    <!-- Narrator A card -->
+    <div class="compare-card">
+      <div class="card-header">
+        <h2 class="ar-name arabic" lang="ar">{{ narratorA.titles?.ar }}</h2>
+        <p class="en-name" *ngIf="narratorA.biography?.english_transliteration">
+          {{ narratorA.biography.english_transliteration }}
+        </p>
+      </div>
+
+      <div class="stats-pills">
+        <span class="stat-pill narrations-pill">
+          {{ narratorA.verse_paths?.length || 0 | number }} {{ 'narrator.totalNarrations' | translate | lowercase }}
+        </span>
+        <span class="stat-pill reliable" *ngIf="narratorA.biography?.reliability">
+          {{ narratorA.biography.reliability }}
+        </span>
+      </div>
+
+      <!-- Biography -->
+      <div class="bio-section" *ngIf="narratorA.biography as bio">
+        <div class="bio-field" *ngIf="bio.era">
+          <span class="bio-label">{{ 'narrator.era' | translate }}:</span>
+          <span class="bio-value">{{ bio.era }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.birth_date">
+          <span class="bio-label">{{ 'narrator.birthDate' | translate }}:</span>
+          <span class="bio-value">{{ bio.birth_date }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.death_date">
+          <span class="bio-label">{{ 'narrator.deathDate' | translate }}:</span>
+          <span class="bio-value">{{ bio.death_date }}</span>
+        </div>
+      </div>
+
+      <!-- Book distribution -->
+      <div class="distribution-section" *ngIf="bookDistributionA.length > 0">
+        <h3>{{ 'narrator.bookDistribution' | translate }}</h3>
+        <div class="distribution-bars">
+          <div class="distribution-bar-row" *ngFor="let bd of bookDistributionA">
+            <span class="bar-label">{{ bd.displayName }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="bd.percentage"></div>
+            </div>
+            <span class="bar-count">{{ bd.count | number }}</span>
+          </div>
+        </div>
+      </div>
+
+      <a mat-button class="view-profile-btn"
+         [routerLink]="['/people/narrators/' + narratorA.index]">
+        {{ 'narrator.viewProfile' | translate }}
+      </a>
+    </div>
+
+    <!-- Narrator B card -->
+    <div class="compare-card">
+      <div class="card-header">
+        <h2 class="ar-name arabic" lang="ar">{{ narratorB.titles?.ar }}</h2>
+        <p class="en-name" *ngIf="narratorB.biography?.english_transliteration">
+          {{ narratorB.biography.english_transliteration }}
+        </p>
+      </div>
+
+      <div class="stats-pills">
+        <span class="stat-pill narrations-pill">
+          {{ narratorB.verse_paths?.length || 0 | number }} {{ 'narrator.totalNarrations' | translate | lowercase }}
+        </span>
+        <span class="stat-pill reliable" *ngIf="narratorB.biography?.reliability">
+          {{ narratorB.biography.reliability }}
+        </span>
+      </div>
+
+      <!-- Biography -->
+      <div class="bio-section" *ngIf="narratorB.biography as bio">
+        <div class="bio-field" *ngIf="bio.era">
+          <span class="bio-label">{{ 'narrator.era' | translate }}:</span>
+          <span class="bio-value">{{ bio.era }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.birth_date">
+          <span class="bio-label">{{ 'narrator.birthDate' | translate }}:</span>
+          <span class="bio-value">{{ bio.birth_date }}</span>
+        </div>
+        <div class="bio-field" *ngIf="bio.death_date">
+          <span class="bio-label">{{ 'narrator.deathDate' | translate }}:</span>
+          <span class="bio-value">{{ bio.death_date }}</span>
+        </div>
+      </div>
+
+      <!-- Book distribution -->
+      <div class="distribution-section" *ngIf="bookDistributionB.length > 0">
+        <h3>{{ 'narrator.bookDistribution' | translate }}</h3>
+        <div class="distribution-bars">
+          <div class="distribution-bar-row" *ngFor="let bd of bookDistributionB">
+            <span class="bar-label">{{ bd.displayName }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" [style.width.%]="bd.percentage"></div>
+            </div>
+            <span class="bar-count">{{ bd.count | number }}</span>
+          </div>
+        </div>
+      </div>
+
+      <a mat-button class="view-profile-btn"
+         [routerLink]="['/people/narrators/' + narratorB.index]">
+        {{ 'narrator.viewProfile' | translate }}
+      </a>
+    </div>
+  </div>
+
+  <!-- Shared narrations section -->
+  <section class="shared-section" *ngIf="sharedNarrations.length > 0">
+    <h3>{{ 'narrator.sharedNarrations' | translate }} ({{ sharedNarrations.length }})</h3>
+    <div class="shared-list">
+      <div *ngFor="let path of getVisibleShared()" class="shared-item">
+        <app-path-link [path]="path"></app-path-link>
+      </div>
+    </div>
+    <button *ngIf="sharedNarrations.length > 20" mat-button class="show-more-btn"
+            (click)="showAllShared = !showAllShared">
+      {{ showAllShared ? ('narrator.showLess' | translate) : ('narrator.showAll' | translate) + ' ' + sharedNarrations.length }}
+    </button>
+  </section>
+
+  <!-- Prompt to select narrators -->
+  <div class="select-prompt" *ngIf="!narratorA || !narratorB">
+    <mat-icon>compare_arrows</mat-icon>
+    <p>{{ 'narrator.selectNarrator' | translate }}</p>
+  </div>
+</div>

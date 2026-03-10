@@ -24,6 +24,11 @@
     color: var(--text-secondary, rgba(0, 0, 0, 0.7));
     margin: 0;
   }
+
+  .compare-btn {
+    margin-top: 0.75rem;
+    color: var(--link-color, #1976d2);
+  }
 }
 
 // Stats summary (NAR-02)

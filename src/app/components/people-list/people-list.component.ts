@@ -36,13 +36,6 @@ export interface FeaturedImam {
   narrations: number;
 }
 
-@Component({
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'app-people-list',
-    templateUrl: './people-list.component.html',
-    styleUrls: ['./people-list.component.scss'],
-    standalone: false
-})
 export interface NarratorFilter {
   text: string;
   minNarrations?: number;
@@ -54,6 +47,13 @@ export interface NarratorFilter {
   category?: string;
 }
 
+@Component({
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-people-list',
+    templateUrl: './people-list.component.html',
+    styleUrls: ['./people-list.component.scss'],
+    standalone: false
+})
 export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   narrators$: Observable<NarratorMetadata[]> = inject(Store).select(PeopleState.getEnrichedNarratorsList);

@@ -91,7 +91,7 @@ a:hover {
   font-size: 13px;
   color: #fff;
   background-color: var(--crumb-bg);
-  padding: 3px 0px 5px 5px;
+  padding: 3px 0 var(--space-xs) var(--space-xs);
 }
 
 :host-context([dir="rtl"]) .crumbs {
@@ -107,6 +107,7 @@ a:hover {
   min-width: 70%;
   max-width: 98%;
   margin: 0 auto;
+  padding: var(--space-sm) 0;
   color: var(--text-primary);
 }
 
@@ -115,9 +116,9 @@ a:hover {
 	background-image: url(/assets/banner_small.png);
 	background-repeat: repeat-x;
   width: 100%;
-  margin-top: 10px;
+  margin-top: var(--space-md);
   font-size: 20px;
-  padding-top: 4px;
+  padding-top: var(--space-xs);
 	font-family: "C&L", Helvetica, Verdana, Arial;
 	color: #fff;
 	height: 30px;

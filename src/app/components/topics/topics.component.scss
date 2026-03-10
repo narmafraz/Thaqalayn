@@ -2,8 +2,8 @@
   display: flex;
   border-radius: 5px;
   color: var(--text-secondary, #666);
-  margin-top: 15px;
-  padding: 10px;
+  margin-top: var(--space-base, 16px);
+  padding: var(--space-md, 12px);
   flex-direction: column;
 }
 
@@ -91,7 +91,9 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
-    font-size: 20px;
+    font-size: var(--type-subheading-size);
+    font-weight: var(--type-subheading-weight);
+    line-height: var(--type-subheading-line-height);
   }
 }
 
@@ -102,26 +104,33 @@
 .topic-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 12px;
+  gap: var(--space-md, 12px);
 }
 
 .topic-card {
-  display: block;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-base, 16px);
   border: 1px solid var(--border-color, #e0e0e0);
   border-radius: 8px;
   text-decoration: none;
   color: inherit;
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
 
   &:hover {
     border-color: var(--primary-color, #673ab7);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   }
 }
 
 .topic-title {
-  font-size: 15px;
+  font-size: var(--type-body-size);
   font-weight: 500;
   margin-bottom: 4px;
   color: var(--text-primary, #333);
@@ -137,8 +146,9 @@
 }
 
 .topic-meta {
-  font-size: 12px;
+  font-size: var(--type-caption-size);
   color: var(--text-muted, #999);
+  margin-top: auto;
 }
 
 // AI Topics tab
@@ -162,7 +172,8 @@
   cursor: pointer;
   padding: 12px 8px;
   border-radius: 8px;
-  font-size: 18px;
+  font-size: var(--type-subheading-size);
+  font-weight: var(--type-subheading-weight);
   margin: 0;
   transition: background 0.15s;
 
@@ -197,10 +208,16 @@
   border-radius: 6px;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
 
   &:hover {
     border-color: var(--primary-color, #673ab7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    transform: translateY(0);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   }
 }
@@ -265,6 +282,17 @@
     color: white;
     opacity: 1;
     margin-bottom: 0;
+  }
+}
+
+// Dark theme shadows
+:host-context(body.dark-theme) {
+  .topic-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  .ai-subtopic-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   }
 }
 

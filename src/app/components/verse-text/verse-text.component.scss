@@ -3,15 +3,15 @@
 }
 
 .translation {
-  padding-left:15px;
-  padding-right:15px;
-	padding-top: 10px;
+  padding-left: var(--space-base);
+  padding-right: var(--space-base);
+	padding-top: var(--space-verse-gap);
 }
 
 .verseText {
-  padding-right: 15px;
-  padding-left: 15px;
-	padding-top: 10px;
+  padding-right: var(--space-base);
+  padding-left: var(--space-base);
+	padding-top: var(--space-verse-gap);
   word-break: break-word;
   overflow-wrap: break-word;
 }
@@ -35,7 +35,7 @@
 .side-by-side {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--space-base);
 
   .translation-col-2 {
     border-left: 1px solid var(--border-color, #e0e0e0);
@@ -195,7 +195,7 @@
 }
 
 .word-translation {
-  font-size: 11px;
+  font-size: var(--type-overline-size);
   color: var(--text-primary, #333);
   text-align: center;
   max-width: 100px;
@@ -205,8 +205,8 @@
 }
 
 .word-pos {
-  font-size: 9px;
-  font-weight: 600;
+  font-size: var(--type-overline-size);
+  font-weight: var(--type-overline-weight);
   text-transform: uppercase;
   margin-top: 2px;
 }
@@ -262,9 +262,9 @@
 }
 
 .chunk-label {
-  font-size: 9px;
+  font-size: var(--type-overline-size);
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: var(--type-overline-weight);
   color: var(--text-secondary, #999);
   letter-spacing: 0.5px;
   margin-bottom: 4px;

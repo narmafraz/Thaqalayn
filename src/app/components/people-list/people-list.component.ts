@@ -43,6 +43,17 @@ export interface FeaturedImam {
     styleUrls: ['./people-list.component.scss'],
     standalone: false
 })
+export interface NarratorFilter {
+  text: string;
+  minNarrations?: number;
+  maxNarrations?: number;
+  minFrom?: number;
+  maxFrom?: number;
+  minTo?: number;
+  maxTo?: number;
+  category?: string;
+}
+
 export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   narrators$: Observable<NarratorMetadata[]> = inject(Store).select(PeopleState.getEnrichedNarratorsList);
@@ -52,6 +63,21 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
   readonly SMALL_SCREEN_ALIAS = 'xs';
   filterValue = '';
   featuredImams: FeaturedImam[] = [];
+
+  // ADV-05: Advanced filter state
+  showFilters = false;
+  minNarrations: number | null = null;
+  maxNarrations: number | null = null;
+  minFrom: number | null = null;
+  maxFrom: number | null = null;
+  minTo: number | null = null;
+  maxTo: number | null = null;
+
+  // ADV-06: Category chips
+  selectedCategory = 'all';
+  allNarrators: NarratorMetadata[] = [];
+  imamCount = 0;
+  topCount = 0;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -111,15 +137,37 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
     this.sort.direction = 'desc';
 
     this.dataSource.sort = this.sort;
-    this.dataSource.filterPredicate = (data: NarratorMetadata, filter: string) => {
-      const searchStr = ((data.titles.ar || '') + ' ' + (data.titles.en || '') + ' ' + data.index).toLowerCase();
-      return searchStr.includes(filter);
+    this.dataSource.filterPredicate = (data: NarratorMetadata, filterStr: string) => {
+      if (!filterStr) return true;
+      try {
+        const f: NarratorFilter = JSON.parse(filterStr);
+        // Text match
+        if (f.text) {
+          const text = f.text.toLowerCase();
+          const searchStr = ((data.titles.ar || '') + ' ' + (data.titles.en || '') + ' ' + data.index).toLowerCase();
+          if (!searchStr.includes(text)) return false;
+        }
+        // Numeric range filters
+        if (f.minNarrations && data.narrations < f.minNarrations) return false;
+        if (f.maxNarrations && data.narrations > f.maxNarrations) return false;
+        if (f.minFrom && data.narrated_from < f.minFrom) return false;
+        if (f.maxFrom && data.narrated_from > f.maxFrom) return false;
+        if (f.minTo && data.narrated_to < f.minTo) return false;
+        if (f.maxTo && data.narrated_to > f.maxTo) return false;
+        return true;
+      } catch {
+        // Fallback to simple text filter for backward compatibility
+        const searchStr = ((data.titles.ar || '') + ' ' + (data.titles.en || '') + ' ' + data.index).toLowerCase();
+        return searchStr.includes(filterStr);
+      }
     };
 
     const subscription = this.narrators$.pipe(
       filter(x => x !== undefined))
       .subscribe((narratorMetadatas) => {
-        this.dataSource.data = narratorMetadatas;
+        this.allNarrators = narratorMetadatas;
+        this.computeCategoryCounts(narratorMetadatas);
+        this.applyCategoryFilter(narratorMetadatas);
         this.computeFeaturedImams(narratorMetadatas);
       });
     this.subscriptions.push(subscription);
@@ -181,9 +229,72 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   applyFilter(filterValue: string) {
-    filterValue = filterValue.trim(); // Remove whitespace
-    filterValue = filterValue.toLowerCase(); // Datasource defaults to lowercase matches
-    this.dataSource.filter = filterValue;
+    const f: NarratorFilter = {
+      text: (filterValue || '').trim().toLowerCase(),
+      minNarrations: this.minNarrations || undefined,
+      maxNarrations: this.maxNarrations || undefined,
+      minFrom: this.minFrom || undefined,
+      maxFrom: this.maxFrom || undefined,
+      minTo: this.minTo || undefined,
+      maxTo: this.maxTo || undefined,
+    };
+    this.dataSource.filter = JSON.stringify(f);
+  }
+
+  applyAdvancedFilter(): void {
+    this.paginator.pageIndex = 0;
+    this.applyFilter(this.filterValue);
+  }
+
+  toggleFilters(): void {
+    this.showFilters = !this.showFilters;
+  }
+
+  clearFilters(): void {
+    this.minNarrations = null;
+    this.maxNarrations = null;
+    this.minFrom = null;
+    this.maxFrom = null;
+    this.minTo = null;
+    this.maxTo = null;
+    this.applyAdvancedFilter();
+  }
+
+  get hasActiveFilters(): boolean {
+    return !!(this.minNarrations || this.maxNarrations || this.minFrom || this.maxFrom || this.minTo || this.maxTo);
+  }
+
+  // ADV-06: Category filtering
+  onCategoryChange(category: string): void {
+    this.selectedCategory = category;
+    this.applyCategoryFilter(this.allNarrators);
+    // Re-apply text/numeric filters on top
+    this.applyAdvancedFilter();
+  }
+
+  private applyCategoryFilter(narrators: NarratorMetadata[]): void {
+    if (!narrators) return;
+    switch (this.selectedCategory) {
+      case 'imams':
+        this.dataSource.data = narrators.filter(n => +n.index in IMAM_IDS);
+        break;
+      case 'top':
+        this.dataSource.data = narrators.filter(n => n.narrations >= 500);
+        break;
+      default:
+        this.dataSource.data = narrators;
+        break;
+    }
+  }
+
+  private computeCategoryCounts(narrators: NarratorMetadata[]): void {
+    if (!narrators) {
+      this.imamCount = 0;
+      this.topCount = 0;
+      return;
+    }
+    this.imamCount = narrators.filter(n => +n.index in IMAM_IDS).length;
+    this.topCount = narrators.filter(n => n.narrations >= 500).length;
   }
 
   keyAscOrder = (a: KeyValue<number, string>, b: KeyValue<number, string>): number => {

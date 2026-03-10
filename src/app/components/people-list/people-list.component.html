@@ -24,15 +24,67 @@
       </div>
     </section>
 
+    <!-- ADV-06: Category chips -->
+    <div class="category-chips">
+      <button class="category-chip" [class.active]="selectedCategory === 'all'" (click)="onCategoryChange('all')">
+        {{ 'narrator.categoryAll' | translate }} ({{ allNarrators.length }})
+      </button>
+      <button class="category-chip" [class.active]="selectedCategory === 'imams'" (click)="onCategoryChange('imams')">
+        {{ 'narrator.categoryImams' | translate }} ({{ imamCount }})
+      </button>
+      <button class="category-chip" [class.active]="selectedCategory === 'top'" (click)="onCategoryChange('top')">
+        {{ 'narrator.categoryTop' | translate }} ({{ topCount }})
+      </button>
+    </div>
+
     <div class="content">
       <div class="mat-elevation-z8">
-        <mat-form-field class="filter-field">
-          <!-- <mat-label>Filter</mat-label> -->
-          <input matInput [placeholder]="'search.filter' | translate" [(ngModel)]="filterValue" #filterInput>
-          <button *ngIf="filterValue" matSuffix mat-icon-button [attr.aria-label]="'common.clear' | translate" [matTooltip]="'common.clear' | translate" (click)="filterValue=''">
-            <mat-icon>close</mat-icon>
+        <div class="filter-row">
+          <mat-form-field class="filter-field">
+            <input matInput [placeholder]="'search.filter' | translate" [(ngModel)]="filterValue" #filterInput>
+            <button *ngIf="filterValue" matSuffix mat-icon-button [attr.aria-label]="'common.clear' | translate" [matTooltip]="'common.clear' | translate" (click)="filterValue=''; applyAdvancedFilter()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+          <button class="filter-toggle-btn" (click)="toggleFilters()" [class.active]="showFilters || hasActiveFilters"
+                  [matTooltip]="'narrator.filters' | translate">
+            <mat-icon>tune</mat-icon>
           </button>
-        </mat-form-field>
+        </div>
+
+        <!-- ADV-05: Advanced filter panel -->
+        <div class="advanced-filters" *ngIf="showFilters">
+          <div class="filter-grid">
+            <div class="filter-group">
+              <label>{{ 'narrator.minNarrations' | translate }}</label>
+              <input type="number" [(ngModel)]="minNarrations" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+            </div>
+            <div class="filter-group">
+              <label>{{ 'narrator.maxNarrations' | translate }}</label>
+              <input type="number" [(ngModel)]="maxNarrations" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+            </div>
+            <div class="filter-group">
+              <label>{{ 'narrator.minFrom' | translate }}</label>
+              <input type="number" [(ngModel)]="minFrom" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+            </div>
+            <div class="filter-group">
+              <label>{{ 'narrator.maxFrom' | translate }}</label>
+              <input type="number" [(ngModel)]="maxFrom" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+            </div>
+            <div class="filter-group">
+              <label>{{ 'narrator.minTo' | translate }}</label>
+              <input type="number" [(ngModel)]="minTo" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+            </div>
+            <div class="filter-group">
+              <label>{{ 'narrator.maxTo' | translate }}</label>
+              <input type="number" [(ngModel)]="maxTo" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+            </div>
+          </div>
+          <button *ngIf="hasActiveFilters" class="clear-filters-btn" (click)="clearFilters()">
+            <mat-icon>clear_all</mat-icon>
+            {{ 'narrator.clearFilters' | translate }}
+          </button>
+        </div>
 
         <table *ngIf="(displayedColumns$ | async) as displayedColumns" mat-table class="full-width-table" [dataSource]="dataSource" matSort
           matSortActive="narrations" matSortDirection="desc"

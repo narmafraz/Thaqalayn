@@ -204,9 +204,148 @@
   text-align: center;
 }
 
+// ADV-06: Category chips
+.category-chips {
+  display: flex;
+  gap: 8px;
+  padding: 8px 10px;
+  flex-wrap: wrap;
+}
+
+.category-chip {
+  background: none;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 16px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--text-secondary, #666);
+  transition: all 0.15s ease;
+
+  &:hover {
+    border-color: var(--link-color, #673ab7);
+    color: var(--link-color, #673ab7);
+  }
+
+  &.active {
+    background: var(--link-color, #673ab7);
+    border-color: var(--link-color, #673ab7);
+    color: #fff;
+  }
+}
+
+// ADV-05: Filter row with toggle
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 10px;
+}
+
+.filter-toggle-btn {
+  background: none;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-secondary, #666);
+  transition: all 0.15s;
+  flex-shrink: 0;
+
+  &:hover {
+    border-color: var(--link-color, #673ab7);
+    color: var(--link-color, #673ab7);
+  }
+
+  &.active {
+    color: var(--link-color, #673ab7);
+    border-color: var(--link-color, #673ab7);
+    background: rgba(103, 58, 183, 0.05);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// ADV-05: Advanced filter panel
+.advanced-filters {
+  padding: 8px 16px 16px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #666);
+    font-weight: 500;
+  }
+}
+
+.filter-number-input {
+  padding: 6px 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  background: var(--card-bg, #fff);
+  color: var(--text-primary, #333);
+  width: 100%;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: var(--link-color, #673ab7);
+  }
+}
+
+.clear-filters-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 12px;
+  background: none;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--text-secondary, #666);
+
+  &:hover {
+    border-color: #d32f2f;
+    color: #d32f2f;
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
 @media (max-width: 600px) {
   .filter-field {
     padding: 10px 16px;
+  }
+
+  .filter-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .filter-row {
+    padding-right: 4px;
   }
 
   .mat-mdc-cell {

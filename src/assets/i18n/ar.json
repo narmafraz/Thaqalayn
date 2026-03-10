@@ -85,7 +85,19 @@
     "bookDistribution": "توزيع الكتب",
     "featuredImams": "أهل البيت",
     "imam": "إمام",
-    "viewProfile": "عرض الملف الشخصي"
+    "viewProfile": "عرض الملف الشخصي",
+    "chainDiagram": "مخطط سلسلة الرواة",
+    "filters": "تصفية",
+    "clearFilters": "مسح التصفية",
+    "minNarrations": "الحد الأدنى للروايات",
+    "maxNarrations": "الحد الأقصى للروايات",
+    "minFrom": "الحد الأدنى للرواية عن",
+    "maxFrom": "الحد الأقصى للرواية عن",
+    "minTo": "الحد الأدنى للرواية إلى",
+    "maxTo": "الحد الأقصى للرواية إلى",
+    "categoryAll": "الكل",
+    "categoryImams": "الأئمة",
+    "categoryTop": "كبار الرواة"
   },
   "search": {
     "filter": "تصفية",

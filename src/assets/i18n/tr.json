@@ -34,7 +34,8 @@
     "nahjDesc": "İmam Ali hutbeleri, mektupları ve sözleri",
     "sahifaDesc": "İmam Seccad duaları",
     "wasaelDesc": "Kapsamlı fıkhi hadis derlemesi",
-    "biharDesc": "Şii rivayetlerin ansiklopedisi"
+    "biharDesc": "Şii rivayetlerin ansiklopedisi",
+    "menu": "Menü"
   },
   "book": {
     "reference": "Referans",
@@ -277,6 +278,8 @@
     "shortcutHelp": "Kısayolları göster",
     "shortcutClose": "Kapat / odağı kaldır",
     "pressEscToClose": "Kapatmak için Esc'ye basın",
-    "showKeyboardShortcuts": "Klavye kısayolları"
+    "showKeyboardShortcuts": "Klavye kısayolları",
+    "title": "Ayarlar",
+    "fontSize": "Yazı boyutu"
   }
 }

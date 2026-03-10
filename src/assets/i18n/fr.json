@@ -34,7 +34,8 @@
     "nahjDesc": "Sermons, lettres et paroles de l'Imam Ali",
     "sahifaDesc": "Supplications de l'Imam al-Sajjad",
     "wasaelDesc": "Compilation complète de hadiths juridiques",
-    "biharDesc": "Encyclopédie des traditions chiites"
+    "biharDesc": "Encyclopédie des traditions chiites",
+    "menu": "Menu"
   },
   "book": {
     "reference": "Référence",
@@ -277,6 +278,8 @@
     "shortcutHelp": "Afficher les raccourcis",
     "shortcutClose": "Fermer / défocaliser",
     "pressEscToClose": "Appuyez sur Échap pour fermer",
-    "showKeyboardShortcuts": "Raccourcis clavier"
+    "showKeyboardShortcuts": "Raccourcis clavier",
+    "title": "Paramètres",
+    "fontSize": "Taille de police"
   }
 }

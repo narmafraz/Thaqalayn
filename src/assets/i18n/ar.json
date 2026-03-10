@@ -34,7 +34,8 @@
     "nahjDesc": "خطب ورسائل وحكم الإمام علي (ع)",
     "sahifaDesc": "أدعية الإمام السجاد (ع)",
     "wasaelDesc": "موسوعة حديثية فقهية شاملة",
-    "biharDesc": "موسوعة الأحاديث الشيعية"
+    "biharDesc": "موسوعة الأحاديث الشيعية",
+    "menu": "القائمة"
   },
   "book": {
     "reference": "المرجع",
@@ -289,6 +290,8 @@
     "shortcutHelp": "عرض الاختصارات",
     "shortcutClose": "إغلاق / إلغاء التركيز",
     "pressEscToClose": "اضغط Esc للإغلاق",
-    "showKeyboardShortcuts": "اختصارات لوحة المفاتيح"
+    "showKeyboardShortcuts": "اختصارات لوحة المفاتيح",
+    "title": "الإعدادات",
+    "fontSize": "حجم الخط"
   }
 }

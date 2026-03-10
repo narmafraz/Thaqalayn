@@ -34,7 +34,8 @@
     "nahjDesc": "خطبه‌ها، نامه‌ها و حکمت‌های امام علی (ع)",
     "sahifaDesc": "دعاهای امام سجاد (ع)",
     "wasaelDesc": "مجموعه جامع احادیث فقهی",
-    "biharDesc": "دایره‌المعارف احادیث شیعه"
+    "biharDesc": "دایره‌المعارف احادیث شیعه",
+    "menu": "منو"
   },
   "book": {
     "reference": "مرجع",
@@ -277,6 +278,8 @@
     "shortcutHelp": "نمایش میانبرها",
     "shortcutClose": "بستن / لغو تمرکز",
     "pressEscToClose": "Esc را فشار دهید تا بسته شود",
-    "showKeyboardShortcuts": "میانبرهای صفحه‌کلید"
+    "showKeyboardShortcuts": "میانبرهای صفحه‌کلید",
+    "title": "تنظیمات",
+    "fontSize": "اندازه فونت"
   }
 }

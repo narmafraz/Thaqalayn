@@ -43,7 +43,8 @@
     "nahjDesc": "Sermons, letters, and sayings of Imam Ali",
     "sahifaDesc": "Supplications of Imam al-Sajjad",
     "wasaelDesc": "Comprehensive jurisprudential hadith compilation",
-    "biharDesc": "Encyclopedic collection of Shia traditions"
+    "biharDesc": "Encyclopedic collection of Shia traditions",
+    "menu": "Menu"
   },
   "book": {
     "reference": "Reference",
@@ -225,9 +226,9 @@
   "language": {
     "picker": "Language",
     "en": "English",
-    "ar": "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
-    "fa": "\u0641\u0627\u0631\u0633\u06cc",
-    "fr": "Fran\u00e7ais"
+    "ar": "العربية",
+    "fa": "فارسی",
+    "fr": "Français"
   },
   "dailyVerse": {
     "title": "Verse of the Day",
@@ -302,6 +303,8 @@
     "shortcutHelp": "Show shortcuts",
     "shortcutClose": "Close / unfocus",
     "pressEscToClose": "Press Esc to close",
-    "showKeyboardShortcuts": "Keyboard shortcuts"
+    "showKeyboardShortcuts": "Keyboard shortcuts",
+    "title": "Settings",
+    "fontSize": "Font size"
   }
 }

@@ -34,7 +34,8 @@
     "nahjDesc": "Predigten, Briefe und Aussprüche von Imam Ali",
     "sahifaDesc": "Bittgebete von Imam al-Sajjad",
     "wasaelDesc": "Umfassende juristische Hadith-Sammlung",
-    "biharDesc": "Enzyklopädie schiitischer Überlieferungen"
+    "biharDesc": "Enzyklopädie schiitischer Überlieferungen",
+    "menu": "Menü"
   },
   "book": {
     "reference": "Referenz",
@@ -277,6 +278,8 @@
     "shortcutHelp": "Tastenkombinationen anzeigen",
     "shortcutClose": "Schließen / Fokus entfernen",
     "pressEscToClose": "Esc drücken zum Schließen",
-    "showKeyboardShortcuts": "Tastenkombinationen"
+    "showKeyboardShortcuts": "Tastenkombinationen",
+    "title": "Einstellungen",
+    "fontSize": "Schriftgröße"
   }
 }

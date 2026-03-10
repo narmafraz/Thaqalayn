@@ -34,7 +34,8 @@
     "nahjDesc": "Khotbah, surat, dan ucapan Imam Ali",
     "sahifaDesc": "Doa-doa Imam al-Sajjad",
     "wasaelDesc": "Kompilasi hadis fikih yang komprehensif",
-    "biharDesc": "Ensiklopedia tradisi Syiah"
+    "biharDesc": "Ensiklopedia tradisi Syiah",
+    "menu": "Menu"
   },
   "book": {
     "reference": "Referensi",
@@ -277,6 +278,8 @@
     "shortcutHelp": "Tampilkan pintasan",
     "shortcutClose": "Tutup / lepas fokus",
     "pressEscToClose": "Tekan Esc untuk menutup",
-    "showKeyboardShortcuts": "Pintasan keyboard"
+    "showKeyboardShortcuts": "Pintasan keyboard",
+    "title": "Pengaturan",
+    "fontSize": "Ukuran huruf"
   }
 }

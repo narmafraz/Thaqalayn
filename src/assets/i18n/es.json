@@ -34,7 +34,8 @@
     "nahjDesc": "Sermones, cartas y dichos del Imam Ali",
     "sahifaDesc": "Súplicas del Imam al-Sajjad",
     "wasaelDesc": "Compilación completa de hadices jurídicos",
-    "biharDesc": "Enciclopedia de tradiciones chiíes"
+    "biharDesc": "Enciclopedia de tradiciones chiíes",
+    "menu": "Menú"
   },
   "book": {
     "reference": "Referencia",
@@ -277,6 +278,8 @@
     "shortcutHelp": "Mostrar atajos",
     "shortcutClose": "Cerrar / desenfocar",
     "pressEscToClose": "Presione Esc para cerrar",
-    "showKeyboardShortcuts": "Atajos de teclado"
+    "showKeyboardShortcuts": "Atajos de teclado",
+    "title": "Configuración",
+    "fontSize": "Tamaño de fuente"
   }
 }

@@ -34,7 +34,8 @@
     "nahjDesc": "امام علی (ع) کے خطبات، خطوط اور اقوال",
     "sahifaDesc": "امام سجاد (ع) کی دعائیں",
     "wasaelDesc": "فقہی احادیث کا جامع مجموعہ",
-    "biharDesc": "شیعہ روایات کا دائرۃ المعارف"
+    "biharDesc": "شیعہ روایات کا دائرۃ المعارف",
+    "menu": "مینیو"
   },
   "book": {
     "reference": "حوالہ",
@@ -277,6 +278,8 @@
     "shortcutHelp": "شارٹ کٹس دکھائیں",
     "shortcutClose": "بند / توجہ ہٹائیں",
     "pressEscToClose": "بند کرنے کے لیے Esc دبائیں",
-    "showKeyboardShortcuts": "کی بورڈ شارٹ کٹس"
+    "showKeyboardShortcuts": "کی بورڈ شارٹ کٹس",
+    "title": "ترتیبات",
+    "fontSize": "فونٹ سائز"
   }
 }

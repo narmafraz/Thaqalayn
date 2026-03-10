@@ -34,7 +34,8 @@
     "nahjDesc": "ইমাম আলীর খুতবা, চিঠি ও বাণী",
     "sahifaDesc": "ইমাম সাজ্জাদের দোয়া সমূহ",
     "wasaelDesc": "ব্যাপক আইনশাস্ত্র হাদিস সংকলন",
-    "biharDesc": "শিয়া ঐতিহ্যের বিশ্বকোষ"
+    "biharDesc": "শিয়া ঐতিহ্যের বিশ্বকোষ",
+    "menu": "মেনু"
   },
   "book": {
     "reference": "তথ্যসূত্র",
@@ -277,6 +278,8 @@
     "shortcutHelp": "শর্টকাট দেখান",
     "shortcutClose": "বন্ধ / আনফোকাস",
     "pressEscToClose": "বন্ধ করতে Esc চাপুন",
-    "showKeyboardShortcuts": "কীবোর্ড শর্টকাট"
+    "showKeyboardShortcuts": "কীবোর্ড শর্টকাট",
+    "title": "সেটিংস",
+    "fontSize": "ফন্ট সাইজ"
   }
 }

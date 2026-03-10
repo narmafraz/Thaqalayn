@@ -34,7 +34,8 @@
     "nahjDesc": "伊玛目阿里的布道、书信和格言",
     "sahifaDesc": "伊玛目萨贾德的祈祷词",
     "wasaelDesc": "综合法学圣训汇编",
-    "biharDesc": "什叶派传统百科全书"
+    "biharDesc": "什叶派传统百科全书",
+    "menu": "菜单"
   },
   "book": {
     "reference": "引用",
@@ -277,6 +278,8 @@
     "shortcutHelp": "显示快捷键",
     "shortcutClose": "关闭 / 取消聚焦",
     "pressEscToClose": "按Esc关闭",
-    "showKeyboardShortcuts": "键盘快捷键"
+    "showKeyboardShortcuts": "键盘快捷键",
+    "title": "设置",
+    "fontSize": "字体大小"
   }
 }

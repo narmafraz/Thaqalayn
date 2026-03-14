@@ -46,6 +46,219 @@
 | New book parsers | TODO | Man La Yahduruhu al-Faqih (ThaqalaynAPI data available), Tahdhib, Istibsar |
 | Standalone components migration | TODO | Angular 19 supports standalone; NgModule→standalone migration pending |
 
+### Phase 3b: UI Polish & Layout Fixes — TODO
+
+> **Goal:** Fix visual regressions, layout bugs, and inconsistencies identified through screenshot review of the hadith reading experience (chapter-content view).
+>
+> **Date identified:** 2026-03-11
+> **Scope:** Thaqalayn (Angular) only — no data/generator changes needed
+> **Evidence:** Screenshots in `screenshots/al-kafi-1-1-1-*.png` and `screenshots/viewmode-*.png`
+
+#### 3b.1 Logo Overflow Covering Breadcrumbs — REGRESSION FIX
+
+**Priority:** P0 (broken — breadcrumb text is unreadable)
+**Root cause:** The logo image (`just-logo_small.png`, natural 255×244px) is no longer properly constrained to the 70px banner height. The `height="70%"` HTML attribute on the `<img>` in `app.component.html` is not resolving correctly against the flex container, causing the logo to render at its natural 244px height. It overflows ~174px below the banner, covering the breadcrumb bar.
+**Files:** `app.component.html` (line 7), `app.component.scss`
+**Fix:**
+1. Replace `height="70%"` with explicit CSS `max-height` matching the banner height (e.g., `max-height: 56px` or `height: 100%` with `object-fit: contain` on a parent with explicit height)
+2. Ensure the breadcrumb bar is fully visible and not overlapped by any element
+3. Test at desktop (1280px), tablet (768px), and mobile (375px) viewports
+
+#### 3b.2 View Mode Toggle Icons Cropped at Bottom
+
+**Priority:** P0 (visible clipping — ~20% of icons cut off)
+**Root cause:** `chapter-content.component.scss` sets `mat-button-toggle-group { height: 36px }` and `mat-button-toggle { height: 36px }`, but Material's inner `<button>` renders at 48px. The group's `overflow: hidden` (set by Material) clips the bottom of each icon.
+**Files:** `chapter-content.component.scss` (lines 39–45)
+**Fix:**
+1. Either remove the explicit `height: 36px` constraints and let Angular Material manage the toggle sizing naturally
+2. Or increase to `height: 48px` to accommodate the Material inner button
+3. Verify icons render fully without clipping at all viewports
+4. Verify the toggle group doesn't overlap with the hadith cards below it (add appropriate margin-bottom if needed)
+
+#### 3b.3 Author Line Shown on Every Page — Scope Restriction
+
+**Priority:** P1 (incorrect behavior — author should only appear on homepage + first book page)
+**Current behavior:** `getBookAuthor(book.index)` is called in both `chapter-content.component.ts` and `chapter-list.component.ts`, extracting the root slug from any path depth. This means "Al-Kulayni - الكليني" appears on every single chapter page (e.g., `al-kafi:1:1:1`), not just the book landing page.
+**Intended behavior:** Author name should only display on:
+- The homepage (book cards)
+- The first book page when clicking into a book (e.g., `al-kafi` or `al-kafi:1`)
+**Files:** `chapter-content.component.ts` (line 112), `chapter-list.component.ts` (line 50), `book-titles.component.html` (lines 12–15)
+**Fix:**
+1. In `chapter-content.component.ts`: Remove the author assignment entirely — chapter-content always shows deep pages (hadith lists), never the book root
+2. In `chapter-list.component.ts`: Add a depth check — only pass author when the book index has ≤2 colon-separated segments (e.g., `al-kafi` or `al-kafi:1`, but not `al-kafi:1:1`)
+3. Alternatively, determine depth from the crumb count or index segment count: `index.split(':').length <= 2`
+
+#### 3b.4 English–Arabic Chunk Horizontal Alignment
+
+**Priority:** P1 (readability — chunks from different sections overlap vertically)
+**Current behavior:** In the two-column layout (plain/paragraph view modes), English text on the left and Arabic text on the right are placed independently. When an English translation is longer than its corresponding Arabic chunk, the next Arabic chunk starts at a different vertical position than the next English chunk. This creates visual misalignment where it's unclear which English text corresponds to which Arabic text.
+**Files:** `verse-text.component.html`, `verse-text.component.scss`, `chapter-content.component.scss`
+**Fix approach:**
+1. Each ISNAD/BODY chunk pair (English left + Arabic right) should be in the same row container, so they share a vertical baseline
+2. Use CSS Grid or Flexbox rows where each row contains one chunk pair: `[English chunk | Arabic chunk]`
+3. The row should expand to the height of its tallest child, preventing overlap with the next chunk
+4. This may require restructuring the template from two independent columns to paired rows
+5. Test with varying text lengths: short hadith (1 line), medium (5–10 lines), long (20+ lines where English is much longer than Arabic)
+
+#### 3b.5 ISNAD/BODY Labels Styling
+
+**Priority:** P2 (cosmetic — labels look like debug output)
+**Current behavior:** "ISNAD" and "BODY" appear as plain uppercase gray text, resembling raw data labels rather than polished UI elements.
+**Fix options (choose one):**
+1. **Subtle badge style:** Small rounded pill with muted background (similar to the topic tags but more subdued), e.g., light gray background with 11px font
+2. **Icon + label:** Small Material icon (e.g., `link` for ISNAD, `article` for BODY) with smaller text beside it
+3. **Colored left border only:** Remove the text labels entirely and use color-coded left borders (e.g., teal for ISNAD, purple for BODY) with a legend at the top
+4. Keep current style but reduce font size to 10px and use letter-spacing for a more refined uppercase look
+
+#### 3b.6 Jump-to-Hadith Dropdown Placement
+
+**Priority:** P2 (usability — current placement is awkward)
+**Current behavior:** The dropdown sits alone above the view mode toolbar in a sticky container. On mobile it truncates to "Jump to h...". It occupies vertical space that pushes content down.
+**Files:** `chapter-content.component.html` (lines 4–16), `chapter-content.component.scss` (lines 1–21)
+**Candidate placements to evaluate:**
+1. **Inside the header/toolbar row** — Merge into the same row as "View mode:" toggle, right-aligned. Saves a full row of vertical space. Test: does it fit on mobile?
+2. **Sticky in the breadcrumb bar** — Add to the right side of the breadcrumb area so it's always visible during scrolling without a dedicated sticky row
+3. **Floating action button (FAB)** — Bottom-right floating button that opens a dropdown overlay. Zero permanent space cost. But may feel out of place.
+4. **Inside the chapter title card** — Place as a compact control within the title/description card area, which is already large and underutilized
+5. **Current placement but styled better** — Keep sticky top but reduce padding, use a compact chip/button style instead of a full mat-form-field
+
+**Recommendation:** Option 1 (merge with view mode toolbar row) for desktop; on mobile, move it below the toolbar as a full-width compact select.
+
+#### 3b.7 View Mode Inconsistencies
+
+**Priority:** P2 (confusing — modes look identical or have layout issues)
+**Findings from testing all 4 modes:**
+
+| Mode | Icon | Observation |
+|------|------|-------------|
+| **Plain** | `subject` | Default. Two-column: English left with ISNAD/BODY labels + Arabic right. Works well for short/medium hadiths. |
+| **Word-by-word** | `grid_on` | Shows word grid with POS tags on the right, narrative English + summary on the left. Good but very wide — horizontal scroll possible on narrow screens. |
+| **Paragraph** | `view_agenda` | Visually **identical** to Plain on this chapter. Users cannot tell them apart. The distinction (if any) is unclear. |
+| **Combined** | `dashboard` | English body text on left, word grid on right. Compact but word grid can be cramped. |
+
+**Issues to fix:**
+1. **Plain vs Paragraph look identical** — Either make them visually distinct (e.g., Paragraph mode merges ISNAD+BODY into a single flowing paragraph without labels) or remove Paragraph mode entirely to reduce confusion
+2. **Word-by-word on narrow viewports** — The word grid cells may need to reflow or reduce column count on mobile. Test at 375px width.
+3. **No visual indicator of active mode** — The checkmark overlay on the toggle is very subtle. Consider highlighting the active toggle with a background color or underline.
+4. **Mode persistence** — Verify that switching modes is persisted in localStorage (via `AiPreferencesService`) and restored on revisit
+5. **Modes only shown for AI content** — The toolbar appears only when `hasAnyAiContent` is true. This is correct but should be documented — users may wonder why some chapters have the toolbar and others don't.
+
+#### 3b.8 Hadith Card Boundaries
+
+**Priority:** P2 (readability — hard to tell where one hadith ends and the next begins)
+**Current behavior:** Hadiths have a left border accent but no clear top/bottom separation. When scrolling through many hadiths, the boundary between consecutive hadiths is ambiguous, especially between the topic tags / action icons of one hadith and the ISNAD label of the next.
+**Fix options:**
+1. Add a horizontal divider (`<mat-divider>`) between hadith cards
+2. Add subtle alternating background colors (e.g., white / very light gray)
+3. Add more margin/padding between cards (currently the gap may be too tight)
+4. Wrap each hadith in a `mat-card` with slight elevation for clear containment
+
+#### 3b.9 PWA Install Banner — No Changes Needed
+
+**Priority:** N/A (not an issue after investigation)
+**Finding:** The install banner is driven by the browser's `beforeinstallprompt` event and only shows when the browser offers installation. It has no dismiss button by design — if the user doesn't install, the banner reappears on next visit via the browser event. The update banner (separate) already has a dismiss button. Adding a dismiss to the install banner would risk users never seeing it again, with no way to get it back since the `beforeinstallprompt` event is browser-controlled and not re-triggerable from JS. Current behavior is correct.
+
+#### 3b.10 Previous/Next Chapter Navigation Visibility
+
+**Priority:** P3 (usability — nav arrows not visible in viewport)
+**Current behavior:** If prev/next navigation exists, it may be outside the viewport or not prominent enough. Users rely on breadcrumbs to navigate between chapters.
+**Fix:** Ensure prev/next arrows are visible either:
+1. In the sticky header/toolbar area
+2. At both the top and bottom of the chapter content
+3. As floating side arrows (← →) at viewport edges
+
+---
+
+#### 3b.11 CRITICAL: Mobile Search Bar Blocks Hamburger Menu Button
+
+**Priority:** P0 (the hamburger menu is completely non-functional on mobile)
+**Root cause:** In the mobile header, `.header-mobile-controls` uses `flex: 1; min-width: 0; gap: 4px` and the `.mobile-header-search` inside it has `flex: 1; min-width: 0; max-width: 280px`. At 375px, the flex layout allocates 0px width to the search container. However, the `<input>` inside has `min-width: 60px` (from `search-bar.component.scss` line 60), causing a 60×23px invisible overflow that sits directly on top of the 44×44px hamburger menu button. Playwright confirmed: the search input intercepts all pointer events, making the menu button untappable.
+**Files:** `app.component.html` (lines 38–45), `app.component.scss` (lines 88–102), `search-bar.component.scss` (lines 52–76)
+**Fix options:**
+1. Add `overflow: hidden` to `.mobile-header-search` so the input doesn't overflow past its 0px container
+2. Restructure the mobile header flex layout to allocate minimum space for both search and menu button (e.g., give the menu button `flex-shrink: 0` with explicit width, and let search fill remaining space)
+3. Replace the inline mobile search input with a search icon button that opens a full-width search overlay (recommended — see 3b.14)
+**Impact:** This is the most severe mobile bug. Without the hamburger menu, users cannot access settings (dark mode, font size, language, AI preferences) on mobile. They only have the bottom nav bar (Home, Books, Topics, Bookmarks, Narrators).
+
+#### 3b.12 Mobile Header Title Truncated
+
+**Priority:** P1 (branding — "THAQALAYN" shows as "THAQAL" at 375px)
+**Current behavior:** The logo image + "THAQALAYN" text compete for horizontal space in the header. At 375px, the title is truncated to "THAQAL" with the remaining letters cut off. At 320px, the layout breaks further with content clipping off the left edge.
+**Files:** `app.component.html` (lines 4–9), `app.component.scss` (lines 33–68, 380–409)
+**Evidence:** `screenshots/mobile-header-375.png`, `screenshots/mobile-header-320.png`
+**Fix options:**
+1. **Hide the text on mobile, show only the logo icon** — Use `display: none` on the title text below 600px and rely on the geometric logo image alone. The logo is distinctive enough for brand recognition.
+2. **Reduce logo size on mobile** — The logo image is oversized (see 3b.1). Fixing the logo size may free up enough space for the full title.
+3. **Use a shorter title on mobile** — e.g., "ث" (thā') or a custom compact logo mark
+4. **Two-row header** — Stack logo/title on one row, controls on another. Increases header height but ensures nothing is truncated.
+
+#### 3b.13 Mobile Layout Completely Broken at 320px
+
+**Priority:** P0 (unusable at smallest common viewport)
+**Current behavior:** At 320px width, the layout is severely broken:
+- Content clips off the left edge of the viewport (negative overflow)
+- Translation selector overflows its container
+- "Chapter 1" heading and author text are left-clipped ("apter 1", "layni - الكليني")
+- View mode icons overflow the screen
+- The page is essentially unusable
+**Evidence:** `screenshots/mobile-header-320.png`
+**Files:** `app.component.scss` (lines 390–409), `chapter-content.component.scss`, `styles.scss`
+**Fix:**
+1. Audit all fixed-width elements (translation selector width, view mode toolbar, etc.) and replace with `max-width: 100%` or responsive units
+2. Ensure no element has `min-width` that exceeds 320px
+3. Add `overflow-x: hidden` to the main content container as a safety net
+4. Test all pages at 320px, 375px, and 414px after fixes
+
+#### 3b.14 Mobile Search UX — Replace Inline Input with Search Overlay
+
+**Priority:** P1 (the current inline search is too small and causes 3b.11)
+**Current behavior:** The mobile header tries to fit a search input inline between the title and hamburger menu. At 375px, the input renders at 60×23px — far below the 44px minimum touch target. The search dropdown would also render incorrectly since its parent has 0px width.
+**Files:** `app.component.html` (lines 38–45), `search-bar.component.html`, `search-bar.component.scss` (lines 52–76)
+**Recommended approach:**
+1. Replace the inline `<app-search-bar>` in `.header-mobile-controls` with a search icon button (magnifying glass, 44×44px)
+2. On tap, open a full-width search overlay that slides down from the header (or a modal)
+3. The overlay contains: back arrow, full-width input (auto-focused), clear button
+4. Search results dropdown renders inside the overlay at full viewport width
+5. Escape or back arrow closes the overlay
+6. This pattern is used by Google, YouTube, and most mobile apps — users expect it
+**Benefit:** Eliminates 3b.11 (no more pointer event conflict), provides a usable search experience, and frees up header space for the hamburger menu and title.
+
+#### 3b.15 Mobile Header — Hamburger Icon Not Visible at 375px
+
+**Priority:** P1 (related to 3b.11 but distinct visual issue)
+**Current behavior:** At 375px, the hamburger menu icon (☰) is either not visible or extremely hard to see. The screenshots show no clear hamburger icon in the top-right area. The search bar's invisible overflow may be visually covering it, or the icon blends into the header background.
+**Evidence:** `screenshots/mobile-header-375.png` — no hamburger icon visible in the header area
+**Fix:** After resolving 3b.11 (search overlap), verify the menu button has:
+1. Sufficient contrast against the teal header background (white icon on teal)
+2. A visible icon (Material `menu` icon at 24px)
+3. Optional: add a subtle background/border to make it stand out as a tappable button
+
+#### 3b.16 Mobile "Jump to Hadith" Truncation
+
+**Priority:** P2 (usability — label unreadable)
+**Current behavior:** At 375px, the "Jump to hadith" dropdown shows as "Jump to h..." with `width: 120px` on mobile (from `chapter-content.component.scss`). The label is meaningless when truncated.
+**Files:** `chapter-content.component.scss` (lines 14–19)
+**Fix options:**
+1. Shorten the label to "Hadith #" or just "Jump" on mobile
+2. Use an icon-only button (e.g., `#` or `format_list_numbered`) with tooltip
+3. Increase width to 160px on mobile (trades space for readability)
+4. This ties into 3b.6 — if the dropdown moves into the toolbar row, it may get more space
+
+#### 3b.17 Bottom Navigation Bar Duplicates Sidebar Navigation
+
+**Priority:** P3 (design consistency — not broken but redundant)
+**Current behavior:** Mobile has both:
+- Bottom nav bar: Home, Books, Topics, Bookmarks, Narrators (always visible)
+- Sidebar menu: Home, Narrators, Topics, Bookmarks, About (opened via hamburger)
+These overlap significantly. The sidebar also contains Settings and AI preferences which are not in the bottom bar.
+**Consideration:** The bottom bar provides quick access to the 5 most common destinations, while the sidebar provides settings access. This is a common mobile pattern (e.g., Instagram). However, the items should be audited:
+- Bottom bar has "Books" but sidebar doesn't (sidebar has "Home" which effectively goes to books)
+- Bottom bar has "Narrators" and sidebar also has "Narrators" — redundant
+- Sidebar has "About" which bottom bar doesn't — acceptable
+**Recommendation:** Keep both but ensure they complement rather than duplicate. Consider replacing one bottom bar item with "Settings" (gear icon) to give direct access to settings without the hamburger menu, which is currently broken (3b.11).
+
+---
+
 ### Remaining Work (Active Priorities)
 
 1. **HTTP error handling** — ErrorInterceptor, loading/error states for BooksService/PeopleService
@@ -71,11 +284,12 @@
 2. [Phase 1: Foundation & Critical Fixes](#2-phase-1-foundation--critical-fixes-weeks-1-4)
 3. [Phase 2: Complete the Four Books](#3-phase-2-complete-the-four-books-months-2-5)
 4. [Phase 3: Multi-Language Expansion](#4-phase-3-multi-language-expansion-months-4-7)
-5. [Phase 4: User Experience & Accessibility](#5-phase-4-user-experience--accessibility-months-5-8)
-6. [Phase 5: Developer Experience & Infrastructure](#6-phase-5-developer-experience--infrastructure-months-6-9)
-7. [Phase 6: Data Optimization](#7-phase-6-data-optimization-months-7-9)
-8. [Phase 7: Extended Use Cases & Future Vision](#8-phase-7-extended-use-cases--future-vision-months-9)
-9. [Summary Matrix](#9-summary-matrix)
+5. [Phase 3b: UI Polish & Layout Fixes](#phase-3b-ui-polish--layout-fixes--todo) *(new — 2026-03-11)*
+6. [Phase 4: User Experience & Accessibility](#5-phase-4-user-experience--accessibility-months-5-8)
+7. [Phase 5: Developer Experience & Infrastructure](#6-phase-5-developer-experience--infrastructure-months-6-9)
+8. [Phase 6: Data Optimization](#7-phase-6-data-optimization-months-7-9)
+9. [Phase 7: Extended Use Cases & Future Vision](#8-phase-7-extended-use-cases--future-vision-months-9)
+10. [Summary Matrix](#9-summary-matrix)
 
 ---
 
@@ -954,6 +1168,22 @@ Add parsers and data for the remaining books listed in the README:
 | P1 | Data schema validation | Generator | 5 | **DONE** (64 tests) |
 | P1 | Hadith grading system | All | 7 | TODO |
 | P1 | Nahj al-Balaghah parser | Generator | 7 | TODO |
+| P0 | Fix logo overflow covering breadcrumbs | Thaqalayn | 3b | TODO — regression |
+| P0 | Fix view mode icons cropped at bottom | Thaqalayn | 3b | TODO |
+| P0 | Mobile search bar blocks hamburger menu | Thaqalayn | 3b | TODO — mobile broken |
+| P0 | Mobile layout broken at 320px | Thaqalayn | 3b | TODO — mobile broken |
+| P1 | Author line only on homepage/book root | Thaqalayn | 3b | TODO |
+| P1 | English–Arabic chunk horizontal alignment | Thaqalayn | 3b | TODO |
+| P1 | Mobile header title truncated | Thaqalayn | 3b | TODO |
+| P1 | Mobile search overlay (replace inline input) | Thaqalayn | 3b | TODO |
+| P1 | Mobile hamburger icon not visible | Thaqalayn | 3b | TODO |
+| P2 | ISNAD/BODY label styling | Thaqalayn | 3b | TODO |
+| P2 | Jump-to-hadith dropdown placement | Thaqalayn | 3b | TODO |
+| P2 | View mode inconsistencies (plain≡paragraph) | Thaqalayn | 3b | TODO |
+| P2 | Hadith card boundary separation | Thaqalayn | 3b | TODO |
+| P2 | Mobile "Jump to hadith" truncation | Thaqalayn | 3b | TODO |
+| P3 | Prev/next chapter nav visibility | Thaqalayn | 3b | TODO |
+| P3 | Mobile bottom nav / sidebar redundancy audit | Thaqalayn | 3b | TODO |
 | P2 | Social sharing (Web Share API) | Thaqalayn | 4 | TODO |
 | P2 | Bookmarks & reading progress (Dexie) | Thaqalayn | 4 | **INSTALLED** — needs UI |
 | P2 | Narrator biographical database | All | 7 | TODO |

@@ -129,14 +129,18 @@ A model passes the benchmark if:
 
 ## Models to Test (Priority Order)
 
-| Priority | Model | Reason | Est. Cost for 15 Verses |
-|----------|-------|--------|------------------------|
-| 1 | GPT-5.4 | Frontier model (Intelligence Index 57), best chance at matching Claude quality | ~$0.50 |
-| 2 | GPT-5.3 Codex | 128K max output, strong structured generation | ~$0.30 |
-| 3 | GPT-5 | Better than GPT-5-mini, 16K output may be tight for long verses | ~$0.15 |
-| 4 | GPT-5-mini (re-test) | Baseline with optimizations applied | ~$0.05 |
+| Priority | Model | Model ID | Max Output | Reason | Est. Cost for 15 Verses |
+|----------|-------|----------|-----------|--------|------------------------|
+| 1 | GPT-5.4 | `gpt-5.4` | ~16K? | Frontier model (Intelligence Index 57) | ~$1.50 |
+| 2 | GPT-5.2 | `gpt-5.2` | **128K** | Large output capacity, same price as 5.3 | ~$0.30 |
+| 3 | GPT-5 | `gpt-5` | ~16K? | Cheapest GPT-5 family | ~$0.15 |
+| 4 | GPT-5-mini (re-test) | `gpt-5-mini` | ~16K? | Baseline with optimizations applied | ~$0.05 |
 
-**Skip**: o4-mini (Intelligence Index 33 < GPT-5-mini's 41), GPT-5.3 Chat (16K max output kills long verses), GPT-5.2 (superseded), GPT-4.1 family (word_tags truncation)
+**Skip**:
+- **GPT-5.3 Codex** (`gpt-5.3-codex`): 128K output but uses Responses API (`/v1/responses`), not Chat Completions — incompatible with pipeline
+- **GPT-5.3 Chat** (`gpt-5.3-chat-latest`): Only 16K max output — truncates verses needing 10-25K+ tokens
+- **o4-mini**: Intelligence Index 33 < GPT-5-mini's 41, costs more
+- **GPT-4.1 family**: Known word_tags truncation issue
 
 ## Expected Output
 
@@ -147,12 +151,44 @@ python scripts/analyse_run.py --run-dir ../ThaqalaynDataSources/ai-content/sampl
 
 Record results in a table:
 
-| Model | Pass | Fail | Pass Rate | Cost | Notes |
-|-------|------|------|-----------|------|-------|
-| GPT-5.4 | ? | ? | ?% | $? | |
-| GPT-5.3 Codex | ? | ? | ?% | $? | |
-| GPT-5 | ? | ? | ?% | $? | |
-| GPT-5-mini (optimized) | ? | ? | ?% | $? | |
+| Model | Completed | Pass | Needs Fix | Error | Pass Rate | Cost | Notes |
+|-------|-----------|------|-----------|-------|-----------|------|-------|
+| GPT-5.4 | 13/15 | 11 | 2 | 0 | **85%** | $1.46 | 300w + 557w timed out (APITimeoutError) |
+| GPT-5.2 | 0/15 | — | — | — | **TBD** | — | Not yet run. 128K max output — may handle long verses |
+| GPT-5.3 Codex | 0/15 | 0 | 0 | 15 | **N/A** | $0.00 | Uses Responses API, not Chat Completions — incompatible |
+| GPT-5.3 Chat | — | — | — | — | **SKIP** | — | 16K max output — too small for our verses |
+| GPT-5 | 1/15 | 1 | 0 | 0 | **TBD** | $0.08 | Only quran_1_1 run so far |
+| GPT-5-mini (prior) | 6/15 | 5 | 0 | 1 | **83%** | $0.16 | Pre-optimization data from prior test run |
+
+### GPT-5.4 Detailed Results (2026-03-11)
+
+| Verse | Words | Status | Cost | Tokens | Notes |
+|-------|-------|--------|------|--------|-------|
+| quran_1_1 | 4 | pass | $0.051 | 2,573 | |
+| al-kafi_1_2_8_2 | 11 | pass | $0.102 | 5,930 | |
+| al-kafi_4_1_1_1 | 14 | needs_fix | $0.096 | 4,956 | Diacritics fix needed |
+| al-kafi_3_1_1_1 | 15 | pass | $0.089 | 5,075 | |
+| al-kafi_7_4_2_6 | 24 | pass | $0.094 | 5,364 | |
+| al-kafi_1_2_19_11 | 39 | pass | $0.090 | 5,107 | |
+| nahj-al-balagha_2_1_3 | 52 | pass | $0.105 | 6,089 | |
+| al-kafi_8_1_12_1 | 54 | pass | $0.108 | 6,266 | |
+| man-la-yahduruhu-al-faqih_1_3_2 | 73 | pass | $0.113 | 6,571 | |
+| al-kafi_2_1_1_1 | 77 | pass | $0.148 | 8,906 | |
+| al-amali-saduq_1_16 | 81 | pass | $0.146 | 8,841 | |
+| al-kafi_6_2_8_5 | 102 | pass | $0.163 | 9,809 | Chunk boundary auto-fixed |
+| tahdhib-al-ahkam_1_11_5 | 110 | needs_fix | $0.158 | 9,219 | Diacritics fix failed |
+| al-kafi_1_4_41_6 | 300 | **TIMEOUT** | — | — | APITimeoutError with SDK retries |
+| al-kafi_1_3_1_1 | 557 | **TIMEOUT** | — | — | APITimeoutError with SDK retries |
+
+**Short hadith (≤80w) pass rate**: 9/10 (90%) — meets success criteria
+**Key finding**: GPT-5.4 quality is excellent on ≤110w verses but cannot produce 40-75K+ output tokens needed for long verses.
+
+### Key Findings (2026-03-11)
+
+1. **GPT-5.3 Codex is incompatible** — uses OpenAI Responses API (`/v1/responses`), not Chat Completions. Requires new endpoint support to test.
+2. **GPT-5.4 times out on long verses** (300w+) — the model can't complete 40-75K token outputs in time, even with 15-min SDK timeout. May need batch API (no timeout, 50% off).
+3. **GPT-5.4 narrator identification is excellent** — this was GPT-5-mini's #1 weakness. GPT-5.4 correctly identifies all narrators with proper `known_identity`.
+4. **Chunk boundary auto-fix works** — `al-kafi_6_2_8_5` had off-by-one chunk boundary, automatically corrected.
 
 ---
 

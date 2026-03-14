@@ -304,11 +304,19 @@ AI_CONTENT_SUBDIR="benchmarks/gpt-5.4" \
   .venv/Scripts/python.exe -m app.pipeline_cli.pipeline batch download-fixes
 ```
 
-### Step 2: Benchmark GPT-5.3 Codex (Priority 2)
+### Step 2: Benchmark GPT-5.2 (Priority 2 — 128K max output)
+
+GPT-5.2 has 128K max output tokens — the largest of any Chat Completions-compatible model. May handle the 300w + 557w verses that GPT-5.4 timed out on.
 
 Same as Step 1 but replace:
-- `--openai-model gpt-5.3-codex`
-- `AI_CONTENT_SUBDIR="benchmarks/gpt-5.3-codex"`
+- `--openai-model gpt-5.2`
+- `AI_CONTENT_SUBDIR="benchmarks/gpt-5.2"`
+
+### ~~Step 2 (old): Benchmark GPT-5.3 Codex~~ — BLOCKED
+
+GPT-5.3 Codex uses the Responses API (`/v1/responses`), not Chat Completions. Incompatible with our pipeline without adding a new endpoint. **Skip.**
+
+GPT-5.3 Chat (`gpt-5.3-chat-latest`) exists but only supports 16K max output — too small for our verses (need 10-25K+). **Skip.**
 
 ### Step 3: Benchmark GPT-5 (Priority 3)
 
@@ -355,7 +363,7 @@ cd /c/Users/TrainingGR03/Documents/Projects/scripture/ThaqalaynDataGenerator
 .venv/Scripts/python.exe -c "
 import json, os, glob
 
-models = ['claude-sonnet', 'gpt-5-mini', 'gpt-5', 'gpt-5.3-codex', 'gpt-5.4']
+models = ['claude-sonnet', 'gpt-5-mini', 'gpt-5', 'gpt-5.2', 'gpt-5.3-codex', 'gpt-5.4']
 base = '../ThaqalaynDataSources/ai-content/benchmarks'
 
 print(f'{'Model':<20} {'Pass':>5} {'Fail':>5} {'Rate':>6} {'Cost':>8}')
@@ -431,23 +439,50 @@ Only implement these AFTER benchmark results guide which are needed:
 ## Implementation Order
 
 ```
-1. [CODE] Change 1: fix_chunk_boundaries()           ~2 hours
-2. [CODE] Change 2: Fix OPENAI_PRICING               ~15 min
-3. [CODE] Change 3: max_output_tokens 32768 → 40000  ~15 min
-4. [CODE] Change 4: Reasoning model in batch API      ~1 hour
-5. [CODE] Change 5: stop_reason truncation check       ~30 min
-6. [TEST] Run existing tests to verify no breakage     ~5 min
-7. [VERIFY] Dry-run benchmark to check AI_CONTENT_SUBDIR works
-8. [RUN] Generate 4 missing Claude baselines           ~30 min, ~$6
-9. [RUN] Benchmark GPT-5.4                             ~30 min, ~$3-4
-10. [RUN] Benchmark GPT-5.3 Codex                      ~30 min, ~$3-4
-11. [RUN] Benchmark GPT-5                              ~30 min, ~$2-3
-12. [RUN] Re-benchmark GPT-5-mini (optimized)          ~30 min, ~$0.30
-13. [ANALYSE] Compare all models                       ~15 min
-14. [DECIDE] Pick primary model for production
+1. [CODE] Change 1: fix_chunk_boundaries()           DONE (commit 47abbf0)
+2. [CODE] Change 2: Fix OPENAI_PRICING               DONE (commit 47abbf0)
+3. [CODE] Change 3: max_output_tokens 32768 → 40000  DONE (commit 47abbf0)
+4. [CODE] Change 4: Reasoning model in batch API      DONE (commit 47abbf0)
+5. [CODE] Change 5: stop_reason truncation check       DONE (commit 47abbf0)
+6. [TEST] Run existing tests to verify no breakage     DONE
+7. [VERIFY] Dry-run benchmark to check AI_CONTENT_SUBDIR works  DONE
+8. [RUN] Generate 4 missing Claude baselines           PENDING (~$6)
+9. [RUN] Benchmark GPT-5.4                             DONE (13/15, 2 long verses timed out) $1.46
+10. [RUN] Benchmark GPT-5.3 Codex                      BLOCKED — uses Responses API, not Chat Completions
+10b.[RUN] Benchmark GPT-5.2 (128K output)              PENDING — may handle long verses GPT-5.4 couldn't
+11. [RUN] Benchmark GPT-5                              IN PROGRESS (1/15 done)
+12. [RUN] Re-benchmark GPT-5-mini (optimized)          PENDING
+13. [ANALYSE] Compare all models                       PENDING
+14. [DECIDE] Pick primary model for production         PENDING
 ```
 
-**Total benchmark cost**: ~$15-20 (trivial)
+### Additional fixes applied during benchmarking
+
+- **SDK timeout 15min → 1hr** (commit e546dff) — long verses were timing out
+- **Removed double-retry** (SDK retries 3x already, our code no longer retries on top)
+- **Fixed logging timestamps** (commit e546dff) — `basicConfig` was no-op, replaced with explicit handler setup
+- **Timeout cost estimation** (commit e546dff) — timed-out requests now log estimated cost
+
+### Benchmark progress (2026-03-11)
+
+| Step | Model | Status | Results |
+|------|-------|--------|---------|
+| 9 | GPT-5.4 | **13/15 done** | 85% pass, $1.46. 300w+557w timed out. |
+| 10 | GPT-5.3 Codex | **BLOCKED** | Uses Responses API — incompatible with pipeline |
+| 10b | GPT-5.2 | **PENDING** | 128K max output — may handle long verses. Same price as 5.3 ($1.75/$14.00) |
+| 11 | GPT-5 | **1/15 done** | quran_1_1 passed, $0.08. Full run needed. |
+| 12 | GPT-5-mini | **6/15 (prior data)** | Pre-optimization. Full re-run needed. |
+
+### Remaining work
+
+1. **GPT-5.2**: Run full 15-verse benchmark (128K output — best chance at long verses)
+2. **GPT-5**: Run remaining 14 verses
+3. **GPT-5.4**: Retry 2 long verses (300w, 557w) — try `--workers 1` or batch API
+4. **GPT-5-mini**: Re-run full 15 with optimizations applied
+5. **Claude baselines**: Generate 4 missing (optional, for comparison)
+6. **Analysis**: Cross-model comparison once all models complete
+
+**Total benchmark cost so far**: ~$1.54
 **Total time**: ~4-6 hours (parallelizable — steps 9-12 can overlap)
 
 ---

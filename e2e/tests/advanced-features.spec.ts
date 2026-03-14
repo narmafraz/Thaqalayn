@@ -89,13 +89,22 @@ test.describe('ADV-04: Chain Diagram', () => {
     expect(firstText).toMatch(chainPattern);
   });
 
-  test('should have chain diagram toggle button', async ({ page }) => {
+  test('should have chain diagram toggle button in expanded footer', async ({ page }) => {
     await page.goto('/#/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
-    await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
+    const firstCard = page.locator('mat-card').first();
+    await firstCard.waitFor({ state: 'visible', timeout: 15000 });
+
+    // AI toggles are now inside the collapsible secondary-metadata in the card footer.
+    // First expand the metadata section by clicking the expand button.
+    const expandBtn = firstCard.locator('.metadata-toggle-btn');
+    if (await expandBtn.count() > 0) {
+      await expandBtn.click();
+      await page.waitForTimeout(500);
+    }
 
     // The chain diagram toggle is a button.ai-toggle-btn with aria-label containing "chain"
-    const toggleBtn = page.locator(
+    const toggleBtn = firstCard.locator(
       'button.ai-toggle-btn[aria-label*="chain" i], ' +
       'button[aria-label*="chain diagram" i]'
     );
@@ -108,10 +117,18 @@ test.describe('ADV-04: Chain Diagram', () => {
   test('should show chain diagram view when toggle is clicked', async ({ page }) => {
     await page.goto('/#/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
-    await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
+    const firstCard = page.locator('mat-card').first();
+    await firstCard.waitFor({ state: 'visible', timeout: 15000 });
+
+    // Expand the metadata section first
+    const expandBtn = firstCard.locator('.metadata-toggle-btn');
+    if (await expandBtn.count() > 0) {
+      await expandBtn.click();
+      await page.waitForTimeout(500);
+    }
 
     // Find and click the chain diagram toggle
-    const toggleBtn = page.locator(
+    const toggleBtn = firstCard.locator(
       'button.ai-toggle-btn[aria-label*="chain" i], ' +
       'button[aria-label*="chain diagram" i]'
     );

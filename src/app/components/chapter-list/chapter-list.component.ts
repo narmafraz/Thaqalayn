@@ -49,7 +49,10 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
     // Derive author from the book index (root slug)
     this.author$ = this.book$.pipe(
       filter((book): book is ChapterList => !!book),
-      map(book => getBookAuthor(book.index)),
+      map(book => {
+        const depth = (book.index.match(/:/g) || []).length;
+        return depth <= 1 ? getBookAuthor(book.index) : undefined;
+      }),
       startWith(undefined)
     );
 

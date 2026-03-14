@@ -1,35 +1,37 @@
 <ng-container *ngIf="(book$ | async) as book">
   <app-settings></app-settings>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author"></app-book-titles>
-  <div class="jump-to-verse" *ngIf="book.data.verses?.length >= 10">
-    <mat-form-field appearance="outline" class="jump-input">
-      <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
-      <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
-        <ng-container *ngFor="let verse of book.data.verses; let i = index">
-          <mat-option *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'"
-                      [value]="verse.local_index">
-            {{ verse.part_type }} {{ verse.local_index }}
-          </mat-option>
-        </ng-container>
-      </mat-select>
-    </mat-form-field>
-  </div>
-  <div class="view-mode-toolbar" *ngIf="hasAnyAiContent">
-    <span class="toolbar-label">{{ 'book.viewMode' | translate }}:</span>
-    <mat-button-toggle-group [value]="currentViewMode" (change)="onViewModeChange($event.value)">
-      <mat-button-toggle value="plain" [matTooltip]="'book.viewPlain' | translate">
-        <mat-icon>subject</mat-icon>
-      </mat-button-toggle>
-      <mat-button-toggle value="word-by-word" [matTooltip]="'book.viewWordByWord' | translate">
-        <mat-icon>grid_on</mat-icon>
-      </mat-button-toggle>
-      <mat-button-toggle value="paragraph" [matTooltip]="'book.viewParagraph' | translate">
-        <mat-icon>view_agenda</mat-icon>
-      </mat-button-toggle>
-      <mat-button-toggle value="combined" [matTooltip]="'book.viewCombined' | translate">
-        <mat-icon>dashboard</mat-icon>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
+  <div class="chapter-toolbar" *ngIf="book.data.verses?.length >= 10 || hasAnyAiContent">
+    <div class="jump-to-verse-inline" *ngIf="book.data.verses?.length >= 10">
+      <mat-form-field appearance="outline" class="jump-input">
+        <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
+        <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
+          <ng-container *ngFor="let verse of book.data.verses; let i = index">
+            <mat-option *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'"
+                        [value]="verse.local_index">
+              {{ verse.part_type }} {{ verse.local_index }}
+            </mat-option>
+          </ng-container>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="view-mode-inline" *ngIf="hasAnyAiContent">
+      <span class="toolbar-label">{{ 'book.viewMode' | translate }}:</span>
+      <mat-button-toggle-group [value]="currentViewMode" (change)="onViewModeChange($event.value)">
+        <mat-button-toggle value="plain" [matTooltip]="'book.viewPlain' | translate">
+          <mat-icon>subject</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="word-by-word" [matTooltip]="'book.viewWordByWord' | translate">
+          <mat-icon>grid_on</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="paragraph" [matTooltip]="'book.viewParagraph' | translate">
+          <mat-icon>view_agenda</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="combined" [matTooltip]="'book.viewCombined' | translate">
+          <mat-icon>dashboard</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
   </div>
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse" [headingLevel]="2"></app-book-titles>

@@ -1,5 +1,5 @@
-// Jump to verse bar
-.jump-to-verse {
+// Merged toolbar: jump-to-verse + view mode
+.chapter-toolbar {
   position: sticky;
   top: 0;
   z-index: 10;
@@ -10,7 +10,14 @@
   background: var(--card-bg, rgba(255, 255, 255, 0.95));
   border-bottom: 1px solid var(--border-color, #e0e0e0);
   backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+}
 
+:host-context(body.dark-theme) .chapter-toolbar {
+  background: var(--card-bg, rgba(48, 48, 48, 0.95));
+}
+
+.jump-to-verse-inline {
   .jump-input {
     width: 160px;
 
@@ -20,50 +27,29 @@
   }
 }
 
-:host-context(body.dark-theme) .jump-to-verse {
-  background: var(--card-bg, rgba(48, 48, 48, 0.95));
-}
-
-// View mode toolbar
-.view-mode-toolbar {
+.view-mode-inline {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 8px var(--space-xs) 16px;
+  margin-inline-start: auto;
 
   .toolbar-label {
     font-size: 14px;
     color: var(--text-secondary, rgba(0, 0, 0, 0.6));
   }
-
-  mat-button-toggle-group {
-    height: 36px;
-
-    mat-button-toggle {
-      height: 36px;
-    }
-  }
 }
 
 @media (max-width: 600px) {
-  .view-mode-toolbar {
-    gap: 6px;
-    margin: 6px 8px 12px;
-
-    .toolbar-label {
-      font-size: 12px;
-    }
-  }
-}
-
-@media (max-width: 600px) {
-  .jump-to-verse {
+  .chapter-toolbar {
     padding: 6px 8px;
-
-    .jump-input {
-      width: 120px;
-    }
+    gap: 6px;
   }
+  .jump-to-verse-inline .jump-input {
+    width: auto;
+    min-width: 100px;
+    max-width: 50vw;
+  }
+  .view-mode-inline .toolbar-label { font-size: 12px; }
 }
 
 // Highlight pulse animation for jump-to-verse target
@@ -81,7 +67,8 @@ mat-mdc-card.highlight-pulse {
 mat-mdc-card {
   background-color: var(--card-bg, rgba(255, 255, 255, 0.5));
 	border-radius: 10px;
-	margin: var(--space-verse-gap) var(--space-xs) var(--space-md) var(--space-xs);
+	margin: var(--space-base) var(--space-xs) var(--space-md) var(--space-xs);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 @media (max-width: 768px) {

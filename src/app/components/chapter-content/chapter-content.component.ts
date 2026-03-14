@@ -108,8 +108,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
         prev: book.data.nav?.prev || null,
         next: book.data.nav?.next || null,
       };
-      // Derive book author from index
-      this.author = getBookAuthor(book.index);
+      // Derive book author from index (only show at top-level: al-kafi, al-kafi:1)
+      const depth = (book.index.match(/:/g) || []).length;
+      this.author = depth <= 1 ? getBookAuthor(book.index) : undefined;
       // Check for AI content to show view mode toolbar
       this.checkAiContent(book);
       // Load bookmark and annotation states for all verses

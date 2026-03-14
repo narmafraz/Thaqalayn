@@ -42,7 +42,7 @@
         </div>
       </mat-card-title>
       <mat-card-content>
-        <app-verse-text [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index"></app-verse-text>
+        <app-verse-text #vt [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index" [showToggles]="false"></app-verse-text>
         <div class="ai-badges-inline" *ngIf="verse.ai?.content_type || verse.ai?.tags?.length">
           <a class="ai-content-type-chip" *ngIf="verse.ai?.content_type"
              [routerLink]="['/search']"
@@ -130,6 +130,36 @@
           </button>
           <!-- Collapsible secondary metadata -->
           <div class="secondary-metadata" *ngIf="isMetadataExpanded(verse.local_index)">
+            <!-- AI feature toggles (per-verse) -->
+            <div class="ai-toggles-footer" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasChunks || vt.hasNarratorChain">
+              <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
+                      [class.active]="vt.showChainDiagram"
+                      [attr.aria-label]="vt.showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"
+                      [matTooltip]="'narrator.chainDiagram' | translate">
+                <mat-icon>{{ vt.showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
+              </button>
+              <button *ngIf="vt.hasAiText" class="ai-toggle-btn" (click)="vt.toggleDiacritics()"
+                      [class.active]="vt.showDiacritics"
+                      [attr.aria-label]="vt.showDiacritics ? 'Show original text' : 'Show diacritized text'"
+                      matTooltip="Toggle diacritics (tashkeel)">
+                <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
+              </button>
+              <button *ngIf="vt.hasWordAnalysis" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
+                      [class.active]="vt.showWordAnalysis"
+                      [attr.aria-label]="vt.showWordAnalysis ? 'Hide word analysis' : 'Show word-by-word analysis'"
+                      matTooltip="Word-by-word analysis">
+                <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
+              </button>
+              <button *ngIf="vt.hasChunks" class="ai-toggle-btn" (click)="vt.toggleChunkedView()"
+                      [class.active]="vt.showChunkedView"
+                      [attr.aria-label]="vt.showChunkedView ? 'Hide paragraph view' : 'Show paragraph view'"
+                      matTooltip="Paragraph view">
+                <mat-icon>{{ vt.showChunkedView ? 'view_headline' : 'view_agenda' }}</mat-icon>
+              </button>
+              <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && verse.ai?.diacritics_status">
+                {{ verse.ai.diacritics_status }}
+              </span>
+            </div>
             <div>{{ 'book.reference' | translate }}</div>
             <div>{{getBookName(crumbs)}} {{verse.index}}</div>
             <div>{{ 'book.inBookReference' | translate }}</div>

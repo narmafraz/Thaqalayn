@@ -1,6 +1,6 @@
 <div class="textrow">
   <!-- AI feature toggles -->
-  <div class="ai-toggles" *ngIf="hasAiText || hasWordAnalysis || hasChunks || hasNarratorChain">
+  <div class="ai-toggles" *ngIf="showToggles && (hasAiText || hasWordAnalysis || hasChunks || hasNarratorChain)">
     <button *ngIf="hasNarratorChain" class="ai-toggle-btn" (click)="toggleChainDiagram()"
             [class.active]="showChainDiagram"
             [attr.aria-label]="showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"

@@ -32,6 +32,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   @Input() verse: Verse;
   @Input() isQuran = false;
   @Input() verseNumber: number;
+  @Input() showToggles = true;
 
   // Narrator hover card state
   hoveredNarrator: { id: number; narrator: NarratorMetadata | null; x: number; y: number } | null = null;
@@ -74,6 +75,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
 
   toggleDiacritics(): void {
     this.showDiacritics = !this.showDiacritics;
+    this.cdr.markForCheck();
   }
 
   toggleWordAnalysis(): void {
@@ -82,15 +84,18 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     if (this.showWordAnalysis) {
       this.showDiacritics = false;
     }
+    this.cdr.markForCheck();
   }
 
   toggleChunkedView(): void {
     this.localOverride = true;
     this.showChunkedView = !this.showChunkedView;
+    this.cdr.markForCheck();
   }
 
   toggleChainDiagram(): void {
     this.showChainDiagram = !this.showChainDiagram;
+    this.cdr.markForCheck();
   }
 
   /** Get narrator-kind parts from the narrator chain for the chain diagram */

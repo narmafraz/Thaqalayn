@@ -47,6 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   showBackToTop = false;
   headerCompact = false;
   mobileMenuOpen = false;
+  mobileSearchOpen = false;
 
   private static readonly STATIC_TITLES: Record<string, { i18nKey: string; fallback: string }> = {
     '/about': { i18nKey: 'pageTitle.about', fallback: 'About' },
@@ -107,6 +108,16 @@ export class AppComponent implements OnInit, OnDestroy {
       queryParams: { lang },
       queryParamsHandling: 'merge',
     });
+  }
+
+  toggleMobileSearch(): void {
+    this.mobileSearchOpen = !this.mobileSearchOpen;
+    if (this.mobileSearchOpen) this.mobileMenuOpen = false;
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+    if (this.mobileMenuOpen) this.mobileSearchOpen = false;
   }
 
   toggleTheme(): void {

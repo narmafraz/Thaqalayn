@@ -21,6 +21,7 @@
   background-position: center top;
 	width: 100%;
 	overflow: auto;
+  overflow-x: hidden;
   min-height: 100%;
   flex-flow: column;
   transition: background-color 0.3s ease;
@@ -65,6 +66,16 @@
   align-items: center;
   gap: 4px;
   cursor: pointer;
+  overflow: hidden;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  img {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+  }
 }
 
 .header-desktop-controls {
@@ -95,10 +106,23 @@
   }
 }
 
-.mobile-header-search {
-  flex: 1;
-  min-width: 0;
-  max-width: 280px;
+// Mobile search overlay
+.mobile-search-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+}
+
+.mobile-search-panel {
+  background: var(--crumb-bg, #512da8);
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-overlay-search {
+  display: block;
+  width: 100%;
 }
 
 .header-search {
@@ -382,7 +406,7 @@ a:hover {
     font-size: 1.5rem;
 
     img {
-      height: 50% !important;
+      height: 32px !important;
     }
   }
 }
@@ -408,6 +432,30 @@ a:hover {
   }
 }
 
+@media (max-width: 320px) {
+  #header > * {
+    padding-left: 2% !important;
+    padding-right: 2% !important;
+  }
+
+  .bannerTop {
+    font-size: 1rem;
+    img { height: 24px !important; }
+  }
+
+  .crumbs {
+    font-size: 9px;
+    padding-left: 2% !important;
+  }
+
+  .mobile-menu-panel {
+    width: 260px;
+    right: -260px;
+  }
+
+  .mobile-lang-picker { width: 100px; }
+}
+
 // Scroll-responsive compact header on mobile
 @media (max-width: 768px) {
   #header {
@@ -430,7 +478,7 @@ a:hover {
       font-size: 1.5rem;
 
       img {
-        height: 50% !important;
+        height: 24px !important;
       }
     }
 

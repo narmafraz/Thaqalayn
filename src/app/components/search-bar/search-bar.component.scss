@@ -49,25 +49,18 @@ input {
   }
 }
 
-:host-context(.header-mobile-controls) {
+:host-context(.mobile-search-panel) {
   display: block;
   width: 100%;
 
   .search-input-container {
-    height: 32px;
-    padding: 0 6px;
+    height: 40px;
+    padding: 0 8px;
   }
 
   input {
     width: 100%;
-    min-width: 60px;
-    font-size: 13px;
-  }
-
-  .search-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    font-size: 16px; // 16px prevents iOS zoom
   }
 
   .search-tips-btn {

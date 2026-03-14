@@ -4,7 +4,7 @@
     <header id="header" [class.header-compact]="headerCompact">
         <div class="bannerTop">
           <div class="header-left" routerLink="/">
-            <img height="70%" src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
+            <img src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
           </div>
 
           <!-- Desktop: all controls visible -->
@@ -35,10 +35,13 @@
             </mat-select>
           </div>
 
-          <!-- Mobile: search + hamburger only -->
+          <!-- Mobile: search icon + hamburger -->
           <div class="header-mobile-controls">
-            <app-search-bar class="mobile-header-search" (click)="$event.stopPropagation()"></app-search-bar>
-            <button class="mobile-menu-btn" (click)="mobileMenuOpen = !mobileMenuOpen; $event.stopPropagation()"
+            <button class="mobile-search-btn" (click)="toggleMobileSearch(); $event.stopPropagation()"
+                    [attr.aria-label]="'search.search' | translate">
+              <mat-icon>{{ mobileSearchOpen ? 'close' : 'search' }}</mat-icon>
+            </button>
+            <button class="mobile-menu-btn" (click)="toggleMobileMenu(); $event.stopPropagation()"
                     [attr.aria-label]="'nav.menu' | translate">
               <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
             </button>
@@ -47,6 +50,13 @@
 
         <nav class="crumbs" aria-label="Breadcrumb"><app-breadcrumbs></app-breadcrumbs></nav>
     </header>
+
+    <!-- Mobile search overlay -->
+    <div class="mobile-search-overlay" *ngIf="mobileSearchOpen" (click)="mobileSearchOpen = false">
+      <div class="mobile-search-panel" (click)="$event.stopPropagation()">
+        <app-search-bar class="mobile-overlay-search"></app-search-bar>
+      </div>
+    </div>
 
     <!-- Mobile hamburger menu overlay -->
     <div class="mobile-menu-overlay" *ngIf="mobileMenuOpen" (click)="mobileMenuOpen = false"></div>
@@ -58,20 +68,17 @@
         </button>
       </div>
       <nav class="mobile-menu-nav">
-        <a routerLink="/" (click)="mobileMenuOpen = false" queryParamsHandling="preserve">
-          <mat-icon>home</mat-icon> {{ 'nav.home' | translate }}
-        </a>
-        <a routerLink="/people/narrators" (click)="mobileMenuOpen = false" queryParamsHandling="preserve">
-          <mat-icon>people</mat-icon> {{ 'nav.narrators' | translate }}
-        </a>
-        <a routerLink="/topics" (click)="mobileMenuOpen = false" queryParamsHandling="preserve">
-          <mat-icon>category</mat-icon> {{ 'nav.topics' | translate }}
-        </a>
-        <a routerLink="/bookmarks" (click)="mobileMenuOpen = false" queryParamsHandling="preserve">
-          <mat-icon>bookmark</mat-icon> {{ 'nav.bookmarks' | translate }}
+        <a routerLink="/books" (click)="mobileMenuOpen = false" queryParamsHandling="preserve">
+          <mat-icon>menu_book</mat-icon> {{ 'nav.books' | translate }}
         </a>
         <a routerLink="/about" (click)="mobileMenuOpen = false">
           <mat-icon>info</mat-icon> {{ 'nav.about' | translate }}
+        </a>
+        <a routerLink="/download" (click)="mobileMenuOpen = false">
+          <mat-icon>download</mat-icon> {{ 'nav.download' | translate }}
+        </a>
+        <a routerLink="/support" (click)="mobileMenuOpen = false">
+          <mat-icon>volunteer_activism</mat-icon> {{ 'nav.support' | translate }}
         </a>
       </nav>
       <div class="mobile-menu-settings">

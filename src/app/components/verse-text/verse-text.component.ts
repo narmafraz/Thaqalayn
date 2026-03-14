@@ -56,13 +56,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.aiPrefs.viewMode$.pipe(takeUntil(this.destroy$)).subscribe(mode => {
       if (!this.localOverride) {
-        // PAR-07: Default to paragraph view when AI chunks are available and user hasn't set a preference
-        if (mode === 'plain' && this.verse?.ai?.chunks?.length > 1) {
-          this.showChunkedView = true;
-          this.showWordAnalysis = false;
-        } else {
-          this.applyViewMode(mode);
-        }
+        this.applyViewMode(mode);
         this.cdr.markForCheck();
       }
     });

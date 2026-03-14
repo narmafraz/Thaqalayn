@@ -23,18 +23,18 @@ const DEFAULTS: AiPreferences = {
   showIsnadSeparation: true,
   showAiTranslationDisclaimer: true,
   wordByWordDefaultLang: 'en',
-  viewMode: 'plain',
+  viewMode: 'paragraph',
 };
 
 @Injectable({ providedIn: 'root' })
 export class AiPreferencesService {
   private prefs: AiPreferences;
   private viewModeSubject: BehaviorSubject<ViewMode>;
-  viewMode$ = new BehaviorSubject<ViewMode>('plain').asObservable();
+  viewMode$ = new BehaviorSubject<ViewMode>('paragraph').asObservable();
 
   constructor() {
     this.prefs = this.load();
-    this.viewModeSubject = new BehaviorSubject<ViewMode>(this.prefs.viewMode || 'plain');
+    this.viewModeSubject = new BehaviorSubject<ViewMode>(this.prefs.viewMode || 'paragraph');
     this.viewMode$ = this.viewModeSubject.asObservable();
   }
 
@@ -52,7 +52,7 @@ export class AiPreferencesService {
   }
 
   get viewMode(): ViewMode {
-    return this.prefs.viewMode || 'plain';
+    return this.prefs.viewMode || 'paragraph';
   }
 
   setViewMode(mode: ViewMode): void {

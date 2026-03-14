@@ -391,6 +391,23 @@
   padding: 8px 12px;
   border-radius: 6px;
   border-left: 3px solid var(--border-color, #e0e0e0);
+
+  @media (min-width: 769px) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 0 16px;
+
+    .chunk-label { grid-column: 1 / -1; }
+    .chunk-arabic { grid-column: 2; grid-row: 2; text-align: right; }
+    .chunk-translation {
+      grid-column: 1; grid-row: 2;
+      border-top: none;
+      border-inline-end: 1px solid var(--border-color, #e0e0e0);
+      padding-inline-end: 16px;
+      padding-top: 0;
+    }
+  }
 }
 
 .chunk-type-isnad {
@@ -416,12 +433,29 @@
 }
 
 .chunk-label {
-  font-size: var(--type-overline-size);
+  font-size: 10px;
   text-transform: uppercase;
-  font-weight: var(--type-overline-weight);
-  color: var(--text-secondary, #999);
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.chunk-type-isnad .chunk-label {
+  color: #757575;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.chunk-type-body .chunk-label {
+  color: var(--link-color, #673ab7);
+  background: rgba(103, 58, 183, 0.06);
+}
+
+.chunk-type-quran_quote .chunk-label {
+  color: #2e7d32;
+  background: rgba(46, 125, 50, 0.06);
 }
 
 .chunk-arabic {

@@ -61,6 +61,12 @@ export class VerseTextComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       }
     });
+    this.aiPrefs.preferences$.pipe(takeUntil(this.destroy$)).subscribe(prefs => {
+      this.showDiacritics = prefs.showDiacritizedByDefault;
+      this.showIsnadSeparation = prefs.showIsnadSeparation;
+      this.wordAnalysisLang = prefs.wordByWordDefaultLang;
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnDestroy(): void {

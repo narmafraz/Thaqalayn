@@ -30,12 +30,17 @@ const DEFAULTS: AiPreferences = {
 export class AiPreferencesService {
   private prefs: AiPreferences;
   private viewModeSubject: BehaviorSubject<ViewMode>;
+  private prefsSubject: BehaviorSubject<AiPreferences>;
   viewMode$ = new BehaviorSubject<ViewMode>('paragraph').asObservable();
+  /** Emits current preferences on subscribe and whenever any preference changes. */
+  preferences$;
 
   constructor() {
     this.prefs = this.load();
     this.viewModeSubject = new BehaviorSubject<ViewMode>(this.prefs.viewMode || 'paragraph');
     this.viewMode$ = this.viewModeSubject.asObservable();
+    this.prefsSubject = new BehaviorSubject<AiPreferences>({ ...this.prefs });
+    this.preferences$ = this.prefsSubject.asObservable();
   }
 
   get preferences(): AiPreferences {
@@ -49,6 +54,7 @@ export class AiPreferencesService {
   set<K extends keyof AiPreferences>(key: K, value: AiPreferences[K]): void {
     this.prefs[key] = value;
     this.save();
+    this.prefsSubject.next({ ...this.prefs });
   }
 
   get viewMode(): ViewMode {
@@ -65,6 +71,7 @@ export class AiPreferencesService {
     this.prefs = { ...DEFAULTS };
     this.save();
     this.viewModeSubject.next(this.prefs.viewMode);
+    this.prefsSubject.next({ ...this.prefs });
   }
 
   private load(): AiPreferences {

@@ -724,12 +724,37 @@ mat-mdc-card {
   }
 }
 
+.ai-quran-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 400;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  .ai-quran-rel-suffix {
+    font-size: 9px;
+    opacity: 0.7;
+  }
+}
+
 :host-context(body.dark-theme) {
   .ai-content-type-chip {
     background-color: rgba(69, 39, 160, 0.2);
   }
   .ai-tag-chip {
     background-color: rgba(255, 255, 255, 0.08);
+  }
+  .ai-quran-chip {
+    background-color: rgba(46, 125, 50, 0.15);
+    color: #81c784;
   }
 }
 

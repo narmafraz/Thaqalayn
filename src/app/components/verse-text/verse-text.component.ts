@@ -315,6 +315,16 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return firstIsnad === chunk;
   }
 
+  getQuranRefLink(ref: string): string {
+    const parts = ref.split(':');
+    return parts.length >= 1 ? 'quran:' + parts[0] : '';
+  }
+
+  getQuranRefFragment(ref: string): string {
+    const parts = ref.split(':');
+    return parts.length >= 2 ? 'h' + parts[1] : '';
+  }
+
   getPosColor(pos: string): string {
     switch (pos) {
       case 'N': return '#1565c0';

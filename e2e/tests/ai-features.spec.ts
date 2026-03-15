@@ -199,59 +199,6 @@ test.describe('Key Phrases Pages', () => {
 });
 
 test.describe('AI Settings Reactivity', () => {
-  test('should open AI settings panel and toggle isnad separation checkbox', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
-    await page.waitForLoadState('networkidle');
-    const firstCard = page.locator('mat-card').first();
-    await firstCard.waitFor({ state: 'visible', timeout: 15000 });
-
-    // Open AI settings panel via the auto_awesome button
-    const settingsBtn = page.locator('.ai-settings-btn').first();
-    await settingsBtn.click();
-    await page.waitForTimeout(300);
-
-    // AI settings panel should be visible with checkboxes
-    const settingsPanel = page.locator('.ai-settings-panel');
-    await expect(settingsPanel).toBeVisible();
-
-    // Find the isnad separation checkbox (4th .ai-pref label)
-    const isnadCheckbox = page.locator('.ai-pref input[type="checkbox"]').nth(3);
-    await expect(isnadCheckbox).toBeVisible();
-
-    // It should be checked by default
-    await expect(isnadCheckbox).toBeChecked();
-
-    // Uncheck it
-    await isnadCheckbox.uncheck();
-    await page.waitForTimeout(500);
-    await expect(isnadCheckbox).not.toBeChecked();
-
-    // If isnad-text was visible before unchecking and the reactive fix is deployed,
-    // the isnad-text should now be hidden. Check reactively:
-    const isnadText = firstCard.locator('.isnad-text');
-    const isnadCount = await isnadText.count();
-    if (isnadCount > 0) {
-      // The fix makes settings reactive — isnad-text should disappear.
-      // If still visible, the reactive fix is not yet deployed (expected on prod before push).
-      const isStillVisible = await isnadText.first().isVisible();
-      if (!isStillVisible) {
-        // Fix is working: isnad-text hidden after toggle
-        expect(isStillVisible).toBe(false);
-      }
-    }
-
-    // Re-check it to restore default state
-    await isnadCheckbox.check();
-    await page.waitForTimeout(300);
-    await expect(isnadCheckbox).toBeChecked();
-
-    // Close settings panel
-    const closeBtn = page.locator('.ai-settings-close');
-    await closeBtn.click();
-    await page.waitForTimeout(300);
-    await expect(settingsPanel).not.toBeVisible();
-  });
-
   test('should toggle diacritics on via settings and update verse text', async ({ page }) => {
     await page.goto('/#/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');

@@ -196,17 +196,6 @@
   }
 }
 
-// Isnad/Matn separation
-.isnad-text {
-  color: var(--text-secondary, #888) !important;
-  font-size: 0.95em;
-}
-
-.isnad-divider {
-  margin: 4px 15px;
-  border-top: 1px dashed var(--border-color, #e0e0e0);
-}
-
 // Word-by-word analysis
 .word-analysis-grid {
   position: relative;
@@ -381,35 +370,54 @@
   }
 }
 
-// Chunked (paragraph) view
+// Chunked view — each chunk is a full-width row
 .chunked-view {
   padding: 0 15px;
 }
 
 .chunk-block {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   padding: 8px 12px;
   border-radius: 6px;
   border-left: 3px solid var(--border-color, #e0e0e0);
+}
 
-  @media (min-width: 769px) {
+// Desktop: side-by-side Arabic (right) and translation (left) within each chunk
+@media (min-width: 769px) {
+  .chunk-block {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto;
     gap: 0 16px;
 
-    .chunk-label { grid-column: 1 / -1; }
-    .chunk-arabic { grid-column: 2; grid-row: 2; text-align: right; }
-    .chunk-translation {
-      grid-column: 1; grid-row: 2;
-      border-top: none;
+    .chunk-label {
+      grid-column: 1 / -1;
+    }
+
+    .chunk-arabic-col {
+      grid-column: 2;
+      grid-row: 2;
+      text-align: right;
+    }
+
+    .chunk-translation-col {
+      grid-column: 1;
+      grid-row: 2;
       border-inline-end: 1px solid var(--border-color, #e0e0e0);
       padding-inline-end: 16px;
-      padding-top: 0;
+    }
+  }
+
+  // When AI translation is active, each chunk row is self-contained
+  .chunked-ai-translation .chunk-block {
+    .chunk-translation-col {
+      display: flex;
+      align-items: flex-start;
     }
   }
 }
 
+// Chunk type border colors
 .chunk-type-isnad {
   border-left-color: #9e9e9e;
   background: rgba(0, 0, 0, 0.02);
@@ -471,7 +479,6 @@
   color: var(--text-primary, #333);
   margin: 0;
   padding-top: 4px;
-  border-top: 1px solid var(--border-color, #e0e0e0);
 }
 
 :host-context(body.dark-theme) {

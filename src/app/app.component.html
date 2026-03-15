@@ -128,12 +128,6 @@
                  (change)="aiPrefs.set('showTopicTags', $any($event.target).checked)">
           <span>{{ 'settings.ai.showTopicTags' | translate }}</span>
         </label>
-        <label class="mobile-setting-checkbox">
-          <input type="checkbox"
-                 [checked]="aiPrefs.get('showIsnadSeparation')"
-                 (change)="aiPrefs.set('showIsnadSeparation', $any($event.target).checked)">
-          <span>{{ 'settings.ai.showIsnadSeparation' | translate }}</span>
-        </label>
       </div>
     </aside>
   </ng-container>

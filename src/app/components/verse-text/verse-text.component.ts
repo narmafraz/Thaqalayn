@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { AiLanguage, AiTranslationEntry, Chunk, ContentType, IsnadMatn, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
+import { AiLanguage, AiTranslationEntry, Chunk, ContentType, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { NarratorMetadata, Verse } from '@app/models';
 import { SpecialText } from '@app/models/book';
 import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
@@ -44,12 +44,11 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   private elementRef = inject(ElementRef);
 
   showDiacritics = this.aiPrefs.get('showDiacritizedByDefault');
-  showIsnadSeparation = this.aiPrefs.get('showIsnadSeparation');
   showWordAnalysis = false;
-  showChunkedView = false;
   showChainDiagram = false;
   wordAnalysisLang: AiLanguage = this.aiPrefs.get('wordByWordDefaultLang');
   activeWordIndex: number | null = null;
+
 
   // Word popup state
   wordPopup: { entry: WordAnalysisEntry; x: number; y: number } | null = null;
@@ -63,7 +62,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     });
     this.aiPrefs.preferences$.pipe(takeUntil(this.destroy$)).subscribe(prefs => {
       this.showDiacritics = prefs.showDiacritizedByDefault;
-      this.showIsnadSeparation = prefs.showIsnadSeparation;
       this.wordAnalysisLang = prefs.wordByWordDefaultLang;
       this.cdr.markForCheck();
     });
@@ -76,7 +74,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
 
   applyViewMode(mode: ViewMode): void {
     this.showWordAnalysis = mode === 'word-by-word' || mode === 'combined';
-    this.showChunkedView = mode === 'paragraph' || mode === 'combined';
   }
 
   toggleDiacritics(): void {
@@ -90,12 +87,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     if (this.showWordAnalysis) {
       this.showDiacritics = false;
     }
-    this.cdr.markForCheck();
-  }
-
-  toggleChunkedView(): void {
-    this.localOverride = true;
-    this.showChunkedView = !this.showChunkedView;
     this.cdr.markForCheck();
   }
 
@@ -129,14 +120,12 @@ export class VerseTextComponent implements OnInit, OnDestroy {
         let x: number;
         let y: number;
         if (containerRect) {
-          // Position popup below the card, centered horizontally
           x = cardRect.left - containerRect.left + cardRect.width / 2;
           y = cardRect.bottom - containerRect.top + 8;
         } else {
           x = cardRect.left;
           y = cardRect.bottom + 8;
         }
-        // Clamp popup to viewport bounds
         const popupWidth = 200;
         const popupHeight = 200;
         if (containerRect) {
@@ -173,7 +162,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (!this.wordPopup) return;
-    // Check if the click is inside the word-analysis-grid
     const target = event.target as HTMLElement;
     const grid = this.elementRef.nativeElement.querySelector('.word-analysis-grid');
     if (grid && !grid.contains(target)) {
@@ -213,42 +201,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return wa ? wa.map(e => e.word).join(' ') : '';
   }
 
-  get hasIsnadMatn(): boolean {
-    return !!this.verse?.ai?.isnad_matn?.has_chain;
-  }
-
-  get isnadMatn(): IsnadMatn | undefined {
-    return this.verse?.ai?.isnad_matn;
-  }
-
-  /** Reconstruct isnad Arabic text from chunks with chunk_type=isnad, or from isnad_matn.isnad_ar */
-  get isnadArabicText(): string {
-    const im = this.verse?.ai?.isnad_matn;
-    if (im?.isnad_ar) return im.isnad_ar;
-    // Reconstruct from chunks
-    const chunks = this.verse?.ai?.chunks;
-    const wa = this.verse?.ai?.word_analysis;
-    if (!chunks || !wa) return '';
-    return chunks
-      .filter(c => c.chunk_type === 'isnad')
-      .map(c => wa.slice(c.word_start, c.word_end).map(e => e.word).join(' '))
-      .join(' ');
-  }
-
-  /** Reconstruct matn Arabic text from non-isnad chunks, or from isnad_matn.matn_ar */
-  get matnArabicText(): string {
-    const im = this.verse?.ai?.isnad_matn;
-    if (im?.matn_ar) return im.matn_ar;
-    // Reconstruct from chunks
-    const chunks = this.verse?.ai?.chunks;
-    const wa = this.verse?.ai?.word_analysis;
-    if (!chunks || !wa) return '';
-    return chunks
-      .filter(c => c.chunk_type !== 'isnad')
-      .map(c => wa.slice(c.word_start, c.word_end).map(e => e.word).join(' '))
-      .join(' ');
-  }
-
   get hasWordAnalysis(): boolean {
     return !!this.verse?.ai?.word_analysis?.length;
   }
@@ -273,7 +225,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     const ai = this.verse?.ai;
     if (!ai) return undefined;
     const l = lang as AiLanguage;
-    // Try dissolved fields first (lean format from merger)
     const summary = ai.summaries?.[l];
     const key_terms = ai.key_terms?.[l];
     const seo_question = ai.seo_questions?.[l];
@@ -284,22 +235,24 @@ export class VerseTextComponent implements OnInit, OnDestroy {
         seo_question: seo_question || '',
       };
     }
-    // Fall back to legacy translations object (pre-merger format)
     return ai.translations?.[l];
   }
 
   getTranslationText(verse: Verse, translationId: string): string[] | undefined {
     if (!translationId) return undefined;
-    // Try human translation first
     if (verse.translations?.[translationId]) {
       return verse.translations[translationId];
     }
-    // Try AI translation (reconstruct from chunks)
     if (isAiTranslation(translationId) && verse.ai) {
       const lang = getAiLang(translationId);
       return lang ? getAiTranslationText(verse.ai, lang) : undefined;
     }
     return undefined;
+  }
+
+  /** Check if the given translation ID is an AI translation */
+  isAiTranslationId(translationId: string): boolean {
+    return isAiTranslation(translationId);
   }
 
   /** Check if translation is missing for the current selection */
@@ -325,15 +278,32 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   };
 
   getChunkArabicText(chunk: Chunk): string {
-    // Use arabic_text if present, otherwise reconstruct from word_analysis
     if (chunk.arabic_text) return chunk.arabic_text;
     const wa = this.verse?.ai?.word_analysis;
     if (!wa) return '';
     return wa.slice(chunk.word_start, chunk.word_end).map(e => e.word).join(' ');
   }
 
-  getChunkTranslation(chunk: Chunk, lang: string): string {
-    return (chunk.translations as Record<string, string>)?.[lang] || '';
+  getChunkTranslation(chunk: Chunk, translationId: string): string {
+    if (!translationId) return '';
+    if (isAiTranslation(translationId)) {
+      const lang = getAiLang(translationId);
+      if (lang) {
+        return (chunk.translations as Record<string, string>)?.[lang] || '';
+      }
+    }
+    return '';
+  }
+
+  /** Check if this chunk is the first isnad chunk and should render narrator_chain.parts[].
+   *  We check if it's the first chunk with chunk_type=isnad in the chunks array. */
+  isFirstIsnadChunk(chunk: Chunk): boolean {
+    if (chunk.chunk_type !== 'isnad') return false;
+    if (!this.verse?.narrator_chain?.parts?.length) return false;
+    const chunks = this.verse?.ai?.chunks;
+    if (!chunks) return false;
+    const firstIsnad = chunks.find(c => c.chunk_type === 'isnad');
+    return firstIsnad === chunk;
   }
 
   getPosColor(pos: string): string {
@@ -388,13 +358,11 @@ export class VerseTextComponent implements OnInit, OnDestroy {
       return this.sanitizer.bypassSecurityTrustHtml(this.escapeHtml(text));
     }
 
-    // Sort phrases by length (longest first) to avoid partial matches
     const sorted = [...phrases].sort((a, b) =>
       (b.phrase_ar?.length || 0) - (a.phrase_ar?.length || 0)
     );
 
     const normalizedText = VerseTextComponent.stripDiacritics(text);
-    // Track which character positions are already matched
     const matched = new Array(text.length).fill(false);
     const replacements: { start: number; end: number; phrase: KeyPhrase }[] = [];
 
@@ -409,7 +377,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
         if (idx === -1) break;
 
         const end = idx + normalizedPhrase.length;
-        // Check if any characters in range are already matched
         let overlap = false;
         for (let i = idx; i < end; i++) {
           if (matched[i]) { overlap = true; break; }
@@ -417,10 +384,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
 
         if (!overlap) {
           for (let i = idx; i < end; i++) matched[i] = true;
-          // Map from normalized positions back to original text positions
-          // Since diacritics removal only removes chars, normalized index i
-          // corresponds to the same logical position. We need to find the original
-          // text positions by walking through and counting non-diacritic chars.
           const origStart = this.mapNormalizedIndex(text, idx);
           const origEnd = this.mapNormalizedIndex(text, end);
           replacements.push({ start: origStart, end: origEnd, phrase });
@@ -433,7 +396,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
       return this.sanitizer.bypassSecurityTrustHtml(this.escapeHtml(text));
     }
 
-    // Sort replacements by start position
     replacements.sort((a, b) => a.start - b.start);
 
     let result = '';
@@ -455,7 +417,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     let nCount = 0;
     for (let i = 0; i < original.length; i++) {
       if (nCount === normalizedIdx) return i;
-      // Check if this char is a diacritic (would be stripped)
       if (!/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06DC\u06DF-\u06E4\u06E7-\u06E8]/.test(original[i])) {
         nCount++;
       }
@@ -481,7 +442,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     const narratorId = this.extractNarratorId(path);
     if (narratorId === null) return;
 
-    // Load narrator index if not yet loaded
     if (!this.narratorIndexLoaded) {
       this.narratorIndex = this.store.selectSnapshot(PeopleState.getEnrichedNarratorIndex) || {};
       this.narratorIndexLoaded = true;

@@ -46,11 +46,6 @@
     <span>{{ 'settings.ai.showTopics' | translate }}</span>
   </label>
   <label class="ai-pref">
-    <input type="checkbox" [checked]="aiPrefs.get('showIsnadSeparation')"
-           (change)="onPrefChange('showIsnadSeparation', $any($event.target).checked)">
-    <span>{{ 'settings.ai.showIsnad' | translate }}</span>
-  </label>
-  <label class="ai-pref">
     <input type="checkbox" [checked]="aiPrefs.get('showAiTranslationDisclaimer')"
            (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
     <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>

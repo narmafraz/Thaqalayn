@@ -119,7 +119,6 @@ describe('VerseTextComponent', () => {
     expect(component.hasAiText).toBe(false);
     expect(component.hasWordAnalysis).toBe(false);
     expect(component.hasChunks).toBe(false);
-    expect(component.hasIsnadMatn).toBe(false);
   });
 
   it('should detect AI features when present', () => {
@@ -128,7 +127,6 @@ describe('VerseTextComponent', () => {
     expect(component.hasAiText).toBe(true);
     expect(component.hasWordAnalysis).toBe(true);
     expect(component.hasChunks).toBe(true);
-    expect(component.hasIsnadMatn).toBe(true);
   });
 
   it('should toggle diacritics display', () => {
@@ -147,12 +145,6 @@ describe('VerseTextComponent', () => {
     expect(component.showWordAnalysis).toBe(true);
   });
 
-  it('should toggle chunked view', () => {
-    component.verse = { ...mockVerse, ai: mockAi };
-    expect(component.showChunkedView).toBe(false);
-    component.toggleChunkedView();
-    expect(component.showChunkedView).toBe(true);
-  });
 
   it('should return correct POS labels', () => {
     expect(component.getPosLabel('N')).toBe('Noun');
@@ -185,10 +177,12 @@ describe('VerseTextComponent', () => {
     expect(entry).toBeUndefined();
   });
 
-  it('should get chunk translation', () => {
+  it('should get chunk translation for AI translation IDs', () => {
     const chunk = mockAi.chunks![0];
-    expect(component.getChunkTranslation(chunk, 'en')).toBe('A number of our companions');
-    expect(component.getChunkTranslation(chunk, 'fr')).toBe('');
+    expect(component.getChunkTranslation(chunk, 'en.ai')).toBe('A number of our companions');
+    expect(component.getChunkTranslation(chunk, 'fr.ai')).toBe('');
+    // Non-AI translation IDs should return empty
+    expect(component.getChunkTranslation(chunk, 'en.qarai')).toBe('');
   });
 
   it('should handle word selection', () => {
@@ -200,10 +194,10 @@ describe('VerseTextComponent', () => {
     expect(component.activeWordIndex).toBe(1);
   });
 
-  it('should access isnad/matn data', () => {
+  it('should get chunk arabic text', () => {
     component.verse = { ...mockVerse, ai: mockAi };
-    expect(component.isnadMatn!.has_chain).toBe(true);
-    expect(component.isnadMatn!.isnad_ar).toBe('عدة من أصحابنا');
+    const chunk = mockAi.chunks![0];
+    expect(component.getChunkArabicText(chunk)).toBe('عدة من أصحابنا');
   });
 
   it('should return word analysis array', () => {
@@ -231,26 +225,21 @@ describe('VerseTextComponent', () => {
     expect(component.diacritizedText).toBe('بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ');
   });
 
-  it('should reconstruct isnad/matn text from chunks when isnad_ar/matn_ar are absent', () => {
-    const aiNoIsnadText = {
-      ...mockAi,
-      isnad_matn: { has_chain: true, narrators: [] },
+  it('should identify first isnad chunk correctly', () => {
+    component.verse = {
+      ...mockVerse,
+      narrator_chain: { parts: [{ kind: 'narrator', text: 'test', path: '/people/narrators/1' }], text: '' },
+      ai: mockAi,
     };
-    component.verse = { ...mockVerse, ai: aiNoIsnadText };
-    expect(component.isnadArabicText).toBe('بِسْمِ');
-    expect(component.matnArabicText).toBe('اللَّهِ');
-  });
-
-  it('should use isnad_ar/matn_ar when present', () => {
-    component.verse = { ...mockVerse, ai: mockAi };
-    expect(component.isnadArabicText).toBe('عدة من أصحابنا');
-    expect(component.matnArabicText).toBe('قال الإمام');
+    const isnadChunk = mockAi.chunks![0]; // chunk_type: 'isnad'
+    const bodyChunk = mockAi.chunks![1]; // chunk_type: 'body'
+    expect(component.isFirstIsnadChunk(isnadChunk)).toBe(true);
+    expect(component.isFirstIsnadChunk(bodyChunk)).toBe(false);
   });
 
   it('should initialize toggle states from AiPreferencesService', () => {
     const prefs = TestBed.inject(AiPreferencesService);
     prefs.set('showDiacritizedByDefault', true);
-    prefs.set('showIsnadSeparation', false);
     prefs.set('wordByWordDefaultLang', 'fr');
 
     // Re-create component to pick up new prefs
@@ -259,7 +248,6 @@ describe('VerseTextComponent', () => {
     newComponent.verse = mockVerse;
 
     expect(newComponent.showDiacritics).toBe(true);
-    expect(newComponent.showIsnadSeparation).toBe(false);
     expect(newComponent.wordAnalysisLang).toBe('fr');
 
     // Reset prefs to defaults for other tests
@@ -347,50 +335,30 @@ describe('VerseTextComponent', () => {
     expect(html).toContain('&quot;');
   });
 
-  // Combined view mode tests
-  it('should set both showWordAnalysis and showChunkedView when applyViewMode("combined")', () => {
+  // View mode tests
+  it('should set showWordAnalysis for combined mode', () => {
     component.verse = { ...mockVerse, ai: mockAi };
     component.applyViewMode('combined');
     expect(component.showWordAnalysis).toBe(true);
-    expect(component.showChunkedView).toBe(true);
   });
 
-  it('should set only showWordAnalysis for word-by-word mode', () => {
+  it('should set showWordAnalysis for word-by-word mode', () => {
     component.verse = { ...mockVerse, ai: mockAi };
     component.applyViewMode('word-by-word');
     expect(component.showWordAnalysis).toBe(true);
-    expect(component.showChunkedView).toBe(false);
   });
 
-  it('should set only showChunkedView for paragraph mode', () => {
-    component.verse = { ...mockVerse, ai: mockAi };
-    component.applyViewMode('paragraph');
-    expect(component.showWordAnalysis).toBe(false);
-    expect(component.showChunkedView).toBe(true);
-  });
-
-  it('should clear both flags for plain mode', () => {
+  it('should clear showWordAnalysis for plain mode', () => {
     component.verse = { ...mockVerse, ai: mockAi };
     component.applyViewMode('combined');
     component.applyViewMode('plain');
     expect(component.showWordAnalysis).toBe(false);
-    expect(component.showChunkedView).toBe(false);
   });
 
-  it('should not clear showChunkedView when toggling word analysis on', () => {
-    component.verse = { ...mockVerse, ai: mockAi };
-    component.showChunkedView = true;
-    component.toggleWordAnalysis();
-    expect(component.showWordAnalysis).toBe(true);
-    expect(component.showChunkedView).toBe(true);
-  });
-
-  it('should not clear showWordAnalysis when toggling chunked view on', () => {
-    component.verse = { ...mockVerse, ai: mockAi };
-    component.showWordAnalysis = true;
-    component.toggleChunkedView();
-    expect(component.showChunkedView).toBe(true);
-    expect(component.showWordAnalysis).toBe(true);
+  it('should check isAiTranslationId correctly', () => {
+    expect(component.isAiTranslationId('en.ai')).toBe(true);
+    expect(component.isAiTranslationId('en.qarai')).toBe(false);
+    expect(component.isAiTranslationId('')).toBe(false);
   });
 
   // FB-03: Word click popup tests

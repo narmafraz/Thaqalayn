@@ -133,7 +133,7 @@
           <!-- Collapsible secondary metadata -->
           <div class="secondary-metadata" *ngIf="isMetadataExpanded(verse.local_index)">
             <!-- AI feature toggles (per-verse) -->
-            <div class="ai-toggles-footer" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasChunks || vt.hasNarratorChain">
+            <div class="ai-toggles-footer" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasNarratorChain">
               <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
                       [class.active]="vt.showChainDiagram"
                       [attr.aria-label]="vt.showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"
@@ -151,12 +151,6 @@
                       [attr.aria-label]="vt.showWordAnalysis ? 'Hide word analysis' : 'Show word-by-word analysis'"
                       matTooltip="Word-by-word analysis">
                 <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
-              </button>
-              <button *ngIf="vt.hasChunks" class="ai-toggle-btn" (click)="vt.toggleChunkedView()"
-                      [class.active]="vt.showChunkedView"
-                      [attr.aria-label]="vt.showChunkedView ? 'Hide paragraph view' : 'Show paragraph view'"
-                      matTooltip="Paragraph view">
-                <mat-icon>{{ vt.showChunkedView ? 'view_headline' : 'view_agenda' }}</mat-icon>
               </button>
               <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && verse.ai?.diacritics_status">
                 {{ verse.ai.diacritics_status }}

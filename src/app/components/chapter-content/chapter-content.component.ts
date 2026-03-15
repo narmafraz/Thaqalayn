@@ -3,12 +3,13 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Elem
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
-import { Book, BOOK_DISPLAY_NAMES, ChapterContent, Crumb, Verse } from '@app/models';
+import { Book, BOOK_DISPLAY_NAMES, ChapterContent, Crumb, Verse, VerseRef } from '@app/models';
 import { BookAuthor, getBookAuthor } from '@app/data/book-authors';
 import { I18nService } from '@app/services/i18n.service';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
 import { BooksService } from '@app/services/books.service';
+import { VerseLoaderService } from '@app/services/verse-loader.service';
 import { ShareCardService } from '@app/services/share-card.service';
 import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
 import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
@@ -71,6 +72,13 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // Book author metadata
   author: BookAuthor | undefined;
 
+  // Shell format lazy-loading state
+  verseRefs: VerseRef[] = [];
+  isShellFormat = false;
+  loadedVerses = new Map<string, Verse>();
+  private observer: IntersectionObserver | null = null;
+  private observedElements = new Set<Element>();
+
   private destroyRef = inject(DestroyRef);
 
   // AI preference visibility flags
@@ -87,6 +95,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private router: Router,
     private el: ElementRef,
     private booksService: BooksService,
+    private verseLoader: VerseLoaderService,
     private shareCard: ShareCardService,
     private i18nService: I18nService,
     private renderer: Renderer2,
@@ -124,8 +133,21 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       // Derive book author from index (only show at top-level: al-kafi, al-kafi:1)
       const depth = (book.index.match(/:/g) || []).length;
       this.author = depth <= 1 ? getBookAuthor(book.index) : undefined;
-      // Check for AI content to show view mode toolbar
-      this.checkAiContent(book);
+
+      // Detect shell format vs legacy
+      this.isShellFormat = !!(book.data.verse_refs?.length) && !book.data.verses?.length;
+      if (this.isShellFormat) {
+        this.verseRefs = book.data.verse_refs!;
+        this.loadedVerses.clear();
+        this.setupIntersectionObserver();
+        // For shell format, derive AI content from verse_translations
+        this.hasAnyAiContent = book.data.verse_translations?.some(id => id.endsWith('.ai')) || false;
+      } else {
+        this.verseRefs = [];
+        this.destroyObserver();
+        this.checkAiContent(book);
+      }
+
       // Load bookmark and annotation states for all verses
       this.loadBookmarkStates(book);
       this.loadAnnotationStates(book);
@@ -139,9 +161,62 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
+    this.destroyObserver();
     const host = this.el.nativeElement;
     host.removeEventListener('touchstart', this.onTouchStart);
     host.removeEventListener('touchend', this.onTouchEnd);
+  }
+
+  // --- Lazy-loading support ---
+
+  private setupIntersectionObserver(): void {
+    this.destroyObserver();
+    this.observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const path = (entry.target as HTMLElement).getAttribute('data-path');
+            if (path && !this.loadedVerses.has(path)) {
+              this.verseLoader.loadVerse(path).subscribe(verse => {
+                if (verse) {
+                  this.loadedVerses.set(path, verse);
+                  this.cdr.markForCheck();
+                }
+              });
+            }
+            this.observer?.unobserve(entry.target);
+            this.observedElements.delete(entry.target);
+          }
+        });
+      },
+      { rootMargin: '200px' }
+    );
+
+    // Observe skeleton elements after a tick (DOM needs to render first)
+    setTimeout(() => this.observeSkeletons());
+  }
+
+  observeSkeletons(): void {
+    if (!this.observer) return;
+    const skeletons = this.el.nativeElement.querySelectorAll('.verse-skeleton[data-path]');
+    skeletons.forEach((el: Element) => {
+      if (!this.observedElements.has(el)) {
+        this.observer!.observe(el);
+        this.observedElements.add(el);
+      }
+    });
+  }
+
+  private destroyObserver(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
+    this.observedElements.clear();
+  }
+
+  trackByRef(_index: number, ref: VerseRef): string {
+    return ref.path || `heading-${ref.local_index}`;
   }
 
   private onTouchStart = (e: TouchEvent): void => {
@@ -268,6 +343,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   }
 
   getVerseCount(book: any): number {
+    if (book?.data?.verse_refs?.length) {
+      return book.data.verse_refs.filter((r: any) => r.part_type === 'Hadith' || r.part_type === 'Verse').length;
+    }
     return book?.data?.verses?.filter((v: any) => v.part_type === 'Hadith' || v.part_type === 'Verse').length || 0;
   }
 
@@ -431,11 +509,38 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     this.booksService.getPart(chapterIndex).subscribe({
       next: (book: Book) => {
         entry.loading = false;
-        if (book.kind === 'verse_list' && book.data.verses) {
-          const found = book.data.verses.find(v => v.local_index === verseIdx);
-          entry.verse = found || null;
-          entry.title = book.data.titles?.en || chapterIndex;
-          if (!found) entry.error = 'Verse not found';
+        if (book.kind === 'verse_list') {
+          if (book.data.verses) {
+            // Legacy format: verses inline
+            const found = book.data.verses.find(v => v.local_index === verseIdx);
+            entry.verse = found || null;
+            entry.title = book.data.titles?.en || chapterIndex;
+            if (!found) entry.error = 'Verse not found';
+          } else {
+            // Shell format: load verse_detail individually
+            entry.title = book.data.titles?.en || chapterIndex;
+            const versePath = path;
+            const vIdx = path.startsWith('/books/') ? path.slice(7) : path;
+            this.booksService.getPart(vIdx).subscribe({
+              next: (vBook: Book) => {
+                if (vBook.kind === 'verse_detail') {
+                  entry.verse = (vBook as any).data.verse;
+                  entry.loading = false;
+                } else {
+                  entry.error = 'Unexpected verse format';
+                }
+                this.cdr.markForCheck();
+              },
+              error: () => {
+                entry.error = 'Failed to load verse';
+                this.cdr.markForCheck();
+              }
+            });
+            return; // Don't markForCheck yet — inner subscribe will
+          }
+        } else if (book.kind === 'verse_detail') {
+          entry.verse = (book as any).data.verse;
+          entry.title = (book as any).data.chapter_title?.en || chapterIndex;
         } else {
           entry.error = 'Unexpected data format';
         }

@@ -858,3 +858,42 @@ mat-mdc-card {
     background-color: rgba(21, 101, 192, 0.2);
   }
 }
+
+// Skeleton loading placeholders for lazy-loaded verses
+.verse-skeleton {
+  mat-card-content {
+    min-height: 120px;
+  }
+}
+
+.skeleton-line {
+  background: linear-gradient(90deg, var(--table-stripe, #f0f0f0) 25%, var(--card-bg, #e8e8e8) 50%, var(--table-stripe, #f0f0f0) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+.skeleton-arabic {
+  height: 24px;
+  width: 80%;
+  margin: 16px auto 12px;
+}
+
+.skeleton-translation {
+  height: 18px;
+  width: 60%;
+  margin: 0 16px 16px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+:host-context(body.dark-theme) {
+  .skeleton-line {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 25%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  }
+}

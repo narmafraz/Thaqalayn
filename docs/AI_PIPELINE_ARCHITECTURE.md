@@ -1,8 +1,10 @@
 # AI Pipeline Architecture
 
+> **STATUS: PARTIALLY SUPERSEDED (2026-03-15)** — This describes the v2 agent-based orchestration which has been replaced by the v3/v4 Python CLI pipeline (`AI_PIPELINE_V3_PLAN.md`, `PIPELINE_OPTIMIZATION_PLAN.md`). However, the **field definitions, review checks, caching, and validation** sections remain accurate and are still used by the current pipeline. Retained as reference for those sections.
+
 > How the Claude Code agent-based AI content generation pipeline works end-to-end.
 
-This document describes the **current production implementation** of the AI content pipeline. For the earlier Batch API design (historical), see [`AI_CONTENT_PIPELINE.md`](AI_CONTENT_PIPELINE.md).
+~~This document describes the **current production implementation** of the AI content pipeline.~~ For the earlier Batch API design (historical), see [`AI_CONTENT_PIPELINE.md`](AI_CONTENT_PIPELINE.md). For the current CLI-based pipeline, see [`AI_PIPELINE_V3_PLAN.md`](AI_PIPELINE_V3_PLAN.md).
 
 ## Overview
 

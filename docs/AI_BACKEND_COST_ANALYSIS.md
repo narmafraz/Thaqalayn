@@ -1,5 +1,7 @@
 # AI Backend Cost Analysis
 
+> **STATUS: SUPERSEDED (2026-03-15)** — This initial comparison has been superseded by [`PIPELINE_OPTIMIZATION_PLAN.md`](PIPELINE_OPTIMIZATION_PLAN.md) (2026-03-13), which includes GPT-5.4 benchmark data and a field-by-field quality analysis. The raw test data below remains valid as historical reference.
+
 Comparison of available backends for the AI content generation pipeline. Tests conducted 2026-03-09/10 on al-Kafi Volume 1, Book 1, Chapter 1 (15 verses, 27-300 words).
 
 ## Executive Summary

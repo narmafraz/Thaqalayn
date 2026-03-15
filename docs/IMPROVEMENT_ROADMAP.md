@@ -1,5 +1,7 @@
 # Thaqalayn Ecosystem: Comprehensive Improvement Roadmap
 
+> **STATUS: SUPERSEDED (2026-03-15)** — Phase 1-2 are complete. Phase 3+ items have been collated into [`CONSOLIDATED_ROADMAP.md`](CONSOLIDATED_ROADMAP.md). This document is retained for historical reference only.
+>
 > **Date:** 2026-02-27 (updated)
 > **Scope:** ThaqalaynDataGenerator (Python) | ThaqalaynData (JSON API) | Thaqalayn (Angular 19 UI)
 > **Primary Goal:** Serve all 4 major Shia hadith books with multi-language translations, accessible to users and developers

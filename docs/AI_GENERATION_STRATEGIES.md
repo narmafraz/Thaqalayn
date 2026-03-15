@@ -1,5 +1,7 @@
 # AI Content Generation Strategies — Full Corpus in 2 Months
 
+> **STATUS: SUPERSEDED (2026-03-15)** — The 20 strategies here have been narrowed down based on benchmark results. The winning approach (multi-phase hybrid pipeline) is detailed in [`PIPELINE_OPTIMIZATION_PLAN.md`](PIPELINE_OPTIMIZATION_PLAN.md) (2026-03-13). Retained for reference on alternative approaches and cost modeling.
+
 **Date**: 2026-03-10
 **Goal**: Generate AI content for ~58,000 hadith within 2 months (~60 days)
 **Current progress**: ~3,686 verses complete (~6.4%)

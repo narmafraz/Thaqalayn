@@ -1,5 +1,7 @@
 # Master Roadmap
 
+> **STATUS: SUPERSEDED (2026-03-15)** — This roadmap has been superseded by [`CONSOLIDATED_ROADMAP.md`](CONSOLIDATED_ROADMAP.md), which collates all outstanding work from this and other docs. Phase 1-2 content below is complete and retained for historical reference. Phase 3+ items have been moved to the consolidated roadmap.
+>
 > **Last updated:** 2026-02-23
 > **Purpose:** Single source of truth for all planned work across the Thaqalayn ecosystem. Consolidates and supersedes individual proposals. Each phase ends with a team evaluation checkpoint.
 >

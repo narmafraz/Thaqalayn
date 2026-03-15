@@ -1,5 +1,7 @@
 # AI Content Pipeline — Design & Architecture
 
+> **STATUS: SUPERSEDED (2026-03-15)** — This was the original v1/v2 pipeline design using Anthropic Batch API. The pipeline has since evolved through v3 (Python asyncio + `claude -p`, see [`AI_PIPELINE_V3_PLAN.md`](AI_PIPELINE_V3_PLAN.md)) and v4 (multi-phase hybrid, see [`PIPELINE_OPTIMIZATION_PLAN.md`](PIPELINE_OPTIMIZATION_PLAN.md)). Retained for historical reference and field definitions.
+>
 > **Date:** 2026-02-23
 > **Purpose:** Comprehensive plan for generating AI-powered content across the Thaqalayn hadith corpus. Covers model selection, content types, fault tolerance, quality validation, attribution, and storage.
 > **Budget context:** ~$14,000 remaining in February 2026 Anthropic API budget.

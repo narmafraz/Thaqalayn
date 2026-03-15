@@ -72,19 +72,19 @@ State modules are configured in `src/store/store.config.ts` and imported via `Ng
 The core data structure is hierarchical:
 
 ```
-Book (ChapterList | ChapterContent | VerseContent)
+Book (ChapterList | ChapterContent | VerseContent | VerseDetail)
   └─ Chapter
       ├─ titles (MultiLingualText)
-      ├─ verses[]
-      │   ├─ text[]
-      │   ├─ translations (Record<string, string[]>)
-      │   └─ narrator_chain
+      ├─ verse_refs[] (shell format — path refs to verse_detail files)
+      │   ├─ local_index, part_type, path (Hadith/Verse)
+      │   └─ local_index, part_type, inline (Heading only)
+      ├─ verses[] (legacy format — full inline verses, absent in shell format)
       ├─ chapters[] (nested sub-chapters)
       ├─ nav (Navigation: prev, next, up)
       └─ verse_translations[]
 ```
 
-Key interfaces are defined in `src/app/models/book.ts`.
+Key interfaces are defined in `src/app/models/book.ts`. The `chapter-content` component detects shell format (`verse_refs` present) vs legacy (`verses` present) and lazy-loads verses via `VerseLoaderService`.
 
 ### Routing
 Routes are defined in `src/app/routing/app-routing.module.ts` with hash-based routing (`useHash: true`). Route resolvers pre-fetch data before component activation:
@@ -98,6 +98,7 @@ Routes are defined in `src/app/routing/app-routing.module.ts` with hash-based ro
 Services in `src/app/services/` handle API communication:
 
 - **BooksService**: Fetches book data from API (converts path `index` like "1:2:3" to URL "books/1/2/3.json")
+- **VerseLoaderService**: Lazy-loads individual verse_detail files with in-memory cache (`shareReplay`). Used by `chapter-content` component with `IntersectionObserver` to load verses as they scroll into view.
 - **PeopleService**: Fetches narrator/people data
 
 ### Components

@@ -1,3 +1,11 @@
+:host {
+  // Prevent the Angular host element from taking up space in the flow
+  // and causing layout shifts when the hover card appears/disappears
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
 .narrator-hover-card {
   position: absolute;
   z-index: 1000;

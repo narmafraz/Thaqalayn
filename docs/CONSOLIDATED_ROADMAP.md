@@ -1,6 +1,7 @@
 # Consolidated Roadmap
 
 > **Created:** 2026-03-15
+> **Last updated:** 2026-03-15 (post team `ui-improvements` run)
 > **Last verified against source code:** 2026-03-15
 > **Purpose:** Single source of truth for all outstanding work across the Thaqalayn ecosystem.
 > Collates unfinished items from all prior roadmaps and proposals into one prioritized list.
@@ -82,38 +83,40 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 
 ### 2.1 i18n Critical Issues
 
-| Item | Severity | Source |
-|------|----------|--------|
-| `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 |
-| Missing `books.{lang}.json` for 8 languages — causes "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 |
-| About + Support pages entirely hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-01 |
-| AI Settings panel labels hardcoded in English (7 strings) | HIGH | UX_REVIEW_2026_03_10 D-02 |
-| Verse-detail section headers hardcoded ("Quran References", etc.) | HIGH | UX_REVIEW_2026_03_10 D-03 |
-| Topics page tabs/content hardcoded | HIGH | UX_REVIEW_2026_03_10 D-04 |
-| Phrase list page entirely hardcoded | HIGH | UX_REVIEW_2026_03_10 D-05 |
-| ~20 raw i18n keys leak as visible text | HIGH | UX_REVIEW_REPORTS §3 |
-| ~15 hardcoded English content labels (Summary, Key Terms, etc.) | MEDIUM | UI_REVIEW_DETAILS.md |
+| Item | Severity | Source | Status |
+|------|----------|--------|--------|
+| `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 | **NEEDS INVESTIGATION** — worker-p2 assessed but may need deeper routing fix |
+| Missing `books.{lang}.json` for 8 languages — causes "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 | **OUTSTANDING** — requires generator-side changes to produce index files |
+| About + Support pages entirely hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-01 | **OUTSTANDING** |
+| AI Settings panel labels hardcoded in English (7 strings) | HIGH | UX_REVIEW_2026_03_10 D-02 | **OUTSTANDING** |
+| Verse-detail section headers hardcoded ("Quran References", etc.) | HIGH | UX_REVIEW_2026_03_10 D-03 | **OUTSTANDING** |
+| Topics page tabs/content hardcoded | HIGH | UX_REVIEW_2026_03_10 D-04 | **OUTSTANDING** |
+| Phrase list page entirely hardcoded | HIGH | UX_REVIEW_2026_03_10 D-05 | **OUTSTANDING** |
+| ~20 raw i18n keys leak as visible text | HIGH | UX_REVIEW_REPORTS §3 | **OUTSTANDING** |
+| ~15 hardcoded English content labels (Summary, Key Terms, etc.) | MEDIUM | UI_REVIEW_DETAILS.md | **OUTSTANDING** |
+| AI toggle aria-labels hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-08 | **DONE** (commit `4eff213`) — replaced with translated strings |
+| Settings close + book-tree tooltips hardcoded | MEDIUM | UX_REVIEW_2026_03_10 | **DONE** (commit `e0ca470`) — i18n keys added to all 12 locales |
 
 ### 2.2 Accessibility Issues
 
-| Item | Severity | Source |
-|------|----------|--------|
-| AI toggle buttons too small for touch on mobile (~20px) | HIGH | UX_REVIEW_2026_03_10 M-01 |
-| Topic category headers used as buttons without ARIA role | HIGH | UX_REVIEW_2026_03_10 A-01 |
-| AI settings checkboxes lack proper label pairing | HIGH | UX_REVIEW_2026_03_10 A-02 |
-| Discussion section toggle lacks ARIA attributes | MEDIUM | UX_REVIEW_2026_03_10 A-03 |
-| Embed verse component lacks dynamic lang attributes | MEDIUM | UX_REVIEW_2026_03_10 A-04 |
-| Search dropdown missing ARIA selected state / keyboard nav | MEDIUM | UX_REVIEW_2026_03_10 A-05 |
-| Narrator sort headers lack accessible names (known issue) | LOW | QA_REPORT.md |
+| Item | Severity | Source | Status |
+|------|----------|--------|--------|
+| AI toggle buttons too small for touch on mobile (~20px) | HIGH | UX_REVIEW_2026_03_10 M-01 | **DONE** (commit `4eff213`) — padding increased to 6px with flexbox centering |
+| Topic category headers used as buttons without ARIA role | HIGH | UX_REVIEW_2026_03_10 A-01 | **OUTSTANDING** |
+| AI settings checkboxes lack proper label pairing | HIGH | UX_REVIEW_2026_03_10 A-02 | **DONE** (commit `4eff213`) — explicit id/for pairing added |
+| Discussion section toggle lacks ARIA attributes | MEDIUM | UX_REVIEW_2026_03_10 A-03 | **OUTSTANDING** |
+| Embed verse component lacks dynamic lang attributes | MEDIUM | UX_REVIEW_2026_03_10 A-04 | **DONE** (commit `4eff213`) — dynamic lang attributes added |
+| Search dropdown missing ARIA selected state / keyboard nav | MEDIUM | UX_REVIEW_2026_03_10 A-05 | **OUTSTANDING** |
+| Narrator sort headers lack accessible names (known issue) | LOW | QA_REPORT.md | **OUTSTANDING** |
 
 ### 2.3 Mobile Issues
 
 | Item | Severity | Source | Status |
 |------|----------|--------|--------|
-| Word-analysis popup may overflow viewport on mobile | HIGH | UX_REVIEW_2026_03_10 M-02 | OPEN |
-| Mobile menu lacks AI settings | MEDIUM | UX_REVIEW_2026_03_10 M-03 | OPEN |
+| Word-analysis popup may overflow viewport on mobile | HIGH | UX_REVIEW_2026_03_10 M-02 | **OUTSTANDING** |
+| Mobile menu lacks AI settings | MEDIUM | UX_REVIEW_2026_03_10 M-03 | **OUTSTANDING** |
 | ~~Bottom navigation missing Narrators link~~ | ~~MEDIUM~~ | ~~UX_REVIEW_2026_03_10 M-04~~ | **DONE** — code shows 5 nav items including Narrators |
-| Compact header breadcrumb text 9px — illegible | MEDIUM | UX_REVIEW_2026_03_10 M-05 | OPEN |
+| Compact header breadcrumb text 9px — illegible | MEDIUM | UX_REVIEW_2026_03_10 M-05 | **DONE** (commit `4eff213`) — minimum increased to 11px |
 
 ---
 
@@ -125,30 +128,30 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 
 ### 3.1 Critical Fixes
 
-| Item | Source |
-|------|--------|
-| Narrator profile pages freeze browser for high-narration narrators (#4: 3,116, #19: 5,511) | UX_REVIEW_REPORTS §1 |
-| Add English transliteration to narrator names (list + profiles) | PPL-07, UX_REVIEW_REPORTS |
-| Default sort narrators by narration count (not opaque ID) | UX_REVIEW_REPORTS §4 |
+| Item | Source | Status |
+|------|--------|--------|
+| Narrator profile pages freeze browser for high-narration narrators (#4: 3,116, #19: 5,511) | UX_REVIEW_REPORTS §1 | **OUTSTANDING** — needs lazy loading/virtualization |
+| Add English transliteration to narrator names (list + profiles) | PPL-07, UX_REVIEW_REPORTS | **DONE** (commit `ce3cbb6`) — two-line name cell with Arabic + English |
+| Default sort narrators by narration count (not opaque ID) | UX_REVIEW_REPORTS §4 | **OUTSTANDING** |
 
 ### 3.2 Narrator List Enhancements
 
-| Item | Source |
-|------|--------|
-| Featured Imams section (horizontal scrollable cards) | UI_REVIEW_DETAILS.md |
-| Enhanced table (two-line name, narration count pills, role badges) | UI_REVIEW_DETAILS.md |
-| Mobile card layout replacing table | UI_REVIEW_DETAILS.md |
-| Filter by English transliteration | PPL-02 enhancement |
+| Item | Source | Status |
+|------|--------|--------|
+| Featured Imams section (horizontal scrollable cards) | UI_REVIEW_DETAILS.md | **OUTSTANDING** |
+| Enhanced table (two-line name, narration count pills, role badges) | UI_REVIEW_DETAILS.md | **DONE** (commit `ce3cbb6`) — count pills + Imam role badges |
+| Mobile card layout replacing table | UI_REVIEW_DETAILS.md | **OUTSTANDING** |
+| Filter by English transliteration | PPL-02 enhancement | **OUTSTANDING** |
 
 ### 3.3 Narrator Profile Enhancements
 
-| Item | Source |
-|------|--------|
-| Profile header hero (monogram, stats pills, era, reliability) | UI_REVIEW_DETAILS.md |
-| Hadith preview cards (not bare path links) | PPL-10 |
-| Lazy loading (50 hadiths at a time) | UI_REVIEW_DETAILS.md |
-| Transmission network summary (top co-narrators by frequency) | UI_REVIEW_DETAILS.md |
-| Stats summary (total narrations, book distribution) | PPL-08 |
+| Item | Source | Status |
+|------|--------|--------|
+| Profile header hero (monogram, stats pills, era, reliability) | UI_REVIEW_DETAILS.md | **DONE** (commit `7f3ec03`) — full hero with monogram, stats, gold Imam styling |
+| Hadith preview cards (not bare path links) | PPL-10 | **OUTSTANDING** |
+| Lazy loading (50 hadiths at a time) | UI_REVIEW_DETAILS.md | **OUTSTANDING** |
+| Transmission network summary (top co-narrators by frequency) | UI_REVIEW_DETAILS.md | **OUTSTANDING** |
+| Stats summary (total narrations, book distribution) | PPL-08 | **DONE** (commit `7f3ec03`) — stats in hero header |
 
 ### 3.4 Future Narrator Features (Lower Priority)
 
@@ -173,30 +176,32 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 
 ### 4.1 Quick Wins (search.service.ts changes only)
 
-| Item | Impact | Effort |
-|------|--------|--------|
-| Set `threshold: 0` for multi-word AND behavior | High | Easy |
-| Add `boost: { en: 2, t: 0.5 }` for better ranking | High | Easy |
-| Add `tolerance: 1` for typo tolerance | Medium | Easy |
-| Expose `offset` for search pagination | High | Easy |
+| Item | Impact | Effort | Status |
+|------|--------|--------|--------|
+| Set `threshold: 0` for multi-word AND behavior | High | Easy | **DONE** — already in code before team run |
+| Add `boost: { en: 2, t: 0.5 }` for better ranking | High | Easy | **DONE** — already in code before team run |
+| Add `tolerance: 1` for typo tolerance | Medium | Easy | **DONE** — already in code before team run |
+| Expose `offset` for search pagination | High | Easy | **DONE** (commits `88b2ba9`, `1f14faf`, `f5e91cd`) — offset wired through NGXS state + edge cases fixed |
+| BM25 relevance tuning (`b: 0.5`) | Medium | Easy | **DONE** (commit `88b2ba9`) — reduces length penalty on longer hadiths |
+| Skip path tokenization (`tokenizeSkipProperties`) | Low | Easy | **DONE** (commit `88b2ba9`) — prevents path fields from polluting search |
 
 ### 4.2 Schema Enrichment (generator + service changes)
 
-| Item | Impact | Effort |
-|------|--------|--------|
-| Add `book` enum field to search documents | Very High | Medium |
-| Faceted search (counts by book) | Very High | Medium |
-| Where filters (filter by book/volume) | Very High | Medium |
-| GroupBy (results organized by book) | High | Medium |
+| Item | Impact | Effort | Status |
+|------|--------|--------|--------|
+| Add `book` enum field to search documents | Very High | Medium | **OUTSTANDING** — needs generator-side changes |
+| Faceted search (counts by book) | Very High | Medium | **OUTSTANDING** — needs book enum field first |
+| Where filters (filter by book/volume) | Very High | Medium | **OUTSTANDING** — needs book enum field first |
+| GroupBy (results organized by book) | High | Medium | **OUTSTANDING** — needs book enum field first |
 
 ### 4.3 Performance & Arabic Quality
 
-| Item | Impact | Effort |
-|------|--------|--------|
-| Pre-built Orama indexes (save/load at build time) | Very High | Medium |
-| Arabic tokenizer (`language: 'arabic'`) | High | Medium |
-| Arabic stemmer (`@orama/stemmers`) | High | Medium |
-| Arabic stop words (`@orama/stopwords`) | Medium | Easy |
+| Item | Impact | Effort | Status |
+|------|--------|--------|--------|
+| Pre-built Orama indexes (save/load at build time) | Very High | Medium | **OUTSTANDING** — needs Node.js build script in generator |
+| Arabic tokenizer (`language: 'arabic'`) | High | Medium | **DONE** — already in code before team run |
+| Arabic stemmer (`@orama/stemmers`) | High | Medium | **OUTSTANDING** — needs npm install of `@orama/stemmers` |
+| Arabic stop words (`@orama/stopwords`) | Medium | Easy | **OUTSTANDING** — needs npm install of `@orama/stopwords` |
 
 ---
 
@@ -208,25 +213,26 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 
 ### 5.1 Schema Changes for New Books
 
-**Code verified (2026-03-15):** `book_registry.py` and `thaqalayn_api.py` both exist. Some schema changes may already be implemented.
+**Verified by worker-p5 (2026-03-15):** All schema changes are already implemented. Infrastructure is ready for new books.
 
 | Item | Source | Status |
 |------|--------|--------|
-| Change `gradings` from `List[str]` to `Dict[str, str]` | SCHEMA_PROPOSAL §2.2 | NEEDS VERIFICATION |
-| Add `source_url` to Verse model | SCHEMA_PROPOSAL §2.2 | NEEDS VERIFICATION |
-| Add `Section` to PartType enum | SCHEMA_PROPOSAL §2.8 | NEEDS VERIFICATION |
-| Add `FR` to Language enum | SCHEMA_PROPOSAL §2.9 | NEEDS VERIFICATION |
-| Create `book_registry.py` for declarative book registration | SCHEMA_PROPOSAL §2.1 | **DONE** — file exists |
-| Add book metadata to books.json (author, source, verse_count, hierarchy) | SCHEMA_PROPOSAL §2.5 | NEEDS VERIFICATION |
+| Change `gradings` from `List[str]` to `Dict[str, str]` | SCHEMA_PROPOSAL §2.2 | **DONE** — already `Dict[str, str]` in Python model + Angular interface |
+| Add `source_url` to Verse model | SCHEMA_PROPOSAL §2.2 | **DONE** — exists in both Python model + Angular interface |
+| Add `Section` to PartType enum | SCHEMA_PROPOSAL §2.8 | **DONE** — exists in PartType enum |
+| Add `FR` to Language enum | SCHEMA_PROPOSAL §2.9 | **DONE** — exists in Language enum |
+| Create `book_registry.py` for declarative book registration | SCHEMA_PROPOSAL §2.1 | **DONE** — functional with configs for all books |
+| Add book metadata to books.json (author, source, verse_count, hierarchy) | SCHEMA_PROPOSAL §2.5 | **DONE** — books.json includes metadata |
 
 ### 5.2 New Book Parsers
 
 | Item | Source | Status |
 |------|--------|--------|
-| `thaqalayn_api.py` — generic parser for ThaqalaynAPI JSON | PARSER_ARCHITECTURE §2 | **DONE** — file exists |
-| `thaqalayn_net.py` — HTML parser for mirror books | PARSER_ARCHITECTURE §3 | NEEDS VERIFICATION |
-| Tahdhib al-Ahkam sourcing (hadith.inoor.ir API or ghbook.ir) | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | NOT STARTED |
-| al-Istibsar sourcing | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | NOT STARTED |
+| `thaqalayn_api.py` — generic parser for ThaqalaynAPI JSON | PARSER_ARCHITECTURE §2 | **DONE** — functional parser |
+| `thaqalayn_net.py` — HTML parser for mirror books | PARSER_ARCHITECTURE §3 | **DONE** — file exists (verified by worker-p5) |
+| `ai_content_merger.py` — merge AI content into data | — | **DONE** — functional |
+| Tahdhib al-Ahkam sourcing (hadith.inoor.ir API or ghbook.ir) | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | **OUTSTANDING** |
+| al-Istibsar sourcing | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | **OUTSTANDING** |
 
 ### 5.3 Data Optimization (Remaining)
 
@@ -246,21 +252,21 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 
 ### 6.1 Design System Foundation
 
-| Item | Source |
-|------|--------|
-| 8px spacing scale (4, 8, 12, 16, 24, 32, 48, 64) | UI_REVIEW_DETAILS DS-01 |
-| Typography scale (heading, subheading, body, caption, overline) | UI_REVIEW_DETAILS DS-02 |
-| Verse card improvements (alternating bg, accent border, verse numbers) | UI_REVIEW_DETAILS |
-| Replace `>>` breadcrumb separator with chevron | UX_REVIEW_REPORTS §4 |
+| Item | Source | Status |
+|------|--------|--------|
+| 8px spacing scale (4, 8, 12, 16, 24, 32, 48, 64) | UI_REVIEW_DETAILS DS-01 | **OUTSTANDING** — CSS custom properties not yet added |
+| Typography scale (heading, subheading, body, caption, overline) | UI_REVIEW_DETAILS DS-02 | **OUTSTANDING** — CSS custom properties not yet added |
+| Verse card improvements (alternating bg, accent border, verse numbers) | UI_REVIEW_DETAILS | **PARTIALLY DONE** (commit `ce3cbb6`) — alternating bg + accent border done; verse numbers outstanding |
+| Replace `>>` breadcrumb separator with chevron | UX_REVIEW_REPORTS §4 | **OUTSTANDING** |
 
 ### 6.2 Reading Experience
 
-| Item | Source |
-|------|--------|
-| Reduce verse metadata visual weight / collapse by default | UX_REVIEW_REPORTS §1 |
-| Increase Arabic/English gap from 8px to 16px | UX_REVIEW_REPORTS §4 |
-| Add "jump to verse" for long surahs | UX_REVIEW_REPORTS §1 |
-| Add tooltips to 26 icons missing them | UI_REVIEW_DETAILS |
+| Item | Source | Status |
+|------|--------|--------|
+| Reduce verse metadata visual weight / collapse by default | UX_REVIEW_REPORTS §1 | **OUTSTANDING** |
+| Increase Arabic/English gap from 8px to 16px | UX_REVIEW_REPORTS §4 | **OUTSTANDING** |
+| Add "jump to verse" for long surahs | UX_REVIEW_REPORTS §1 | **OUTSTANDING** |
+| Add tooltips to 26 icons missing them | UI_REVIEW_DETAILS | **PARTIALLY DONE** (commits `ce3cbb6`, `e0ca470`) — settings + book-tree tooltips done; ~20 remaining (verse footer, bookmark page, search/filter) |
 
 ### 6.3 Remaining Feature Proposals
 

@@ -24,5 +24,28 @@ export class PeopleService {
     );
   }
 
+  getFeaturedNarrators(): Observable<FeaturedNarratorsResponse> {
+    return this.http.get<FeaturedNarratorsResponse>(`${PeopleService.narratorsUrl}/featured.json`).pipe(
+      timeout(15000),
+      retry({ count: 1, delay: 1000 })
+    );
+  }
+
   constructor(private http: HttpClient) { }
+}
+
+export interface FeaturedNarratorEntry {
+  id: number;
+  name_ar: string;
+  name_en: string;
+  narrations: number;
+}
+
+export interface FeaturedNarratorsResponse {
+  index: string;
+  kind: string;
+  data: {
+    featured: FeaturedNarratorEntry[];
+    imam_ids: Record<string, { name_en: string; name_ar: string }>;
+  };
 }

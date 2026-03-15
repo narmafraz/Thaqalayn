@@ -5,6 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { NarratorMetadata } from '@app/models';
+import { PeopleService, FeaturedNarratorEntry } from '@app/services/people.service';
 import { PeopleState } from '@store/people/people.state';
 import { RetryLoadNarrator } from '@store/people/people.actions';
 import { Observable, Subscription, fromEvent, of } from 'rxjs';
@@ -12,26 +13,8 @@ import { debounceTime, distinctUntilChanged, filter, map, startWith, tap, withLa
 import { MultiLingualText } from './../../models/text';
 import { Store } from '@ngxs/store';
 
-/** Known Imam narrator IDs from the dataset (the Ahl al-Bayt) */
-export const IMAM_IDS: Record<number, { en: string; ar: string }> = {
-  1:    { en: 'Imam al-Sadiq', ar: 'الإمام الصادق (ع)' },
-  9:    { en: 'Imam al-Baqir', ar: 'الإمام الباقر (ع)' },
-  64:   { en: 'Imam al-Kadhim', ar: 'الإمام الكاظم (ع)' },
-  98:   { en: 'Imam al-Ridha', ar: 'الإمام الرضا (ع)' },
-  184:  { en: 'Imam al-Ridha', ar: 'الرضا (ع)' },
-  194:  { en: 'Imam al-Kadhim', ar: 'أبي إبراهيم (ع)' },
-  195:  { en: 'Imam al-Sajjad', ar: 'الإمام السجاد (ع)' },
-  206:  { en: 'Imam al-Kadhim', ar: 'أبي الحسن موسى (ع)' },
-  394:  { en: 'Amir al-Mu\'minin', ar: 'أمير المؤمنين (ع)' },
-  427:  { en: 'Imam Ali', ar: 'الإمام علي (ع)' },
-  477:  { en: 'Imam al-Jawad', ar: 'الإمام الجواد (ع)' },
-  1242: { en: 'Imam al-Hadi', ar: 'الإمام الهادي (ع)' },
-  1244: { en: 'Imam al-Askari', ar: 'الإمام العسكري (ع)' },
-  2595: { en: 'Imam al-Husayn', ar: 'الإمام الحسين (ع)' },
-};
-
-/** IDs used for the featured Imams cards (main entries only, avoiding duplicates) */
-const FEATURED_IMAM_IDS = [1, 9, 64, 98, 195, 394, 477, 1242, 1244, 2595];
+/** Imam IDs loaded from featured.json — populated at runtime by PeopleListComponent */
+export let IMAM_IDS: Record<number, { en: string; ar: string }> = {};
 
 export interface FeaturedImam {
   id: number;
@@ -98,6 +81,7 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
 
   constructor(private store: Store,
               private breakpointObserver: BreakpointObserver,
+              private peopleService: PeopleService,
               private changeDetectorRefs: ChangeDetectorRef) {
     this.mqAlias$ = this.breakpointObserver.observe([
         Breakpoints.XSmall,
@@ -324,31 +308,37 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
     return imam ? imam.en : '';
   }
 
-  private computeFeaturedImams(narrators: NarratorMetadata[]): void {
-    if (!narrators) {
-      this.featuredImams = [];
-      return;
-    }
-    const narratorMap = new Map<string, NarratorMetadata>();
-    for (const n of narrators) {
-      narratorMap.set(n.index, n);
-    }
+  private computeFeaturedImams(_narrators: NarratorMetadata[]): void {
+    if (this.featuredImams.length > 0) return; // already loaded from API
+    this.loadFeaturedFromApi();
+  }
 
-    this.featuredImams = FEATURED_IMAM_IDS
-      .filter(id => narratorMap.has(String(id)))
-      .map(id => {
-        const n = narratorMap.get(String(id))!;
-        const imam = IMAM_IDS[id];
-        return {
-          id,
-          nameEn: imam.en,
-          nameAr: n.titles.ar,
-          narrations: n.narrations
-        };
-      })
-      .sort((a, b) => b.narrations - a.narrations);
+  private loadFeaturedFromApi(): void {
+    this.peopleService.getFeaturedNarrators().subscribe({
+      next: (resp) => {
+        // Populate the global IMAM_IDS from API data
+        IMAM_IDS = {};
+        for (const [id, info] of Object.entries(resp.data.imam_ids)) {
+          IMAM_IDS[+id] = { en: info.name_en, ar: info.name_ar };
+        }
 
-    this.changeDetectorRefs.markForCheck();
+        this.featuredImams = resp.data.featured.map(e => ({
+          id: e.id,
+          nameEn: e.name_en,
+          nameAr: e.name_ar,
+          narrations: e.narrations,
+        }));
+
+        // Recompute category counts now that IMAM_IDS is populated
+        this.computeCategoryCounts(this.allNarrators);
+        this.changeDetectorRefs.markForCheck();
+      },
+      error: () => {
+        // API failed — featured cards just won't show
+        this.featuredImams = [];
+        this.changeDetectorRefs.markForCheck();
+      }
+    });
   }
 
   onRetry(): void {

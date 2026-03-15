@@ -193,7 +193,9 @@
     "hadiths": "hadiths",
     "selectPage": "Select page",
     "clear": "Clear",
-    "bookNavigation": "Book navigation"
+    "bookNavigation": "Book navigation",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "breadcrumb": {
     "home": "Home"
@@ -323,6 +325,7 @@
     "previewHadith": "Preview hadith"
   },
   "settings": {
+    "close": "Close settings",
     "toggleDarkMode": "Toggle dark mode",
     "increaseFont": "Increase font size",
     "decreaseFont": "Decrease font size",

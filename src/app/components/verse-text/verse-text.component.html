@@ -3,20 +3,20 @@
   <div class="ai-toggles" *ngIf="showToggles && (hasAiText || hasWordAnalysis || hasNarratorChain)">
     <button *ngIf="hasNarratorChain" class="ai-toggle-btn" (click)="toggleChainDiagram()"
             [class.active]="showChainDiagram"
-            [attr.aria-label]="showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"
+            [attr.aria-label]="showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
             matTooltip="{{ 'narrator.chainDiagram' | translate }}">
       <mat-icon>{{ showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
     </button>
     <button *ngIf="hasAiText" class="ai-toggle-btn" (click)="toggleDiacritics()"
             [class.active]="showDiacritics"
-            [attr.aria-label]="showDiacritics ? 'Show original text' : 'Show diacritized text'"
-            matTooltip="Toggle diacritics (tashkeel)">
+            [attr.aria-label]="showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
+            matTooltip="{{ 'settings.ai.showDiacritizedText' | translate }}">
       <mat-icon>{{ showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
     </button>
     <button *ngIf="hasWordAnalysis" class="ai-toggle-btn" (click)="toggleWordAnalysis()"
             [class.active]="showWordAnalysis"
-            [attr.aria-label]="showWordAnalysis ? 'Hide word analysis' : 'Show word-by-word analysis'"
-            matTooltip="Word-by-word analysis">
+            [attr.aria-label]="showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
+            matTooltip="{{ 'settings.ai.showWordAnalysis' | translate }}">
       <mat-icon>{{ showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
     </button>
     <span class="ai-diacritics-badge" *ngIf="showDiacritics && verse.ai?.diacritics_status">

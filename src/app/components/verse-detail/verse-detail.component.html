@@ -27,14 +27,14 @@
         <div class="verse-detail-toggles" *ngIf="vt.hasAiText || vt.hasWordAnalysis">
           <button *ngIf="vt.hasAiText" class="ai-toggle-btn" (click)="vt.toggleDiacritics()"
                   [class.active]="vt.showDiacritics"
-                  [attr.aria-label]="vt.showDiacritics ? 'Show original text' : 'Show diacritized text'"
-                  matTooltip="Toggle diacritics (tashkeel)">
+                  [attr.aria-label]="vt.showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
+                  matTooltip="{{ 'settings.ai.showDiacritizedText' | translate }}">
             <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
           </button>
           <button *ngIf="vt.hasWordAnalysis" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
                   [class.active]="vt.showWordAnalysis"
-                  [attr.aria-label]="vt.showWordAnalysis ? 'Hide word analysis' : 'Show word-by-word analysis'"
-                  matTooltip="Word-by-word analysis">
+                  [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
+                  matTooltip="{{ 'settings.ai.showWordAnalysis' | translate }}">
             <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
           </button>
           <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && book.data.verse.ai?.diacritics_status">

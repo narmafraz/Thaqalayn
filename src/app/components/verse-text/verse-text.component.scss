@@ -104,9 +104,12 @@
   border: 1px solid var(--border-color, #e0e0e0);
   border-radius: 4px;
   cursor: pointer;
-  padding: 2px;
+  padding: 6px;
   color: var(--text-secondary, #666);
   opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     opacity: 1;

@@ -179,7 +179,9 @@
     "hadiths": "أحاديث",
     "selectPage": "اختيار الصفحة",
     "clear": "مسح",
-    "bookNavigation": "تصفح الكتب"
+    "bookNavigation": "تصفح الكتب",
+    "collapse": "طي",
+    "expand": "توسيع"
   },
   "breadcrumb": {
     "home": "الرئيسية"
@@ -308,6 +310,7 @@
     "previewHadith": "معاينة الحديث"
   },
   "settings": {
+    "close": "إغلاق الإعدادات",
     "toggleDarkMode": "تبديل الوضع الداكن",
     "increaseFont": "تكبير الخط",
     "decreaseFont": "تصغير الخط",

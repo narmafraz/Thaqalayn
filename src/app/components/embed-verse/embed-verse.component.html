@@ -20,7 +20,8 @@
         <p *ngFor="let txt of book.data.verse.text" class="embed-verse-text" [innerHTML]="txt"></p>
       </div>
 
-      <div class="embed-translation" *ngIf="book.data.verse.translations as translations">
+      <div class="embed-translation" *ngIf="book.data.verse.translations as translations"
+           [attr.lang]="(translationClass$ | async)">
         <p *ngFor="let trt of translations[(translation$ | async)]"
            [class]="'embed-translation-text ' + (translationClass$ | async)"
            [innerHTML]="trt"></p>
@@ -52,7 +53,8 @@
         <div class="embed-arabic" lang="ar" dir="rtl">
           <p *ngFor="let txt of book.data.verses[0].text" class="embed-verse-text" [innerHTML]="txt"></p>
         </div>
-        <div class="embed-translation" *ngIf="book.data.verses[0].translations as translations">
+        <div class="embed-translation" *ngIf="book.data.verses[0].translations as translations"
+             [attr.lang]="(translationClass$ | async)">
           <p *ngFor="let trt of translations[(translation$ | async)]"
              [class]="'embed-translation-text ' + (translationClass$ | async)"
              [innerHTML]="trt"></p>

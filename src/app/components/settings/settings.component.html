@@ -32,23 +32,23 @@
       <mat-icon>close</mat-icon>
     </button>
   </div>
-  <label class="ai-pref">
-    <input type="checkbox" [checked]="aiPrefs.get('showDiacritizedByDefault')"
+  <label class="ai-pref" for="ai-pref-diacritized">
+    <input type="checkbox" id="ai-pref-diacritized" [checked]="aiPrefs.get('showDiacritizedByDefault')"
            (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">
     <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
   </label>
-  <label class="ai-pref">
-    <input type="checkbox" [checked]="aiPrefs.get('showContentTypeBadges')"
+  <label class="ai-pref" for="ai-pref-badges">
+    <input type="checkbox" id="ai-pref-badges" [checked]="aiPrefs.get('showContentTypeBadges')"
            (change)="onPrefChange('showContentTypeBadges', $any($event.target).checked)">
     <span>{{ 'settings.ai.showBadges' | translate }}</span>
   </label>
-  <label class="ai-pref">
-    <input type="checkbox" [checked]="aiPrefs.get('showTopicTags')"
+  <label class="ai-pref" for="ai-pref-topics">
+    <input type="checkbox" id="ai-pref-topics" [checked]="aiPrefs.get('showTopicTags')"
            (change)="onPrefChange('showTopicTags', $any($event.target).checked)">
     <span>{{ 'settings.ai.showTopics' | translate }}</span>
   </label>
-  <label class="ai-pref">
-    <input type="checkbox" [checked]="aiPrefs.get('showAiTranslationDisclaimer')"
+  <label class="ai-pref" for="ai-pref-disclaimer">
+    <input type="checkbox" id="ai-pref-disclaimer" [checked]="aiPrefs.get('showAiTranslationDisclaimer')"
            (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
     <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
   </label>

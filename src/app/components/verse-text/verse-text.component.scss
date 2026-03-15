@@ -1,9 +1,11 @@
 .textrow {
   position: relative;
 
-  // Override global .textrow flex row-reverse layout when chunked view is active,
-  // since chunks handle their own internal Arabic/translation grid layout
-  &:has(.chunked-view) {
+  // Override global .textrow flex row-reverse layout only when chunks have
+  // inline AI translation (per-chunk grid handles its own layout).
+  // For non-AI translations with chunks, the global row-reverse layout
+  // gives Arabic chunks on right and translation on left at 50% each.
+  &:has(.chunked-ai-translation) {
     flex-direction: column;
     align-items: stretch;
 
@@ -401,6 +403,11 @@
     grid-template-rows: auto auto;
     gap: 0 16px;
 
+    // Single-column when no translation column is present
+    &:not(:has(.chunk-translation-col)) {
+      grid-template-columns: 1fr;
+    }
+
     .chunk-label {
       grid-column: 1 / -1;
     }
@@ -409,6 +416,11 @@
       grid-column: 2;
       grid-row: 2;
       text-align: right;
+    }
+
+    // When single-column, Arabic fills the only column
+    &:not(:has(.chunk-translation-col)) .chunk-arabic-col {
+      grid-column: 1;
     }
 
     .chunk-translation-col {
@@ -501,7 +513,14 @@
   }
 }
 
-// AI translation extras — inline (AI-01: visible by default)
+// Wrapper to keep translations + AI extras together as one flex item
+// in the global .textrow row-reverse flex layout
+.translation-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+// AI translation extras — below translations
 .ai-translation-extra {
   padding: 8px 15px;
   font-size: 13px;

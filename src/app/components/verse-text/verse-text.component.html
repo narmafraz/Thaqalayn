@@ -107,7 +107,7 @@
         (mouseleave)="hideNarratorCard()">
       </app-narrator-hover-card>
 
-      <div class="chunked-view" [class.chunked-ai-translation]="chunksHaveTranslation((translation$ | async) || '')">
+      <div class="chunked-view" [class.chunked-ai-translation]="!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')">
         <ng-container *ngFor="let chunk of chunks">
           <div class="chunk-block" [class]="'chunk-type-' + chunk.chunk_type">
             <div class="chunk-label">{{ chunk.chunk_type }}</div>
@@ -133,9 +133,9 @@
                 </ng-template>
               </ng-template>
             </div>
-            <!-- Per-chunk translation (when chunks have translation data for selected language) -->
+            <!-- Per-chunk translation (only when NOT comparing and chunks have translation data) -->
             <div class="chunk-translation-col"
-                 *ngIf="chunksHaveTranslation((translation$ | async) || '')">
+                 *ngIf="!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')">
               <p class="chunk-translation"
                  *ngIf="getChunkTranslation(chunk, (translation$ | async) || '') as t">{{ t }}</p>
             </div>
@@ -185,11 +185,14 @@
     </ng-template>
   </ng-container>
 
-  <!-- ===== TRANSLATION SECTION (always visible) ===== -->
-  <!-- Hidden only when chunked view has per-chunk translation inline -->
-  <ng-container *ngIf="!(!showWordAnalysis && hasChunks && showDiacritics && chunksHaveTranslation((translation$ | async) || ''))">
+  <!-- ===== TRANSLATION SECTION ===== -->
+  <!-- Wrapper keeps translations + AI extras together in the flex layout -->
+  <div class="translation-wrapper">
+    <!-- Primary translation: hidden when chunked+AI inline (already shown per-chunk) -->
+    <!-- Secondary translation (compare): always shown when present -->
     <div [class.side-by-side]="(translation2$ | async)">
-      <div class="translation-col">
+      <div class="translation-col"
+           *ngIf="!(!(translation2$ | async) && !showWordAnalysis && hasChunks && showDiacritics && chunksHaveTranslation((translation$ | async) || ''))">
         <p *ngFor="let trt of getTranslationText(verse, (translation$ | async))" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
         <div class="translation-fallback" *ngIf="isMissingTranslation((translation$ | async))">
           <p class="fallback-message">
@@ -203,29 +206,14 @@
             </span>
           </p>
         </div>
-        <!-- AI translation extras -->
-        <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
-          <div class="ai-summary-inline" *ngIf="aiT.summary">
-            <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
-            <span class="ai-summary-text">{{ aiT.summary }}</span>
-          </div>
-          <div class="ai-key-terms-inline" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
-            <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
-            <span class="key-term-chip" *ngFor="let term of aiT.key_terms | keyvalue">
-              <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
-              <span class="key-term-gloss">{{ term.value }}</span>
-            </span>
-          </div>
-        </div>
       </div>
+      <!-- Secondary translation (compare mode) — always visible when comparing -->
       <div class="translation-col translation-col-2" *ngIf="(translation2$ | async) as t2">
         <p *ngFor="let trt of getTranslationText(verse, t2)" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
       </div>
     </div>
-  </ng-container>
 
-  <!-- AI translation extras for chunked+AI mode (shown after chunks) -->
-  <ng-container *ngIf="!showWordAnalysis && hasChunks && showDiacritics && chunksHaveTranslation((translation$ | async) || '')">
+    <!-- AI translation extras — below translations, inside the same flex item -->
     <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
       <div class="ai-summary-inline" *ngIf="aiT.summary">
         <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
@@ -239,5 +227,5 @@
         </span>
       </div>
     </div>
-  </ng-container>
+  </div>
 </div>

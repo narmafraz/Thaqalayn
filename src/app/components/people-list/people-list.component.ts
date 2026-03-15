@@ -14,20 +14,24 @@ import { Store } from '@ngxs/store';
 
 /** Known Imam narrator IDs from the dataset (the Ahl al-Bayt) */
 export const IMAM_IDS: Record<number, { en: string; ar: string }> = {
-  15:  { en: 'Imam Ali', ar: 'الإمام علي (ع)' },
-  279: { en: 'Imam Ali (Amir al-Mu\'minin)', ar: 'أمير المؤمنين (ع)' },
-  8:   { en: 'Imam al-Baqir', ar: 'الإمام الباقر (ع)' },
-  19:  { en: 'Imam al-Sadiq', ar: 'الإمام الصادق (ع)' },
-  161: { en: 'Imam al-Sajjad', ar: 'الإمام السجاد (ع)' },
-  90:  { en: 'Imam al-Ridha', ar: 'الإمام الرضا (ع)' },
-  128: { en: 'Imam al-Kadhim', ar: 'الإمام الكاظم (ع)' },
-  351: { en: 'Imam (Abu al-Hasan)', ar: 'أبي الحسن (ع)' },
-  731: { en: 'Imam al-Jawad', ar: 'الإمام الجواد (ع)' },
-  712: { en: 'Imam al-Hadi', ar: 'الإمام الهادي (ع)' },
+  1:    { en: 'Imam al-Sadiq', ar: 'الإمام الصادق (ع)' },
+  9:    { en: 'Imam al-Baqir', ar: 'الإمام الباقر (ع)' },
+  64:   { en: 'Imam al-Kadhim', ar: 'الإمام الكاظم (ع)' },
+  98:   { en: 'Imam al-Ridha', ar: 'الإمام الرضا (ع)' },
+  184:  { en: 'Imam al-Ridha', ar: 'الرضا (ع)' },
+  194:  { en: 'Imam al-Kadhim', ar: 'أبي إبراهيم (ع)' },
+  195:  { en: 'Imam al-Sajjad', ar: 'الإمام السجاد (ع)' },
+  206:  { en: 'Imam al-Kadhim', ar: 'أبي الحسن موسى (ع)' },
+  394:  { en: 'Amir al-Mu\'minin', ar: 'أمير المؤمنين (ع)' },
+  427:  { en: 'Imam Ali', ar: 'الإمام علي (ع)' },
+  477:  { en: 'Imam al-Jawad', ar: 'الإمام الجواد (ع)' },
+  1242: { en: 'Imam al-Hadi', ar: 'الإمام الهادي (ع)' },
+  1244: { en: 'Imam al-Askari', ar: 'الإمام العسكري (ع)' },
+  2595: { en: 'Imam al-Husayn', ar: 'الإمام الحسين (ع)' },
 };
 
 /** IDs used for the featured Imams cards (main entries only, avoiding duplicates) */
-const FEATURED_IMAM_IDS = [19, 8, 351, 161, 90, 128, 279, 15, 731, 712];
+const FEATURED_IMAM_IDS = [1, 9, 64, 98, 195, 394, 477, 1242, 1244, 2595];
 
 export interface FeaturedImam {
   id: number;

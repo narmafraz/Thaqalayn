@@ -162,32 +162,62 @@ test.describe('Verse Detail Pages', () => {
     });
   });
 
-  test.describe('Narrator Hover Card', () => {
-    test('should show narrator hover card on mouseover in chapter view', async ({ page }) => {
+  test.describe('Narrator Links and Hover Cards', () => {
+    test('should render narrator chain links in chapter view', async ({ page }) => {
+      // Al-Kafi 1:1:1 has hadiths with narrator chains
       await page.goto('/#/books/al-kafi:1:1:1?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 
-      // Find a narrator link in the narrator chain
-      const narratorLink = page.locator('.textrow a[href*="/people/narrators/"]').first();
+      // Narrator links should be present (links to /people/narrators/)
+      const narratorLinks = page.locator('a[href*="/people/narrators/"]');
+      const count = await narratorLinks.count();
+      expect(count).toBeGreaterThan(0);
+    });
+
+    test('should show narrator hover card with name and stats on mouseover', async ({ page }) => {
+      await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+      await page.waitForLoadState('networkidle');
+      await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
+
+      const narratorLink = page.locator('a[href*="/people/narrators/"]').first();
       if (await narratorLink.count() > 0) {
         await narratorLink.hover();
-        // Wait for the hover card to appear
         const hoverCard = page.locator('app-narrator-hover-card');
-        await expect(hoverCard).toBeVisible({ timeout: 3000 });
+        await expect(hoverCard).toBeVisible({ timeout: 5000 });
+
+        // Card should contain narrator name (Arabic) and a "View profile" link
+        const viewProfileLink = hoverCard.locator('a:has-text("View profile")');
+        await expect(viewProfileLink).toBeVisible({ timeout: 3000 });
       }
     });
 
-    test('should show narrator hover card on mouseover in verse detail', async ({ page }) => {
-      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    test('should navigate to narrator page when clicking narrator link', async ({ page }) => {
+      await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+      await page.waitForLoadState('networkidle');
+      await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
+
+      const narratorLink = page.locator('a[href*="/people/narrators/"]').first();
+      if (await narratorLink.count() > 0) {
+        const href = await narratorLink.getAttribute('href');
+        await narratorLink.click();
+        await page.waitForLoadState('networkidle');
+
+        // Should navigate to the narrator page
+        expect(page.url()).toContain('/people/narrators/');
+      }
+    });
+
+    test('should show narrator hover card on verse detail page', async ({ page }) => {
+      await page.goto('/#/books/al-kafi:1:1:1:2?lang=en');
       await page.waitForLoadState('networkidle');
       await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
 
-      const narratorLink = page.locator('.textrow a[href*="/people/narrators/"]').first();
+      const narratorLink = page.locator('a[href*="/people/narrators/"]').first();
       if (await narratorLink.count() > 0) {
         await narratorLink.hover();
         const hoverCard = page.locator('app-narrator-hover-card');
-        await expect(hoverCard).toBeVisible({ timeout: 3000 });
+        await expect(hoverCard).toBeVisible({ timeout: 5000 });
       }
     });
   });

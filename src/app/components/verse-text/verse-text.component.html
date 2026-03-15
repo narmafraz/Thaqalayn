@@ -37,7 +37,9 @@
     </div>
   </div>
 
-  <!-- Word-by-word analysis view -->
+  <!-- ===== ARABIC TEXT SECTION ===== -->
+
+  <!-- Word-by-word analysis (replaces Arabic text when active) -->
   <div *ngIf="showWordAnalysis && hasWordAnalysis" class="word-analysis-grid" dir="rtl" lang="ar">
     <div class="word-analysis-lang-select">
       <select [(ngModel)]="wordAnalysisLang" aria-label="Word translation language" class="word-lang-select">
@@ -90,11 +92,10 @@
     </div>
   </div>
 
-  <!-- Main content display (not word-by-word) -->
+  <!-- Standard Arabic text (hidden when word-by-word is active) -->
   <ng-container *ngIf="!showWordAnalysis">
-
-    <!-- ===== CHUNKED VIEW: when chunks exist and diacritics is ON (AI text) ===== -->
-    <ng-container *ngIf="hasChunks && showDiacritics; else fallbackView">
+    <!-- Chunked view: when chunks exist and diacritics is ON -->
+    <ng-container *ngIf="hasChunks && showDiacritics; else fallbackArabic">
       <!-- Narrator hover card (shared) -->
       <app-narrator-hover-card
         *ngIf="hoveredNarrator"
@@ -110,7 +111,6 @@
         <ng-container *ngFor="let chunk of chunks">
           <div class="chunk-block" [class]="'chunk-type-' + chunk.chunk_type">
             <div class="chunk-label">{{ chunk.chunk_type }}</div>
-            <!-- Isnad chunk: render narrator_chain.parts[] with clickable links (first isnad only) -->
             <div class="chunk-arabic-col" lang="ar">
               <ng-container *ngIf="isFirstIsnadChunk(chunk); else plainChunkArabic">
                 <p class="chunk-arabic arabic" dir="rtl">
@@ -133,7 +133,7 @@
                 </ng-template>
               </ng-template>
             </div>
-            <!-- Per-chunk AI translation -->
+            <!-- Per-chunk AI translation (only when AI translation is selected) -->
             <div class="chunk-translation-col"
                  *ngIf="isAiTranslationId((translation$ | async) || '')">
               <p class="chunk-translation"
@@ -142,51 +142,11 @@
           </div>
         </ng-container>
       </div>
-
-      <!-- Non-AI translation: merged below all chunks -->
-      <ng-container *ngIf="!isAiTranslationId((translation$ | async) || '')">
-        <div [class.side-by-side]="(translation2$ | async)">
-          <div class="translation-col">
-            <p *ngFor="let trt of getTranslationText(verse, (translation$ | async))" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
-            <div class="translation-fallback" *ngIf="isMissingTranslation((translation$ | async))">
-              <p class="fallback-message">
-                {{ 'translation.notAvailable' | translate }}
-                <span *ngIf="getAvailableTranslationIds().length">
-                  {{ 'translation.availableIn' | translate }}:
-                  <ng-container *ngFor="let tid of getAvailableTranslationIds(); let isLast = last">
-                    <a [routerLink]="[]" [queryParams]="{translation: tid}" queryParamsHandling="merge"
-                       class="fallback-lang-link">{{ getTranslationLangName(tid) }}</a><span *ngIf="!isLast">, </span>
-                  </ng-container>
-                </span>
-              </p>
-            </div>
-          </div>
-          <div class="translation-col translation-col-2" *ngIf="(translation2$ | async) as t2">
-            <p *ngFor="let trt of getTranslationText(verse, t2)" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
-          </div>
-        </div>
-      </ng-container>
-
-      <!-- AI translation extras (summary, key terms) -->
-      <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
-        <div class="ai-summary-inline" *ngIf="aiT.summary">
-          <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
-          <span class="ai-summary-text">{{ aiT.summary }}</span>
-        </div>
-        <div class="ai-key-terms-inline" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
-          <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
-          <span class="key-term-chip" *ngFor="let term of aiT.key_terms | keyvalue">
-            <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
-            <span class="key-term-gloss">{{ term.value }}</span>
-          </span>
-        </div>
-      </div>
     </ng-container>
 
-    <!-- ===== FALLBACK VIEW: no chunks, or diacritics OFF ===== -->
-    <ng-template #fallbackView>
+    <!-- Fallback Arabic: no chunks, or diacritics OFF -->
+    <ng-template #fallbackArabic>
       <div lang="ar">
-        <!-- Narrator chain (clickable links) -->
         <p class="verseText arabic" *ngIf="verse.narrator_chain">
           <ng-container *ngFor="let npart of verse.narrator_chain.parts" [ngSwitch]="npart.kind">
             <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve"
@@ -194,12 +154,9 @@
                (mouseleave)="hideNarratorCard()"
                (touchstart)="onNarratorTouchStart($event, npart.path)"
                (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
-            <ng-container *ngSwitchDefault>
-              {{npart.text}}
-            </ng-container>
+            <ng-container *ngSwitchDefault>{{npart.text}}</ng-container>
           </ng-container>
         </p>
-        <!-- Narrator hover card -->
         <app-narrator-hover-card
           *ngIf="hoveredNarrator"
           [narrator]="hoveredNarrator.narrator"
@@ -209,7 +166,6 @@
           (mouseenter)="keepNarratorCard()"
           (mouseleave)="hideNarratorCard()">
         </app-narrator-hover-card>
-        <!-- Diacritized or original text, with optional phrase highlighting -->
         <ng-container *ngIf="showDiacritics && hasAiText; else originalText">
           <p *ngIf="hasKeyPhrases; else plainDiacritics" class="verseText arabic" dir="rtl" [innerHTML]="highlightPhrases(diacritizedText)"></p>
           <ng-template #plainDiacritics>
@@ -226,43 +182,62 @@
         </ng-template>
         <span class="quran-verse-number" *ngIf="isQuran && verseNumber" dir="rtl" lang="ar">&#xFD3E;{{ verseNumber }}&#xFD3F;</span>
       </div>
+    </ng-template>
+  </ng-container>
 
-      <!-- Standard translation display -->
-      <div [class.side-by-side]="(translation2$ | async)">
-        <div class="translation-col">
-          <p *ngFor="let trt of getTranslationText(verse, (translation$ | async))" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
-          <div class="translation-fallback" *ngIf="isMissingTranslation((translation$ | async))">
-            <p class="fallback-message">
-              {{ 'translation.notAvailable' | translate }}
-              <span *ngIf="getAvailableTranslationIds().length">
-                {{ 'translation.availableIn' | translate }}:
-                <ng-container *ngFor="let tid of getAvailableTranslationIds(); let isLast = last">
-                  <a [routerLink]="[]" [queryParams]="{translation: tid}" queryParamsHandling="merge"
-                     class="fallback-lang-link">{{ getTranslationLangName(tid) }}</a><span *ngIf="!isLast">, </span>
-                </ng-container>
-              </span>
-            </p>
-          </div>
-          <!-- AI translation extras -->
-          <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
-            <div class="ai-summary-inline" *ngIf="aiT.summary">
-              <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
-              <span class="ai-summary-text">{{ aiT.summary }}</span>
-            </div>
-            <div class="ai-key-terms-inline" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
-              <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
-              <span class="key-term-chip" *ngFor="let term of aiT.key_terms | keyvalue">
-                <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
-                <span class="key-term-gloss">{{ term.value }}</span>
-              </span>
-            </div>
-          </div>
+  <!-- ===== TRANSLATION SECTION (always visible) ===== -->
+  <!-- Hidden only when chunked view has AI translation inline per-chunk -->
+  <ng-container *ngIf="!(!showWordAnalysis && hasChunks && showDiacritics && isAiTranslationId((translation$ | async) || ''))">
+    <div [class.side-by-side]="(translation2$ | async)">
+      <div class="translation-col">
+        <p *ngFor="let trt of getTranslationText(verse, (translation$ | async))" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
+        <div class="translation-fallback" *ngIf="isMissingTranslation((translation$ | async))">
+          <p class="fallback-message">
+            {{ 'translation.notAvailable' | translate }}
+            <span *ngIf="getAvailableTranslationIds().length">
+              {{ 'translation.availableIn' | translate }}:
+              <ng-container *ngFor="let tid of getAvailableTranslationIds(); let isLast = last">
+                <a [routerLink]="[]" [queryParams]="{translation: tid}" queryParamsHandling="merge"
+                   class="fallback-lang-link">{{ getTranslationLangName(tid) }}</a><span *ngIf="!isLast">, </span>
+              </ng-container>
+            </span>
+          </p>
         </div>
-        <div class="translation-col translation-col-2" *ngIf="(translation2$ | async) as t2">
-          <p *ngFor="let trt of getTranslationText(verse, t2)" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
+        <!-- AI translation extras -->
+        <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
+          <div class="ai-summary-inline" *ngIf="aiT.summary">
+            <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
+            <span class="ai-summary-text">{{ aiT.summary }}</span>
+          </div>
+          <div class="ai-key-terms-inline" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
+            <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
+            <span class="key-term-chip" *ngFor="let term of aiT.key_terms | keyvalue">
+              <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
+              <span class="key-term-gloss">{{ term.value }}</span>
+            </span>
+          </div>
         </div>
       </div>
-    </ng-template>
+      <div class="translation-col translation-col-2" *ngIf="(translation2$ | async) as t2">
+        <p *ngFor="let trt of getTranslationText(verse, t2)" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
+      </div>
+    </div>
+  </ng-container>
 
+  <!-- AI translation extras for chunked+AI mode (shown after chunks) -->
+  <ng-container *ngIf="!showWordAnalysis && hasChunks && showDiacritics && isAiTranslationId((translation$ | async) || '')">
+    <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
+      <div class="ai-summary-inline" *ngIf="aiT.summary">
+        <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
+        <span class="ai-summary-text">{{ aiT.summary }}</span>
+      </div>
+      <div class="ai-key-terms-inline" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
+        <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
+        <span class="key-term-chip" *ngFor="let term of aiT.key_terms | keyvalue">
+          <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
+          <span class="key-term-gloss">{{ term.value }}</span>
+        </span>
+      </div>
+    </div>
   </ng-container>
 </div>

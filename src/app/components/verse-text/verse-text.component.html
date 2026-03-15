@@ -107,6 +107,20 @@
         (mouseleave)="hideNarratorCard()">
       </app-narrator-hover-card>
 
+      <!-- Narrator chain links when no isnad chunk contains them -->
+      <div lang="ar" *ngIf="hasNarratorChain && !hasIsnadChunk">
+        <p class="verseText arabic" dir="rtl">
+          <ng-container *ngFor="let npart of verse.narrator_chain.parts" [ngSwitch]="npart.kind">
+            <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve"
+               (mouseenter)="showNarratorCard($event, npart.path)"
+               (mouseleave)="hideNarratorCard()"
+               (touchstart)="onNarratorTouchStart($event, npart.path)"
+               (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
+            <ng-container *ngSwitchDefault>{{npart.text}}</ng-container>
+          </ng-container>
+        </p>
+      </div>
+
       <div class="chunked-view" [class.chunked-ai-translation]="!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')">
         <ng-container *ngFor="let chunk of chunks">
           <div class="chunk-block" [class]="'chunk-type-' + chunk.chunk_type">

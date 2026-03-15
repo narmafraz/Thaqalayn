@@ -7,6 +7,7 @@ import { I18nService, SeoService, ThemeService, KeyboardShortcutService } from '
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
+import { LoadNarrator } from '@store/people/people.actions';
 import { PeopleState } from '@store/people/people.state';
 import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
@@ -173,6 +174,9 @@ export class AppComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    // Pre-load narrator index so hover cards work on book pages
+    this.store.dispatch(new LoadNarrator('index'));
+
     if (this.isBrowser) {
       this.subscriptions.push(
         this.i18n.isRtl$.subscribe(isRtl => {

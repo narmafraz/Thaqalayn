@@ -108,6 +108,10 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return !!this.verse?.narrator_chain?.parts?.length;
   }
 
+  get hasIsnadChunk(): boolean {
+    return !!this.verse?.ai?.chunks?.some(c => c.chunk_type === 'isnad');
+  }
+
   setActiveWord(index: number | null, event?: MouseEvent): void {
     if (this.activeWordIndex === index) {
       this.activeWordIndex = null;

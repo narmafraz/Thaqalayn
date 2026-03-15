@@ -1,12 +1,16 @@
 <div class="narrator-hover-card"
      [style.left.px]="positionX"
-     [style.top.px]="positionY"
-     *ngIf="narrator">
-  <div class="hover-card-name arabic" lang="ar" dir="rtl">{{ narrator.titles?.ar }}</div>
-  <div class="hover-card-name-en" *ngIf="narrator.titles?.en">{{ narrator.titles?.en }}</div>
-  <div class="hover-card-stats">
-    <span class="hover-card-stat">{{ narrator.narrations }} {{ 'common.hadiths' | translate }}</span>
-  </div>
+     [style.top.px]="positionY">
+  <ng-container *ngIf="narrator; else loadingCard">
+    <div class="hover-card-name arabic" lang="ar" dir="rtl">{{ narrator.titles?.ar }}</div>
+    <div class="hover-card-name-en" *ngIf="narrator.titles?.en">{{ narrator.titles?.en }}</div>
+    <div class="hover-card-stats">
+      <span class="hover-card-stat">{{ narrator.narrations }} {{ 'common.hadiths' | translate }}</span>
+    </div>
+  </ng-container>
+  <ng-template #loadingCard>
+    <div class="hover-card-loading">{{ 'common.loading' | translate }}</div>
+  </ng-template>
   <a class="hover-card-link" [routerLink]="['/people/narrators/' + narratorId]" queryParamsHandling="preserve">
     {{ 'narrator.viewProfile' | translate }}
   </a>

@@ -363,6 +363,16 @@ describe('VerseTextComponent', () => {
     expect(component.isAiTranslationId('')).toBe(false);
   });
 
+  it('should check chunksHaveTranslation correctly', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    expect(component.chunksHaveTranslation('en.ai')).toBe(true);
+    expect(component.chunksHaveTranslation('en.qarai')).toBe(false);
+    expect(component.chunksHaveTranslation('')).toBe(false);
+    // No chunks
+    component.verse = { ...mockVerse, ai: undefined } as any;
+    expect(component.chunksHaveTranslation('en.ai')).toBe(false);
+  });
+
   // FB-03: Word click popup tests
   describe('word click popup', () => {
     beforeEach(() => {

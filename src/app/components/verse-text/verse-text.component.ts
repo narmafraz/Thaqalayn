@@ -295,6 +295,15 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return '';
   }
 
+  /** Check if chunks have translation data for the given translation ID. */
+  chunksHaveTranslation(translationId: string): boolean {
+    if (!translationId || !this.chunks?.length) return false;
+    if (!isAiTranslation(translationId)) return false;
+    const lang = getAiLang(translationId);
+    if (!lang) return false;
+    return this.chunks.some(c => !!(c.translations as Record<string, string>)?.[lang]);
+  }
+
   /** Check if this chunk is the first isnad chunk and should render narrator_chain.parts[].
    *  We check if it's the first chunk with chunk_type=isnad in the chunks array. */
   isFirstIsnadChunk(chunk: Chunk): boolean {

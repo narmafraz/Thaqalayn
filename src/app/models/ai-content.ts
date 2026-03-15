@@ -125,13 +125,13 @@ export interface AiContent {
   seo_questions?: Partial<Record<AiLanguage, string>>;
 }
 
-/** Reconstruct full AI translation text for a language by concatenating chunk translations. */
+/** Reconstruct full AI translation text for a language from chunk translations. Each chunk becomes a separate paragraph. */
 export function getAiTranslationText(ai: AiContent, lang: AiLanguage): string[] | undefined {
   if (!ai?.chunks) return undefined;
   const parts = ai.chunks
     .map(c => c.translations?.[lang])
     .filter((t): t is string => !!t);
-  return parts.length > 0 ? [parts.join(' ')] : undefined;
+  return parts.length > 0 ? parts : undefined;
 }
 
 /** Check if a translation ID is an AI translation (e.g., "en.ai"). */

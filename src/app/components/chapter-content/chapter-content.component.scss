@@ -27,15 +27,41 @@
   }
 }
 
-.view-mode-inline {
-  display: flex;
+.word-by-word-toggle {
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   margin-inline-start: auto;
+  background: none;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  color: var(--text-secondary, #666);
+  font-size: 13px;
+  opacity: 0.7;
+  transition: opacity 0.15s, border-color 0.15s, color 0.15s;
 
-  .toolbar-label {
-    font-size: 14px;
-    color: var(--text-secondary, rgba(0, 0, 0, 0.6));
+  &:hover {
+    opacity: 1;
+    border-color: var(--link-color, #673ab7);
+  }
+
+  &.active {
+    opacity: 1;
+    color: var(--link-color, #673ab7);
+    border-color: var(--link-color, #673ab7);
+    background: rgba(103, 58, 183, 0.05);
+  }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .toggle-label {
+    font-size: 12px;
   }
 }
 
@@ -49,7 +75,7 @@
     min-width: 100px;
     max-width: 50vw;
   }
-  .view-mode-inline .toolbar-label { font-size: 12px; }
+  .word-by-word-toggle .toggle-label { display: none; }
 }
 
 // Highlight pulse animation for jump-to-verse target

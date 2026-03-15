@@ -15,17 +15,13 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <div class="view-mode-inline" *ngIf="hasAnyAiContent">
-      <span class="toolbar-label">{{ 'book.viewMode' | translate }}:</span>
-      <mat-button-toggle-group [value]="currentViewMode" (change)="onViewModeChange($event.value)">
-        <mat-button-toggle value="plain" [matTooltip]="'book.viewPlain' | translate">
-          <mat-icon>subject</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle value="word-by-word" [matTooltip]="'book.viewWordByWord' | translate">
-          <mat-icon>grid_on</mat-icon>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
-    </div>
+    <button class="word-by-word-toggle" *ngIf="hasAnyAiContent"
+            (click)="onViewModeChange(currentViewMode === 'word-by-word' ? 'plain' : 'word-by-word')"
+            [class.active]="currentViewMode === 'word-by-word'"
+            [matTooltip]="'book.viewWordByWord' | translate">
+      <mat-icon>grid_on</mat-icon>
+      <span class="toggle-label">{{ 'book.wordByWord' | translate }}</span>
+    </button>
   </div>
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse" [headingLevel]="2"></app-book-titles>

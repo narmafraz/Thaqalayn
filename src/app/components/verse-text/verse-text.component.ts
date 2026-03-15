@@ -46,6 +46,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   showDiacritics = this.aiPrefs.get('showDiacritizedByDefault');
   showWordAnalysis = false;
   showChainDiagram = false;
+  private _previousDiacritics = this.showDiacritics;
   wordAnalysisLang: AiLanguage = this.aiPrefs.get('wordByWordDefaultLang');
   activeWordIndex: number | null = null;
 
@@ -85,7 +86,10 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     this.localOverride = true;
     this.showWordAnalysis = !this.showWordAnalysis;
     if (this.showWordAnalysis) {
+      this._previousDiacritics = this.showDiacritics;
       this.showDiacritics = false;
+    } else {
+      this.showDiacritics = this._previousDiacritics;
     }
     this.cdr.markForCheck();
   }

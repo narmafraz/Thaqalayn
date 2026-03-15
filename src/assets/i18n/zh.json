@@ -114,7 +114,8 @@
     "bookDistribution": "经典分布",
     "featuredImams": "圣裔",
     "imam": "伊玛目",
-    "viewProfile": "查看简介"
+    "viewProfile": "查看简介",
+    "roleImam": "伊玛目"
   },
   "search": {
     "filter": "筛选",
@@ -318,7 +319,13 @@
       "showTopics": "显示主题标签",
       "showIsnad": "显示传述链/正文分离",
       "showDisclaimer": "显示AI翻译免责声明",
-      "wordByWordLang": "逐词翻译语言："
+      "wordByWordLang": "逐词翻译语言：",
+      "showOriginalText": "显示原文",
+      "showDiacritizedText": "显示标注音标的文本",
+      "showChainDiagram": "显示传述链图",
+      "hideChainDiagram": "隐藏传述链图",
+      "showWordAnalysis": "显示逐词分析",
+      "hideWordAnalysis": "隐藏分析"
     }
   },
   "about": {

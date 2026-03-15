@@ -114,7 +114,8 @@
     "bookDistribution": "Kitap dağılımı",
     "featuredImams": "Ehl-i Beyt",
     "imam": "İmam",
-    "viewProfile": "Profili görüntüle"
+    "viewProfile": "Profili görüntüle",
+    "roleImam": "İmam"
   },
   "search": {
     "filter": "Filtre",
@@ -318,7 +319,13 @@
       "showTopics": "Konu etiketlerini göster",
       "showIsnad": "İsnad/metin ayrımını göster",
       "showDisclaimer": "Yapay zeka çeviri uyarısını göster",
-      "wordByWordLang": "Kelime kelime dil:"
+      "wordByWordLang": "Kelime kelime dil:",
+      "showOriginalText": "Orijinal metni göster",
+      "showDiacritizedText": "Harekeli metni göster",
+      "showChainDiagram": "Ravi zinciri diyagramını göster",
+      "hideChainDiagram": "Zincir diyagramını gizle",
+      "showWordAnalysis": "Kelime kelime analizi göster",
+      "hideWordAnalysis": "Analizi gizle"
     }
   },
   "about": {

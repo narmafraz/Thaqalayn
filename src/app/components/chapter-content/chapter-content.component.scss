@@ -95,6 +95,17 @@ mat-mdc-card {
 	border-radius: 10px;
 	margin: var(--space-base) var(--space-xs) var(--space-md) var(--space-xs);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-left: 3px solid transparent;
+
+  // Alternating backgrounds for verse cards
+  &:nth-child(even) {
+    background-color: var(--verse-alt-bg, rgba(250, 247, 242, 0.7));
+  }
+
+  // Accent border on verse cards
+  &:not(.verse-skeleton) {
+    border-left-color: var(--link-color, #5F9999);
+  }
 }
 
 @media (max-width: 768px) {
@@ -107,6 +118,10 @@ mat-mdc-card {
 :host-context(body.dark-theme) mat-mdc-card {
   background-color: var(--card-bg);
   border-color: var(--border-color);
+
+  &:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
 }
 
 .suraHeaderFrame {

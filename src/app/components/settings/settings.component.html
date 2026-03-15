@@ -26,7 +26,9 @@
   <div class="ai-settings-header">
     <mat-icon>auto_awesome</mat-icon>
     <span>{{ 'settings.ai.title' | translate }}</span>
-    <button class="ai-settings-close" (click)="showAiSettings = false">
+    <button class="ai-settings-close" (click)="showAiSettings = false"
+            aria-label="Close settings"
+            matTooltip="Close settings">
       <mat-icon>close</mat-icon>
     </button>
   </div>

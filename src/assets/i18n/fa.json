@@ -114,7 +114,8 @@
     "bookDistribution": "توزیع کتاب‌ها",
     "featuredImams": "اهل بیت",
     "imam": "امام",
-    "viewProfile": "مشاهده پروفایل"
+    "viewProfile": "مشاهده پروفایل",
+    "roleImam": "امام"
   },
   "search": {
     "filter": "فیلتر",
@@ -318,7 +319,13 @@
       "showTopics": "نمایش برچسب‌های موضوع",
       "showIsnad": "نمایش جداسازی سند و متن",
       "showDisclaimer": "نمایش سلب مسئولیت ترجمه هوش مصنوعی",
-      "wordByWordLang": "زبان کلمه به کلمه:"
+      "wordByWordLang": "زبان کلمه به کلمه:",
+      "showOriginalText": "نمایش متن اصلی",
+      "showDiacritizedText": "نمایش متن اعراب‌دار",
+      "showChainDiagram": "نمایش نمودار سلسله راویان",
+      "hideChainDiagram": "پنهان کردن نمودار سلسله",
+      "showWordAnalysis": "نمایش تحلیل کلمه به کلمه",
+      "hideWordAnalysis": "پنهان کردن تحلیل"
     }
   },
   "about": {

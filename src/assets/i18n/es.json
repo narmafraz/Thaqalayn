@@ -114,7 +114,8 @@
     "bookDistribution": "Distribución de libros",
     "featuredImams": "Los Ahl al-Bayt",
     "imam": "Imam",
-    "viewProfile": "Ver perfil"
+    "viewProfile": "Ver perfil",
+    "roleImam": "Imam"
   },
   "search": {
     "filter": "Filtrar",
@@ -318,7 +319,13 @@
       "showTopics": "Mostrar etiquetas de temas",
       "showIsnad": "Mostrar separación isnad/matn",
       "showDisclaimer": "Mostrar descargo de traducción IA",
-      "wordByWordLang": "Idioma palabra por palabra:"
+      "wordByWordLang": "Idioma palabra por palabra:",
+      "showOriginalText": "Mostrar texto original",
+      "showDiacritizedText": "Mostrar texto vocalizado",
+      "showChainDiagram": "Mostrar diagrama de cadena de narradores",
+      "hideChainDiagram": "Ocultar diagrama de cadena",
+      "showWordAnalysis": "Mostrar análisis palabra por palabra",
+      "hideWordAnalysis": "Ocultar análisis"
     }
   },
   "about": {

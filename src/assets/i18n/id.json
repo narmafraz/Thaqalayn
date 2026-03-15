@@ -114,7 +114,8 @@
     "bookDistribution": "Distribusi kitab",
     "featuredImams": "Ahlul Bait",
     "imam": "Imam",
-    "viewProfile": "Lihat profil"
+    "viewProfile": "Lihat profil",
+    "roleImam": "Imam"
   },
   "search": {
     "filter": "Filter",
@@ -318,7 +319,13 @@
       "showTopics": "Tampilkan tag topik",
       "showIsnad": "Tampilkan pemisahan isnad/matan",
       "showDisclaimer": "Tampilkan disclaimer terjemahan AI",
-      "wordByWordLang": "Bahasa kata per kata:"
+      "wordByWordLang": "Bahasa kata per kata:",
+      "showOriginalText": "Tampilkan teks asli",
+      "showDiacritizedText": "Tampilkan teks berharakat",
+      "showChainDiagram": "Tampilkan diagram rantai perawi",
+      "hideChainDiagram": "Sembunyikan diagram rantai",
+      "showWordAnalysis": "Tampilkan analisis kata per kata",
+      "hideWordAnalysis": "Sembunyikan analisis"
     }
   },
   "about": {

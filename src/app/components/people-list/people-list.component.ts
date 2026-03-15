@@ -126,8 +126,7 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sortingDataAccessor = (item, property) => {
       switch (property) {
-        case 'name.ar': return item.titles.ar;
-        case 'name.en': return item.titles.en || '';
+        case 'name': return item.titles.en || item.titles.ar;
         default: return item[property];
       }
     };
@@ -218,14 +217,19 @@ export class PeopleListComponent implements AfterViewInit, OnInit, OnDestroy {
         return ['octrta']; // one column to rule them all
       }
       columns.push('index');
-      columns.push('name.en');
-      columns.push('name.ar');
+      columns.push('name');
       columns.push('narrations');
       columns.push('narrated_from');
       columns.push('narrated_to');
       columns.push('conarrators');
       return columns;
     };
+  }
+
+  getNarrationPillClass(narrations: number): string {
+    if (narrations >= 1000) return 'pill-high';
+    if (narrations >= 100) return 'pill-medium';
+    return 'pill-low';
   }
 
   applyFilter(filterValue: string) {

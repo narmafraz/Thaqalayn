@@ -114,7 +114,8 @@
     "bookDistribution": "কিতাব বিতরণ",
     "featuredImams": "আহলে বাইত",
     "imam": "ইমাম",
-    "viewProfile": "প্রোফাইল দেখুন"
+    "viewProfile": "প্রোফাইল দেখুন",
+    "roleImam": "ইমাম"
   },
   "search": {
     "filter": "ফিল্টার",
@@ -318,7 +319,13 @@
       "showTopics": "টপিক ট্যাগ দেখান",
       "showIsnad": "ইসনাদ/মতন পৃথকীকরণ দেখান",
       "showDisclaimer": "AI অনুবাদ দাবিত্যাগ দেখান",
-      "wordByWordLang": "শব্দ-দ্বারা-শব্দ ভাষা:"
+      "wordByWordLang": "শব্দ-দ্বারা-শব্দ ভাষা:",
+      "showOriginalText": "মূল পাঠ্য দেখান",
+      "showDiacritizedText": "স্বরচিহ্নিত পাঠ্য দেখান",
+      "showChainDiagram": "বর্ণনাকারী শৃঙ্খল চিত্র দেখান",
+      "hideChainDiagram": "শৃঙ্খল চিত্র লুকান",
+      "showWordAnalysis": "শব্দ-দ্বারা-শব্দ বিশ্লেষণ দেখান",
+      "hideWordAnalysis": "বিশ্লেষণ লুকান"
     }
   },
   "about": {

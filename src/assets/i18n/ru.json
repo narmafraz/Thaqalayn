@@ -114,7 +114,8 @@
     "bookDistribution": "Распределение по книгам",
     "featuredImams": "Ахль аль-Байт",
     "imam": "Имам",
-    "viewProfile": "Просмотреть профиль"
+    "viewProfile": "Просмотреть профиль",
+    "roleImam": "Имам"
   },
   "search": {
     "filter": "Фильтр",
@@ -318,7 +319,13 @@
       "showTopics": "Показывать теги тем",
       "showIsnad": "Показывать разделение иснад/матн",
       "showDisclaimer": "Показывать отказ за ИИ-перевод",
-      "wordByWordLang": "Язык пословного перевода:"
+      "wordByWordLang": "Язык пословного перевода:",
+      "showOriginalText": "Показать оригинальный текст",
+      "showDiacritizedText": "Показать огласованный текст",
+      "showChainDiagram": "Показать схему цепочки передатчиков",
+      "hideChainDiagram": "Скрыть схему цепочки",
+      "showWordAnalysis": "Показать пословный анализ",
+      "hideWordAnalysis": "Скрыть анализ"
     }
   },
   "about": {

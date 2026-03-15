@@ -139,7 +139,8 @@
     "sharedNarrations": "Shared Narrations",
     "sharedConarrators": "Shared Co-Narrators",
     "selectNarrator": "Select narrator",
-    "noNarrations": "No narrations found for this narrator."
+    "noNarrations": "No narrations found for this narrator.",
+    "roleImam": "Imam"
   },
   "search": {
     "filter": "Filter",
@@ -349,7 +350,13 @@
       "showTopics": "Show topic tags",
       "showIsnad": "Show isnad/matn separation",
       "showDisclaimer": "Show AI translation disclaimer",
-      "wordByWordLang": "Word-by-word language:"
+      "wordByWordLang": "Word-by-word language:",
+      "showOriginalText": "Show original text",
+      "showDiacritizedText": "Show diacritized text",
+      "showChainDiagram": "Show narrator chain diagram",
+      "hideChainDiagram": "Hide chain diagram",
+      "showWordAnalysis": "Show word-by-word analysis",
+      "hideWordAnalysis": "Hide word analysis"
     }
   },
   "about": {

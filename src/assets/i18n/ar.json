@@ -126,7 +126,8 @@
     "maxTo": "الحد الأقصى للرواية إلى",
     "categoryAll": "الكل",
     "categoryImams": "الأئمة",
-    "categoryTop": "كبار الرواة"
+    "categoryTop": "كبار الرواة",
+    "roleImam": "إمام"
   },
   "search": {
     "filter": "تصفية",
@@ -330,7 +331,13 @@
       "showTopics": "إظهار علامات الموضوع",
       "showIsnad": "إظهار فصل السند والمتن",
       "showDisclaimer": "إظهار إخلاء مسؤولية ترجمة الذكاء الاصطناعي",
-      "wordByWordLang": "لغة الترجمة كلمة بكلمة:"
+      "wordByWordLang": "لغة الترجمة كلمة بكلمة:",
+      "showOriginalText": "إظهار النص الأصلي",
+      "showDiacritizedText": "إظهار النص المشكّل",
+      "showChainDiagram": "إظهار مخطط سلسلة الرواة",
+      "hideChainDiagram": "إخفاء مخطط السلسلة",
+      "showWordAnalysis": "إظهار التحليل كلمة بكلمة",
+      "hideWordAnalysis": "إخفاء التحليل"
     }
   },
   "about": {

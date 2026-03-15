@@ -167,7 +167,9 @@
     "hadiths": "段圣训",
     "selectPage": "选择页面",
     "clear": "清除",
-    "bookNavigation": "经典导航"
+    "bookNavigation": "经典导航",
+    "collapse": "收起",
+    "expand": "展开"
   },
   "breadcrumb": {
     "home": "首页"
@@ -296,6 +298,7 @@
     "previewHadith": "预览圣训"
   },
   "settings": {
+    "close": "关闭设置",
     "toggleDarkMode": "切换深色模式",
     "increaseFont": "增大字体",
     "decreaseFont": "减小字体",

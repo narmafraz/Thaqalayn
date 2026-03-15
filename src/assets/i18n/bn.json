@@ -167,7 +167,9 @@
     "hadiths": "হাদিস",
     "selectPage": "পৃষ্ঠা নির্বাচন",
     "clear": "মুছুন",
-    "bookNavigation": "কিতাব নেভিগেশন"
+    "bookNavigation": "কিতাব নেভিগেশন",
+    "collapse": "সংকুচিত",
+    "expand": "প্রসারিত"
   },
   "breadcrumb": {
     "home": "হোম"
@@ -296,6 +298,7 @@
     "previewHadith": "হাদিস প্রিভিউ"
   },
   "settings": {
+    "close": "সেটিংস বন্ধ করুন",
     "toggleDarkMode": "ডার্ক মোড টগল",
     "increaseFont": "ফন্ট বড় করুন",
     "decreaseFont": "ফন্ট ছোট করুন",

@@ -167,7 +167,9 @@
     "hadiths": "hadiths",
     "selectPage": "Sélectionner la page",
     "clear": "Effacer",
-    "bookNavigation": "Navigation des livres"
+    "bookNavigation": "Navigation des livres",
+    "collapse": "Réduire",
+    "expand": "Développer"
   },
   "breadcrumb": {
     "home": "Accueil"
@@ -296,6 +298,7 @@
     "previewHadith": "Aperçu du hadith"
   },
   "settings": {
+    "close": "Fermer les paramètres",
     "toggleDarkMode": "Basculer le mode sombre",
     "increaseFont": "Augmenter la taille de police",
     "decreaseFont": "Diminuer la taille de police",

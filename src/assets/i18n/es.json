@@ -167,7 +167,9 @@
     "hadiths": "hadices",
     "selectPage": "Seleccionar página",
     "clear": "Limpiar",
-    "bookNavigation": "Navegación de libros"
+    "bookNavigation": "Navegación de libros",
+    "collapse": "Contraer",
+    "expand": "Expandir"
   },
   "breadcrumb": {
     "home": "Inicio"
@@ -296,6 +298,7 @@
     "previewHadith": "Vista previa del hadiz"
   },
   "settings": {
+    "close": "Cerrar ajustes",
     "toggleDarkMode": "Alternar modo oscuro",
     "increaseFont": "Aumentar tamaño de fuente",
     "decreaseFont": "Disminuir tamaño de fuente",

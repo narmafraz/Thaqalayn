@@ -28,8 +28,8 @@
               class="toggle-btn"
               mat-icon-button
               (click)="toggle(node)"
-              [attr.aria-label]="isExpanded(node) ? 'Collapse ' + (node.titleEn || node.titleAr) : 'Expand ' + (node.titleEn || node.titleAr)"
-              [matTooltip]="isExpanded(node) ? 'Collapse ' + (node.titleEn || node.titleAr) : 'Expand ' + (node.titleEn || node.titleAr)">
+              [attr.aria-label]="getToggleLabel(node)"
+              [matTooltip]="getToggleLabel(node)">
         <mat-icon>{{ isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
       </button>
       <span *ngIf="!node.expandable" class="toggle-spacer"></span>

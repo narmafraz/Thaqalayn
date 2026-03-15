@@ -167,7 +167,9 @@
     "hadiths": "hadis",
     "selectPage": "Sayfa seçin",
     "clear": "Temizle",
-    "bookNavigation": "Kitap navigasyonu"
+    "bookNavigation": "Kitap navigasyonu",
+    "collapse": "Daralt",
+    "expand": "Genişlet"
   },
   "breadcrumb": {
     "home": "Ana Sayfa"
@@ -296,6 +298,7 @@
     "previewHadith": "Hadis önizlemesi"
   },
   "settings": {
+    "close": "Ayarları kapat",
     "toggleDarkMode": "Karanlık modu değiştir",
     "increaseFont": "Yazı boyutunu büyüt",
     "decreaseFont": "Yazı boyutunu küçült",

@@ -8,6 +8,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
+import { I18nService } from '@app/services/i18n.service';
 import { IndexedTitles, IndexState } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
 import { Subscription } from 'rxjs';
@@ -50,7 +51,8 @@ export class BookTreeComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private i18n: I18nService,
   ) {
     this.treeControl = new FlatTreeControl<BookTreeNode>(
       (node) => node.level,
@@ -121,6 +123,11 @@ export class BookTreeComponent implements OnInit, OnDestroy {
   clearSearch(): void {
     this.searchQuery = '';
     this.updateVisibleNodes();
+  }
+
+  getToggleLabel(node: BookTreeNode): string {
+    const prefix = this.isExpanded(node) ? this.i18n.get('common.collapse') : this.i18n.get('common.expand');
+    return prefix + ' ' + (node.titleEn || node.titleAr);
   }
 
   private buildTree(

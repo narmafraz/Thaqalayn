@@ -167,7 +167,9 @@
     "hadiths": "hadis",
     "selectPage": "Pilih halaman",
     "clear": "Hapus",
-    "bookNavigation": "Navigasi kitab"
+    "bookNavigation": "Navigasi kitab",
+    "collapse": "Ciutkan",
+    "expand": "Perluas"
   },
   "breadcrumb": {
     "home": "Beranda"
@@ -296,6 +298,7 @@
     "previewHadith": "Pratinjau hadis"
   },
   "settings": {
+    "close": "Tutup pengaturan",
     "toggleDarkMode": "Alihkan mode gelap",
     "increaseFont": "Perbesar ukuran font",
     "decreaseFont": "Perkecil ukuran font",

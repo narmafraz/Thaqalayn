@@ -167,7 +167,9 @@
     "hadiths": "хадисов",
     "selectPage": "Выбрать страницу",
     "clear": "Очистить",
-    "bookNavigation": "Навигация по книгам"
+    "bookNavigation": "Навигация по книгам",
+    "collapse": "Свернуть",
+    "expand": "Развернуть"
   },
   "breadcrumb": {
     "home": "Главная"
@@ -296,6 +298,7 @@
     "previewHadith": "Предпросмотр хадиса"
   },
   "settings": {
+    "close": "Закрыть настройки",
     "toggleDarkMode": "Переключить тёмный режим",
     "increaseFont": "Увеличить шрифт",
     "decreaseFont": "Уменьшить шрифт",

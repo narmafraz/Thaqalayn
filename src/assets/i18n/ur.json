@@ -167,7 +167,9 @@
     "hadiths": "احادیث",
     "selectPage": "صفحہ منتخب کریں",
     "clear": "صاف",
-    "bookNavigation": "کتابوں کی نیویگیشن"
+    "bookNavigation": "کتابوں کی نیویگیشن",
+    "collapse": "سکیڑیں",
+    "expand": "پھیلائیں"
   },
   "breadcrumb": {
     "home": "ہوم"
@@ -296,6 +298,7 @@
     "previewHadith": "حدیث کا پیش نظارہ"
   },
   "settings": {
+    "close": "سیٹنگز بند کریں",
     "toggleDarkMode": "ڈارک موڈ تبدیل کریں",
     "increaseFont": "فونٹ بڑا کریں",
     "decreaseFont": "فونٹ چھوٹا کریں",

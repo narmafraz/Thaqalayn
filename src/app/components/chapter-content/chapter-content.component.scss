@@ -745,6 +745,28 @@ mat-mdc-card {
   }
 }
 
+.ai-relation-type-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+}
+
+.ai-relation-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 400;
+  background-color: #e3f2fd;
+  color: #1565c0;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
 :host-context(body.dark-theme) {
   .ai-content-type-chip {
     background-color: rgba(69, 39, 160, 0.2);
@@ -755,6 +777,10 @@ mat-mdc-card {
   .ai-quran-chip {
     background-color: rgba(46, 125, 50, 0.15);
     color: #81c784;
+  }
+  .ai-relation-chip {
+    background-color: rgba(21, 101, 192, 0.15);
+    color: #64b5f6;
   }
 }
 

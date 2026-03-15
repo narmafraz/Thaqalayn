@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Elem
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
-import { Book, ChapterContent, Crumb, Verse } from '@app/models';
+import { Book, BOOK_DISPLAY_NAMES, ChapterContent, Crumb, Verse } from '@app/models';
 import { BookAuthor, getBookAuthor } from '@app/data/book-authors';
 import { I18nService } from '@app/services/i18n.service';
 import { AudioService } from '@app/services/audio.service';
@@ -501,6 +501,24 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   getQuranRefFragment(ref: string): string {
     const parts = ref.split(':');
     return parts.length >= 2 ? 'h' + parts[1] : '';
+  }
+
+  hasRelations(verse: Verse): boolean {
+    return !!verse.relations && Object.keys(verse.relations).length > 0;
+  }
+
+  stripBooksPrefix(path: string): string {
+    return path.startsWith('/books/') ? path.slice(7) : path;
+  }
+
+  formatRelationPath(path: string): string {
+    const raw = path.startsWith('/books/') ? path.slice(7) : path;
+    const parts = raw.split(':');
+    const bookId = parts[0];
+    const bookName = BOOK_DISPLAY_NAMES[bookId] || bookId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const segments = parts.slice(1);
+    if (!segments.length) return bookName;
+    return `${bookName} ${segments.join(':')}`;
   }
 
   async shareAsImage(book: ChapterContent, verse: Verse, crumbs: Crumb[]): Promise<void> {

@@ -33,7 +33,7 @@
       </mat-card-title>
       <mat-card-content>
         <app-verse-text #vt [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index" [showToggles]="false"></app-verse-text>
-        <div class="ai-badges-inline" *ngIf="(showContentTypeBadges && verse.ai?.content_type) || (showTopicTags && verse.ai?.tags?.length) || verse.ai?.related_quran?.length">
+        <div class="ai-badges-inline" *ngIf="(showContentTypeBadges && verse.ai?.content_type) || (showTopicTags && verse.ai?.tags?.length) || verse.ai?.related_quran?.length || hasRelations(verse)">
           <a class="ai-content-type-chip" *ngIf="showContentTypeBadges && verse.ai?.content_type"
              [routerLink]="['/search']"
              [queryParams]="{q: 'type:' + verse.ai.content_type}"
@@ -55,6 +55,16 @@
                queryParamsHandling="preserve">
               {{ qref.ref }} <span class="ai-quran-rel-suffix">{{ qref.relationship }}</span>
             </a>
+          </ng-container>
+          <ng-container *ngIf="verse.relations as relations">
+            <ng-container *ngFor="let relation of relations | keyvalue">
+              <span class="ai-relation-type-label">{{ relation.key }}:</span>
+              <a class="ai-relation-chip" *ngFor="let rLink of relation.value"
+                 [routerLink]="['/books', stripBooksPrefix(rLink)]"
+                 queryParamsHandling="preserve">
+                {{ formatRelationPath(rLink) }}
+              </a>
+            </ng-container>
           </ng-container>
         </div>
       </mat-card-content>

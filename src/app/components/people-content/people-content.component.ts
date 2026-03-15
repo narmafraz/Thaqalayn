@@ -9,6 +9,7 @@ import { IndexState, IndexedTitles } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
 import { Observable, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, takeUntil } from 'rxjs/operators';
+import { IMAM_IDS } from '../people-list/people-list.component';
 
 export interface ConarratorSummary {
   id: number;
@@ -79,6 +80,12 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
   totalNarrations = 0;
   bookCount = 0;
   bookDistribution: BookDistribution[] = [];
+
+  // Profile hero
+  isImam = false;
+  monogramLetter = '';
+  narratedFromCount = 0;
+  narratedToCount = 0;
 
   // Filter
   private pathsFilterSubject = new Subject<string>();
@@ -154,6 +161,13 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(narrator => {
       this.currentNarratorIndex = narrator.index;
+
+      // Compute hero properties
+      this.isImam = +narrator.index in IMAM_IDS;
+      this.monogramLetter = this.getMonogramLetter(narrator.titles?.ar || '');
+      const meta = this.narratorIndex[+narrator.index];
+      this.narratedFromCount = meta?.narrated_from || 0;
+      this.narratedToCount = meta?.narrated_to || 0;
 
       // Process verse paths
       if (narrator.verse_paths) {
@@ -386,5 +400,15 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
         count,
         percentage: (count / maxCount) * 100
       }));
+  }
+
+  /** Extract first Arabic letter for geometric monogram */
+  private getMonogramLetter(arabicName: string): string {
+    if (!arabicName) return '';
+    // Strip diacritics to get base letter
+    const stripped = arabicName.replace(/[\u0610-\u061A\u064B-\u065F\u0670]/g, '');
+    // Find first actual Arabic letter (skip spaces, parentheses, etc.)
+    const match = stripped.match(/[\u0621-\u064A]/);
+    return match ? match[0] : stripped.charAt(0);
   }
 }

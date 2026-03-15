@@ -10,34 +10,59 @@
         <span>{{ 'nav.narrators' | translate }}</span>
       </a>
     </div>
-    <div class="titles">
-      <h1 class="arabic" lang="ar">{{narrator.titles?.ar}}</h1>
-      <h2 class="transliteration" *ngIf="narrator.biography?.english_transliteration">
+    <!-- Profile Hero Header -->
+    <section class="profile-hero" [class.imam-hero]="isImam">
+      <div class="monogram" [class.imam-monogram]="isImam" aria-hidden="true">
+        <span class="monogram-letter arabic">{{ monogramLetter }}</span>
+      </div>
+      <h1 class="hero-name-ar arabic" lang="ar" dir="rtl">{{narrator.titles?.ar}}</h1>
+      <h2 class="hero-name-en" *ngIf="narrator.biography?.english_transliteration">
         {{ narrator.biography.english_transliteration }}
       </h2>
+      <h2 class="hero-name-en" *ngIf="!narrator.biography?.english_transliteration && narrator.titles?.en">
+        {{ narrator.titles.en }}
+      </h2>
+      <span class="hero-imam-badge" *ngIf="isImam">{{ 'narrator.roleImam' | translate }}</span>
+
+      <div class="hero-stats" *ngIf="totalNarrations > 0">
+        <span class="hero-stat">
+          <span class="hero-stat-value">{{ totalNarrations | number }}</span>
+          <span class="hero-stat-label">{{ 'narrator.narrations' | translate }}</span>
+        </span>
+        <span class="hero-stat" *ngIf="narratedFromCount > 0">
+          <span class="hero-stat-value">{{ narratedFromCount | number }}</span>
+          <span class="hero-stat-label">{{ 'narrator.narratedFrom' | translate }}</span>
+        </span>
+        <span class="hero-stat" *ngIf="narratedToCount > 0">
+          <span class="hero-stat-value">{{ narratedToCount | number }}</span>
+          <span class="hero-stat-label">{{ 'narrator.narratedTo' | translate }}</span>
+        </span>
+        <span class="hero-stat" *ngIf="uniqueConarratorCount > 0">
+          <span class="hero-stat-value">{{ uniqueConarratorCount | number }}</span>
+          <span class="hero-stat-label">{{ 'narrator.conarratorCount' | translate }}</span>
+        </span>
+      </div>
+
+      <div class="hero-meta">
+        <span class="hero-meta-item" *ngIf="narrator.biography?.era">{{ narrator.biography.era }}</span>
+        <span class="hero-meta-item reliability-badge"
+              *ngIf="narrator.biography?.reliability"
+              [class.reliable]="narrator.biography.reliability?.includes('Thiqah') || narrator.biography.reliability?.includes('ثقة')">
+          {{ narrator.biography.reliability }}
+        </span>
+      </div>
+
       <a mat-button class="compare-btn"
          [routerLink]="['/people/narrators/compare']"
          [queryParams]="{ a: narrator.index }">
         <mat-icon>compare_arrows</mat-icon>
         {{ 'narrator.compare' | translate }}
       </a>
-    </div>
+    </section>
 
-    <!-- Stats Summary Section (NAR-02) -->
-    <section class="stats-section" *ngIf="totalNarrations > 0">
-      <div class="stats-pills">
-        <span class="stat-pill narrations-pill">
-          {{ 'narrator.totalNarrations' | translate }}: {{ totalNarrations | number }}
-        </span>
-        <span class="stat-pill" *ngIf="narrator.biography?.reliability"
-              [class.reliable]="narrator.biography.reliability?.includes('Thiqah') || narrator.biography.reliability?.includes('ثقة')">
-          {{ narrator.biography.reliability }}
-        </span>
-        <span class="stat-pill book-pill" *ngFor="let bd of bookDistribution">
-          {{ bd.displayName }}: {{ bd.count | number }}
-        </span>
-      </div>
-      <div class="book-distribution-chart" *ngIf="bookDistribution.length > 1">
+    <!-- Book Distribution Chart -->
+    <section class="stats-section" *ngIf="bookDistribution.length > 1">
+      <div class="book-distribution-chart">
         <h3>{{ 'narrator.bookDistribution' | translate }}</h3>
         <div class="distribution-bars">
           <div class="distribution-bar-row" *ngFor="let bd of bookDistribution">

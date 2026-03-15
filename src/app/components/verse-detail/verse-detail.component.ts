@@ -6,6 +6,7 @@ import { BooksService } from '@app/services/books.service';
 import { Comment, DiscussionService } from '@app/services/discussion.service';
 import { SeoService } from '@app/services/seo.service';
 import { ShareCardService, ShareCardData } from '@app/services/share-card.service';
+import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { SyncService } from '@app/services/sync.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -58,6 +59,10 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   newCommentText = '';
   isSignedIn = false;
 
+  // AI preference visibility flags
+  showContentTypeBadges = true;
+  showTopicTags = true;
+
   constructor(
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
@@ -66,6 +71,7 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     private shareCard: ShareCardService,
     private discussionService: DiscussionService,
     private syncService: SyncService,
+    private aiPrefs: AiPreferencesService,
   ) {
     this.discussionEnabled = this.discussionService.isConfigured;
     this.comments$ = this.discussionService.comments$;
@@ -73,6 +79,12 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.aiPrefs.preferences$.subscribe(prefs => {
+      this.showContentTypeBadges = prefs.showContentTypeBadges;
+      this.showTopicTags = prefs.showTopicTags;
+      this.cdr.markForCheck();
+    });
+
     this.transSub = this.translation$.subscribe(t => {
       this.currentTranslation = t || '';
     });

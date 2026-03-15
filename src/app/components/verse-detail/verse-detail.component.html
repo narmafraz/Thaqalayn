@@ -110,22 +110,24 @@
         </div>
 
         <!-- AI Content: Tags & Content Type -->
-        <div class="ai-metadata-section" *ngIf="book.data.verse.ai?.content_type || book.data.verse.ai?.tags?.length || book.data.verse.ai?.topics?.length">
+        <div class="ai-metadata-section" *ngIf="(showContentTypeBadges && book.data.verse.ai?.content_type) || (showTopicTags && (book.data.verse.ai?.tags?.length || book.data.verse.ai?.topics?.length))">
           <div class="ai-badges">
-            <a class="ai-content-type-badge" *ngIf="book.data.verse.ai?.content_type"
+            <a class="ai-content-type-badge" *ngIf="showContentTypeBadges && book.data.verse.ai?.content_type"
                [routerLink]="['/search']"
                [queryParams]="{q: 'type:' + book.data.verse.ai.content_type}"
                queryParamsHandling="merge">
               {{ getContentTypeLabel(book.data.verse.ai.content_type) }}
             </a>
-            <a class="ai-tag-badge" *ngFor="let tag of book.data.verse.ai?.tags"
-               [routerLink]="['/search']"
-               [queryParams]="{q: 'tag:' + tag}"
-               queryParamsHandling="merge">{{ formatLabel(tag) }}</a>
-            <a class="ai-topic-badge" *ngFor="let topic of book.data.verse.ai?.topics"
-               [routerLink]="['/search']"
-               [queryParams]="{q: 'topic:' + topic}"
-               queryParamsHandling="merge">{{ formatLabel(topic) }}</a>
+            <ng-container *ngIf="showTopicTags">
+              <a class="ai-tag-badge" *ngFor="let tag of book.data.verse.ai?.tags"
+                 [routerLink]="['/search']"
+                 [queryParams]="{q: 'tag:' + tag}"
+                 queryParamsHandling="merge">{{ formatLabel(tag) }}</a>
+              <a class="ai-topic-badge" *ngFor="let topic of book.data.verse.ai?.topics"
+                 [routerLink]="['/search']"
+                 [queryParams]="{q: 'topic:' + topic}"
+                 queryParamsHandling="merge">{{ formatLabel(topic) }}</a>
+            </ng-container>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
 import { Book, ChapterContent, Crumb, Verse } from '@app/models';
@@ -70,6 +71,12 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // Book author metadata
   author: BookAuthor | undefined;
 
+  private destroyRef = inject(DestroyRef);
+
+  // AI preference visibility flags
+  showContentTypeBadges = true;
+  showTopicTags = true;
+
   constructor(
     private store: Store,
     private viewportScroller: ViewportScroller,
@@ -86,7 +93,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private aiPrefs: AiPreferencesService,
   ) {
     this.tafsirEditions = this.tafsirService.editions;
-    this.fragment$.subscribe(fragment => {
+    this.fragment$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(fragment => {
       setTimeout(() => {
           this.viewportScroller.scrollToAnchor(fragment);
       });
@@ -94,8 +101,14 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.i18nService.currentLang$.subscribe(lang => {
+    this.i18nService.currentLang$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(lang => {
       this.currentLang = lang;
+    });
+
+    this.aiPrefs.preferences$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(prefs => {
+      this.showContentTypeBadges = prefs.showContentTypeBadges;
+      this.showTopicTags = prefs.showTopicTags;
+      this.cdr.markForCheck();
     });
 
     this.sub = this.book$.subscribe(book => {

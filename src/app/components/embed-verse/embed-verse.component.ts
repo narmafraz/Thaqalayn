@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { Book, VerseDetail, ChapterContent } from '@app/models';
 import { Store } from '@ngxs/store';
@@ -24,8 +25,10 @@ export class EmbedVerseComponent {
 
   theme: string;
 
+  private destroyRef = inject(DestroyRef);
+
   constructor(private route: ActivatedRoute) {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.theme = params['theme'] || 'auto';
     });
   }

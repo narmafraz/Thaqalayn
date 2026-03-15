@@ -47,6 +47,13 @@ export interface Verse {
   ai?: AiContent;
 }
 
+export interface VerseRef {
+  local_index: number;
+  part_type: string;
+  path?: string;       // present for Hadith/Verse
+  inline?: Verse;      // present for Heading (inlined, ~43 total)
+}
+
 export interface Chapter {
   index: string;
   local_index: string;
@@ -65,6 +72,7 @@ export interface Chapter {
   nav: Navigation;
   verse_translations: string[];
   default_verse_translation_ids: Record<string, string>;
+  verse_refs?: VerseRef[];
 }
 
 export interface ChapterList {

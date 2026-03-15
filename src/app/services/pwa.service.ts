@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, ApplicationRef, PLATFORM_ID } from '@angular/core';
-import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
+import { SwUpdate, UnrecoverableStateEvent, VersionReadyEvent } from '@angular/service-worker';
 import { BehaviorSubject, Observable, first, filter } from 'rxjs';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -94,20 +94,47 @@ export class PwaService {
   private listenForUpdates(): void {
     if (!this.swUpdate.isEnabled) return;
 
-    // Wait for app stability, then check for updates periodically
+    // Check for updates immediately on app start, then every 30 minutes
     this.appRef.isStable.pipe(
       first(stable => stable)
     ).subscribe(() => {
-      // Check for updates every 6 hours
+      // Immediate check on startup — catches deploys that happened while the tab was closed
+      this.swUpdate.checkForUpdate();
+
+      // Periodic checks every 30 minutes
       setInterval(() => {
         this.swUpdate.checkForUpdate();
-      }, 6 * 60 * 60 * 1000);
+      }, 30 * 60 * 1000);
     });
 
     this.swUpdate.versionUpdates.pipe(
       filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY')
     ).subscribe(() => {
-      this.updateAvailableSubject.next(true);
+      // Automatically activate the update and reload — don't wait for user action.
+      // This ensures stale cached JS/CSS/i18n files are replaced immediately.
+      // The reload is seamless since Angular PWA caches the new version in the background
+      // before firing VERSION_READY, so the reload is instant (no network fetch needed).
+      this.swUpdate.activateUpdate().then(() => {
+        if (this.isBrowser) {
+          window.location.reload();
+        }
+      });
+    });
+
+    // Handle unrecoverable state — cache is corrupt or hash mismatch.
+    // This happens when the CDN serves stale files or a non-atomic deploy leaves
+    // the service worker with a mix of old and new file versions.
+    // The only recovery is to clear caches and reload from network.
+    this.swUpdate.unrecoverable.subscribe((event: UnrecoverableStateEvent) => {
+      console.error('Service worker unrecoverable state:', event.reason);
+      if (this.isBrowser) {
+        // Clear all service worker caches and reload
+        caches.keys().then(keys => {
+          Promise.all(keys.map(key => caches.delete(key))).then(() => {
+            window.location.reload();
+          });
+        });
+      }
     });
   }
 }

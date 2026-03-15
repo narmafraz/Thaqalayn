@@ -307,7 +307,7 @@ export class SearchService {
     const filtered = this.parseFilteredQuery(query);
     if (filtered) {
       if (filtered.prefix === 'topic') {
-        return this.searchByTopic(filtered.value, limit);
+        return this.searchByTopic(filtered.value, limit, offset);
       }
       // For tag: and type: — strip prefix, search the value as plain text
       return this.searchAllPlain(filtered.value, mode, limit, offset);
@@ -323,7 +323,9 @@ export class SearchService {
         await this.loadFullTextIndex();
       }
       const [titleResults, fulltextResults] = await Promise.all([
-        this.searchTitles(query, 10, offset),
+        // Always fetch titles from offset 0 — they're boosted to top and capped at 10,
+        // so applying a global offset would skip all title matches on page 2+
+        this.searchTitles(query, 10),
         this.searchFullText(query, limit, offset),
       ]);
       // Merge: titles first (boosted), then full text
@@ -332,11 +334,11 @@ export class SearchService {
       return [...titleResults, ...uniqueFulltext].slice(0, limit);
     }
 
-    return this.searchTitles(query, limit);
+    return this.searchTitles(query, limit, offset);
   }
 
   /** Search by topic using the AI topics index */
-  async searchByTopic(topicValue: string, limit = 50): Promise<SearchResult[]> {
+  async searchByTopic(topicValue: string, limit = 50, offset = 0): Promise<SearchResult[]> {
     const topics = await firstValueFrom(this.aiContentService.getTopics());
     if (!topics) return [];
 
@@ -354,7 +356,7 @@ export class SearchService {
     // Deduplicate and resolve chapter paths
     const uniqueChapterPaths = [...new Set(matchingPaths.map(p => p.replace(/:\d+$/, '')))];
 
-    return uniqueChapterPaths.slice(0, limit).map(chapterPath => ({
+    return uniqueChapterPaths.slice(offset, offset + limit).map(chapterPath => ({
       path: chapterPath,
       title: '',
       titleAr: '',

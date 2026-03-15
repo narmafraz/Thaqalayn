@@ -1,5 +1,16 @@
 .textrow {
   position: relative;
+
+  // Override global .textrow flex row-reverse layout when chunked view is active,
+  // since chunks handle their own internal Arabic/translation grid layout
+  &:has(.chunked-view) {
+    flex-direction: column;
+    align-items: stretch;
+
+    & > * {
+      max-width: 100% !important;
+    }
+  }
 }
 
 .translation {

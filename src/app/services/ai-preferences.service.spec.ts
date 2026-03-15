@@ -10,7 +10,7 @@ describe('AiPreferencesService', () => {
 
   it('should be created with defaults', () => {
     expect(service).toBeTruthy();
-    expect(service.get('showDiacritizedByDefault')).toBe(false);
+    expect(service.get('showDiacritizedByDefault')).toBe(true);
     expect(service.get('showContentTypeBadges')).toBe(true);
     expect(service.get('showTopicTags')).toBe(true);
     expect(service.get('showIsnadSeparation')).toBe(true);

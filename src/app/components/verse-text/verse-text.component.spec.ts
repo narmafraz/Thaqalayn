@@ -131,11 +131,11 @@ describe('VerseTextComponent', () => {
 
   it('should toggle diacritics display', () => {
     component.verse = { ...mockVerse, ai: mockAi };
+    expect(component.showDiacritics).toBe(true); // default is now true
+    component.toggleDiacritics();
     expect(component.showDiacritics).toBe(false);
     component.toggleDiacritics();
     expect(component.showDiacritics).toBe(true);
-    component.toggleDiacritics();
-    expect(component.showDiacritics).toBe(false);
   });
 
   it('should toggle word analysis display', () => {

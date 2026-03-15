@@ -19,7 +19,7 @@ export interface AiPreferences {
 const STORAGE_KEY = 'thaqalayn_ai_preferences';
 
 const DEFAULTS: AiPreferences = {
-  showDiacritizedByDefault: false,
+  showDiacritizedByDefault: true,
   showContentTypeBadges: true,
   showTopicTags: true,
   showIsnadSeparation: true,

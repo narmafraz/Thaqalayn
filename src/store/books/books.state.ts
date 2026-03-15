@@ -97,10 +97,11 @@ export class BooksState {
         if (defaultVerseTranslationIds && defaultVerseTranslationIds[language]) {
           return defaultVerseTranslationIds[language];
         }
-        // Otherwise return the first one that matches the language
-        const translationMatchingLanguage = verseTranslations.find(x => x.split('.')[0] === language);
-        if (translationMatchingLanguage) {
-          return translationMatchingLanguage;
+        // Otherwise prefer AI translation for the language, then fall back to any match
+        const matchingTranslations = verseTranslations.filter(x => x.split('.')[0] === language);
+        if (matchingTranslations.length > 0) {
+          const aiMatch = matchingTranslations.find(x => x.endsWith('.ai'));
+          return aiMatch || matchingTranslations[0];
         }
         // Otherwise just return the first in the list
         return verseTranslations[0];

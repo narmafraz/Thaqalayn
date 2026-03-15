@@ -5,7 +5,7 @@
   // inline AI translation (per-chunk grid handles its own layout).
   // For non-AI translations with chunks, the global row-reverse layout
   // gives Arabic chunks on right and translation on left at 50% each.
-  &:has(.chunked-ai-translation) {
+  &:has(.chunked-ai-translation), &.comparing {
     flex-direction: column;
     align-items: stretch;
 

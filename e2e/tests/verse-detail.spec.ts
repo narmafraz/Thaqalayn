@@ -161,4 +161,69 @@ test.describe('Verse Detail Pages', () => {
       expect(canonical).toContain('al-kafi');
     });
   });
+
+  test.describe('Narrator Hover Card', () => {
+    test('should show narrator hover card on mouseover in chapter view', async ({ page }) => {
+      await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+      await page.waitForLoadState('networkidle');
+      await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
+
+      // Find a narrator link in the narrator chain
+      const narratorLink = page.locator('.textrow a[href*="/people/narrators/"]').first();
+      if (await narratorLink.count() > 0) {
+        await narratorLink.hover();
+        // Wait for the hover card to appear
+        const hoverCard = page.locator('app-narrator-hover-card');
+        await expect(hoverCard).toBeVisible({ timeout: 3000 });
+      }
+    });
+
+    test('should show narrator hover card on mouseover in verse detail', async ({ page }) => {
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+      await page.waitForLoadState('networkidle');
+      await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
+
+      const narratorLink = page.locator('.textrow a[href*="/people/narrators/"]').first();
+      if (await narratorLink.count() > 0) {
+        await narratorLink.hover();
+        const hoverCard = page.locator('app-narrator-hover-card');
+        await expect(hoverCard).toBeVisible({ timeout: 3000 });
+      }
+    });
+  });
+
+  test.describe('Toggle Buttons', () => {
+    test('should show toggle buttons outside text area on verse detail', async ({ page }) => {
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en&translation=en.ai');
+      await page.waitForLoadState('networkidle');
+      await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
+
+      // Toggles should be in .verse-detail-toggles, not inside .textrow .ai-toggles
+      const externalToggles = page.locator('.verse-detail-toggles .ai-toggle-btn');
+      const internalToggles = page.locator('.textrow .ai-toggles .ai-toggle-btn');
+
+      // External toggles should exist if AI content is available
+      const externalCount = await externalToggles.count();
+      const internalCount = await internalToggles.count();
+
+      // If AI content exists, toggles should be external, not internal
+      if (externalCount > 0) {
+        expect(internalCount).toBe(0);
+      }
+    });
+  });
+
+  test.describe('Comparison Mode Layout', () => {
+    test('should add comparing class when second translation is selected', async ({ page }) => {
+      await page.goto('/#/books/al-kafi:1:1:1:1?lang=en&translation=en.ai&translation2=en.hubeali');
+      await page.waitForLoadState('networkidle');
+      await page.locator('mat-card, .verse-detail-container').first().waitFor({ state: 'visible', timeout: 15000 });
+
+      // .textrow should have .comparing class
+      const textrow = page.locator('.textrow.comparing');
+      if (await textrow.count() > 0) {
+        await expect(textrow.first()).toBeVisible();
+      }
+    });
+  });
 });

@@ -1,4 +1,4 @@
-<div class="textrow">
+<div class="textrow" [class.comparing]="(translation2$ | async)">
   <!-- AI feature toggles -->
   <div class="ai-toggles" *ngIf="showToggles && (hasAiText || hasWordAnalysis || hasNarratorChain)">
     <button *ngIf="hasNarratorChain" class="ai-toggle-btn" (click)="toggleChainDiagram()"

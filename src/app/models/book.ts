@@ -105,6 +105,7 @@ export interface VerseDetailData {
   chapter_path: string;
   chapter_title: MultiLingualText;
   nav: Navigation;
+  verse_translations?: string[];
   gradings?: Record<string, string>;
   source_url?: string;
   cross_validation?: {
@@ -129,8 +130,13 @@ export function getVerseTranslations(book: Book): string[] {
   if (book.kind === 'chapter_list' || book.kind === 'verse_list') {
     return book.data.verse_translations;
   }
-  if (book.kind === 'verse_detail' && book.data.verse && book.data.verse.translations) {
-    return Object.keys(book.data.verse.translations);
+  if (book.kind === 'verse_detail') {
+    if (book.data.verse_translations) {
+      return book.data.verse_translations;
+    }
+    if (book.data.verse && book.data.verse.translations) {
+      return Object.keys(book.data.verse.translations);
+    }
   }
   return undefined;
 }

@@ -482,6 +482,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
       x: offsetX,
       y: offsetY
     };
+    this.cdr.markForCheck();
   }
 
   hideNarratorCard(): void {
@@ -491,6 +492,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     }
     this.hoverTimeout = setTimeout(() => {
       this.hoveredNarrator = null;
+      this.cdr.markForCheck();
     }, 200);
   }
 
@@ -526,6 +528,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
         x: offsetX,
         y: offsetY
       };
+      this.cdr.markForCheck();
     }, 500);
   }
 

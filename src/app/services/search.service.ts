@@ -88,6 +88,12 @@ export class SearchService {
           arn: 'string',
         } as const,
         language: 'arabic',
+        components: {
+          tokenizer: {
+            stemming: false,
+            tokenizeSkipProperties: ['p'],
+          },
+        },
       });
 
       if (data) {
@@ -142,6 +148,12 @@ export class SearchService {
             i: 'number',
           } as const,
           language: 'arabic',
+          components: {
+            tokenizer: {
+              stemming: false,
+              tokenizeSkipProperties: ['p'],
+            },
+          },
         });
 
         if (data) {
@@ -170,7 +182,7 @@ export class SearchService {
       .join(' ');
   }
 
-  async searchTitles(query: string, limit = 20): Promise<SearchResult[]> {
+  async searchTitles(query: string, limit = 20, offset = 0): Promise<SearchResult[]> {
     if (!this.titlesLoaded || !this.titlesDb) {
       return [];
     }
@@ -183,6 +195,7 @@ export class SearchService {
     let results = await search(this.titlesDb, {
       term: normalizedQuery,
       limit,
+      offset,
       properties: ['en', 'ar', 'arn', 'pt'],
       threshold: isMultiWord ? 0 : 1,
       tolerance: isMultiWord ? 0 : 1,
@@ -194,6 +207,7 @@ export class SearchService {
       results = await search(this.titlesDb, {
         term: normalizedQuery,
         limit,
+        offset,
         properties: ['en', 'ar', 'arn', 'pt'],
         threshold: 1,
         tolerance: 1,
@@ -216,24 +230,28 @@ export class SearchService {
   }
 
   /** Search full-text content across all loaded books */
-  async searchFullText(query: string, limit = 30): Promise<SearchResult[]> {
+  async searchFullText(query: string, limit = 30, offset = 0): Promise<SearchResult[]> {
     if (!this.fullTextLoaded) return [];
 
     const normalizedQuery = this.normalizeArabic(query);
     const isMultiWord = normalizedQuery.trim().split(/\s+/).length > 1;
     const allResults: SearchResult[] = [];
     const perBookLimit = Math.ceil(limit / this.fullTextDbs.size);
+    const perBookOffset = Math.ceil(offset / this.fullTextDbs.size);
 
     for (const [, entry] of this.fullTextDbs) {
       // Use AND logic for multi-word queries, with OR fallback
       // Boost English translations and chapter titles above Arabic
+      // BM25 tuning: lower b to reduce length penalty on longer hadiths
       let results = await search(entry.db, {
         term: normalizedQuery,
         limit: perBookLimit,
+        offset: perBookOffset,
         properties: ['ar', 'en', 't'],
         threshold: isMultiWord ? 0 : 1,
         tolerance: isMultiWord ? 0 : 1,
         boost: { en: 2, t: 1.5, ar: 1 },
+        relevance: { k: 1.2, b: 0.5, d: 0.5 },
       });
 
       // If AND returned nothing for this book, fall back to OR
@@ -241,10 +259,12 @@ export class SearchService {
         results = await search(entry.db, {
           term: normalizedQuery,
           limit: perBookLimit,
+          offset: perBookOffset,
           properties: ['ar', 'en', 't'],
           threshold: 1,
           tolerance: 1,
           boost: { en: 2, t: 1.5, ar: 1 },
+          relevance: { k: 1.2, b: 0.5, d: 0.5 },
         });
       }
 

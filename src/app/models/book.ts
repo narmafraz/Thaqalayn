@@ -43,7 +43,8 @@ export interface Verse {
   part_type: string;
   relations: Record<string, string[]>;
   narrator_chain: NarratorChain;
-  gradings?: string[];
+  gradings?: Record<string, string> | string[];
+  source_url?: string;
   ai?: AiContent;
 }
 

@@ -3,6 +3,8 @@ import { BehaviorSubject } from 'rxjs';
 import { AiLanguage } from '@app/models/ai-content';
 
 export type ViewMode = 'plain' | 'word-by-word' | 'paragraph' | 'combined';
+// Note: 'paragraph' and 'combined' are legacy values that may exist in localStorage.
+// They are treated as 'plain' by applyViewMode() since paragraph view was removed.
 
 export interface AiPreferences {
   showDiacritizedByDefault: boolean;
@@ -23,7 +25,7 @@ const DEFAULTS: AiPreferences = {
   showIsnadSeparation: true,
   showAiTranslationDisclaimer: true,
   wordByWordDefaultLang: 'en',
-  viewMode: 'paragraph',
+  viewMode: 'plain',
 };
 
 @Injectable({ providedIn: 'root' })

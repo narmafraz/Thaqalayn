@@ -73,7 +73,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   }
 
   applyViewMode(mode: ViewMode): void {
-    this.showWordAnalysis = mode === 'word-by-word' || mode === 'combined';
+    this.showWordAnalysis = mode === 'word-by-word';
   }
 
   toggleDiacritics(): void {

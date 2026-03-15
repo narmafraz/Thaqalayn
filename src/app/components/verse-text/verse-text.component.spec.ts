@@ -336,12 +336,6 @@ describe('VerseTextComponent', () => {
   });
 
   // View mode tests
-  it('should set showWordAnalysis for combined mode', () => {
-    component.verse = { ...mockVerse, ai: mockAi };
-    component.applyViewMode('combined');
-    expect(component.showWordAnalysis).toBe(true);
-  });
-
   it('should set showWordAnalysis for word-by-word mode', () => {
     component.verse = { ...mockVerse, ai: mockAi };
     component.applyViewMode('word-by-word');
@@ -350,8 +344,16 @@ describe('VerseTextComponent', () => {
 
   it('should clear showWordAnalysis for plain mode', () => {
     component.verse = { ...mockVerse, ai: mockAi };
-    component.applyViewMode('combined');
+    component.applyViewMode('word-by-word');
     component.applyViewMode('plain');
+    expect(component.showWordAnalysis).toBe(false);
+  });
+
+  it('should treat legacy combined/paragraph modes as plain', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    component.applyViewMode('combined');
+    expect(component.showWordAnalysis).toBe(false);
+    component.applyViewMode('paragraph');
     expect(component.showWordAnalysis).toBe(false);
   });
 

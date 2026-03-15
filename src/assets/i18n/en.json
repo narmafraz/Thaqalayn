@@ -138,7 +138,8 @@
     "compare": "Compare Narrators",
     "sharedNarrations": "Shared Narrations",
     "sharedConarrators": "Shared Co-Narrators",
-    "selectNarrator": "Select narrator"
+    "selectNarrator": "Select narrator",
+    "noNarrations": "No narrations found for this narrator."
   },
   "search": {
     "filter": "Filter",
@@ -166,7 +167,8 @@
     "loadMore": "Load more results",
     "showingAll": "All results shown",
     "placeholder": "Search...",
-    "filteredBy": "Filtered by"
+    "filteredBy": "Filtered by",
+    "tryDifferent": "Try different keywords or check spelling"
   },
   "translation": {
     "selectTranslation": "Select Translation",
@@ -234,7 +236,8 @@
     "clearProgress": "Clear reading progress",
     "exportImport": "Export / Import",
     "export": "Export",
-    "import": "Import"
+    "import": "Import",
+    "startExploring": "Start exploring books"
   },
   "audio": {
     "play": "Play",
@@ -328,6 +331,7 @@
     "shortcutPrevChapter": "Previous chapter",
     "shortcutParent": "Go to parent",
     "shortcutSearch": "Focus search",
+    "shortcutBookmark": "Toggle bookmark",
     "shortcutDarkMode": "Toggle dark mode",
     "shortcutHelp": "Show shortcuts",
     "shortcutClose": "Close / unfocus",

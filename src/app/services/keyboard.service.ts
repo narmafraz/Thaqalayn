@@ -3,6 +3,7 @@ import { Inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
+import { BookmarkService } from './bookmark.service';
 import { ThemeService } from './theme.service';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -20,6 +21,7 @@ export class KeyboardShortcutService implements OnDestroy {
     private router: Router,
     private store: Store,
     private theme: ThemeService,
+    private bookmarkService: BookmarkService,
     @Inject(PLATFORM_ID) platformId: object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -81,6 +83,10 @@ export class KeyboardShortcutService implements OnDestroy {
         this.toggleHelp();
         event.preventDefault();
         break;
+      case 'b':
+        this.toggleBookmark();
+        event.preventDefault();
+        break;
       case 'd':
         this.theme.toggleTheme();
         event.preventDefault();
@@ -121,5 +127,13 @@ export class KeyboardShortcutService implements OnDestroy {
     if (searchInput) {
       searchInput.focus();
     }
+  }
+
+  private toggleBookmark(): void {
+    const book = this.store.selectSnapshot(BooksState.getCurrentNavigatedPart);
+    if (!book || !book.index || book.index === 'books') return;
+    const path = '/books/' + book.index;
+    const title = book.index;
+    this.bookmarkService.toggleBookmark(path, title);
   }
 }

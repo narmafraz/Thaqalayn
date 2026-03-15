@@ -28,6 +28,30 @@
             </a>
           </div>
         </div>
+        <!-- Continue Reading -->
+        <div *ngIf="readingProgress.length > 0" class="continue-reading-card mat-elevation-z2">
+          <div class="continue-reading-label">
+            <mat-icon>history</mat-icon>
+            <span>{{ 'bookmark.continueReading' | translate }}</span>
+          </div>
+          <div class="continue-reading-list">
+            <a *ngFor="let rp of readingProgress"
+               [routerLink]="getProgressRouterLink(rp)"
+               queryParamsHandling="preserve"
+               class="continue-reading-item">
+              <mat-icon>menu_book</mat-icon>
+              <div class="continue-reading-info">
+                <span class="continue-reading-book">{{ formatBookName(rp.bookId) }}</span>
+                <span class="continue-reading-title">{{ rp.lastTitle }}</span>
+              </div>
+              <button class="continue-reading-dismiss" (click)="$event.preventDefault(); $event.stopPropagation(); clearProgress(rp.bookId)"
+                      [attr.aria-label]="'bookmark.clearProgress' | translate">
+                <mat-icon>close</mat-icon>
+              </button>
+            </a>
+          </div>
+        </div>
+
         <app-book-tree></app-book-tree>
         <div class="homepage-quick-links" *ngIf="exploreCards.length > 0">
           <h2>{{ 'nav.explore' | translate }}</h2>

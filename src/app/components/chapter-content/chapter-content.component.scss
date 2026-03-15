@@ -180,9 +180,26 @@ mat-mdc-card {
     padding: 0;
     color: var(--link-color, #673ab7);
     opacity: 0.6;
+    position: relative;
 
     &:hover {
       opacity: 1;
+    }
+
+    &.has-note {
+      opacity: 1;
+      color: var(--note-accent, #ffc107);
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--note-accent, #ffc107);
+      }
     }
 
     &:disabled {

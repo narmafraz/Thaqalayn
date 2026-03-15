@@ -94,6 +94,7 @@
             </a>
             <!-- Add/edit note -->
             <button class="action-icon-btn"
+                    [class.has-note]="hasNote(book.index, verse)"
                     (click)="toggleNoteEditor(book.index, verse)"
                     [attr.aria-label]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)"
                     [matTooltip]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">

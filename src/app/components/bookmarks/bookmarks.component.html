@@ -31,6 +31,9 @@
     <div *ngIf="bookmarks.length === 0" class="empty-state">
       <mat-icon class="empty-icon">bookmark_border</mat-icon>
       <p>{{ 'bookmark.noBookmarks' | translate }}</p>
+      <a routerLink="/books" queryParamsHandling="preserve" class="empty-cta">
+        {{ 'bookmark.startExploring' | translate }}
+      </a>
     </div>
 
     <div class="bookmark-list">

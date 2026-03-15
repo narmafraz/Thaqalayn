@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { Book } from '@app/models';
 import { BOOK_AUTHORS } from '@app/data/book-authors';
+import { BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
 import { DailyVerse, DailyVerseService } from '@app/services/daily-verse.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -58,13 +59,31 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   dailyVerse$: Observable<DailyVerse | null>;
 
   exploreCards: ExploreCard[] = [];
+  readingProgress: ReadingProgress[] = [];
   private subscriptions: Subscription[] = [];
 
-  constructor(private store: Store, dailyVerseService: DailyVerseService, private cdr: ChangeDetectorRef) {
+  private static readonly BOOK_NAMES: Record<string, string> = {
+    'quran': 'Quran', 'al-kafi': 'Al-Kafi', 'tahdhib-al-ahkam': 'Tahdhib al-Ahkam',
+    'al-istibsar': 'Al-Istibsar', 'man-la-yahduruhu-al-faqih': 'Man La Yahduruhu al-Faqih',
+    'nahj-al-balagha': 'Nahj al-Balagha', 'al-sahifa-al-sajjadiyya': 'Al-Sahifa al-Sajjadiyya',
+  };
+
+  constructor(
+    private store: Store,
+    dailyVerseService: DailyVerseService,
+    private bookmarkService: BookmarkService,
+    private cdr: ChangeDetectorRef,
+  ) {
     this.dailyVerse$ = dailyVerseService.getDailyVerse();
   }
 
   ngOnInit(): void {
+    this.subscriptions.push(
+      this.bookmarkService.readingProgress$.subscribe(rp => {
+        this.readingProgress = rp.slice(0, 3);
+        this.cdr.markForCheck();
+      })
+    );
     this.subscriptions.push(
       this.store.select(IndexState.getBookForLanguage)
         .pipe(filter(fn => !!fn))
@@ -120,5 +139,22 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   onRetry(): void {
     const index = this.store.selectSnapshot(RouterState.getBookPartIndex) || 'books';
     this.store.dispatch(new RetryLoadBookPart(index));
+  }
+
+  getProgressRouterLink(rp: ReadingProgress): string[] {
+    const clean = rp.lastPath.replace(/^\//, '');
+    const slashIdx = clean.indexOf('/');
+    if (slashIdx > 0) {
+      return ['/' + clean.substring(0, slashIdx), clean.substring(slashIdx + 1)];
+    }
+    return [rp.lastPath];
+  }
+
+  formatBookName(bookId: string): string {
+    return BookDispatcherComponent.BOOK_NAMES[bookId] || bookId;
+  }
+
+  clearProgress(bookId: string): void {
+    this.bookmarkService.clearReadingProgress(bookId);
   }
 }

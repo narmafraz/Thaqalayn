@@ -123,6 +123,9 @@ export class BooksState {
     if (chapter && chapter.nav) {
       return chapter.nav;
     }
+    if (book && book.kind === 'verse_detail' && book.data.nav) {
+      return book.data.nav;
+    }
     return undefined;
   }
 
@@ -156,8 +159,14 @@ export class BooksState {
   public static getCurrentNavigatedCrumbs(state: BooksStateModel, currentPart: Book, language: string, getBookForLanguage: (lang: string) => IndexedTitles): Crumb[] {
     if (!currentPart) return [];
     const chapter = getChapter(currentPart);
-    if (!chapter) return [];
-    let path = chapter.path;
+    let path: string;
+    if (chapter) {
+      path = chapter.path;
+    } else if (currentPart.kind === 'verse_detail' && currentPart.data.chapter_path) {
+      path = currentPart.data.chapter_path;
+    } else {
+      return [];
+    }
     const crumbs = [];
     const arIndex = getBookForLanguage('ar');
     const enIndex = getBookForLanguage('en');
@@ -195,6 +204,18 @@ export class BooksState {
       }
       path = path.substring(0, lastColon);
     }
+
+    // For verse_detail, append a crumb for the current verse
+    if (currentPart.kind === 'verse_detail' && currentPart.data.verse) {
+      const v = currentPart.data.verse;
+      const verseLabel = (v.part_type || 'Hadith') + ' ' + v.local_index;
+      crumbs.push({
+        path: '/books/' + currentPart.index,
+        indexed_titles: { ar: verseLabel, en: verseLabel },
+        titles: { ar: verseLabel, en: verseLabel }
+      });
+    }
+
     return crumbs;
   }
 

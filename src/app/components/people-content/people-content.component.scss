@@ -4,6 +4,29 @@
   margin: 0 auto;
 }
 
+.narrator-back-link {
+  margin-bottom: 12px;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--link-color, #673ab7);
+    text-decoration: none;
+    font-size: 14px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
 .titles {
   text-align: center;
   margin-bottom: 2rem;
@@ -28,6 +51,28 @@
   .compare-btn {
     margin-top: 0.75rem;
     color: var(--link-color, #1976d2);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 0;
+  color: var(--text-muted, #999);
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--text-muted, #ccc);
+    margin-bottom: 8px;
+  }
+
+  p {
+    font-size: 14px;
+    margin: 0;
   }
 }
 

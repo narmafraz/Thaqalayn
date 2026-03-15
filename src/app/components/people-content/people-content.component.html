@@ -4,6 +4,12 @@
 
 <ng-template #narratorContent>
   <div class="container" *ngIf="narrator$ | async as narrator">
+    <div class="narrator-back-link">
+      <a routerLink="/people/narrators/index" queryParamsHandling="preserve">
+        <mat-icon>arrow_back</mat-icon>
+        <span>{{ 'nav.narrators' | translate }}</span>
+      </a>
+    </div>
     <div class="titles">
       <h1 class="arabic" lang="ar">{{narrator.titles?.ar}}</h1>
       <h2 class="transliteration" *ngIf="narrator.biography?.english_transliteration">
@@ -86,7 +92,12 @@
     <section class="narrated-section">
       <h2>{{ 'narrator.narratedAhadith' | translate }}</h2>
 
-      <div class="search-box">
+      <div *ngIf="totalNarrations === 0" class="empty-state">
+        <mat-icon class="empty-icon">menu_book</mat-icon>
+        <p>{{ 'narrator.noNarrations' | translate }}</p>
+      </div>
+
+      <div class="search-box" *ngIf="totalNarrations > 0">
         <mat-form-field appearance="outline" class="w-full">
           <mat-label>{{ 'narrator.searchAhadith' | translate }}</mat-label>
           <input matInput (keyup)="applyPathsFilter($event)" [placeholder]="'narrator.searchByPath' | translate">
@@ -94,6 +105,7 @@
         </mat-form-field>
       </div>
 
+      <ng-container *ngIf="totalNarrations > 0">
       <button mat-button (click)="sortVersePathsByLength()">{{ 'narrator.sortByLength' | translate }}</button>
 
       <div class="paths-list">
@@ -121,6 +133,7 @@
         (page)="onPathsPageChange($event)"
         [attr.aria-label]="'common.selectPage' | translate">
       </mat-paginator>
+      </ng-container>
     </section>
 
     <!-- Co-Narrators Section -->

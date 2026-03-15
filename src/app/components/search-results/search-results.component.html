@@ -40,7 +40,11 @@
   <ng-container *ngIf="(results$ | async) as results">
     <p *ngIf="(query$ | async) as query" class="results-summary">
       <span *ngIf="results.length > 0">{{ results.length }} {{ 'search.resultsFor' | translate }} "{{ activeFilter ? formatFilterLabel(activeFilter.value) : query }}"</span>
-      <span *ngIf="results.length === 0 && !(loading$ | async)">{{ 'search.noResultsFor' | translate }} "{{ activeFilter ? formatFilterLabel(activeFilter.value) : query }}"</span>
+      <span *ngIf="results.length === 0 && !(loading$ | async)" class="no-results-message">
+        <mat-icon class="no-results-icon">search_off</mat-icon>
+        {{ 'search.noResultsFor' | translate }} "{{ activeFilter ? formatFilterLabel(activeFilter.value) : query }}"
+        <span class="no-results-hint">{{ 'search.tryDifferent' | translate }}</span>
+      </span>
     </p>
 
     <div class="book-filters" *ngIf="bookFilters.length > 1">

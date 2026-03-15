@@ -168,22 +168,6 @@
             <div>{{getBookName(crumbs)}} {{verse.index}}</div>
             <div>{{ 'book.inBookReference' | translate }}</div>
             <div>{{getInBookReference(crumbs, verse)}}</div>
-            <div class="related">
-              <ng-container *ngIf="verse.relations as relations">
-                <div *ngFor="let relation of relations | keyvalue" class="perRel">
-                  <strong>{{relation.key}}</strong>:
-                  <span *ngFor="let rLink of relation.value" class="relLinks">
-                    <app-path-link [path]="rLink"></app-path-link>
-                    <button class="compare-inline-btn"
-                            (click)="toggleCompareVerse(rLink)"
-                            [attr.aria-label]="isCompareExpanded(rLink) ? 'Hide' : 'Preview'"
-                            [matTooltip]="isCompareExpanded(rLink) ? ('tooltip.hidePreview' | translate) : ('tooltip.previewRelated' | translate)">
-                      <mat-icon>{{ isCompareExpanded(rLink) ? 'expand_less' : 'expand_more' }}</mat-icon>
-                    </button>
-                  </span>
-                </div>
-              </ng-container>
-            </div>
           </div>
         </div>
       </mat-card-footer>
@@ -213,35 +197,6 @@
           </button>
         </div>
       </div>
-
-      <!-- Inline comparison panels -->
-      <ng-container *ngIf="verse.relations as relations">
-        <ng-container *ngFor="let relation of relations | keyvalue">
-          <ng-container *ngFor="let rLink of relation.value">
-            <div class="compare-inline-panel" *ngIf="isCompareExpanded(rLink)">
-              <div class="compare-inline-header">
-                <mat-icon class="compare-inline-icon">compare_arrows</mat-icon>
-                <a [routerLink]="['/books', rLink.replace('/books/', '')]" queryParamsHandling="preserve" class="compare-inline-title">
-                  {{ getCompareData(rLink)?.title || rLink.replace('/books/', '') }}
-                </a>
-                <button class="compare-inline-close" (click)="toggleCompareVerse(rLink)" [matTooltip]="'tooltip.closeComparison' | translate">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-              <div *ngIf="getCompareData(rLink)?.loading" class="compare-inline-loading">
-                <mat-spinner diameter="18"></mat-spinner>
-              </div>
-              <div *ngIf="getCompareData(rLink)?.error" class="compare-inline-error">{{ getCompareData(rLink)?.error }}</div>
-              <div *ngIf="getCompareData(rLink)?.verse as cVerse" class="compare-inline-content">
-                <p *ngFor="let txt of cVerse.text" class="compare-inline-arabic arabic" dir="rtl" lang="ar" [innerHTML]="txt"></p>
-                <div class="compare-inline-translation" *ngIf="getFirstTranslation(cVerse) as trl">
-                  <p *ngFor="let t of trl" [innerHTML]="t"></p>
-                </div>
-              </div>
-            </div>
-          </ng-container>
-        </ng-container>
-      </ng-container>
 
       <!-- Tafsir (Quran commentary) -->
       <div class="tafsir-panel" *ngIf="expandedTafsir.has(verse.local_index)">

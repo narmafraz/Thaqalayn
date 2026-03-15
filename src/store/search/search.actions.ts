@@ -6,7 +6,7 @@ export class InitSearchIndex {
 
 export class SearchQuery {
   public static readonly type = '[Search] Query';
-  constructor(public query: string) { }
+  constructor(public query: string, public offset = 0) { }
 }
 
 export class SetSearchMode {

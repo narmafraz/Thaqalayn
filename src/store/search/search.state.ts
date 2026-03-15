@@ -109,7 +109,7 @@ export class SearchState {
       if (!ctx.getState().indexReady) {
         ctx.patchState({ indexReady: true });
       }
-      const results = await this.searchService.searchAll(query, state.mode);
+      const results = await this.searchService.searchAll(query, state.mode, 30, action.offset);
       ctx.patchState({ results, loading: false, fullTextLoading: false });
     } catch {
       ctx.patchState({

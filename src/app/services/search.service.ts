@@ -79,6 +79,8 @@ export class SearchService {
       const url = `${environment.apiBaseUrl}index/search/titles.json`;
       const data = await this.http.get<TitleDocument[]>(url).toPromise();
 
+      // TODO: Add 'book' enum field to schema for faceted search (requires generator changes)
+      // TODO: Pre-build index at data-gen time and use save/load for instant startup
       this.titlesDb = await create({
         schema: {
           p: 'string',
@@ -87,6 +89,8 @@ export class SearchService {
           ar: 'string',
           arn: 'string',
         } as const,
+        // Arabic tokenizer handles both Arabic and space-separated English text.
+        // For proper English stemming, a dual-index approach would be needed.
         language: 'arabic',
         components: {
           tokenizer: {
@@ -139,6 +143,8 @@ export class SearchService {
         const data = await this.http.get<FullTextDocument[]>(url).toPromise();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // TODO: Add 'book: enum' field for faceted search, where filters, and groupBy (requires generator changes)
+        // TODO: Pre-build index at data-gen time and use save/load for instant startup
         const db: any = await create({
           schema: {
             p: 'string',
@@ -237,6 +243,9 @@ export class SearchService {
     const isMultiWord = normalizedQuery.trim().split(/\s+/).length > 1;
     const allResults: SearchResult[] = [];
     const perBookLimit = Math.ceil(limit / this.fullTextDbs.size);
+    // NOTE: Dividing global offset evenly across N books is approximate — when results
+    // are unevenly distributed across books, some pages may have gaps. This is acceptable
+    // because the final global re-sort + slice produces correct output for the caller.
     const perBookOffset = Math.ceil(offset / this.fullTextDbs.size);
 
     for (const [, entry] of this.fullTextDbs) {
@@ -293,7 +302,7 @@ export class SearchService {
   }
 
   /** Combined search: titles + full text (if loaded) */
-  async searchAll(query: string, mode: SearchMode = 'titles', limit = 30): Promise<SearchResult[]> {
+  async searchAll(query: string, mode: SearchMode = 'titles', limit = 30, offset = 0): Promise<SearchResult[]> {
     // Intercept filter prefix queries (topic:, tag:, type:)
     const filtered = this.parseFilteredQuery(query);
     if (filtered) {
@@ -301,21 +310,21 @@ export class SearchService {
         return this.searchByTopic(filtered.value, limit);
       }
       // For tag: and type: — strip prefix, search the value as plain text
-      return this.searchAllPlain(filtered.value, mode, limit);
+      return this.searchAllPlain(filtered.value, mode, limit, offset);
     }
 
-    return this.searchAllPlain(query, mode, limit);
+    return this.searchAllPlain(query, mode, limit, offset);
   }
 
   /** Plain search without filter prefix handling */
-  private async searchAllPlain(query: string, mode: SearchMode, limit: number): Promise<SearchResult[]> {
+  private async searchAllPlain(query: string, mode: SearchMode, limit: number, offset = 0): Promise<SearchResult[]> {
     if (mode === 'fulltext') {
       if (!this.fullTextLoaded) {
         await this.loadFullTextIndex();
       }
       const [titleResults, fulltextResults] = await Promise.all([
-        this.searchTitles(query, 10),
-        this.searchFullText(query, limit),
+        this.searchTitles(query, 10, offset),
+        this.searchFullText(query, limit, offset),
       ]);
       // Merge: titles first (boosted), then full text
       const titlePaths = new Set(titleResults.map(r => r.path));

@@ -185,10 +185,10 @@ export class OfflineStorageService {
     // Check if this node matches
     if (book.index === targetIndex || data.index === targetIndex) {
       if (book.kind) return book as Book;
-      // Construct the Book wrapper
+      // Construct the Book wrapper — verse_refs (shell) or verses (legacy) = verse_list
+      const hasVerseRefs = data.verse_refs && data.verse_refs.length > 0;
       const hasVerses = data.verses && data.verses.length > 0;
-      const hasSubChapters = data.chapters && data.chapters.length > 0;
-      const kind = hasVerses ? 'verse_list' : 'chapter_list';
+      const kind = (hasVerseRefs || hasVerses) ? 'verse_list' : 'chapter_list';
       return { kind, index: targetIndex, data } as Book;
     }
 
@@ -196,8 +196,9 @@ export class OfflineStorageService {
     const chapters = data.chapters || [];
     for (const chapter of chapters) {
       if (chapter.index === targetIndex) {
+        const hasVerseRefs = chapter.verse_refs && chapter.verse_refs.length > 0;
         const hasVerses = chapter.verses && chapter.verses.length > 0;
-        const kind = hasVerses ? 'verse_list' : 'chapter_list';
+        const kind = (hasVerseRefs || hasVerses) ? 'verse_list' : 'chapter_list';
         return { kind, index: targetIndex, data: chapter } as Book;
       }
       // Recurse only if target starts with this chapter's index

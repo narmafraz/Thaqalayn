@@ -7,14 +7,14 @@ test.describe('Loading States', () => {
       await new Promise(r => setTimeout(r, 2000));
       await route.continue();
     });
-    await page.goto('/#/books/al-kafi:1:1:1');
+    await page.goto('/books/al-kafi:1:1:1');
     // Skeleton should appear within 1 second
     const skeleton = page.locator('app-skeleton-loader');
     await expect(skeleton).toBeVisible({ timeout: 1000 });
   });
 
   test('should hide skeleton once content loads', async ({ page }) => {
-    await page.goto('/#/books/quran:1');
+    await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(3000);
     // Skeleton should be gone once content has loaded
@@ -27,7 +27,7 @@ test.describe('Loading States', () => {
       await new Promise(r => setTimeout(r, 2000));
       await route.continue();
     });
-    await page.goto('/#/people/narrators/1');
+    await page.goto('/people/narrators/1');
     const skeleton = page.locator('app-skeleton-loader');
     await expect(skeleton).toBeVisible({ timeout: 1000 });
   });
@@ -37,7 +37,7 @@ test.describe('Loading States', () => {
       await new Promise(r => setTimeout(r, 2000));
       await route.continue();
     });
-    await page.goto('/#/people/narrators/index');
+    await page.goto('/people/narrators/index');
     const skeleton = page.locator('app-skeleton-loader');
     await expect(skeleton).toBeVisible({ timeout: 1000 });
   });
@@ -47,7 +47,7 @@ test.describe('Loading States', () => {
       await new Promise(r => setTimeout(r, 3000));
       await route.continue();
     });
-    await page.goto('/#/books/al-kafi:1:1');
+    await page.goto('/books/al-kafi:1:1');
     const shimmerLines = page.locator('app-skeleton-loader .skeleton-line');
     await expect(shimmerLines.first()).toBeVisible({ timeout: 1000 });
     const count = await shimmerLines.count();

@@ -11,7 +11,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('AI Topics Page', () => {
   test('should display tab bar on topics page', async ({ page }) => {
-    await page.goto('/#/topics?lang=en');
+    await page.goto('/topics?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Wait for the component to render
@@ -25,7 +25,7 @@ test.describe('AI Topics Page', () => {
   });
 
   test('should default to Books tab', async ({ page }) => {
-    await page.goto('/#/topics?lang=en');
+    await page.goto('/topics?lang=en');
     await page.waitForLoadState('networkidle');
 
     const tabBar = page.locator('.topics-tabs, .tab-bar, mat-tab-group');
@@ -40,7 +40,7 @@ test.describe('AI Topics Page', () => {
   });
 
   test('should show AI Topics tab with categories', async ({ page }) => {
-    await page.goto('/#/topics?lang=en');
+    await page.goto('/topics?lang=en');
     await page.waitForLoadState('networkidle');
 
     const tabBar = page.locator('.topics-tabs, .tab-bar, mat-tab-group');
@@ -63,7 +63,7 @@ test.describe('AI Topics Page', () => {
   });
 
   test('should expand topic category to show subtopics', async ({ page }) => {
-    await page.goto('/#/topics?lang=en');
+    await page.goto('/topics?lang=en');
     await page.waitForLoadState('networkidle');
 
     const tabBar = page.locator('.topics-tabs, .tab-bar, mat-tab-group');
@@ -94,7 +94,7 @@ test.describe('AI Topics Page', () => {
 
 test.describe('AI Content Badges on Hadith', () => {
   test('should display content type badge when AI data is present', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
@@ -113,7 +113,7 @@ test.describe('AI Content Badges on Hadith', () => {
   });
 
   test('should display clickable tag chips with search links', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
@@ -137,7 +137,7 @@ test.describe('AI Content Badges on Hadith', () => {
   });
 
   test('should display key phrases section', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
@@ -157,7 +157,7 @@ test.describe('AI Content Badges on Hadith', () => {
 
 test.describe('Key Phrases Pages', () => {
   test('should load phrases list page', async ({ page }) => {
-    await page.goto('/#/phrases?lang=en');
+    await page.goto('/phrases?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Wait for the page to render
@@ -172,7 +172,7 @@ test.describe('Key Phrases Pages', () => {
   });
 
   test('should navigate to phrase detail page', async ({ page }) => {
-    await page.goto('/#/phrases?lang=en');
+    await page.goto('/phrases?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -200,7 +200,7 @@ test.describe('Key Phrases Pages', () => {
 
 test.describe('AI Settings Reactivity', () => {
   test('should toggle diacritics on via settings and update verse text', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const firstCard = page.locator('mat-card').first();
     await firstCard.waitFor({ state: 'visible', timeout: 15000 });
@@ -240,7 +240,7 @@ test.describe('AI Settings Reactivity', () => {
 
 test.describe('Filtered Search', () => {
   test('should show filter banner for topic: queries', async ({ page }) => {
-    await page.goto('/#/search?q=topic:divine_unity&lang=en');
+    await page.goto('/search?q=topic:divine_unity&lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(3000);
 
@@ -254,7 +254,7 @@ test.describe('Filtered Search', () => {
   });
 
   test('should return results for topic: search', async ({ page }) => {
-    await page.goto('/#/search?q=topic:divine_unity&lang=en');
+    await page.goto('/search?q=topic:divine_unity&lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(3000);
 

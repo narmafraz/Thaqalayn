@@ -13,7 +13,7 @@ test.describe('ADV-03: Narrator Comparison', () => {
     const errors: string[] = [];
     page.on('pageerror', err => errors.push(err.message));
 
-    await page.goto('/#/people/narrators/compare?lang=en');
+    await page.goto('/people/narrators/compare?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Page should load without JavaScript errors
@@ -22,7 +22,7 @@ test.describe('ADV-03: Narrator Comparison', () => {
   });
 
   test('should have two autocomplete inputs for narrator selection', async ({ page }) => {
-    await page.goto('/#/people/narrators/compare?lang=en');
+    await page.goto('/people/narrators/compare?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -38,7 +38,7 @@ test.describe('ADV-03: Narrator Comparison', () => {
   });
 
   test('should pre-select narrator A via query parameter', async ({ page }) => {
-    await page.goto('/#/people/narrators/compare?a=19&lang=en');
+    await page.goto('/people/narrators/compare?a=19&lang=en');
     await page.waitForLoadState('networkidle');
 
     // Wait for content to potentially load
@@ -65,7 +65,7 @@ test.describe('ADV-03: Narrator Comparison', () => {
 
 test.describe('ADV-04: Chain Diagram', () => {
   test('should display hadith with narrator chain on Al-Kafi page', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -90,7 +90,7 @@ test.describe('ADV-04: Chain Diagram', () => {
   });
 
   test('should have chain diagram toggle button in expanded footer', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const firstCard = page.locator('mat-card').first();
     await firstCard.waitFor({ state: 'visible', timeout: 15000 });
@@ -115,7 +115,7 @@ test.describe('ADV-04: Chain Diagram', () => {
   });
 
   test('should show chain diagram view when toggle is clicked', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const firstCard = page.locator('mat-card').first();
     await firstCard.waitFor({ state: 'visible', timeout: 15000 });
@@ -149,7 +149,7 @@ test.describe('ADV-04: Chain Diagram', () => {
 
 test.describe('ADV-05: Advanced Narrator Filters', () => {
   test('should have filter panel toggle on narrator index page', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table.full-width-table').waitFor({ state: 'visible', timeout: 15000 });
 
@@ -159,7 +159,7 @@ test.describe('ADV-05: Advanced Narrator Filters', () => {
   });
 
   test('should show min/max narration inputs when filter panel is opened', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table.full-width-table').waitFor({ state: 'visible', timeout: 15000 });
 
@@ -180,7 +180,7 @@ test.describe('ADV-05: Advanced Narrator Filters', () => {
   });
 
   test('should filter narrator table when min narrations is set', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table.full-width-table').waitFor({ state: 'visible', timeout: 15000 });
 
@@ -214,7 +214,7 @@ test.describe('ADV-05: Advanced Narrator Filters', () => {
 
 test.describe('ADV-06: Category Chips', () => {
   test('should display category chips on narrator index page', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table.full-width-table').waitFor({ state: 'visible', timeout: 15000 });
 
@@ -226,7 +226,7 @@ test.describe('ADV-06: Category Chips', () => {
   });
 
   test('should have an "Imams" category chip', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table.full-width-table').waitFor({ state: 'visible', timeout: 15000 });
 
@@ -238,7 +238,7 @@ test.describe('ADV-06: Category Chips', () => {
   });
 
   test('should filter table to show only Imam entries when "Imams" chip is clicked', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table.full-width-table').waitFor({ state: 'visible', timeout: 15000 });
 

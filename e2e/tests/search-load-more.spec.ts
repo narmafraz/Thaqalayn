@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Search Results Count and Load More', () => {
   test('should display results count header', async ({ page }) => {
-    await page.goto('/#/search?q=allah&lang=en');
+    await page.goto('/search?q=allah&lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -15,7 +15,7 @@ test.describe('Search Results Count and Load More', () => {
 
   test('should limit displayed results and show load more button', async ({ page }) => {
     // Use a broad search that returns many results
-    await page.goto('/#/search?q=allah&lang=en');
+    await page.goto('/search?q=allah&lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -30,7 +30,7 @@ test.describe('Search Results Count and Load More', () => {
   });
 
   test('should load more results when button is clicked', async ({ page }) => {
-    await page.goto('/#/search?q=allah&lang=en');
+    await page.goto('/search?q=allah&lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -49,7 +49,7 @@ test.describe('Search Results Count and Load More', () => {
 
   test('should show "all results shown" when all are displayed', async ({ page }) => {
     // Use a search with fewer results
-    await page.goto('/#/search?q=fatiha&lang=en');
+    await page.goto('/search?q=fatiha&lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 

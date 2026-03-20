@@ -91,9 +91,10 @@ export class SearchService {
         } as const,
         // Arabic tokenizer handles both Arabic and space-separated English text.
         // For proper English stemming, a dual-index approach would be needed.
-        language: 'arabic',
+        // Note: language must be inside tokenizer config, not at top level (Orama 3.x).
         components: {
           tokenizer: {
+            language: 'arabic',
             stemming: false,
             tokenizeSkipProperties: ['p'],
           },
@@ -153,9 +154,9 @@ export class SearchService {
             en: 'string',
             i: 'number',
           } as const,
-          language: 'arabic',
           components: {
             tokenizer: {
+              language: 'arabic',
               stemming: false,
               tokenizeSkipProperties: ['p'],
             },

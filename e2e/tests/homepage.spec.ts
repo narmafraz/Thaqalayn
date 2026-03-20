@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Homepage', () => {
   test('should load and display the book tree and quick links', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Header with app title should be visible
@@ -31,7 +31,7 @@ test.describe('Homepage', () => {
   });
 
   test('should navigate to Quran via quick link card', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Click the Quran quick link card
@@ -46,7 +46,7 @@ test.describe('Homepage', () => {
   });
 
   test('should still show chapter-list table on non-root pages', async ({ page }) => {
-    await page.goto('/#/books/al-kafi?lang=en');
+    await page.goto('/books/al-kafi?lang=en');
     await page.waitForLoadState('networkidle');
 
     // The chapter-list table should be visible on non-root chapter_list pages
@@ -55,7 +55,7 @@ test.describe('Homepage', () => {
   });
 
   test('should display footer navigation links', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     const footer = page.locator('#footer');

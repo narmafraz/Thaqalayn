@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Verse Card Metadata Density', () => {
   test('should show primary actions (detail link, bookmark) inline', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const firstCard = page.locator('mat-card').first();
@@ -17,7 +17,7 @@ test.describe('Verse Card Metadata Density', () => {
   });
 
   test('should show overflow menu with secondary actions', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const firstCard = page.locator('mat-card').first();
@@ -38,7 +38,7 @@ test.describe('Verse Card Metadata Density', () => {
   });
 
   test('should hide secondary metadata by default and show on expand', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const firstCard = page.locator('mat-card').first();
@@ -61,7 +61,7 @@ test.describe('Verse Card Metadata Density', () => {
 
   test('should show grading badges inline on hadith cards', async ({ page }) => {
     // Al-Kafi has graded hadiths
-    await page.goto('/#/books/al-kafi:1:2:1?lang=en');
+    await page.goto('/books/al-kafi:1:2:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const gradingChips = page.locator('.grading-chip');

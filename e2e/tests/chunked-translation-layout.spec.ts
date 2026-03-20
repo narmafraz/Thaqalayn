@@ -14,7 +14,7 @@ import { test, expect } from '@playwright/test';
  * enabled (which activates the chunked view).
  */
 
-const CHAPTER_WITH_CHUNKS = '/#/books/al-kafi:1:2:2';
+const CHAPTER_WITH_CHUNKS = '/books/al-kafi:1:2:2';
 
 /** Helper: enable diacritics setting if not already enabled */
 async function enableDiacritics(page: import('@playwright/test').Page) {

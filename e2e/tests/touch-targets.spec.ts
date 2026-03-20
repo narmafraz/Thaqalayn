@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Touch Targets', () => {
   test('verse action buttons should have at least 44px touch targets', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/#/books/quran:1');
+    await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(3000);
 
@@ -58,7 +58,7 @@ test.describe('Touch Targets', () => {
 
   test('verse action buttons should have 44px touch targets on hadith page', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/#/books/al-kafi:1:1:1');
+    await page.goto('/books/al-kafi:1:1:1');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(3000);
 

@@ -87,7 +87,7 @@ Book (ChapterList | ChapterContent | VerseContent | VerseDetail)
 Key interfaces are defined in `src/app/models/book.ts`. The `chapter-content` component detects shell format (`verse_refs` present) vs legacy (`verses` present) and lazy-loads verses via `VerseLoaderService`.
 
 ### Routing
-Routes are defined in `src/app/routing/app-routing.module.ts` with hash-based routing (`useHash: true`). Route resolvers pre-fetch data before component activation:
+Routes are defined in `src/app/routing/app-routing.module.ts` with path-based routing (`useHash: false`). Route resolvers pre-fetch data before component activation:
 
 - `BookTitlesResolver`: Loads book list
 - `BookPartResolver`: Loads specific book part/chapter
@@ -167,8 +167,8 @@ e2e/tests/
 ```
 
 ### Routing Notes
-- `/#/people/narrators` redirects to `/#/people/narrators/index` (redirect defined in `app-routing.module.ts` line 20). This works correctly.
-- Hash-based routing (`useHash: true`) means all routes start with `/#/`. Direct URL navigation works for all routes.
+- `/people/narrators` redirects to `/people/narrators/index` (redirect defined in `app-routing.module.ts` line 20). This works correctly.
+- Path-based routing (`useHash: false`) is used. Direct URL navigation works for all routes via Netlify `_redirects` SPA fallback.
 
 ### NGXS Selector Race Conditions
 NGXS selectors fire immediately on subscription, before API data is loaded. This means selectors like `getCurrentNavigatedPart` return `undefined` initially. Any function that accesses `book.data` must guard with `book &&` first. The functions `getVerseTranslations()`, `getChapter()`, and `getDefaultVerseTranslationIds()` in `src/app/models/book.ts` all have these guards. Without them, ~20 TypeErrors appear in the console on every page load (non-fatal but noisy).

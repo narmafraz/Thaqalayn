@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Tooltips on icon buttons', () => {
   test('header font controls have tooltips', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Font A- button
@@ -19,7 +19,7 @@ test.describe('Tooltips on icon buttons', () => {
   });
 
   test('chapter content icons have tooltips', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Verse detail link (open_in_new icon)
@@ -36,7 +36,7 @@ test.describe('Tooltips on icon buttons', () => {
   });
 
   test('verse detail page has back-to-chapter tooltip', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // The back arrow icon in chapter-context
@@ -45,7 +45,7 @@ test.describe('Tooltips on icon buttons', () => {
   });
 
   test('search bar icons have tooltips', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Search tips button (visible when search is empty)
@@ -54,7 +54,7 @@ test.describe('Tooltips on icon buttons', () => {
   });
 
   test('book tree clear search has tooltip', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Type in the book tree search to make clear button appear

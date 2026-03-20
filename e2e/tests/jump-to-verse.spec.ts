@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Jump to Verse', () => {
   test('should show jump-to-verse bar on chapters with 20+ verses', async ({ page }) => {
     // Surah Al-Baqarah has 286 verses
-    await page.goto('/#/books/quran:2?lang=en');
+    await page.goto('/books/quran:2?lang=en');
     await page.waitForLoadState('networkidle');
 
     const jumpBar = page.locator('.jump-to-verse');
@@ -12,7 +12,7 @@ test.describe('Jump to Verse', () => {
 
   test('should NOT show jump-to-verse bar on short chapters', async ({ page }) => {
     // Surah Al-Fatiha has only 7 verses
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const jumpBar = page.locator('.jump-to-verse');
@@ -20,7 +20,7 @@ test.describe('Jump to Verse', () => {
   });
 
   test('should scroll to the target verse when jump is triggered', async ({ page }) => {
-    await page.goto('/#/books/quran:2?lang=en');
+    await page.goto('/books/quran:2?lang=en');
     await page.waitForLoadState('networkidle');
 
     const jumpInput = page.locator('.jump-to-verse input[type="number"]');
@@ -41,7 +41,7 @@ test.describe('Jump to Verse', () => {
 
   test('should show jump-to-verse bar for long hadith chapters', async ({ page }) => {
     // Al-Kafi volume 1, book 1, chapter 1 typically has 20+ hadiths
-    await page.goto('/#/books/al-kafi:1:2:1?lang=en');
+    await page.goto('/books/al-kafi:1:2:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Check if the chapter has enough verses for the bar to appear

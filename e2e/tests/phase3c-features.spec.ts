@@ -15,7 +15,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Grading Badges', () => {
   test('should render grading badges when gradings data is present', async ({ page }) => {
     // Navigate to a hadith detail page (individual hadith)
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Wait for content to render
@@ -38,7 +38,7 @@ test.describe('Grading Badges', () => {
   });
 
   test('should show scholar name in grading badge', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -56,7 +56,7 @@ test.describe('Grading Badges', () => {
   });
 
   test('should use correct color classes for different grading levels', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -76,7 +76,7 @@ test.describe('Grading Badges', () => {
 
 test.describe('Verification Badges', () => {
   test('should render verification badge when cross_validation data is present', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -93,7 +93,7 @@ test.describe('Verification Badges', () => {
   });
 
   test('should show verified icon and source count for verified hadiths', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -113,7 +113,7 @@ test.describe('Verification Badges', () => {
   });
 
   test('should show help icon for unverified hadiths', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -130,7 +130,7 @@ test.describe('Verification Badges', () => {
 
 test.describe('Narrator Biography Display', () => {
   test('should display narrator name in Arabic', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -141,7 +141,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display transliteration when biography data is present', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -155,7 +155,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display biography section when biography data is present', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -168,7 +168,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display era field in biography', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -183,7 +183,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display reliability badge with color coding', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -205,7 +205,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display birth/death dates when available', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -230,7 +230,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display teachers and students lists when available', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -251,7 +251,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display biography summary text when available', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -266,7 +266,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display biography source attribution', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -283,7 +283,7 @@ test.describe('Narrator Biography Display', () => {
 
 test.describe('Hadith Detail Page - Phase 3C Integration', () => {
   test('should display hadith card with Arabic text and translation', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -298,7 +298,7 @@ test.describe('Hadith Detail Page - Phase 3C Integration', () => {
   });
 
   test('should display chapter context link', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -312,7 +312,7 @@ test.describe('Hadith Detail Page - Phase 3C Integration', () => {
   });
 
   test('should have share and view-in-chapter action buttons', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -331,7 +331,7 @@ test.describe('Hadith Detail Page - Phase 3C Integration', () => {
   });
 
   test('should have source link when source_url is present', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -348,7 +348,7 @@ test.describe('Hadith Detail Page - Phase 3C Integration', () => {
   });
 
   test('should have prev/next navigation on hadith detail page', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
@@ -366,7 +366,7 @@ test.describe('Hadith Detail Page - Phase 3C Integration', () => {
 
 test.describe('Narrator Page - Phase 3C Accessibility', () => {
   test('should have no accessibility issues in biography section', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -384,7 +384,7 @@ test.describe('Narrator Page - Phase 3C Accessibility', () => {
   });
 
   test('should have proper lang="ar" attributes on Arabic content', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 

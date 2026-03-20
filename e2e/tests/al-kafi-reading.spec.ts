@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Al-Kafi Reading', () => {
   test('should display Al-Kafi chapter with hadiths', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Title section should be visible
@@ -17,7 +17,7 @@ test.describe('Al-Kafi Reading', () => {
   });
 
   test('should display narrator chains for hadiths', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Narrator chain text should be present (Arabic text with narrator links)
@@ -26,7 +26,7 @@ test.describe('Al-Kafi Reading', () => {
   });
 
   test('should have clickable narrator links in chains', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Look for narrator links within verse text (links to /people/narrators/)
@@ -37,7 +37,7 @@ test.describe('Al-Kafi Reading', () => {
   });
 
   test('should display hadith reference numbers', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Reference section should be visible
@@ -48,7 +48,7 @@ test.describe('Al-Kafi Reading', () => {
   });
 
   test('should display Arabic hadith text', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Arabic RTL text should be present in hadiths
@@ -59,7 +59,7 @@ test.describe('Al-Kafi Reading', () => {
   });
 
   test('should display English translation of hadiths', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const translation = page.locator('.translation');

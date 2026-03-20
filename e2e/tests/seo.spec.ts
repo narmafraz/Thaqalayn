@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('SEO - Legacy Hash URL Redirects', () => {
   test('should redirect old hash URL /#/books/quran:1 to /books/quran:1', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // URL should no longer contain the hash
@@ -17,7 +17,7 @@ test.describe('SEO - Legacy Hash URL Redirects', () => {
   });
 
   test('should redirect old hash URL /#/books/al-kafi:1:1:1 to /books/al-kafi:1:1:1', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const url = page.url();
@@ -26,7 +26,7 @@ test.describe('SEO - Legacy Hash URL Redirects', () => {
   });
 
   test('should redirect old hash URL /#/people/narrators/1 to /people/narrators/1', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const url = page.url();
@@ -50,7 +50,7 @@ test.describe('SEO - robots.txt', () => {
 
 test.describe('SEO - Meta Tags', () => {
   test('should have meta description on homepage', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -60,7 +60,7 @@ test.describe('SEO - Meta Tags', () => {
   });
 
   test('should have Open Graph tags on Quran page', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -75,7 +75,7 @@ test.describe('SEO - Meta Tags', () => {
   });
 
   test('should have Open Graph tags on narrator page', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -88,7 +88,7 @@ test.describe('SEO - Meta Tags', () => {
   });
 
   test('should have canonical URL on pages', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -100,7 +100,7 @@ test.describe('SEO - Meta Tags', () => {
 
 test.describe('SEO - JSON-LD Structured Data', () => {
   test('should have JSON-LD on homepage', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -114,7 +114,7 @@ test.describe('SEO - JSON-LD Structured Data', () => {
   });
 
   test('should have JSON-LD with Book type on Quran page', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -128,7 +128,7 @@ test.describe('SEO - JSON-LD Structured Data', () => {
   });
 
   test('should have JSON-LD with Person type on narrator page', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -142,7 +142,7 @@ test.describe('SEO - JSON-LD Structured Data', () => {
   });
 
   test('should have JSON-LD with CollectionPage type on narrator list', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 

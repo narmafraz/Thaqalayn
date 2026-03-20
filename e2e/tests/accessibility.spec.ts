@@ -15,7 +15,7 @@ const KNOWN_ISSUE_RULES_TO_SKIP = [
 
 test.describe('Accessibility - Homepage', () => {
   test('should have no critical accessibility violations', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
     // Wait for Angular to render the book list
     await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
@@ -39,7 +39,7 @@ test.describe('Accessibility - Homepage', () => {
   });
 
   test('should have proper document language', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     const lang = await page.locator('html').getAttribute('lang');
@@ -48,7 +48,7 @@ test.describe('Accessibility - Homepage', () => {
   });
 
   test('should have a descriptive page title', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
     const title = await page.title();
@@ -57,7 +57,7 @@ test.describe('Accessibility - Homepage', () => {
   });
 
   test('should have visible focus indicators on interactive elements', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -78,7 +78,7 @@ test.describe('Accessibility - Homepage', () => {
 
 test.describe('Accessibility - Quran Page', () => {
   test('should have no critical accessibility violations', async ({ page }) => {
-    await page.goto('/#/books/quran:1');
+    await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
     // Wait for verse content to load
     await page.locator('.verse-text, p').first().waitFor({ state: 'visible', timeout: 10000 });
@@ -101,7 +101,7 @@ test.describe('Accessibility - Quran Page', () => {
   });
 
   test('should have proper heading structure', async ({ page }) => {
-    await page.goto('/#/books/quran:1');
+    await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
     await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -116,7 +116,7 @@ test.describe('Accessibility - Quran Page', () => {
   });
 
   test('should have navigable links with accessible names', async ({ page }) => {
-    await page.goto('/#/books/quran:1');
+    await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
     await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -143,7 +143,7 @@ test.describe('Accessibility - Quran Page', () => {
 
 test.describe('Accessibility - Al-Kafi Page', () => {
   test('should have no critical accessibility violations', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1');
+    await page.goto('/books/al-kafi:1:1:1');
     await page.waitForLoadState('networkidle');
     // Wait for hadith content to render
     await page.locator('.verse-text, p').first().waitFor({ state: 'visible', timeout: 15000 });
@@ -166,7 +166,7 @@ test.describe('Accessibility - Al-Kafi Page', () => {
   });
 
   test('should have breadcrumb navigation', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1');
+    await page.goto('/books/al-kafi:1:1:1');
     await page.waitForLoadState('networkidle');
     await page.locator('.crumb-holder, nav').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -177,7 +177,7 @@ test.describe('Accessibility - Al-Kafi Page', () => {
   });
 
   test('should have Arabic text with RTL direction', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1');
+    await page.goto('/books/al-kafi:1:1:1');
     await page.waitForLoadState('networkidle');
     await page.locator('.verse-text, p').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -193,7 +193,7 @@ test.describe('Accessibility - Al-Kafi Page', () => {
 
 test.describe('Accessibility - Narrator List Page', () => {
   test('should have no critical accessibility violations', async ({ page }) => {
-    await page.goto('/#/people/narrators/index');
+    await page.goto('/people/narrators/index');
     await page.waitForLoadState('networkidle');
     await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -215,7 +215,7 @@ test.describe('Accessibility - Narrator List Page', () => {
   });
 
   test('should have a filter input with accessible label', async ({ page }) => {
-    await page.goto('/#/people/narrators/index');
+    await page.goto('/people/narrators/index');
     await page.waitForLoadState('networkidle');
     await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -233,7 +233,7 @@ test.describe('Accessibility - Narrator List Page', () => {
   });
 
   test('should have sortable table columns with accessible headers', async ({ page }) => {
-    await page.goto('/#/people/narrators/index');
+    await page.goto('/people/narrators/index');
     await page.waitForLoadState('networkidle');
     await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -251,7 +251,7 @@ test.describe('Accessibility - Narrator List Page', () => {
 
 test.describe('Accessibility - Narrator Detail Page', () => {
   test('should have no critical accessibility violations', async ({ page }) => {
-    await page.goto('/#/people/narrators/1');
+    await page.goto('/people/narrators/1');
     await page.waitForLoadState('networkidle');
     await page.locator('h1, h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -273,7 +273,7 @@ test.describe('Accessibility - Narrator Detail Page', () => {
   });
 
   test('should have breadcrumb navigation back to narrator list', async ({ page }) => {
-    await page.goto('/#/people/narrators/1');
+    await page.goto('/people/narrators/1');
     await page.waitForLoadState('networkidle');
     await page.locator('.crumb-holder, nav').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -283,7 +283,7 @@ test.describe('Accessibility - Narrator Detail Page', () => {
   });
 
   test('should have linked narrator names in co-narrator chains', async ({ page }) => {
-    await page.goto('/#/people/narrators/1');
+    await page.goto('/people/narrators/1');
     await page.waitForLoadState('networkidle');
     await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -297,7 +297,7 @@ test.describe('Accessibility - Narrator Detail Page', () => {
 test.describe('Accessibility - Responsive', () => {
   test('should be accessible at mobile viewport (360px)', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 640 });
-    await page.goto('/#/books/quran:1');
+    await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
     await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -311,7 +311,7 @@ test.describe('Accessibility - Responsive', () => {
 
   test('should be accessible at tablet viewport (768px)', async ({ page }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto('/#/books/al-kafi:1:1:1');
+    await page.goto('/books/al-kafi:1:1:1');
     await page.waitForLoadState('networkidle');
     await page.locator('.verse-text, p').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -326,7 +326,7 @@ test.describe('Accessibility - Responsive', () => {
 
 test.describe('Accessibility - Color Contrast', () => {
   test('should meet WCAG AA contrast requirements on homepage', async ({ page }) => {
-    await page.goto('/#/books?lang=en');
+    await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
 

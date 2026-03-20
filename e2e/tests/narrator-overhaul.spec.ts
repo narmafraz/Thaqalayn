@@ -15,7 +15,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('NAR-01: Narrator List Visual Hierarchy', () => {
   test('should display featured Imams section with gold-styled cards', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
 
     const featuredSection = page.locator('section.featured-imams');
@@ -41,7 +41,7 @@ test.describe('NAR-01: Narrator List Visual Hierarchy', () => {
   });
 
   test('should show Arabic and English names on featured Imam cards', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
 
     const imamCards = page.locator('.imam-card');
@@ -67,7 +67,7 @@ test.describe('NAR-01: Narrator List Visual Hierarchy', () => {
   });
 
   test('should default sort narrator table by narrations descending', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
 
     const table = page.locator('table.full-width-table');
@@ -100,7 +100,7 @@ test.describe('NAR-01: Narrator List Visual Hierarchy', () => {
   });
 
   test('should filter narrator list by English name', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
 
     const table = page.locator('table.full-width-table');
@@ -129,7 +129,7 @@ test.describe('NAR-01: Narrator List Visual Hierarchy', () => {
   });
 
   test('should filter narrator list by Arabic name', async ({ page }) => {
-    await page.goto('/#/people/narrators/index?lang=en');
+    await page.goto('/people/narrators/index?lang=en');
     await page.waitForLoadState('networkidle');
 
     const table = page.locator('table.full-width-table');
@@ -153,7 +153,7 @@ test.describe('NAR-01: Narrator List Visual Hierarchy', () => {
 });
 
 test.describe('NAR-03: Hadith Preview Cards', () => {
-  const narratorUrl = '/#/people/narrators/19?lang=en';
+  const narratorUrl = '/people/narrators/19?lang=en';
 
   test('should show hadith preview cards instead of bare links', async ({ page }) => {
     await page.goto(narratorUrl);
@@ -247,7 +247,7 @@ test.describe('NAR-03: Hadith Preview Cards', () => {
 
 test.describe('NAR-05: Hover Cards', () => {
   test('should show hover card when hovering over narrator name in hadith chain', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Wait for the hadith content to render
@@ -289,7 +289,7 @@ test.describe('NAR-05: Hover Cards', () => {
 });
 
 test.describe('NAR-06: Teacher/Student Sections', () => {
-  const narratorUrl = '/#/people/narrators/19?lang=en';
+  const narratorUrl = '/people/narrators/19?lang=en';
 
   test('should display teachers section on narrator profile when data is available', async ({ page }) => {
     await page.goto(narratorUrl);

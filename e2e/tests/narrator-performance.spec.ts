@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Narrator Profile Performance', () => {
   test('should load narrator with many narrations without freezing', async ({ page }) => {
     const start = Date.now();
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
     const loadTime = Date.now() - start;
@@ -15,7 +15,7 @@ test.describe('Narrator Profile Performance', () => {
   });
 
   test('should paginate narrated ahadith', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Should have paginator(s)
@@ -25,7 +25,7 @@ test.describe('Narrator Profile Performance', () => {
   });
 
   test('should limit verse paths shown per subchain by default', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Look for a "Show all" button indicating paths are collapsed
@@ -38,7 +38,7 @@ test.describe('Narrator Profile Performance', () => {
   });
 
   test('should expand subchain verse paths on click', async ({ page }) => {
-    await page.goto('/#/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const showAllBtn = page.locator('button', { hasText: /Show all/ });

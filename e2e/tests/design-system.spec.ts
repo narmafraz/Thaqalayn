@@ -9,7 +9,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('DS-01: Spacing System', () => {
   test('should apply consistent spacing on verse cards', async ({ page }) => {
-    await page.goto('/#/books/al-kafi:1:1:1?lang=en');
+    await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -34,7 +34,7 @@ test.describe('DS-01: Spacing System', () => {
   });
 
   test('should have visual separation between Arabic and English text', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -72,7 +72,7 @@ test.describe('DS-01: Spacing System', () => {
 
 test.describe('DS-04: Topic Card Hover States', () => {
   test('should display topic cards on the topics page', async ({ page }) => {
-    await page.goto('/#/topics?lang=en');
+    await page.goto('/topics?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Topic cards or topic list items should exist
@@ -86,7 +86,7 @@ test.describe('DS-04: Topic Card Hover States', () => {
   });
 
   test('should have cursor: pointer on topic cards', async ({ page }) => {
-    await page.goto('/#/topics?lang=en');
+    await page.goto('/topics?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Find clickable topic elements
@@ -104,7 +104,7 @@ test.describe('DS-04: Topic Card Hover States', () => {
 
 test.describe('DS-06: Localized Page Titles', () => {
   test('should have English page title on Quran Fatiha page with lang=en', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=en');
+    await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 
@@ -118,7 +118,7 @@ test.describe('DS-06: Localized Page Titles', () => {
   });
 
   test('should have non-English page title on Quran Fatiha page with lang=ar', async ({ page }) => {
-    await page.goto('/#/books/quran:1?lang=ar');
+    await page.goto('/books/quran:1?lang=ar');
     await page.waitForLoadState('networkidle');
     await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 15000 });
 

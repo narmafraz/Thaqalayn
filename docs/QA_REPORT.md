@@ -19,11 +19,11 @@ The Thaqalayn production site is **functional and usable**. All key pages load, 
 
 | Page | URL | Status | Notes |
 |------|-----|--------|-------|
-| Homepage | `/#/books` | PASS | Loads correctly, shows Quran and Al-Kafi |
-| Quran Al-Fatiha | `/#/books/quran:1` | PASS | All 7 verses, Arabic + English, cross-refs |
-| Al-Kafi 1:1:1 | `/#/books/al-kafi:1:1:1` | PASS (with errors) | 36 hadiths load, but 20 console errors |
-| Narrator List | `/#/people/narrators/index` | PASS | 4,860 narrators, sortable, filterable |
-| Narrator Detail | `/#/people/narrators/1` | PASS | Shows hadith links + co-narrator chains |
+| Homepage | `/books` | PASS | Loads correctly, shows Quran and Al-Kafi |
+| Quran Al-Fatiha | `/books/quran:1` | PASS | All 7 verses, Arabic + English, cross-refs |
+| Al-Kafi 1:1:1 | `/books/al-kafi:1:1:1` | PASS (with errors) | 36 hadiths load, but 20 console errors |
+| Narrator List | `/people/narrators/index` | PASS | 4,860 narrators, sortable, filterable |
+| Narrator Detail | `/people/narrators/1` | PASS | Shows hadith links + co-narrator chains |
 
 ---
 
@@ -32,7 +32,7 @@ The Thaqalayn production site is **functional and usable**. All key pages load, 
 ### HIGH Severity
 
 #### H1: 20 JavaScript Errors on Al-Kafi Chapter Pages
-- **Page:** `/#/books/al-kafi:1:1:1`
+- **Page:** `/books/al-kafi:1:1:1`
 - **Error:** `TypeError: Cannot read properties of undefined (reading 'data')`
 - **Functions affected:** `getTranslationIfInBookOrDefault`, `getBookNavigation`, `getBookTranslations`
 - **Impact:** These are race condition errors in NGXS state selectors that fire before data is fully loaded. Despite the errors, the page renders correctly after data loads.
@@ -93,7 +93,7 @@ The Thaqalayn production site is **functional and usable**. All key pages load, 
 - **Assigned to:** UIdev
 
 #### M7: Quran Breadcrumbs Missing (Data Bug)
-- All Quran pages (e.g., `/#/books/quran:1`) show only "Home" in breadcrumbs -- missing "Quran > Al-Fatiha" trail.
+- All Quran pages (e.g., `/books/quran:1`) show only "Home" in breadcrumbs -- missing "Quran > Al-Fatiha" trail.
 - Al-Kafi breadcrumbs work correctly (full 5-level hierarchy).
 - **Root cause:** `index/books.en.json` and `index/books.ar.json` contain 2,368 Al-Kafi entries but **zero Quran entries**. The breadcrumb builder (`BooksState.getCurrentNavigatedCrumbs`) relies on this index. Confirmed by UIdev that frontend logic is correct.
 - **Fix:** DataGen must update index generation (`lib_index.py`) to include Quran paths.
@@ -102,8 +102,8 @@ The Thaqalayn production site is **functional and usable**. All key pages load, 
 ### LOW Severity
 
 #### L1: Narrator Route Without `/index` Redirects to Books Page
-- `/#/people/narrators` (without `/index`) shows the Books page instead of the narrator list.
-- Only `/#/people/narrators/index` correctly shows the narrator list.
+- `/people/narrators` (without `/index`) shows the Books page instead of the narrator list.
+- Only `/people/narrators/index` correctly shows the narrator list.
 - **Recommendation:** Add a redirect from `/people/narrators` to `/people/narrators/index`.
 - **Assigned to:** UIdev
 
@@ -224,7 +224,7 @@ The responsive design is well-implemented across all tested viewport sizes.
 | `book-navigation.spec.ts` | 3 | Navigate between books, chapter drill-down, back navigation |
 | `breadcrumbs.spec.ts` | 5 | Breadcrumb rendering, navigation, hierarchy correctness |
 | `cross-references.spec.ts` | 4 | Quran-to-Kafi and Kafi-to-Quran cross-reference links |
-| `deep-linking.spec.ts` | 10 | Direct URL access to all page types, hash routing |
+| `deep-linking.spec.ts` | 10 | Direct URL access to all page types, path routing |
 | `homepage.spec.ts` | 3 | Homepage loads, shows both books, has correct structure |
 | `narrator-pages.spec.ts` | 8 | Narrator list pagination, filtering, detail pages |
 | `no-console-errors.spec.ts` | 5 | Verify no JavaScript errors on key pages |

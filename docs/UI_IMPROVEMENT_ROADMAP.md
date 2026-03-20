@@ -34,7 +34,7 @@ Items that block core usability or break fundamental user stories. These should 
 
 ### FIX-02: Fix `?lang=` URL Parameter Ignored on Fresh Sessions
 
-**Description:** Opening a URL like `https://thaqalayn.netlify.app/#/books/quran:1?lang=fa` in a fresh browser session does not apply the language. This breaks link sharing for non-English users entirely.
+**Description:** Opening a URL like `https://thaqalayn.netlify.app/books/quran:1?lang=fa` in a fresh browser session does not apply the language. This breaks link sharing for non-English users entirely.
 
 **Source:** RTL/Multilingual Reviewer
 **Severity:** CRITICAL

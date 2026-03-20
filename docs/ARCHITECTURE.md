@@ -109,7 +109,7 @@ Scripture texts are deeply hierarchical (Book > Volume > Section > Chapter > Ver
 - **Always know where you are.** Breadcrumbs show the full path from the root to the current location. The reader should never feel lost in the hierarchy.
 - **Always know where you can go.** Previous/next chapter navigation is always visible. The "up" button returns to the parent level. Cross-references to related verses are inline and tappable.
 - **Preserve context across navigation.** Language and translation preferences persist via URL query parameters (`?lang=en&translation=en.qarai`). Navigating between chapters or books does not reset the reader's preferences.
-- **Deep linking works.** Every page has a unique URL. Users can bookmark, share, or return to any specific verse via its URL (e.g., `/#/books/quran:2:255`). Fragment anchors (`#h4`) link to specific hadith numbers within a chapter.
+- **Deep linking works.** Every page has a unique URL. Users can bookmark, share, or return to any specific verse via its URL (e.g., `/books/quran:2:255`). Fragment anchors (`#h4`) link to specific hadith numbers within a chapter.
 - **Minimize clicks to content.** From the homepage, a reader should reach any specific verse in 2-3 clicks. The hierarchical chapter list, combined with breadcrumb shortcuts, provides both drill-down and jump-back navigation.
 - **Narrator chains are navigable.** In hadith text, narrator names are links. Tapping a narrator name goes to their profile page, which lists all hadiths they narrate and their co-narrators. This turns the chain of transmission into a navigable graph.
 
@@ -119,7 +119,7 @@ Scripture texts are deeply hierarchical (Book > Volume > Section > Chapter > Ver
 - Prev/Next/Up: icon buttons with tooltips at top and bottom of chapter content
 - Cross-references: `relations` field rendered as inline links (e.g., "Mentioned In: Al-kafi:2:3:13:20")
 - Narrator chain links: each narrator name in a hadith is a router link to their profile
-- Hash-based routing with query parameter preservation
+- Path-based routing with query parameter preservation
 - Route resolvers pre-fetch data before rendering to avoid blank screens
 
 **Aspirations:**
@@ -240,7 +240,7 @@ This section documents the current technology state, identifies technical debt, 
 
 2. **Python generator as build step** -- Correct. Parsing HTML/XML is complex enough to warrant a dedicated tool, and running it once at build time is far better than running it per-request.
 
-3. **Hash-based routing** -- Still necessary for Netlify static hosting without `_redirects` file for catch-all routing. Could switch to path-based routing with Netlify redirects, but hash routing works reliably and changing it would break existing bookmarks/links.
+3. **Path-based routing** -- Migrated from hash-based routing. Uses Netlify `_redirects` file for SPA catch-all routing. Legacy `/#/` bookmarks are redirected automatically by a handler in `app.component.ts`.
 
 4. **NGXS for state management** -- Appropriate for the app's complexity. The app has 3-4 state slices with moderate logic. Angular Signals could eventually replace NGXS for simpler state, but there is no urgent reason to migrate.
 
@@ -273,7 +273,7 @@ These should be prioritized before adding more books, as each new book will comp
 | Netlify free tier for hosting | No expiration, automatic HTTPS, global CDN, deploy on push |
 | Angular with Material Design | Mature framework, good RTL support, accessible components |
 | Python generator as build step | Complex parsing logic runs once, output is static |
-| Hash-based routing | Works on static hosting without server-side URL rewriting |
+| Path-based routing | Clean URLs for SEO; Netlify `_redirects` handles SPA fallback |
 | Centralized translation index | Translator metadata stored once, not duplicated in every chapter file |
 | Breadcrumbs from index files | Reduces per-file JSON size, computed client-side from lightweight indexes |
 | Mobile-first responsive layout | Primary audience reads on phones |

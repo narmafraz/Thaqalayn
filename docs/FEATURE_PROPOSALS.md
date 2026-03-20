@@ -93,8 +93,8 @@ Build Time (ThaqalaynDataGenerator)          Runtime (Angular App)
 
 In addition to full-text search, the AI pipeline (v2.0.0) generates `topics` (Level 2 sub-topic tags from a controlled vocabulary of ~90 topics) and `key_phrases` (multi-word Arabic expressions) per hadith. These enable **structured faceted browsing** alongside Orama full-text search:
 
-- **Topic browsing**: `/#/topics` page with two-level taxonomy (14 categories, ~90 sub-topics)
-- **Phrase browsing**: `/#/phrases/{phrase}` pages showing all hadiths containing a specific multi-word expression
+- **Topic browsing**: `/topics` page with two-level taxonomy (14 categories, ~90 sub-topics)
+- **Phrase browsing**: `/phrases/{phrase}` pages showing all hadiths containing a specific multi-word expression
 - **Faceted filtering**: Combine search results with topic/phrase filters for precise discovery
 
 Post-processing indexes (`index/topics.json`, `index/phrases.json`) are built at generator time and served as static JSON.
@@ -249,7 +249,7 @@ Users may want to share specific verses or hadiths with others.
 
 ### Recommended Approach: Web Share API + Shareable URLs
 
-The app already has hash-based URLs that uniquely identify every verse (e.g., `https://thaqalayn.netlify.app/#/books/quran:2:255`).
+The app already has URLs that uniquely identify every verse (e.g., `https://thaqalayn.netlify.app/books/quran:2:255`).
 
 **Features:**
 - "Share" button on each verse that uses `navigator.share()` (native sharing on mobile)

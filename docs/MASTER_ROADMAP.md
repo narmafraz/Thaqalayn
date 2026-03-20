@@ -494,7 +494,7 @@ Everything below has been implemented and tested. Included for context — do no
 
 #### Scope
 
-**Word detail pages** (`/#/words/{word-id}`): A page for each unique Arabic word/lemma showing:
+**Word detail pages** (`/words/{word-id}`): A page for each unique Arabic word/lemma showing:
 - Root and morphological form (wazn)
 - Morphological breakdown (prefix-stem-suffix)
 - All inflected forms of this word across the corpus
@@ -503,7 +503,7 @@ Everything below has been implemented and tested. Included for context — do no
 - Occurrences across Quran and all hadith collections
 - Etymology and scholarly notes
 
-**Root index pages** (`/#/words/roots/{root}`): All words sharing a root, grouped by morphological pattern, with occurrence counts and navigation to word detail pages.
+**Root index pages** (`/words/roots/{root}`): All words sharing a root, grouped by morphological pattern, with occurrence counts and navigation to word detail pages.
 
 **Word-by-word verse integration**: Clickable Arabic words in verse display link to their word detail page.
 
@@ -528,8 +528,8 @@ Everything below has been implemented and tested. Included for context — do no
 | Status | Task | Description | Effort |
 |--------|------|-------------|--------|
 | [ ] | UX research and design | Study existing Arabic lexicon tools for navigation patterns. Design wireframes for word detail page with progressive disclosure. User test with different audience levels. | High |
-| [ ] | Word detail page component | Route `/#/words/{word-id}` showing word analysis, translations, related forms, occurrences. | High |
-| [ ] | Root index page component | Route `/#/words/roots/{root}` showing all words from a root grouped by pattern. | Medium |
+| [ ] | Word detail page component | Route `/words/{word-id}` showing word analysis, translations, related forms, occurrences. | High |
+| [ ] | Root index page component | Route `/words/roots/{root}` showing all words from a root grouped by pattern. | Medium |
 | [ ] | Word-by-word verse integration | Clickable Arabic words in verse display linking to word detail pages. Toggle between reading and word-by-word views. | High |
 | [ ] | Word popover component | Quick-view tooltip on hover/tap: translation, root, link to full word page. | Medium |
 

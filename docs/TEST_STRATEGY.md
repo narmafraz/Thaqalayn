@@ -89,16 +89,16 @@ Thaqalayn/
 
 #### Test 1: Homepage / Book List
 ```
-Navigate to /#/books
+Navigate to /books
 VERIFY: Page loads without errors
 VERIFY: "The Holy Quran" text is visible
 VERIFY: "Al-Kafi" text is visible
-VERIFY: Clicking "The Holy Quran" navigates to /#/books/quran
+VERIFY: Clicking "The Holy Quran" navigates to /books/quran
 ```
 
 #### Test 2: Quran Surah
 ```
-Navigate to /#/books/quran:1
+Navigate to /books/quran:1
 VERIFY: Page loads without errors
 VERIFY: Arabic text is present (matches /[\u0600-\u06FF]/)
 VERIFY: At least 7 verse elements are rendered (Al-Fatiha has 7 verses)
@@ -107,7 +107,7 @@ VERIFY: English translation text is visible
 
 #### Test 3: Al-Kafi Chapter
 ```
-Navigate to /#/books/al-kafi:1:1:1
+Navigate to /books/al-kafi:1:1:1
 VERIFY: Page loads without errors
 VERIFY: Hadith text is present (Arabic characters visible)
 VERIFY: At least one narrator chain link exists (anchor with href containing /people/narrators/)
@@ -115,7 +115,7 @@ VERIFY: At least one narrator chain link exists (anchor with href containing /pe
 
 #### Test 4: Breadcrumb Navigation
 ```
-Navigate to /#/books/al-kafi:1:2:3
+Navigate to /books/al-kafi:1:2:3
 VERIFY: Breadcrumbs are visible
 VERIFY: Breadcrumbs contain multiple levels (at least 3 links)
 Click the second breadcrumb
@@ -125,7 +125,7 @@ VERIFY: Page content updates
 
 #### Test 5: Prev/Next Chapter Navigation
 ```
-Navigate to /#/books/al-kafi:1:1:1
+Navigate to /books/al-kafi:1:1:1
 VERIFY: "Next" navigation button is visible
 Click Next button
 VERIFY: URL changes (path should now end in :2 or similar)
@@ -136,7 +136,7 @@ VERIFY: URL returns to original path
 
 #### Test 6: Language/Translation Switching
 ```
-Navigate to /#/books/quran:1?lang=en
+Navigate to /books/quran:1?lang=en
 VERIFY: Translation dropdown/selector is visible
 VERIFY: English translation text is visible
 Switch to a different translation (if available)
@@ -145,7 +145,7 @@ VERIFY: Displayed translation text changes
 
 #### Test 7: Narrator Detail Page
 ```
-Navigate to /#/people/narrators/1
+Navigate to /people/narrators/1
 VERIFY: Page loads without errors
 VERIFY: Arabic narrator name is visible (matches /[\u0600-\u06FF]/)
 VERIFY: Hadith paths list is present (at least one /books/ link)
@@ -154,7 +154,7 @@ VERIFY: Co-narrators section is present
 
 #### Test 8: Narrator Index Page
 ```
-Navigate to /#/people/narrators/index
+Navigate to /people/narrators/index
 VERIFY: Table loads with narrator entries
 VERIFY: Table has multiple rows (narrators listed)
 VERIFY: Search/filter input exists (Material table filter)
@@ -164,7 +164,7 @@ VERIFY: Table filters results
 
 #### Test 9: Deep Linking
 ```
-Navigate directly to /#/books/quran:2:255 (Ayat al-Kursi)
+Navigate directly to /books/quran:2:255 (Ayat al-Kursi)
 VERIFY: Page loads without prior navigation
 VERIFY: Verse content is rendered
 VERIFY: Arabic text is present
@@ -172,7 +172,7 @@ VERIFY: Arabic text is present
 
 #### Test 10: Cross-References
 ```
-Navigate to a chapter known to have relations (e.g., /#/books/al-kafi:1:2:1)
+Navigate to a chapter known to have relations (e.g., /books/al-kafi:1:2:1)
 VERIFY: At least one verse has a "Mentions" or "Mentioned In" section
 VERIFY: Cross-reference links contain /books/ paths
 Click a cross-reference link
@@ -181,7 +181,7 @@ VERIFY: Navigation occurs to the referenced page
 
 ### Important Technical Notes
 
-- The app uses **hash-based routing** (`useHash: true`). URLs are `http://localhost:4200/#/books/quran:1`.
+- The app uses **path-based routing** (`useHash: false`). URLs are `http://localhost:4200/books/quran:1`.
 - Data loads asynchronously via route resolvers. Always wait for content to appear before asserting.
 - Use `page.waitForSelector()` or Playwright's auto-waiting rather than fixed timeouts where possible.
 - Arabic text can be verified with: `expect(text).toMatch(/[\u0600-\u06FF]/)`.

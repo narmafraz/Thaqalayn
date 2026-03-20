@@ -14,7 +14,7 @@ Visual diagrams of every UI element in the hadith/verse display, as currently im
 
 ## 1. Chapter-Level Page Structure
 
-When browsing a chapter (e.g., `/#/books/al-kafi:1:2:3`), the page renders:
+When browsing a chapter (e.g., `/books/al-kafi:1:2:3`), the page renders:
 
 ```
 <app-settings>                       ← settings cog (top)
@@ -151,7 +151,7 @@ Each hadith in the chapter is rendered as a `<mat-card>`. This is the complete a
 
 ## 3. Hadith Card — Verse Detail View
 
-When navigating to a single hadith (e.g., `/#/books/al-kafi:1:2:3:4`), the verse-detail component renders a more comprehensive layout:
+When navigating to a single hadith (e.g., `/books/al-kafi:1:2:3:4`), the verse-detail component renders a more comprehensive layout:
 
 ```
 ┌─ verse-detail-container ────────────────────────────────────────────┐

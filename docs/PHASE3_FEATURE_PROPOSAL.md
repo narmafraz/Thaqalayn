@@ -176,7 +176,7 @@ Approximately ~1,700 unique roots. Size: ~200 KB.
 #### 1.4.2 Route Additions
 
 ```
-/#/words/root/{root}        -> root-page component
+/words/root/{root}        -> root-page component
 ```
 
 #### 1.4.3 Verse Display Enhancement
@@ -750,7 +750,7 @@ This is standard `role="tree"` ARIA behavior and required for WCAG 2.1 AA compli
 
 ### 5.1 Problem
 
-Breadcrumbs were not showing on Quran pages specifically. On `https://thaqalayn.netlify.app/#/books/quran:1`, only "Home" was displayed -- no "The Holy Quran > Al-Fatiha" trail. Al-Kafi breadcrumbs worked correctly.
+Breadcrumbs were not showing on Quran pages specifically. On `https://thaqalayn.netlify.app/books/quran:1`, only "Home" was displayed -- no "The Holy Quran > Al-Fatiha" trail. Al-Kafi breadcrumbs worked correctly.
 
 ### 5.2 Root Cause
 
@@ -1357,11 +1357,11 @@ Three new fields added to the AI pipeline schema (v2.0.0) enable a suite of cros
 
 | Field | Per-Hadith Data | Post-Processing Index | Angular Feature |
 |-------|----------------|----------------------|-----------------|
-| `topics` | 1-3 Level 2 topic keys from controlled vocabulary | `index/topics.json` (topic -> hadith paths) | Topic browsing page (`/#/topics`), Bihar-style pages |
-| `key_phrases` | 0-5 multi-word Arabic expressions | `index/phrases.json` (phrase -> hadith paths) | Phrase detail pages (`/#/phrases/{phrase}`), clickable highlights |
+| `topics` | 1-3 Level 2 topic keys from controlled vocabulary | `index/topics.json` (topic -> hadith paths) | Topic browsing page (`/topics`), Bihar-style pages |
+| `key_phrases` | 0-5 multi-word Arabic expressions | `index/phrases.json` (phrase -> hadith paths) | Phrase detail pages (`/phrases/{phrase}`), clickable highlights |
 | `similar_content_hints` | 0-3 thematic hints for similar narrations | `index/similar_hadiths.json` (verified links) | "Related Narrations" section on hadith pages |
 
-### 10.3 Topic Browsing Page (`/#/topics`)
+### 10.3 Topic Browsing Page (`/topics`)
 
 A two-level browsable taxonomy with 14 Level 1 categories and ~90 Level 2 sub-topics. Each topic shows the count of hadiths and links to a topic detail page listing all relevant hadiths with their Quran cross-references (Bihar al-Anwar pattern: verses first, then hadiths).
 

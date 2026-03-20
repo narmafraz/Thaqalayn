@@ -706,7 +706,7 @@ BOOKS = [
 
 **Priority:** P2
 **Action:** Add share buttons that generate:
-- Deep links to specific verses (`/#/books/quran:2#h255`)
+- Deep links to specific verses (`/books/quran:2#h255`)
 - Copy verse text + translation to clipboard
 - Social media share cards with verse text overlay
 

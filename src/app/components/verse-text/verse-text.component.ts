@@ -218,7 +218,11 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   }
 
   get hasChunks(): boolean {
-    return (this.verse?.ai?.chunks?.length || 0) > 1;
+    const chunks = this.verse?.ai?.chunks;
+    if (!chunks || chunks.length <= 1) return false;
+    // Only activate chunked view if we can reconstruct Arabic text
+    // (either word_analysis exists, or chunks have inline arabic_text)
+    return !!this.verse?.ai?.word_analysis?.length || !!chunks[0]?.arabic_text;
   }
 
   get chunks(): Chunk[] {

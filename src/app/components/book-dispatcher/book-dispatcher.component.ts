@@ -33,6 +33,60 @@ export const BOOK_CARD_META: Record<string, BookCardMeta> = {
   'bihar-al-anwar': { icon: 'library_books', descKey: 'nav.biharDesc' },
 };
 
+/**
+ * Approximate chronological order by composition/compilation date.
+ * Lower number = older book. Used to sort explore cards oldest-first.
+ *
+ * Quran: ~610-632 CE
+ * Risalat al-Huquq: Imam al-Sajjad (d. 713 CE)
+ * Nahj al-Balagha: sermons of Imam Ali, compiled ~1010 CE but content ~7th c.
+ * Kitab al-Zuhd / Kitab al-Mu'min: Al-Ahwazi (d. ~864 CE)
+ * Kitab Sulaym ibn Qays: attributed to Sulaym (d. ~697 CE), compiled later
+ * Al-Kafi: Al-Kulayni (d. 941 CE)
+ * Kitab al-Ghayba (Nu'mani): Al-Nu'mani (d. ~965 CE)
+ * Kamil al-Ziyarat: Ibn Qulawayh (d. 979 CE)
+ * Al-Saduq's works: Al-Saduq (d. 991 CE)
+ * Al-Mufid's works: Al-Mufid (d. 1022 CE)
+ * Al-Sharif al-Radi compiled Nahj al-Balagha ~1010 CE
+ * Al-Sahifa al-Sajjadiyya: Imam al-Sajjad, compiled ~11th c.
+ * Al-Tusi's works: Al-Tusi (d. 1067 CE)
+ * Kitab al-Du'afa': Ibn al-Ghada'iri (d. ~1050 CE)
+ * Wasa'il al-Shi'a: Al-Hurr al-Amili (d. 1693 CE)
+ * Bihar al-Anwar: Al-Majlisi (d. 1699 CE)
+ * Mu'jam al-Ahadith: Muhammad Asif Muhsini (modern)
+ */
+const BOOK_CHRONOLOGICAL_ORDER: Record<string, number> = {
+  'quran':                          1,   // ~610-632 CE
+  'risalat-al-huquq':              2,   // Imam al-Sajjad (d. 713)
+  'kitab-al-zuhd':                 3,   // Al-Ahwazi (d. ~864)
+  'kitab-al-mumin':                4,   // Al-Ahwazi (d. ~864)
+  'al-kafi':                       5,   // Al-Kulayni (d. 941)
+  'kitab-al-ghayba-numani':        6,   // Al-Nu'mani (d. ~965)
+  'kamil-al-ziyarat':              7,   // Ibn Qulawayh (d. 979)
+  'al-amali-saduq':                8,   // Al-Saduq (d. 991)
+  'al-khisal':                     9,   // Al-Saduq (d. 991)
+  'al-tawhid':                    10,   // Al-Saduq (d. 991)
+  'kamal-al-din':                 11,   // Al-Saduq (d. 991)
+  'maani-al-akhbar':              12,   // Al-Saduq (d. 991)
+  'man-la-yahduruhu-al-faqih':    13,   // Al-Saduq (d. 991)
+  'thawab-al-amal':               14,   // Al-Saduq (d. 991)
+  'uyun-akhbar-al-rida':          15,   // Al-Saduq (d. 991)
+  'fadail-al-shia':               16,   // Al-Saduq (d. 991)
+  'sifat-al-shia':                17,   // Al-Saduq (d. 991)
+  'nahj-al-balagha':              18,   // Al-Sharif al-Radi (compiled ~1010)
+  'al-amali-mufid':               19,   // Al-Mufid (d. 1022)
+  'kitab-al-irshad':              20,   // Al-Mufid (d. 1022)
+  'al-sahifa-al-sajjadiyya':      21,   // Compiled/transmitted ~11th c.
+  'kitab-al-duafa':               22,   // Ibn al-Ghada'iri (d. ~1050)
+  'kitab-al-ghayba-tusi':         23,   // Al-Tusi (d. 1067)
+  'tahdhib-al-ahkam':             24,   // Al-Tusi (d. 1067)
+  'al-istibsar':                  25,   // Al-Tusi (d. 1067)
+  'kitab-sulaym-ibn-qays':        26,   // Content ~7th c., compiled form ~11th c.
+  'wasael-ul-shia':               27,   // Al-Hurr al-Amili (d. 1693)
+  'bihar-al-anwar':               28,   // Al-Majlisi (d. 1699)
+  'mujam-al-ahadith-al-mutabara': 29,   // Modern compilation
+};
+
 export interface ExploreCard {
   slug: string;
   routerLink: string;
@@ -126,10 +180,10 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
       });
     }
 
-    // Sort: featured first, then alphabetically by English title
+    // Sort chronologically (oldest first), with featured books promoted to top
     cards.sort((a, b) => {
       if (a.featured !== b.featured) return a.featured ? -1 : 1;
-      return a.titleEn.localeCompare(b.titleEn);
+      return (BOOK_CHRONOLOGICAL_ORDER[a.slug] ?? 999) - (BOOK_CHRONOLOGICAL_ORDER[b.slug] ?? 999);
     });
 
     this.exploreCards = cards;

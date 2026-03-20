@@ -61,6 +61,35 @@ test.describe('Search Regression Tests', () => {
     await expect(bookName).not.toBeEmpty();
   });
 
+  test('should return more than 30 results for broad queries (no artificial limit)', async ({ page }) => {
+    await page.goto('/search?q=allah&lang=en');
+    await page.waitForLoadState('networkidle');
+
+    const resultsText = page.locator('.results-summary');
+    await expect(resultsText).toContainText(/\d+ results for/, { timeout: 15000 });
+
+    // Extract total result count from "N results for" text
+    const summaryText = await resultsText.textContent();
+    const match = summaryText?.match(/(\d+) results for/);
+    expect(match).toBeTruthy();
+    const totalResults = parseInt(match![1], 10);
+
+    // A broad query like "allah" should return well over 30 results
+    expect(totalResults).toBeGreaterThan(30);
+
+    // Should show paged display: "Showing 30 of N results"
+    const showingCount = page.locator('.showing-count');
+    await expect(showingCount).toContainText('30');
+
+    // Load more button should be visible
+    const loadMoreBtn = page.locator('.load-more-btn');
+    await expect(loadMoreBtn).toBeVisible();
+
+    // Click load more and verify more results are shown
+    await loadMoreBtn.click();
+    await expect(showingCount).toContainText('60');
+  });
+
   test('should navigate to book page when clicking a result', async ({ page }) => {
     await page.goto('/search?q=moon&lang=en');
     await page.waitForLoadState('networkidle');

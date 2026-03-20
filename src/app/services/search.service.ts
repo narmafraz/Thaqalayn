@@ -189,7 +189,7 @@ export class SearchService {
       .join(' ');
   }
 
-  async searchTitles(query: string, limit = 20, offset = 0): Promise<SearchResult[]> {
+  async searchTitles(query: string, limit = 10000): Promise<SearchResult[]> {
     if (!this.titlesLoaded || !this.titlesDb) {
       return [];
     }
@@ -202,7 +202,6 @@ export class SearchService {
     let results = await search(this.titlesDb, {
       term: normalizedQuery,
       limit,
-      offset,
       properties: ['en', 'ar', 'arn', 'pt'],
       threshold: isMultiWord ? 0 : 1,
       tolerance: isMultiWord ? 0 : 1,
@@ -214,7 +213,6 @@ export class SearchService {
       results = await search(this.titlesDb, {
         term: normalizedQuery,
         limit,
-        offset,
         properties: ['en', 'ar', 'arn', 'pt'],
         threshold: 1,
         tolerance: 1,
@@ -236,18 +234,17 @@ export class SearchService {
     });
   }
 
-  /** Search full-text content across all loaded books */
-  async searchFullText(query: string, limit = 30, offset = 0): Promise<SearchResult[]> {
+  /** Search full-text content across all loaded books.
+   *  Returns all matching results sorted by relevance — component handles display pagination.
+   */
+  async searchFullText(query: string): Promise<SearchResult[]> {
     if (!this.fullTextLoaded) return [];
 
     const normalizedQuery = this.normalizeArabic(query);
     const isMultiWord = normalizedQuery.trim().split(/\s+/).length > 1;
     const allResults: SearchResult[] = [];
-    const perBookLimit = Math.ceil(limit / this.fullTextDbs.size);
-    // NOTE: Dividing global offset evenly across N books is approximate — when results
-    // are unevenly distributed across books, some pages may have gaps. This is acceptable
-    // because the final global re-sort + slice produces correct output for the caller.
-    const perBookOffset = Math.ceil(offset / this.fullTextDbs.size);
+    // Fetch up to 1000 results per book — effectively unlimited for realistic queries
+    const perBookLimit = 1000;
 
     for (const [, entry] of this.fullTextDbs) {
       // Use AND logic for multi-word queries, with OR fallback
@@ -256,7 +253,6 @@ export class SearchService {
       let results = await search(entry.db, {
         term: normalizedQuery,
         limit: perBookLimit,
-        offset: perBookOffset,
         properties: ['ar', 'en', 't'],
         threshold: isMultiWord ? 0 : 1,
         tolerance: isMultiWord ? 0 : 1,
@@ -269,7 +265,6 @@ export class SearchService {
         results = await search(entry.db, {
           term: normalizedQuery,
           limit: perBookLimit,
-          offset: perBookOffset,
           properties: ['ar', 'en', 't'],
           threshold: 1,
           tolerance: 1,
@@ -297,49 +292,49 @@ export class SearchService {
       }
     }
 
-    // Sort by score descending and limit
+    // Sort by score descending
     allResults.sort((a, b) => b.score - a.score);
-    return allResults.slice(0, limit);
+    return allResults;
   }
 
-  /** Combined search: titles + full text (if loaded) */
-  async searchAll(query: string, mode: SearchMode = 'titles', limit = 30, offset = 0): Promise<SearchResult[]> {
+  /** Combined search: titles + full text (if loaded).
+   *  Returns all matching results — the component handles display pagination.
+   */
+  async searchAll(query: string, mode: SearchMode = 'titles'): Promise<SearchResult[]> {
     // Intercept filter prefix queries (topic:, tag:, type:)
     const filtered = this.parseFilteredQuery(query);
     if (filtered) {
       if (filtered.prefix === 'topic') {
-        return this.searchByTopic(filtered.value, limit, offset);
+        return this.searchByTopic(filtered.value);
       }
       // For tag: and type: — strip prefix, search the value as plain text
-      return this.searchAllPlain(filtered.value, mode, limit, offset);
+      return this.searchAllPlain(filtered.value, mode);
     }
 
-    return this.searchAllPlain(query, mode, limit, offset);
+    return this.searchAllPlain(query, mode);
   }
 
   /** Plain search without filter prefix handling */
-  private async searchAllPlain(query: string, mode: SearchMode, limit: number, offset = 0): Promise<SearchResult[]> {
+  private async searchAllPlain(query: string, mode: SearchMode): Promise<SearchResult[]> {
     if (mode === 'fulltext') {
       if (!this.fullTextLoaded) {
         await this.loadFullTextIndex();
       }
       const [titleResults, fulltextResults] = await Promise.all([
-        // Always fetch titles from offset 0 — they're boosted to top and capped at 10,
-        // so applying a global offset would skip all title matches on page 2+
         this.searchTitles(query, 10),
-        this.searchFullText(query, limit, offset),
+        this.searchFullText(query),
       ]);
-      // Merge: titles first (boosted), then full text
+      // Merge: titles first (boosted), then full text, deduplicated
       const titlePaths = new Set(titleResults.map(r => r.path));
       const uniqueFulltext = fulltextResults.filter(r => !titlePaths.has(r.path));
-      return [...titleResults, ...uniqueFulltext].slice(0, limit);
+      return [...titleResults, ...uniqueFulltext];
     }
 
-    return this.searchTitles(query, limit, offset);
+    return this.searchTitles(query);
   }
 
   /** Search by topic using the AI topics index */
-  async searchByTopic(topicValue: string, limit = 50, offset = 0): Promise<SearchResult[]> {
+  async searchByTopic(topicValue: string): Promise<SearchResult[]> {
     const topics = await firstValueFrom(this.aiContentService.getTopics());
     if (!topics) return [];
 
@@ -357,7 +352,7 @@ export class SearchService {
     // Deduplicate and resolve chapter paths
     const uniqueChapterPaths = [...new Set(matchingPaths.map(p => p.replace(/:\d+$/, '')))];
 
-    return uniqueChapterPaths.slice(offset, offset + limit).map(chapterPath => ({
+    return uniqueChapterPaths.map(chapterPath => ({
       path: chapterPath,
       title: '',
       titleAr: '',

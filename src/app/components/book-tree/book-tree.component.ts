@@ -9,6 +9,7 @@ import {
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { I18nService } from '@app/services/i18n.service';
+import { BOOK_CHRONOLOGICAL_ORDER } from '@app/components/book-dispatcher/book-dispatcher.component';
 import { IndexedTitles, IndexState } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
 import { Subscription } from 'rxjs';
@@ -193,6 +194,12 @@ export class BookTreeComponent implements OnInit, OnDestroy {
 
     for (let i = 0; i < Math.min(partsA.length, partsB.length); i++) {
       if (partsA[i] !== partsB[i]) {
+        // For the book slug (first segment), use chronological order
+        if (i === 0) {
+          const orderA = BOOK_CHRONOLOGICAL_ORDER[partsA[0]] ?? 999;
+          const orderB = BOOK_CHRONOLOGICAL_ORDER[partsB[0]] ?? 999;
+          return orderA - orderB;
+        }
         const numA = parseInt(partsA[i], 10);
         const numB = parseInt(partsB[i], 10);
         if (!isNaN(numA) && !isNaN(numB)) {

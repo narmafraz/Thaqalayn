@@ -55,7 +55,7 @@ export const BOOK_CARD_META: Record<string, BookCardMeta> = {
  * Bihar al-Anwar: Al-Majlisi (d. 1699 CE)
  * Mu'jam al-Ahadith: Muhammad Asif Muhsini (modern)
  */
-const BOOK_CHRONOLOGICAL_ORDER: Record<string, number> = {
+export const BOOK_CHRONOLOGICAL_ORDER: Record<string, number> = {
   'quran':                          1,   // ~610-632 CE
   'risalat-al-huquq':              2,   // Imam al-Sajjad (d. 713)
   'kitab-al-zuhd':                 3,   // Al-Ahwazi (d. ~864)

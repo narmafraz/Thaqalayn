@@ -399,7 +399,20 @@
     "siteIssue": "An issue regarding how the site looks",
     "siteIssueDesc": "Please check existing issues on",
     "createNewIssue": "and if your issue is not currently addressed please create a new issue.",
-    "dataIssue": "An issue to do with the data on the site"
+    "dataIssue": "An issue to do with the data on the site",
+    "troubleshooting": "Troubleshooting",
+    "troubleshootingDesc": "If the site is showing outdated content, broken text, or displaying raw key names instead of proper text, resetting the site data can fix these issues by clearing all cached data and forcing a fresh download.",
+    "resetSiteData": "Reset Site Data",
+    "resetConfirmTitle": "Are you sure?",
+    "resetConfirmDesc": "This will clear all locally stored data and force the site to re-download everything from the server. The following will be permanently deleted:",
+    "resetItem1": "Cached pages and offline data (service worker cache)",
+    "resetItem2": "Your bookmarks and reading progress",
+    "resetItem3": "Your personal notes on verses",
+    "resetItem4": "Your language, theme, and AI display preferences",
+    "resetCancel": "Cancel",
+    "resetConfirm": "Yes, reset everything",
+    "resetSuccess": "Site data has been cleared successfully. Click the button below to reload with fresh data.",
+    "resetReload": "Reload Site"
   },
   "phrases": {
     "title": "Key Phrases",

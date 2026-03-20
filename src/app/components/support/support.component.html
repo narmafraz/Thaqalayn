@@ -7,4 +7,47 @@
   <h2>{{ 'support.dataIssue' | translate }}</h2>
   <p>{{ 'support.siteIssueDesc' | translate }} <a href="https://github.com/narmafraz/ThaqalaynDataGenerator/issues" target="_blank">https://github.com/narmafraz/ThaqalaynDataGenerator/issues</a> <br>
     {{ 'support.createNewIssue' | translate }}</p>
+
+  <h2>{{ 'support.troubleshooting' | translate }}</h2>
+  <p>{{ 'support.troubleshootingDesc' | translate }}</p>
+
+  <!-- Reset button -->
+  <button *ngIf="!showResetConfirm && !resetComplete"
+          class="reset-button"
+          (click)="promptReset()">
+    <mat-icon>restart_alt</mat-icon>
+    {{ 'support.resetSiteData' | translate }}
+  </button>
+
+  <!-- Confirmation dialog -->
+  <div *ngIf="showResetConfirm" class="reset-confirm">
+    <mat-icon class="warning-icon">warning</mat-icon>
+    <h3>{{ 'support.resetConfirmTitle' | translate }}</h3>
+    <p>{{ 'support.resetConfirmDesc' | translate }}</p>
+    <ul>
+      <li>{{ 'support.resetItem1' | translate }}</li>
+      <li>{{ 'support.resetItem2' | translate }}</li>
+      <li>{{ 'support.resetItem3' | translate }}</li>
+      <li>{{ 'support.resetItem4' | translate }}</li>
+    </ul>
+    <div class="reset-actions">
+      <button class="cancel-button" (click)="cancelReset()">
+        {{ 'support.resetCancel' | translate }}
+      </button>
+      <button class="confirm-button" (click)="confirmReset()">
+        <mat-icon>delete_forever</mat-icon>
+        {{ 'support.resetConfirm' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Success message -->
+  <div *ngIf="resetComplete" class="reset-success">
+    <mat-icon>check_circle</mat-icon>
+    <p>{{ 'support.resetSuccess' | translate }}</p>
+    <button class="reload-button" (click)="reloadPage()">
+      <mat-icon>refresh</mat-icon>
+      {{ 'support.resetReload' | translate }}
+    </button>
+  </div>
 </div>

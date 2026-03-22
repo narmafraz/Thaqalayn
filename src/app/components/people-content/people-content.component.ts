@@ -17,6 +17,14 @@ export interface ConarratorSummary {
   count: number;
 }
 
+export interface DirectionalNarrator {
+  id: number;
+  nameAr: string;
+  nameEn: string;
+  hadithCount: number;
+  percentage: number;
+}
+
 export interface BookDistribution {
   book: string;
   displayName: string;
@@ -86,6 +94,12 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
   monogramLetter = '';
   narratedFromCount = 0;
   narratedToCount = 0;
+
+  // Directional transmission analysis
+  narratedFromList: DirectionalNarrator[] = [];
+  narratedToList: DirectionalNarrator[] = [];
+  showAllNarratedFrom = false;
+  showAllNarratedTo = false;
 
   // Filter
   private pathsFilterSubject = new Subject<string>();
@@ -194,14 +208,21 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
 
         // Compute top co-narrators (NAR-04)
         this.computeTopConarrators(narrator);
+
+        // Compute directional transmission analysis
+        this.computeDirectionalNarrators(narrator);
       } else {
         this.allSubchains = [];
         this.topConarrators = [];
         this.uniqueConarratorCount = 0;
+        this.narratedFromList = [];
+        this.narratedToList = [];
       }
       this.filteredSubchains = this.allSubchains;
       this.subchainsPage = 0;
       this.showAllConarrators = false;
+      this.showAllNarratedFrom = false;
+      this.showAllNarratedTo = false;
       this.expandedSubchains.clear();
       this.updatePaginatedSubchains();
 
@@ -399,6 +420,46 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
         displayName: BOOK_DISPLAY_NAMES[book] || book,
         count,
         percentage: (count / maxCount) * 100
+      }));
+  }
+
+  /** Compute directional narrated-from and narrated-to lists from 2-narrator subchains */
+  private computeDirectionalNarrators(narrator: Narrator): void {
+    const currentId = parseInt(narrator.index, 10);
+    const fromCounts = new Map<number, number>(); // people this narrator received from
+    const toCounts = new Map<number, number>();   // people this narrator transmitted to
+
+    if (narrator.subchains) {
+      for (const chain of Object.values(narrator.subchains)) {
+        if (!chain.narrator_ids || chain.narrator_ids.length !== 2) continue;
+        const verseCount = chain.verse_paths ? chain.verse_paths.length : 0;
+        const [first, second] = chain.narrator_ids;
+
+        if (second === currentId && first !== currentId) {
+          // [source, currentNarrator] → narrator received FROM source
+          fromCounts.set(first, (fromCounts.get(first) || 0) + verseCount);
+        }
+        if (first === currentId && second !== currentId) {
+          // [currentNarrator, receiver] → narrator transmitted TO receiver
+          toCounts.set(second, (toCounts.get(second) || 0) + verseCount);
+        }
+      }
+    }
+
+    this.narratedFromList = this.buildDirectionalList(fromCounts);
+    this.narratedToList = this.buildDirectionalList(toCounts);
+  }
+
+  private buildDirectionalList(counts: Map<number, number>): DirectionalNarrator[] {
+    const totalHadiths = Array.from(counts.values()).reduce((sum, c) => sum + c, 0);
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([id, hadithCount]) => ({
+        id,
+        nameAr: this.narratorIndex[id]?.titles?.ar || String(id),
+        nameEn: this.narratorIndex[id]?.titles?.en || '',
+        hadithCount,
+        percentage: totalHadiths > 0 ? Math.round((hadithCount / totalHadiths) * 100) : 0
       }));
   }
 

@@ -115,7 +115,11 @@
     "featuredImams": "Ehl-i Beyt",
     "imam": "İmam",
     "viewProfile": "Profili görüntüle",
-    "roleImam": "İmam"
+    "roleImam": "İmam",
+    "narratedFromTitle": "Narrated From",
+    "narratedToTitle": "Narrated To",
+    "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
   },
   "search": {
     "filter": "Filtre",

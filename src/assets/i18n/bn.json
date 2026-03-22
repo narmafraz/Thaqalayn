@@ -115,7 +115,11 @@
     "featuredImams": "আহলে বাইত",
     "imam": "ইমাম",
     "viewProfile": "প্রোফাইল দেখুন",
-    "roleImam": "ইমাম"
+    "roleImam": "ইমাম",
+    "narratedFromTitle": "Narrated From",
+    "narratedToTitle": "Narrated To",
+    "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
   },
   "search": {
     "filter": "ফিল্টার",

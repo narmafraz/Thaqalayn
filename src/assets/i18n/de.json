@@ -115,7 +115,11 @@
     "featuredImams": "Die Ahl al-Bayt",
     "imam": "Imam",
     "viewProfile": "Profil anzeigen",
-    "roleImam": "Imam"
+    "roleImam": "Imam",
+    "narratedFromTitle": "Narrated From",
+    "narratedToTitle": "Narrated To",
+    "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
   },
   "search": {
     "filter": "Filter",

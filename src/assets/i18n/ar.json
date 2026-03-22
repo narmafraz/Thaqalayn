@@ -127,7 +127,11 @@
     "categoryAll": "الكل",
     "categoryImams": "الأئمة",
     "categoryTop": "كبار الرواة",
-    "roleImam": "إمام"
+    "roleImam": "إمام",
+    "narratedFromTitle": "روى عن",
+    "narratedToTitle": "روى عنه",
+    "narratedFromDesc": "الأشخاص الذين روى عنهم هذا الراوي، مرتبين حسب التكرار",
+    "narratedToDesc": "الأشخاص الذين رووا عن هذا الراوي، مرتبين حسب التكرار"
   },
   "search": {
     "filter": "تصفية",

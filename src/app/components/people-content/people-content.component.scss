@@ -370,6 +370,149 @@
   }
 }
 
+// Transmission analysis sections (Narrated From / Narrated To)
+.transmission-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--card-bg, #fafafa);
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 1.1rem;
+    color: var(--text-primary, #333);
+  }
+}
+
+.transmission-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary, #666);
+  margin: 0 0 1rem;
+}
+
+.transmission-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.transmission-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .transmission-name {
+    min-width: 140px;
+    max-width: 200px;
+    font-family: 'Amiri', serif;
+    font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .transmission-name-en {
+    min-width: 100px;
+    max-width: 160px;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #777);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .transmission-track {
+    flex: 1;
+    height: 20px;
+    background: var(--table-stripe, #e8e8e8);
+    border-radius: 4px;
+    overflow: hidden;
+    min-width: 60px;
+  }
+
+  .transmission-fill {
+    height: 100%;
+    border-radius: 4px;
+    min-width: 2px;
+    transition: width 0.3s ease;
+
+    &.narrated-from-fill {
+      background: linear-gradient(90deg, #66bb6a, #388e3c);
+    }
+
+    &.narrated-to-fill {
+      background: linear-gradient(90deg, #42a5f5, #1976d2);
+    }
+  }
+
+  .transmission-stats {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    min-width: 80px;
+    justify-content: flex-end;
+    white-space: nowrap;
+  }
+
+  .transmission-count {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary, #333);
+  }
+
+  .transmission-pct {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #888);
+  }
+}
+
+:host-context(body.dark-theme) {
+  .transmission-bar-row:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .transmission-track {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.show-all-transmission-btn {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: var(--link-color, #1976d2);
+}
+
+@media (max-width: 600px) {
+  .transmission-bar-row {
+    flex-wrap: wrap;
+    gap: 4px;
+
+    .transmission-name {
+      min-width: 100px;
+      max-width: none;
+      flex: 1;
+    }
+
+    .transmission-name-en {
+      display: none;
+    }
+
+    .transmission-stats {
+      min-width: 70px;
+    }
+  }
+}
+
 .biography-section {
   margin-bottom: 2rem;
   padding: 1rem;

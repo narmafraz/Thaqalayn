@@ -76,6 +76,58 @@
       </div>
     </section>
 
+    <!-- Narrated From Section -->
+    <section class="transmission-section" *ngIf="narratedFromList.length > 0">
+      <h2>{{ 'narrator.narratedFromTitle' | translate }} ({{ narratedFromList.length }})</h2>
+      <p class="transmission-desc">{{ 'narrator.narratedFromDesc' | translate }}</p>
+      <div class="transmission-bars">
+        <ng-container *ngFor="let item of (showAllNarratedFrom ? narratedFromList : narratedFromList.slice(0, 10))">
+          <a class="transmission-bar-row" [routerLink]="['/people/narrators/' + item.id]">
+            <span class="transmission-name arabic" lang="ar" dir="rtl">{{ item.nameAr }}</span>
+            <span class="transmission-name-en" *ngIf="item.nameEn">{{ item.nameEn }}</span>
+            <div class="transmission-track">
+              <div class="transmission-fill narrated-from-fill" [style.width.%]="item.percentage"></div>
+            </div>
+            <span class="transmission-stats">
+              <span class="transmission-count">{{ item.hadithCount | number }}</span>
+              <span class="transmission-pct">{{ item.percentage }}%</span>
+            </span>
+          </a>
+        </ng-container>
+      </div>
+      <button *ngIf="narratedFromList.length > 10 && !showAllNarratedFrom"
+              mat-button class="show-all-transmission-btn"
+              (click)="showAllNarratedFrom = true">
+        {{ 'narrator.showAll' | translate }} {{ narratedFromList.length }}
+      </button>
+    </section>
+
+    <!-- Narrated To Section -->
+    <section class="transmission-section" *ngIf="narratedToList.length > 0">
+      <h2>{{ 'narrator.narratedToTitle' | translate }} ({{ narratedToList.length }})</h2>
+      <p class="transmission-desc">{{ 'narrator.narratedToDesc' | translate }}</p>
+      <div class="transmission-bars">
+        <ng-container *ngFor="let item of (showAllNarratedTo ? narratedToList : narratedToList.slice(0, 10))">
+          <a class="transmission-bar-row" [routerLink]="['/people/narrators/' + item.id]">
+            <span class="transmission-name arabic" lang="ar" dir="rtl">{{ item.nameAr }}</span>
+            <span class="transmission-name-en" *ngIf="item.nameEn">{{ item.nameEn }}</span>
+            <div class="transmission-track">
+              <div class="transmission-fill narrated-to-fill" [style.width.%]="item.percentage"></div>
+            </div>
+            <span class="transmission-stats">
+              <span class="transmission-count">{{ item.hadithCount | number }}</span>
+              <span class="transmission-pct">{{ item.percentage }}%</span>
+            </span>
+          </a>
+        </ng-container>
+      </div>
+      <button *ngIf="narratedToList.length > 10 && !showAllNarratedTo"
+              mat-button class="show-all-transmission-btn"
+              (click)="showAllNarratedTo = true">
+        {{ 'narrator.showAll' | translate }} {{ narratedToList.length }}
+      </button>
+    </section>
+
     <!-- Biography Section -->
     <section class="biography-section" *ngIf="narrator.biography as bio">
       <h2>{{ 'narrator.biography' | translate }}</h2>

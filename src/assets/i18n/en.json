@@ -140,7 +140,11 @@
     "sharedConarrators": "Shared Co-Narrators",
     "selectNarrator": "Select narrator",
     "noNarrations": "No narrations found for this narrator.",
-    "roleImam": "Imam"
+    "roleImam": "Imam",
+    "narratedFromTitle": "Narrated From",
+    "narratedToTitle": "Narrated To",
+    "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
   },
   "search": {
     "filter": "Filter",

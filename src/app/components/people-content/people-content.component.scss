@@ -192,6 +192,63 @@
   color: var(--link-color, #1976d2);
 }
 
+// Active filter chips bar
+.active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  margin-bottom: 1rem;
+  background: rgba(25, 118, 210, 0.06);
+  border-radius: 8px;
+  border: 1px solid rgba(25, 118, 210, 0.2);
+
+  .filter-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--link-color, #1976d2);
+  }
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: var(--link-color, #1976d2);
+  color: white;
+
+  &.from-chip { background: #388e3c; }
+  &.to-chip { background: #1565c0; }
+
+  .chip-dir {
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+  }
+
+  .chip-close {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.clear-filters-btn {
+  font-size: 0.8rem;
+  color: var(--link-color, #1976d2);
+}
+
+:host-context(body.dark-theme) .active-filters {
+  background: rgba(25, 118, 210, 0.08);
+  border-color: rgba(25, 118, 210, 0.15);
+}
+
 @media (max-width: 600px) {
   .profile-hero {
     padding: 24px 16px 20px;
@@ -327,6 +384,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &.active-filter {
+    background: rgba(25, 118, 210, 0.1);
+    border-left: 3px solid var(--link-color, #1976d2);
+  }
 
   .bar-label {
     min-width: 160px;
@@ -406,10 +476,16 @@
   border-radius: 6px;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
   transition: background-color 0.15s ease;
 
   &:hover {
     background: rgba(0, 0, 0, 0.04);
+  }
+
+  &.active-filter {
+    background: rgba(25, 118, 210, 0.1);
+    border-left: 3px solid var(--link-color, #1976d2);
   }
 
   .transmission-name {
@@ -418,6 +494,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover {
+      color: var(--link-color, #1976d2);
+      text-decoration: underline;
+    }
   }
 
   .transmission-name-en {

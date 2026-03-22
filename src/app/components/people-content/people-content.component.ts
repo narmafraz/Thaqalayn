@@ -23,6 +23,8 @@ export interface DirectionalNarrator {
   nameEn: string;
   hadithCount: number;
   percentage: number;
+  /** Bar width normalized to max entry (0-100) */
+  barWidth: number;
 }
 
 export interface BookDistribution {
@@ -39,6 +41,13 @@ export interface HadithPreviewInfo {
   chapterTitle: string;
   hadithNumber: string;
   volumeLabel: string;
+}
+
+/** Raw data for a 2-narrator directional chain */
+interface DirectionalChainData {
+  otherId: number;
+  direction: 'from' | 'to';
+  versePaths: string[];
 }
 
 @Component({
@@ -101,10 +110,21 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
   showAllNarratedFrom = false;
   showAllNarratedTo = false;
 
+  // Cross-filter state
+  selectedBook: string | null = null;
+  selectedFromId: number | null = null;
+  selectedToId: number | null = null;
+  activeFilterCount = 0;
+
+  // Raw directional chain data for cross-filtering
+  private rawFromChains: DirectionalChainData[] = [];
+  private rawToChains: DirectionalChainData[] = [];
+  private allVersePaths: string[] = [];
+
   // Filter
   private pathsFilterSubject = new Subject<string>();
   private subchainsFilterSubject = new Subject<string>();
-  private narratorIndex: Record<number, NarratorMetadata> = {};
+  narratorIndex: Record<number, NarratorMetadata> = {};
   private currentNarratorIndex: string = '';
 
   ngOnInit() {
@@ -183,18 +203,17 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       this.narratedFromCount = meta?.narrated_from || 0;
       this.narratedToCount = meta?.narrated_to || 0;
 
-      // Process verse paths
-      if (narrator.verse_paths) {
-        this.allPaths = this.sortBy(narrator.verse_paths).map(path => ({ path }));
-      } else {
-        this.allPaths = [];
-      }
-      this.filteredPaths = this.allPaths;
-      this.pathsPage = 0;
-      this.updatePaginatedPaths();
+      // Store all verse paths
+      this.allVersePaths = narrator.verse_paths || [];
 
-      // Compute stats summary (NAR-02)
-      this.computeStats(narrator);
+      // Build raw directional chain data for cross-filtering
+      this.buildRawChainData(narrator);
+
+      // Reset filters
+      this.selectedBook = null;
+      this.selectedFromId = null;
+      this.selectedToId = null;
+      this.activeFilterCount = 0;
 
       // Process subchains
       if (narrator.subchains) {
@@ -208,15 +227,10 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
 
         // Compute top co-narrators (NAR-04)
         this.computeTopConarrators(narrator);
-
-        // Compute directional transmission analysis
-        this.computeDirectionalNarrators(narrator);
       } else {
         this.allSubchains = [];
         this.topConarrators = [];
         this.uniqueConarratorCount = 0;
-        this.narratedFromList = [];
-        this.narratedToList = [];
       }
       this.filteredSubchains = this.allSubchains;
       this.subchainsPage = 0;
@@ -225,6 +239,9 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       this.showAllNarratedTo = false;
       this.expandedSubchains.clear();
       this.updatePaginatedSubchains();
+
+      // Compute all sections (unfiltered initially)
+      this.recomputeFilteredSections();
 
       this.cdr.markForCheck();
     });
@@ -289,6 +306,40 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
     this.store.dispatch(new RetryLoadNarrator(index));
   }
 
+  // --- Cross-filter toggle methods ---
+
+  toggleBookFilter(book: string): void {
+    this.selectedBook = this.selectedBook === book ? null : book;
+    this.recomputeFilteredSections();
+    this.cdr.markForCheck();
+  }
+
+  toggleFromFilter(id: number, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectedFromId = this.selectedFromId === id ? null : id;
+    this.recomputeFilteredSections();
+    this.cdr.markForCheck();
+  }
+
+  toggleToFilter(id: number, event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectedToId = this.selectedToId === id ? null : id;
+    this.recomputeFilteredSections();
+    this.cdr.markForCheck();
+  }
+
+  clearAllFilters(): void {
+    this.selectedBook = null;
+    this.selectedFromId = null;
+    this.selectedToId = null;
+    this.recomputeFilteredSections();
+    this.cdr.markForCheck();
+  }
+
+  // --- Private helpers ---
+
   private updatePaginatedPaths() {
     const start = this.pathsPage * this.pathsPageSize;
     this.paginatedPaths = this.filteredPaths.slice(start, start + this.pathsPageSize);
@@ -307,17 +358,14 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
     const bookName = BOOK_DISPLAY_NAMES[bookId] || this.titleCase(bookId);
     const hadithNumber = parts.length > 1 ? parts[parts.length - 1] : '';
 
-    // Build parent chapter path by stripping the last segment (hadith number)
     const lastColon = path.lastIndexOf(':');
     const chapterPath = lastColon > 0 ? path.substring(0, lastColon) : path;
 
-    // Look up chapter title from IndexState
     let chapterTitle = '';
     if (this.enIndex && this.enIndex[chapterPath]) {
       chapterTitle = this.enIndex[chapterPath].title || '';
     }
 
-    // Build volume label from segments
     const volumeLabel = this.buildVolumeLabel(bookId, parts.slice(1, -1));
 
     return { path, bookId, bookName, chapterTitle, hadithNumber, volumeLabel };
@@ -332,7 +380,6 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       const labels = ['Vol.', 'Book', 'Ch.'];
       return segments.map((s, i) => `${labels[i] || ''} ${s}`).join(', ');
     }
-    // Generic: just number the segments
     return segments.join(':');
   }
 
@@ -367,6 +414,11 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       .trim();
   }
 
+  private getBookSlug(path: string): string {
+    const match = path.match(/^\/books\/([^:]+)/);
+    return match ? match[1] : '';
+  }
+
   /** Compute top co-narrators from subchains (NAR-04) */
   private computeTopConarrators(narrator: Narrator): void {
     const currentId = parseInt(narrator.index, 10);
@@ -395,19 +447,87 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
     }));
   }
 
-  /** Compute stats summary from verse_paths (NAR-02) */
-  private computeStats(narrator: Narrator): void {
-    const paths = narrator.verse_paths || [];
-    this.totalNarrations = paths.length;
+  /** Build raw directional chain data from 2-narrator subchains */
+  private buildRawChainData(narrator: Narrator): void {
+    const currentId = parseInt(narrator.index, 10);
+    this.rawFromChains = [];
+    this.rawToChains = [];
 
-    const bookCounts = new Map<string, number>();
-    for (const path of paths) {
-      // path format: /books/al-kafi:1:2:3:4
-      const match = path.match(/^\/books\/([^:]+)/);
-      if (match) {
-        const book = match[1];
-        bookCounts.set(book, (bookCounts.get(book) || 0) + 1);
+    if (!narrator.subchains) return;
+
+    for (const chain of Object.values(narrator.subchains)) {
+      if (!chain.narrator_ids || chain.narrator_ids.length !== 2) continue;
+      const paths = chain.verse_paths || [];
+      const [first, second] = chain.narrator_ids;
+
+      if (second === currentId && first !== currentId) {
+        this.rawFromChains.push({ otherId: first, direction: 'from', versePaths: paths });
       }
+      if (first === currentId && second !== currentId) {
+        this.rawToChains.push({ otherId: second, direction: 'to', versePaths: paths });
+      }
+    }
+  }
+
+  /** Recompute all three sections based on active filters */
+  private recomputeFilteredSections(): void {
+    this.activeFilterCount = (this.selectedBook ? 1 : 0) +
+      (this.selectedFromId != null ? 1 : 0) +
+      (this.selectedToId != null ? 1 : 0);
+
+    // Step 1: Determine the set of verse paths matching ALL active filters
+    let matchingPaths: Set<string> | null = null;
+
+    if (this.selectedBook) {
+      const bookPaths = new Set(this.allVersePaths.filter(p => this.getBookSlug(p) === this.selectedBook));
+      matchingPaths = bookPaths;
+    }
+
+    if (this.selectedFromId != null) {
+      const fromChain = this.rawFromChains.find(c => c.otherId === this.selectedFromId);
+      const fromPaths = new Set(fromChain ? fromChain.versePaths : []);
+      matchingPaths = matchingPaths ? this.intersectSets(matchingPaths, fromPaths) : fromPaths;
+    }
+
+    if (this.selectedToId != null) {
+      const toChain = this.rawToChains.find(c => c.otherId === this.selectedToId);
+      const toPaths = new Set(toChain ? toChain.versePaths : []);
+      matchingPaths = matchingPaths ? this.intersectSets(matchingPaths, toPaths) : toPaths;
+    }
+
+    // Step 2: Compute filtered versions of each section
+    const activePaths = matchingPaths || new Set(this.allVersePaths);
+
+    // Book distribution
+    this.computeFilteredBookDistribution(activePaths);
+
+    // Narrated from/to — filter by paths that match other active filters
+    this.computeFilteredDirectional(activePaths);
+
+    // Narrated ahadith list
+    const sortedPaths = this.sortBy(Array.from(activePaths));
+    this.allPaths = sortedPaths.map(path => ({ path }));
+    this.filteredPaths = this.allPaths;
+    this.pathsPage = 0;
+    this.totalNarrations = this.activeFilterCount > 0 ? activePaths.size : this.allVersePaths.length;
+    this.updatePaginatedPaths();
+  }
+
+  private intersectSets(a: Set<string>, b: Set<string>): Set<string> {
+    const result = new Set<string>();
+    const smaller = a.size <= b.size ? a : b;
+    const larger = a.size <= b.size ? b : a;
+    for (const item of smaller) {
+      if (larger.has(item)) result.add(item);
+    }
+    return result;
+  }
+
+  private computeFilteredBookDistribution(activePaths: Set<string>): void {
+    const bookCounts = new Map<string, number>();
+    for (const path of activePaths) {
+      const book = this.getBookSlug(path);
+      if (book) bookCounts.set(book, (bookCounts.get(book) || 0) + 1);
     }
 
     this.bookCount = bookCounts.size;
@@ -423,35 +543,31 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
       }));
   }
 
-  /** Compute directional narrated-from and narrated-to lists from 2-narrator subchains */
-  private computeDirectionalNarrators(narrator: Narrator): void {
-    const currentId = parseInt(narrator.index, 10);
-    const fromCounts = new Map<number, number>(); // people this narrator received from
-    const toCounts = new Map<number, number>();   // people this narrator transmitted to
-
-    if (narrator.subchains) {
-      for (const chain of Object.values(narrator.subchains)) {
-        if (!chain.narrator_ids || chain.narrator_ids.length !== 2) continue;
-        const verseCount = chain.verse_paths ? chain.verse_paths.length : 0;
-        const [first, second] = chain.narrator_ids;
-
-        if (second === currentId && first !== currentId) {
-          // [source, currentNarrator] → narrator received FROM source
-          fromCounts.set(first, (fromCounts.get(first) || 0) + verseCount);
-        }
-        if (first === currentId && second !== currentId) {
-          // [currentNarrator, receiver] → narrator transmitted TO receiver
-          toCounts.set(second, (toCounts.get(second) || 0) + verseCount);
-        }
+  private computeFilteredDirectional(activePaths: Set<string>): void {
+    // Narrated from: count only verse_paths that intersect with activePaths
+    const fromCounts = new Map<number, number>();
+    for (const chain of this.rawFromChains) {
+      const count = chain.versePaths.filter(p => activePaths.has(p)).length;
+      if (count > 0) {
+        fromCounts.set(chain.otherId, (fromCounts.get(chain.otherId) || 0) + count);
       }
     }
-
     this.narratedFromList = this.buildDirectionalList(fromCounts);
+
+    // Narrated to
+    const toCounts = new Map<number, number>();
+    for (const chain of this.rawToChains) {
+      const count = chain.versePaths.filter(p => activePaths.has(p)).length;
+      if (count > 0) {
+        toCounts.set(chain.otherId, (toCounts.get(chain.otherId) || 0) + count);
+      }
+    }
     this.narratedToList = this.buildDirectionalList(toCounts);
   }
 
   private buildDirectionalList(counts: Map<number, number>): DirectionalNarrator[] {
     const totalHadiths = Array.from(counts.values()).reduce((sum, c) => sum + c, 0);
+    const maxCount = Math.max(...Array.from(counts.values()), 1);
     return Array.from(counts.entries())
       .sort((a, b) => b[1] - a[1])
       .map(([id, hadithCount]) => ({
@@ -459,16 +575,15 @@ export class PeopleContentComponent implements OnInit, OnDestroy {
         nameAr: this.narratorIndex[id]?.titles?.ar || String(id),
         nameEn: this.narratorIndex[id]?.titles?.en || '',
         hadithCount,
-        percentage: totalHadiths > 0 ? Math.round((hadithCount / totalHadiths) * 100) : 0
+        percentage: totalHadiths > 0 ? Math.round((hadithCount / totalHadiths) * 100) : 0,
+        barWidth: (hadithCount / maxCount) * 100
       }));
   }
 
   /** Extract first Arabic letter for geometric monogram */
   private getMonogramLetter(arabicName: string): string {
     if (!arabicName) return '';
-    // Strip diacritics to get base letter
     const stripped = arabicName.replace(/[\u0610-\u061A\u064B-\u065F\u0670]/g, '');
-    // Find first actual Arabic letter (skip spaces, parentheses, etc.)
     const match = stripped.match(/[\u0621-\u064A]/);
     return match ? match[0] : stripped.charAt(0);
   }

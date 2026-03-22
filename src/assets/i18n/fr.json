@@ -82,7 +82,8 @@
     "keyPhrases": "Phrases clés",
     "relatedNarrations": "Narrations associées",
     "loadingCommentary": "Chargement du commentaire...",
-    "unknownBookPart": "Nous ne savons pas afficher cette partie, désolé !"
+    "unknownBookPart": "Nous ne savons pas afficher cette partie, désolé !",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "Ahadiths rapportés",

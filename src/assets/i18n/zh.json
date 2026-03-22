@@ -82,7 +82,8 @@
     "keyPhrases": "关键短语",
     "relatedNarrations": "相关传述",
     "loadingCommentary": "正在加载注释...",
-    "unknownBookPart": "抱歉，不确定如何显示这部分！"
+    "unknownBookPart": "抱歉，不确定如何显示这部分！",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "所传圣训",

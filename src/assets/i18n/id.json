@@ -82,7 +82,8 @@
     "keyPhrases": "Frasa Kunci",
     "relatedNarrations": "Riwayat Terkait",
     "loadingCommentary": "Memuat tafsir...",
-    "unknownBookPart": "Maaf, tidak yakin bagaimana menampilkan bagian ini!"
+    "unknownBookPart": "Maaf, tidak yakin bagaimana menampilkan bagian ini!",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "Hadis yang diriwayatkan",

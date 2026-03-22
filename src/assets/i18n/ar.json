@@ -82,7 +82,8 @@
     "keyPhrases": "العبارات الرئيسية",
     "relatedNarrations": "روايات ذات صلة",
     "loadingCommentary": "جاري تحميل التفسير...",
-    "unknownBookPart": "لا نعرف كيفية عرض هذا الجزء، نعتذر!"
+    "unknownBookPart": "لا نعرف كيفية عرض هذا الجزء، نعتذر!",
+    "relatedChapters": "فصول ذات صلة في كتب أخرى"
   },
   "narrator": {
     "narratedAhadith": "الأحاديث المروية",

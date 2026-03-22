@@ -82,7 +82,8 @@
     "keyPhrases": "মূল বাক্যাংশ",
     "relatedNarrations": "সম্পর্কিত বর্ণনা",
     "loadingCommentary": "তাফসীর লোড হচ্ছে...",
-    "unknownBookPart": "দুঃখিত, এই অংশটি কীভাবে প্রদর্শন করতে হবে!"
+    "unknownBookPart": "দুঃখিত, এই অংশটি কীভাবে প্রদর্শন করতে হবে!",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "বর্ণিত হাদিস",

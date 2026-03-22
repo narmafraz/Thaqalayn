@@ -82,7 +82,8 @@
     "keyPhrases": "کلیدی جملے",
     "relatedNarrations": "متعلقہ روایات",
     "loadingCommentary": "تفسیر لوڈ ہو رہی ہے...",
-    "unknownBookPart": "معذرت، اس حصے کو دکھانے کا طریقہ معلوم نہیں!"
+    "unknownBookPart": "معذرت، اس حصے کو دکھانے کا طریقہ معلوم نہیں!",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "مروی احادیث",

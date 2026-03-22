@@ -435,5 +435,20 @@
     </mat-card>
   </ng-container>
   </ng-container>
+
+  <!-- Related chapters in other books -->
+  <section class="related-chapters-section" *ngIf="relatedChapters?.length">
+    <h3>{{ 'book.relatedChapters' | translate }}</h3>
+    <div class="related-chapters-list">
+      <a *ngFor="let rc of relatedChapters"
+         class="related-chapter-card"
+         [routerLink]="['/books', stripBooksPrefix(rc.path)]"
+         queryParamsHandling="preserve">
+        <span class="related-book-name">{{ rc.book }}</span>
+        <span class="related-chapter-title">{{ rc.title }}</span>
+      </a>
+    </div>
+  </section>
+
   <app-settings></app-settings>
 </ng-container>

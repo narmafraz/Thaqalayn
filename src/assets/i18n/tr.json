@@ -82,7 +82,8 @@
     "keyPhrases": "Anahtar İfadeler",
     "relatedNarrations": "İlgili Rivayetler",
     "loadingCommentary": "Tefsir yükleniyor...",
-    "unknownBookPart": "Bu bölümü nasıl görüntüleyeceğimizi bilmiyoruz, üzgünüz!"
+    "unknownBookPart": "Bu bölümü nasıl görüntüleyeceğimizi bilmiyoruz, üzgünüz!",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "Rivayet edilen hadisler",

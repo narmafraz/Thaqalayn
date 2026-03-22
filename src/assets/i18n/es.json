@@ -82,7 +82,8 @@
     "keyPhrases": "Frases clave",
     "relatedNarrations": "Narraciones relacionadas",
     "loadingCommentary": "Cargando comentario...",
-    "unknownBookPart": "No sabemos cómo mostrar esta parte, ¡lo sentimos!"
+    "unknownBookPart": "No sabemos cómo mostrar esta parte, ¡lo sentimos!",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "Hadices narrados",

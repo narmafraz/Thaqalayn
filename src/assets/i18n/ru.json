@@ -82,7 +82,8 @@
     "keyPhrases": "Ключевые фразы",
     "relatedNarrations": "Связанные повествования",
     "loadingCommentary": "Загрузка комментария...",
-    "unknownBookPart": "Не знаем, как отобразить эту часть, извините!"
+    "unknownBookPart": "Не знаем, как отобразить эту часть, извините!",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "Переданные хадисы",

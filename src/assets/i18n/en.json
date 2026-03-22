@@ -90,7 +90,8 @@
     "keyPhrases": "Key Phrases",
     "relatedNarrations": "Related Narrations",
     "loadingCommentary": "Loading commentary...",
-    "unknownBookPart": "Not sure how to display this book part, sorry!"
+    "unknownBookPart": "Not sure how to display this book part, sorry!",
+    "relatedChapters": "Related Chapters in Other Books"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",

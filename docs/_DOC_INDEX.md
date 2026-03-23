@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-03-15
+> **Last updated:** 2026-03-22
 
 ## Status Legend
 
@@ -97,3 +97,9 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [PIPELINE_OPTIMIZATION_PLAN.md](PIPELINE_OPTIMIZATION_PLAN.md) | **ACTIVE** | Most recent AI pipeline plan. Multi-phase architecture (GPT-5.4 + programmatic + Claude + GPT-5-mini). Not yet implemented. |
+
+### 2026-03-22
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [BIHAR_MIRAT_SCRAPING_PLAN.md](BIHAR_MIRAT_SCRAPING_PLAN.md) | **ACTIVE** | Scraping plan for Bihar al-Anwar (110 vols) and Mir'at al-Uqul (26 vols) from rafed.net Word API. Includes cross-referencing strategy. |

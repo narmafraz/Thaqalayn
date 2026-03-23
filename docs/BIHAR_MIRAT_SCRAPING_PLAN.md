@@ -15,7 +15,9 @@ Both are critical for cross-referencing: Bihar cites source books by name/volume
 
 ## Source Selection
 
-### Primary Source: books.rafed.net (Word Download API)
+### Primary Source: books.rafed.net (Word Download API) — BLOCKED
+
+> **Status (2026-03-23):** rafed.net download API returning HTTP 500. Homepage loads but backend is down. Scripts are ready; waiting for site recovery.
 
 **Why rafed.net:**
 - Already integrated — working scraper infrastructure exists (`download_rafed_word.py`, `scrape_rafed_text.py`)
@@ -23,12 +25,20 @@ Both are critical for cross-referencing: Bihar cites source books by name/volume
 - Clean Arabic text (not image scans)
 - Both books confirmed available with known view IDs
 
-**Why NOT other sources:**
+### Fallback Source: alfeker.net → archive.org / MediaFire — DISCOVERED
+
+> **Status (2026-03-23):** All download URLs discovered and cached. PDFs are scanned images (no text layer). OCR text available via `_djvu.txt` files on archive.org but quality is moderate (Arabic OCR artifacts). **Not recommended as primary source.**
+
+- **Bihar al-Anwar:** 110 PDFs on archive.org + OCR `_djvu.txt` + EPUB (all OCR-based)
+- **Mir'at al-Uqul:** 28 PDFs on MediaFire (likely scanned, untested)
+- Scripts: `download_alfeker_pdfs.py` (downloader), URL cache at `alfeker_net/discovered_urls.json`
+
+### Sources NOT viable:
 - **lib.eshia.ir** — Image-based scans, not text. Confirmed not viable (see `scrape_eshia_notes.md`).
-- **shiaonlinelibrary.com** — Would require a new scraper; page-based navigation without clear API. Not worth the effort when rafed.net already works.
+- **shiaonlinelibrary.com** — DNS not resolving (site appears down as of 2026-03-23).
 - **thaqalayn-api.net** — Neither book is available (API has only 21 primary hadith books).
 - **ghbook.ir** — Not confirmed to have these books.
-- **archive.org** — PDF scans only, not structured text.
+- **archive.org PDFs** — Scanned images without text layer. OCR text files exist but quality insufficient for production use.
 
 ### Known View IDs
 

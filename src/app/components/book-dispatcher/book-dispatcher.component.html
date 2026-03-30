@@ -14,17 +14,38 @@
   <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
     <ng-container *ngSwitchCase="'chapter_list'">
       <ng-container *ngIf="book.index === 'books'">
-        <div *ngIf="(dailyVerse$ | async) as dv" class="daily-verse-card mat-elevation-z2">
-          <div class="daily-verse-label">
-            <mat-icon>auto_stories</mat-icon>
-            <span>{{ 'dailyVerse.title' | translate }}</span>
+        <!-- Random Quran + Hadith cards -->
+        <div class="random-verse-row">
+          <div *ngIf="(randomQuran$ | async) as qv" class="random-verse-card mat-elevation-z2">
+            <div class="random-verse-label">
+              <mat-icon>menu_book</mat-icon>
+              <span>{{ qv.bookLabel }}</span>
+              <button class="random-verse-shuffle" (click)="shuffleQuran($event)" aria-label="Show another verse">
+                <mat-icon>refresh</mat-icon>
+              </button>
+            </div>
+            <div class="random-verse-body">
+              <div class="random-verse-arabic" lang="ar" dir="rtl">{{ qv.arabicText }}</div>
+              <div class="random-verse-translation" *ngIf="qv.translationText">{{ qv.translationText }}</div>
+            </div>
+            <a class="random-verse-ref" [routerLink]="qv.path" queryParamsHandling="preserve">
+              {{ qv.reference }} →
+            </a>
           </div>
-          <div class="daily-verse-arabic" lang="ar" dir="rtl">{{ dv.arabicText }}</div>
-          <div class="daily-verse-translation" *ngIf="dv.translationText" [innerHTML]="dv.translationText"></div>
-          <div class="daily-verse-footer">
-            <span class="daily-verse-ref">{{ dv.reference }}</span>
-            <a [routerLink]="dv.path" queryParamsHandling="preserve" class="daily-verse-link">
-              {{ 'dailyVerse.readMore' | translate }} →
+          <div *ngIf="(randomHadith$ | async) as hv" class="random-verse-card mat-elevation-z2">
+            <div class="random-verse-label">
+              <mat-icon>auto_stories</mat-icon>
+              <span>{{ hv.bookLabel }}</span>
+              <button class="random-verse-shuffle" (click)="shuffleHadith($event)" aria-label="Show another hadith">
+                <mat-icon>refresh</mat-icon>
+              </button>
+            </div>
+            <div class="random-verse-body">
+              <div class="random-verse-arabic" lang="ar" dir="rtl">{{ hv.arabicText }}</div>
+              <div class="random-verse-translation" *ngIf="hv.translationText">{{ hv.translationText }}</div>
+            </div>
+            <a class="random-verse-ref" [routerLink]="hv.path" queryParamsHandling="preserve">
+              {{ hv.reference }} →
             </a>
           </div>
         </div>

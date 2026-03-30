@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestro
 import { Book } from '@app/models';
 import { BOOK_AUTHORS } from '@app/data/book-authors';
 import { BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
-import { DailyVerse, DailyVerseService } from '@app/services/daily-verse.service';
+import { RandomVerse, RandomVerseService } from '@app/services/random-verse.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RetryLoadBookPart } from '@store/books/books.actions';
@@ -110,7 +110,8 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   book$: Observable<Book> = inject(Store).select(BooksState.getCurrentNavigatedPart);
   loading$: Observable<boolean> = inject(Store).select(BooksState.getCurrentLoading);
   error$: Observable<string> = inject(Store).select(BooksState.getCurrentError);
-  dailyVerse$: Observable<DailyVerse | null>;
+  randomQuran$: Observable<RandomVerse | null>;
+  randomHadith$: Observable<RandomVerse | null>;
 
   exploreCards: ExploreCard[] = [];
   readingProgress: ReadingProgress[] = [];
@@ -124,14 +125,15 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store,
-    dailyVerseService: DailyVerseService,
+    private randomVerseService: RandomVerseService,
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
-  ) {
-    this.dailyVerse$ = dailyVerseService.getDailyVerse();
-  }
+  ) {}
 
   ngOnInit(): void {
+    this.randomQuran$ = this.randomVerseService.getRandomQuranVerse();
+    this.randomHadith$ = this.randomVerseService.getRandomHadith();
+
     this.subscriptions.push(
       this.bookmarkService.readingProgress$.subscribe(rp => {
         this.readingProgress = rp.slice(0, 3);
@@ -210,5 +212,17 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
 
   clearProgress(bookId: string): void {
     this.bookmarkService.clearReadingProgress(bookId);
+  }
+
+  shuffleQuran(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.randomQuran$ = this.randomVerseService.getRandomQuranVerse();
+  }
+
+  shuffleHadith(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.randomHadith$ = this.randomVerseService.getRandomHadith();
   }
 }

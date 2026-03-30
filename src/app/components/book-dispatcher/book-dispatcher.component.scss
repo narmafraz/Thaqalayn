@@ -19,16 +19,37 @@
   z-index: 10;
 }
 
-.daily-verse-card {
+// Random verse cards (Quran + Hadith side by side)
+.random-verse-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
   margin: 16px auto;
-  max-width: 800px;
-  padding: 24px;
+  max-width: 1000px;
+  padding: 0 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.random-verse-card {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
   border-radius: 12px;
   background: var(--card-bg, rgba(255, 255, 255, 0.9));
   border-left: 4px solid var(--link-color, #673ab7);
+  max-height: 320px;
 }
 
-.daily-verse-label {
+.random-verse-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.random-verse-label {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -37,7 +58,8 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--link-color, #673ab7);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
 
   mat-icon {
     font-size: 20px;
@@ -46,41 +68,55 @@
   }
 }
 
-.daily-verse-arabic {
+.random-verse-shuffle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-muted, #999);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, background 0.15s;
+
+  &:hover {
+    color: var(--link-color, #673ab7);
+    background: var(--hover-bg, rgba(0, 0, 0, 0.04));
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.random-verse-arabic {
   font-family: 'Scheherazade New', 'Traditional Arabic', 'Noto Naskh Arabic', serif;
-  font-size: 1.4em;
-  line-height: 2.2;
+  font-size: 1.25em;
+  line-height: 2;
   text-align: right;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   color: var(--text-primary, #333);
 }
 
-.daily-verse-translation {
-  font-size: 1.05em;
-  line-height: 1.8;
+.random-verse-translation {
+  font-size: 0.95em;
+  line-height: 1.7;
   color: var(--text-secondary, #555);
-  margin-bottom: 16px;
   font-style: italic;
+  margin-bottom: 8px;
 }
 
-.daily-verse-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.daily-verse-ref {
-  font-size: 12px;
-  color: var(--text-muted, #999);
-}
-
-.daily-verse-link {
-  font-size: 14px;
+.random-verse-ref {
+  font-size: 13px;
   color: var(--link-color, #673ab7);
   text-decoration: none;
   font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 8px;
 
   &:hover {
     text-decoration: underline;

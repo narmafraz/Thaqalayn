@@ -202,11 +202,19 @@
           <app-diff-viewer *ngIf="cv.diffs && cv.diffs.length > 0" [diffs]="cv.diffs"></app-diff-viewer>
         </div>
 
-        <!-- Source URL -->
-        <div class="source-section" *ngIf="book.data.source_url">
-          <a [href]="book.data.source_url" target="_blank" rel="noopener noreferrer" class="source-link">
-            <mat-icon>open_in_new</mat-icon> {{ 'book.viewSource' | translate }}
-          </a>
+        <!-- External Links -->
+        <div class="source-section" *ngIf="externalLinks.length > 0">
+          <button mat-stroked-button [matMenuTriggerFor]="externalLinksMenu" class="external-links-btn">
+            <mat-icon>open_in_new</mat-icon>
+            {{ 'book.viewOnOtherSites' | translate }}
+            <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #externalLinksMenu="matMenu">
+            <a mat-menu-item *ngFor="let link of externalLinks"
+               [href]="link.url" target="_blank" rel="noopener noreferrer">
+              {{ link.label }}
+            </a>
+          </mat-menu>
         </div>
       </mat-card-content>
 

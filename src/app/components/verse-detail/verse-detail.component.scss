@@ -435,22 +435,12 @@
   padding-top: 16px;
   border-top: 1px solid var(--border-color, #e0e0e0);
 
-  .source-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--link-color, #673ab7);
-    text-decoration: none;
+  .external-links-btn {
     font-size: 14px;
 
-    &:hover {
-      text-decoration: underline;
-    }
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
+    .dropdown-arrow {
+      margin-left: -4px;
+      margin-right: -8px;
     }
   }
 }

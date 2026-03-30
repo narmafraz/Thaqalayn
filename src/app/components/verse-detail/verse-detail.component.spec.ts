@@ -7,6 +7,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { VerseDetailComponent } from './verse-detail.component';
@@ -52,6 +53,7 @@ describe('VerseDetailComponent', () => {
         MatIconModule,
         MatButtonModule,
         MatTooltipModule,
+        MatMenuModule,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
@@ -119,13 +121,11 @@ describe('VerseDetailComponent', () => {
     expect(badges[0].classList.contains('grading-sahih')).toBe(true);
   });
 
-  it('should render source link when source_url is present', () => {
+  it('should render external links button when external links are available', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const sourceLink = compiled.querySelector('.source-link') as HTMLAnchorElement;
-    expect(sourceLink).toBeTruthy();
-    expect(sourceLink.href).toContain('example.com');
-    expect(sourceLink.target).toBe('_blank');
-    expect(sourceLink.rel).toContain('noopener');
+    const externalLinksBtn = compiled.querySelector('.external-links-btn');
+    expect(externalLinksBtn).toBeTruthy();
+    expect(component.externalLinks.length).toBeGreaterThan(0);
   });
 
   it('should render next nav link but not prev link', () => {

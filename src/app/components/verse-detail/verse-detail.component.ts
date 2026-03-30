@@ -7,6 +7,7 @@ import { Comment, DiscussionService } from '@app/services/discussion.service';
 import { SeoService } from '@app/services/seo.service';
 import { ShareCardService, ShareCardData } from '@app/services/share-card.service';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
+import { ExternalLink, ExternalLinksService } from '@app/services/external-links.service';
 import { SyncService } from '@app/services/sync.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -63,6 +64,9 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   showContentTypeBadges = true;
   showTopicTags = true;
 
+  // External links
+  externalLinks: ExternalLink[] = [];
+
   constructor(
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
@@ -72,6 +76,7 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     private discussionService: DiscussionService,
     private syncService: SyncService,
     private aiPrefs: AiPreferencesService,
+    private externalLinksService: ExternalLinksService,
   ) {
     this.discussionEnabled = this.discussionService.isConfigured;
     this.comments$ = this.discussionService.comments$;
@@ -125,6 +130,10 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       const title = (book.data.chapter_title?.en || '') + ' ' +
         book.data.verse.part_type + ' ' + book.data.verse.local_index;
       this.bookmarkService.updateReadingProgress(path, title);
+      // Compute external links
+      this.externalLinks = this.externalLinksService.getExternalLinks(
+        path, book.data.source_url || book.data.verse?.source_url
+      );
       // Load discussion comments
       if (this.discussionEnabled) {
         this.discussionService.loadComments(path);

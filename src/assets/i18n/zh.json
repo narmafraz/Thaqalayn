@@ -134,6 +134,8 @@
     "modeFullText": "全文",
     "loadingFullText": "正在加载全文索引...",
     "hadith": "圣训",
+    "verse": "经文",
+    "chapter": "章节",
     "tipsTitle": "搜索提示",
     "tipMultipleWords": "多个词使用AND逻辑。结果太少时会自动扩展搜索范围。",
     "tipArabic": "可用阿拉伯语或英语搜索。阿拉伯语变音符号会被忽略。",

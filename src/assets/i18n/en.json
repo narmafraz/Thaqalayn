@@ -159,6 +159,8 @@
     "modeFullText": "Full Text",
     "loadingFullText": "Loading full-text index...",
     "hadith": "Hadith",
+    "verse": "Verse",
+    "chapter": "Chapter",
     "tipsTitle": "Search Tips",
     "tipMultipleWords": "Multiple words use AND logic — searching \"mercy knowledge\" finds content containing both words. If too few results are found, it automatically broadens to match either word.",
     "tipArabic": "Search in Arabic or English. Arabic diacritics are ignored, so typing without tashkeel works.",

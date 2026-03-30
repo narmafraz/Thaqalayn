@@ -134,6 +134,8 @@
     "modeFullText": "Volltext",
     "loadingFullText": "Volltextindex wird geladen...",
     "hadith": "Hadith",
+    "verse": "Vers",
+    "chapter": "Kapitel",
     "tipsTitle": "Suchtipps",
     "tipMultipleWords": "Mehrere Wörter verwenden AND-Logik. Bei zu wenigen Ergebnissen wird automatisch erweitert.",
     "tipArabic": "Suchen Sie auf Arabisch oder Englisch. Arabische diakritische Zeichen werden ignoriert.",

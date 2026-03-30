@@ -134,6 +134,8 @@
     "modeFullText": "Texto completo",
     "loadingFullText": "Cargando índice de texto completo...",
     "hadith": "Hadiz",
+    "verse": "Verso",
+    "chapter": "Capítulo",
     "tipsTitle": "Consejos de búsqueda",
     "tipMultipleWords": "Múltiples palabras usan lógica AND. Si se encuentran pocos resultados, se amplía automáticamente.",
     "tipArabic": "Busque en árabe o inglés. Los diacríticos árabes se ignoran.",

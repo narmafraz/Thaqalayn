@@ -134,6 +134,8 @@
     "modeFullText": "Teks lengkap",
     "loadingFullText": "Memuat indeks teks lengkap...",
     "hadith": "Hadis",
+    "verse": "Ayat",
+    "chapter": "Bab",
     "tipsTitle": "Tips pencarian",
     "tipMultipleWords": "Beberapa kata menggunakan logika AND. Jika hasil terlalu sedikit, pencarian diperluas otomatis.",
     "tipArabic": "Cari dalam bahasa Arab atau Inggris. Diakritik Arab diabaikan.",

@@ -134,6 +134,8 @@
     "modeFullText": "Tam metin",
     "loadingFullText": "Tam metin dizini yükleniyor...",
     "hadith": "Hadis",
+    "verse": "Ayet",
+    "chapter": "Bölüm",
     "tipsTitle": "Arama ipuçları",
     "tipMultipleWords": "Birden fazla kelime AND mantığı kullanır. Az sonuç bulunursa otomatik olarak genişletilir.",
     "tipArabic": "Arapça veya İngilizce arayın. Arapça harekeler göz ardı edilir.",

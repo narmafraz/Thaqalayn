@@ -64,7 +64,7 @@
         (mousedown)="selectResult(result)">
         <div class="result-title">
           {{ result.title || result.titleAr }}
-          <span *ngIf="result.kind === 'hadith'" class="result-kind-badge">{{ 'search.hadith' | translate }}</span>
+          <span *ngIf="result.kind !== 'title'" class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
         </div>
         <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
         <div class="result-meta">{{ result.bookName }}</div>

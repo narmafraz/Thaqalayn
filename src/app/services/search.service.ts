@@ -13,7 +13,7 @@ export interface SearchResult {
   titleAr: string;
   snippet: string;
   bookName: string;
-  kind: 'title' | 'hadith';
+  kind: 'title' | 'hadith' | 'verse' | 'chapter';
   score: number;
 }
 
@@ -228,7 +228,7 @@ export class SearchService {
         titleAr: doc.ar,
         snippet: '',
         bookName: this.bookNameFromPath(doc.p),
-        kind: 'title' as const,
+        kind: 'chapter' as const,
         score: hit.score
       };
     });
@@ -246,7 +246,7 @@ export class SearchService {
     // Fetch up to 1000 results per book — effectively unlimited for realistic queries
     const perBookLimit = 1000;
 
-    for (const [, entry] of this.fullTextDbs) {
+    for (const [bookSlug, entry] of this.fullTextDbs) {
       // Use AND logic for multi-word queries, with OR fallback
       // Boost English translations and chapter titles above Arabic
       // BM25 tuning: lower b to reduce length penalty on longer hadiths
@@ -286,7 +286,7 @@ export class SearchService {
           titleAr: '',
           snippet,
           bookName: entry.bookName,
-          kind: 'hadith' as const,
+          kind: bookSlug === 'quran' ? 'verse' as const : 'hadith' as const,
           score: hit.score,
         });
       }
@@ -358,7 +358,7 @@ export class SearchService {
       titleAr: '',
       snippet: `Contains hadith about "${topicValue.replace(/_/g, ' ')}"`,
       bookName: this.bookNameFromPath(chapterPath),
-      kind: 'hadith' as const,
+      kind: (chapterPath.includes('/books/quran') ? 'verse' : 'hadith') as 'verse' | 'hadith',
       score: 1,
     }));
   }

@@ -54,7 +54,7 @@ export class ExternalLinksService {
     // al-quran.info — has Shia Pooya/Ali commentary
     links.push({
       label: 'Al-Quran.info',
-      url: `https://al-quran.info/${surah}/${ayah}`,
+      url: `https://al-quran.info/#${surah}:${ayah}`,
     });
 
     // Quranic Arabic Corpus — word-by-word morphology

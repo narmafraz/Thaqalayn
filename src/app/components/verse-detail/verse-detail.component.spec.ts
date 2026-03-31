@@ -158,7 +158,7 @@ describe('VerseDetailComponent', () => {
     };
 
     bookSubject.next(bookWithValidation);
-    component.showMetadata = true;
+
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
@@ -207,7 +207,7 @@ describe('VerseDetailComponent', () => {
     };
 
     bookSubject.next(bookWithUnverified);
-    component.showMetadata = true;
+
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;

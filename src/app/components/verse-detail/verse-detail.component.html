@@ -129,136 +129,129 @@
             </ng-container>
           </div>
 
-          <!-- Expand toggle for additional metadata -->
-          <button class="metadata-toggle-btn"
-                  (click)="showMetadata = !showMetadata"
-                  [attr.aria-label]="showMetadata ? 'Hide details' : 'Show details'"
-                  [matTooltip]="showMetadata ? 'Hide details' : 'Show details'">
-            <mat-icon>{{ showMetadata ? 'expand_less' : 'expand_more' }}</mat-icon>
-          </button>
+        </div>
+      </mat-card-footer>
 
-          <!-- Collapsible metadata panel -->
-          <div class="secondary-metadata" *ngIf="showMetadata">
+      <!-- Detail sections (always visible) -->
+      <div class="detail-sections">
 
-            <!-- Relations / Cross-references -->
-            <div class="detail-section" *ngIf="book.data.verse.relations as relations">
-              <div class="detail-section-header">
-                <span class="detail-section-label">{{ 'book.crossReferences' | translate }}</span>
-                <button class="compare-all-btn" (click)="loadAllRelations(relations)"
-                        *ngIf="!compareExpanded">
-                  <mat-icon>compare_arrows</mat-icon>
+        <!-- Relations / Cross-references -->
+        <div class="detail-section" *ngIf="book.data.verse.relations as relations">
+          <div class="detail-section-header">
+            <span class="detail-section-label">{{ 'book.crossReferences' | translate }}</span>
+            <button class="compare-all-btn" (click)="loadAllRelations(relations)"
+                    *ngIf="!compareExpanded">
+              <mat-icon>compare_arrows</mat-icon>
+            </button>
+            <button class="compare-all-btn" (click)="toggleCompare()"
+                    *ngIf="compareExpanded">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <ng-container *ngFor="let relation of relations | keyvalue">
+            <div class="relation-group" *ngIf="relation.value?.length">
+              <span class="relation-type">{{ relation.key }}:</span>
+              <span *ngFor="let rLink of relation.value" class="relation-link-wrapper">
+                <app-path-link [path]="rLink" class="relation-link"></app-path-link>
+                <button class="compare-btn" (click)="loadCompareVerse(rLink)"
+                        *ngIf="!isCompareLoaded(rLink)"
+                        [matTooltip]="'tooltip.previewHadith' | translate">
+                  <mat-icon>visibility</mat-icon>
                 </button>
-                <button class="compare-all-btn" (click)="toggleCompare()"
-                        *ngIf="compareExpanded">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </div>
-              <ng-container *ngFor="let relation of relations | keyvalue">
-                <div class="relation-group" *ngIf="relation.value?.length">
-                  <span class="relation-type">{{ relation.key }}:</span>
-                  <span *ngFor="let rLink of relation.value" class="relation-link-wrapper">
-                    <app-path-link [path]="rLink" class="relation-link"></app-path-link>
-                    <button class="compare-btn" (click)="loadCompareVerse(rLink)"
-                            *ngIf="!isCompareLoaded(rLink)"
-                            [matTooltip]="'tooltip.previewHadith' | translate">
-                      <mat-icon>visibility</mat-icon>
-                    </button>
-                  </span>
-                </div>
-              </ng-container>
-
-              <!-- Inline comparison panels -->
-              <div class="compare-panels" *ngIf="compareExpanded && compareEntries.size > 0">
-                <ng-container *ngFor="let entry of compareEntries | keyvalue">
-                  <div class="compare-panel" *ngIf="entry.value as cmp">
-                    <div class="compare-panel-header">
-                      <a [routerLink]="['/books', removeBookPrefix(cmp.path)]" queryParamsHandling="preserve" class="compare-title">
-                        {{ cmp.chapterTitle || removeBookPrefix(cmp.path) }}
-                      </a>
-                    </div>
-                    <div class="compare-loading" *ngIf="cmp.loading">
-                      <mat-spinner diameter="18"></mat-spinner>
-                    </div>
-                    <div class="compare-error" *ngIf="cmp.error && !cmp.loading">{{ cmp.error }}</div>
-                    <div class="compare-content" *ngIf="cmp.verse && !cmp.loading">
-                      <p *ngFor="let txt of cmp.verse.text" class="compare-arabic arabic" dir="rtl" lang="ar" [innerHTML]="txt"></p>
-                      <div class="compare-translation" *ngIf="getFirstTranslation(cmp.verse) as trl">
-                        <p *ngFor="let t of trl" [innerHTML]="t"></p>
-                      </div>
-                    </div>
-                  </div>
-                </ng-container>
-              </div>
+              </span>
             </div>
+          </ng-container>
 
-            <!-- AI Quran Cross-References -->
-            <div class="detail-section" *ngIf="book.data.verse.ai?.related_quran?.length">
-              <span class="detail-section-label">{{ 'book.quranReferences' | translate }}</span>
-              <div class="ai-quran-list">
-                <div *ngFor="let qref of book.data.verse.ai.related_quran" class="ai-quran-item">
-                  <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
-                     [fragment]="getQuranRefFragment(qref.ref)"
-                     queryParamsHandling="preserve"
-                     class="ai-quran-link">
-                    Surah {{ qref.ref.split(':')[0] }}, Ayah {{ qref.ref.split(':')[1] }}
+          <!-- Inline comparison panels -->
+          <div class="compare-panels" *ngIf="compareExpanded && compareEntries.size > 0">
+            <ng-container *ngFor="let entry of compareEntries | keyvalue">
+              <div class="compare-panel" *ngIf="entry.value as cmp">
+                <div class="compare-panel-header">
+                  <a [routerLink]="['/books', removeBookPrefix(cmp.path)]" queryParamsHandling="preserve" class="compare-title">
+                    {{ cmp.chapterTitle || removeBookPrefix(cmp.path) }}
                   </a>
-                  <span [class]="'ai-quran-rel-badge ai-quran-rel-' + qref.relationship">{{ qref.relationship }}</span>
+                </div>
+                <div class="compare-loading" *ngIf="cmp.loading">
+                  <mat-spinner diameter="18"></mat-spinner>
+                </div>
+                <div class="compare-error" *ngIf="cmp.error && !cmp.loading">{{ cmp.error }}</div>
+                <div class="compare-content" *ngIf="cmp.verse && !cmp.loading">
+                  <p *ngFor="let txt of cmp.verse.text" class="compare-arabic arabic" dir="rtl" lang="ar" [innerHTML]="txt"></p>
+                  <div class="compare-translation" *ngIf="getFirstTranslation(cmp.verse) as trl">
+                    <p *ngFor="let t of trl" [innerHTML]="t"></p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
+          </div>
+        </div>
 
-            <!-- AI Key Phrases -->
-            <div class="detail-section" *ngIf="book.data.verse.ai?.key_phrases?.length">
-              <span class="detail-section-label">{{ 'book.keyPhrases' | translate }}</span>
-              <div class="ai-phrase-list">
-                <a *ngFor="let phrase of book.data.verse.ai.key_phrases"
-                   class="ai-phrase-item"
-                   [routerLink]="['/phrases', stripDiacritics(phrase.phrase_ar)]">
-                  <span class="ai-phrase-ar" lang="ar" dir="rtl">{{ phrase.phrase_ar }}</span>
-                  <span class="ai-phrase-en">{{ phrase.phrase_en }}</span>
-                  <span class="ai-phrase-category">{{ formatLabel(phrase.category) }}</span>
-                </a>
-              </div>
-            </div>
-
-            <!-- AI Similar Hadiths -->
-            <div class="detail-section" *ngIf="book.data.verse.ai?.similar_content_hints?.length">
-              <span class="detail-section-label">{{ 'book.relatedNarrations' | translate }}</span>
-              <div class="ai-similar-list">
-                <div *ngFor="let hint of book.data.verse.ai.similar_content_hints" class="ai-similar-item">
-                  <span class="ai-similar-theme">{{ formatLabel(hint.theme) }}</span>
-                  <p class="ai-similar-desc">{{ hint.description }}</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Cross-validation -->
-            <div class="detail-section" *ngIf="book.data.cross_validation as cv">
-              <div class="validation-badge" [class.verified]="cv.status === 'verified'" [class.unverified]="cv.status !== 'verified'">
-                <mat-icon>{{ cv.status === 'verified' ? 'verified' : 'help_outline' }}</mat-icon>
-                <span *ngIf="cv.status === 'verified'">{{ 'book.verifiedFrom' | translate }} {{ cv.sources.length }} {{ cv.sources.length > 1 ? ('book.sourcesWord' | translate) : ('book.sourceWord' | translate) }}</span>
-                <span *ngIf="cv.status !== 'verified'">{{ 'book.unverified' | translate }}</span>
-              </div>
-              <app-diff-viewer *ngIf="cv.diffs && cv.diffs.length > 0" [diffs]="cv.diffs"></app-diff-viewer>
-            </div>
-
-            <!-- External Links -->
-            <div class="detail-section" *ngIf="externalLinks.length > 0">
-              <button mat-stroked-button [matMenuTriggerFor]="externalLinksMenu" class="external-links-btn">
-                <mat-icon>open_in_new</mat-icon>
-                {{ 'book.viewOnOtherSites' | translate }}
-                <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
-              </button>
-              <mat-menu #externalLinksMenu="matMenu">
-                <a mat-menu-item *ngFor="let link of externalLinks"
-                   [href]="link.url" target="_blank" rel="noopener noreferrer">
-                  {{ link.label }}
-                </a>
-              </mat-menu>
+        <!-- AI Quran Cross-References -->
+        <div class="detail-section" *ngIf="book.data.verse.ai?.related_quran?.length">
+          <span class="detail-section-label">{{ 'book.quranReferences' | translate }}</span>
+          <div class="ai-quran-list">
+            <div *ngFor="let qref of book.data.verse.ai.related_quran" class="ai-quran-item">
+              <a [routerLink]="['/books', getQuranRefLink(qref.ref)]"
+                 [fragment]="getQuranRefFragment(qref.ref)"
+                 queryParamsHandling="preserve"
+                 class="ai-quran-link">
+                Surah {{ qref.ref.split(':')[0] }}, Ayah {{ qref.ref.split(':')[1] }}
+              </a>
+              <span [class]="'ai-quran-rel-badge ai-quran-rel-' + qref.relationship">{{ qref.relationship }}</span>
             </div>
           </div>
         </div>
-      </mat-card-footer>
+
+        <!-- AI Key Phrases -->
+        <div class="detail-section" *ngIf="book.data.verse.ai?.key_phrases?.length">
+          <span class="detail-section-label">{{ 'book.keyPhrases' | translate }}</span>
+          <div class="ai-phrase-list">
+            <a *ngFor="let phrase of book.data.verse.ai.key_phrases"
+               class="ai-phrase-item"
+               [routerLink]="['/phrases', stripDiacritics(phrase.phrase_ar)]">
+              <span class="ai-phrase-ar" lang="ar" dir="rtl">{{ phrase.phrase_ar }}</span>
+              <span class="ai-phrase-en">{{ phrase.phrase_en }}</span>
+              <span class="ai-phrase-category">{{ formatLabel(phrase.category) }}</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- AI Similar Hadiths -->
+        <div class="detail-section" *ngIf="book.data.verse.ai?.similar_content_hints?.length">
+          <span class="detail-section-label">{{ 'book.relatedNarrations' | translate }}</span>
+          <div class="ai-similar-list">
+            <div *ngFor="let hint of book.data.verse.ai.similar_content_hints" class="ai-similar-item">
+              <span class="ai-similar-theme">{{ formatLabel(hint.theme) }}</span>
+              <p class="ai-similar-desc">{{ hint.description }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cross-validation -->
+        <div class="detail-section" *ngIf="book.data.cross_validation as cv">
+          <div class="validation-badge" [class.verified]="cv.status === 'verified'" [class.unverified]="cv.status !== 'verified'">
+            <mat-icon>{{ cv.status === 'verified' ? 'verified' : 'help_outline' }}</mat-icon>
+            <span *ngIf="cv.status === 'verified'">{{ 'book.verifiedFrom' | translate }} {{ cv.sources.length }} {{ cv.sources.length > 1 ? ('book.sourcesWord' | translate) : ('book.sourceWord' | translate) }}</span>
+            <span *ngIf="cv.status !== 'verified'">{{ 'book.unverified' | translate }}</span>
+          </div>
+          <app-diff-viewer *ngIf="cv.diffs && cv.diffs.length > 0" [diffs]="cv.diffs"></app-diff-viewer>
+        </div>
+
+        <!-- External Links -->
+        <div class="detail-section" *ngIf="externalLinks.length > 0">
+          <button mat-stroked-button [matMenuTriggerFor]="externalLinksMenu" class="external-links-btn">
+            <mat-icon>open_in_new</mat-icon>
+            {{ 'book.viewOnOtherSites' | translate }}
+            <mat-icon class="dropdown-arrow">arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #externalLinksMenu="matMenu">
+            <a mat-menu-item *ngFor="let link of externalLinks"
+               [href]="link.url" target="_blank" rel="noopener noreferrer">
+              {{ link.label }}
+            </a>
+          </mat-menu>
+        </div>
+      </div>
 
       <!-- Note display -->
       <div class="note-display" *ngIf="hasNote && !showNoteEditor">

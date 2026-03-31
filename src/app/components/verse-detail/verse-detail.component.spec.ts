@@ -109,22 +109,16 @@ describe('VerseDetailComponent', () => {
     expect(component.getNavRouterLink('/books/quran:1:1')).toBe('quran:1:1');
   });
 
-  it('should render grading badges in the template', () => {
+  it('should render grading badges in the footer', () => {
     const compiled = fixture.nativeElement as HTMLElement;
-    const gradingSection = compiled.querySelector('.gradings-section');
-    expect(gradingSection).toBeTruthy();
-
-    const badges = compiled.querySelectorAll('.grading-badge');
+    const badges = compiled.querySelectorAll('.grading-chip');
     expect(badges.length).toBe(1);
 
     // Should have the sahih class
     expect(badges[0].classList.contains('grading-sahih')).toBe(true);
   });
 
-  it('should render external links button when external links are available', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const externalLinksBtn = compiled.querySelector('.external-links-btn');
-    expect(externalLinksBtn).toBeTruthy();
+  it('should have external links available', () => {
     expect(component.externalLinks.length).toBeGreaterThan(0);
   });
 
@@ -150,7 +144,7 @@ describe('VerseDetailComponent', () => {
     expect(validationSection).toBeFalsy();
   });
 
-  it('should render validation section when cross_validation is present', () => {
+  it('should render validation badge when cross_validation is present and metadata expanded', () => {
     const bookWithValidation: VerseDetail = {
       ...mockBook,
       data: {
@@ -164,12 +158,10 @@ describe('VerseDetailComponent', () => {
     };
 
     bookSubject.next(bookWithValidation);
+    component.showMetadata = true;
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    const validationSection = compiled.querySelector('.validation-section');
-    expect(validationSection).toBeTruthy();
-
     const badge = compiled.querySelector('.validation-badge.verified');
     expect(badge).toBeTruthy();
   });
@@ -201,7 +193,7 @@ describe('VerseDetailComponent', () => {
     });
   });
 
-  it('should render unverified badge for non-verified status', () => {
+  it('should render unverified badge for non-verified status when metadata expanded', () => {
     const bookWithUnverified: VerseDetail = {
       ...mockBook,
       data: {
@@ -215,6 +207,7 @@ describe('VerseDetailComponent', () => {
     };
 
     bookSubject.next(bookWithUnverified);
+    component.showMetadata = true;
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;

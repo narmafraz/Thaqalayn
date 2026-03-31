@@ -60,6 +60,9 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   newCommentText = '';
   isSignedIn = false;
 
+  // Collapsible metadata panel
+  showMetadata = false;
+
   // AI preference visibility flags
   showContentTypeBadges = true;
   showTopicTags = true;

@@ -43,7 +43,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   // Tafsir state
   tafsirEditions: TafsirEdition[] = [];
-  selectedTafsirEdition = 'en-tafisr-ibn-kathir';
+  selectedTafsirEdition = 'en.mizan';
   expandedTafsir = new Map<number, string>();
   loadingTafsir = new Set<number>();
 
@@ -106,7 +106,13 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private aiPrefs: AiPreferencesService,
     private relatedChaptersService: RelatedChaptersService,
   ) {
-    this.tafsirEditions = this.tafsirService.editions;
+    this.tafsirService.loadEditions().subscribe(editions => {
+      this.tafsirEditions = editions;
+      if (editions.length > 0 && !editions.find(e => e.id === this.selectedTafsirEdition)) {
+        this.selectedTafsirEdition = editions[0].id;
+      }
+      this.cdr.markForCheck();
+    });
     this.fragment$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(fragment => {
       setTimeout(() => {
           this.viewportScroller.scrollToAnchor(fragment);

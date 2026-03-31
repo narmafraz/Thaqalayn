@@ -705,6 +705,38 @@ mat-mdc-card {
     font-size: 14px;
     line-height: 1.8;
     color: var(--text-primary, #333);
+
+    ::ng-deep {
+      .tafsir-arabic {
+        font-family: 'Traditional Arabic', 'Noto Naskh Arabic', 'Arial', serif;
+        font-size: 20px;
+        line-height: 2;
+        padding: 8px 12px;
+        margin: 8px 0;
+        background: var(--arabic-bg, rgba(0, 0, 0, 0.03));
+        border-radius: 4px;
+      }
+
+      .tafsir-english,
+      .tafsir-urdu {
+        font-size: 14px;
+        padding: 4px 0;
+        margin: 4px 0;
+        font-style: italic;
+      }
+
+      h1, h2, h3, h4 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 12px 0 6px;
+      }
+
+      h1 { font-size: 17px; }
+
+      p {
+        margin: 6px 0;
+      }
+    }
   }
 }
 

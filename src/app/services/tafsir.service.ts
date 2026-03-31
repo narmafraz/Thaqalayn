@@ -1,55 +1,81 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { map, catchError, shareReplay } from 'rxjs/operators';
+import { map, catchError, shareReplay, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
 
 export interface TafsirEdition {
+  id: string;
   name: string;
-  author_name: string;
-  slug: string;
+  name_en: string;
+  author: string;
+  author_en: string;
   language: string;
+  source: string;
 }
 
 export interface TafsirAyah {
-  id: number;
-  surah_number: number;
-  ayah_number: number;
+  ayah: number;
   text: string;
 }
 
-const TAFSIR_CDN = 'https://cdn.jsdelivr.net/gh/spa5k/tafsir_api/tafsir';
-
-// Curated list of English tafsir editions available on the CDN
-const DEFAULT_EDITIONS: TafsirEdition[] = [
-  { name: 'Tafsir Ibn Kathir', author_name: 'Ibn Kathir', slug: 'en-tafisr-ibn-kathir', language: 'en' },
-  { name: 'Tafsir al-Jalalayn', author_name: 'Jalal ad-Din al-Mahalli & Jalal ad-Din as-Suyuti', slug: 'en-al-jalalayn', language: 'en' },
-  { name: 'Maarif-ul-Quran', author_name: 'Mufti Muhammad Shafi', slug: 'en-tafsir-maarif-ul-quran', language: 'en' },
-];
+const TAFSIR_BASE = environment.apiBaseUrl + 'tafsir';
 
 @Injectable({ providedIn: 'root' })
 export class TafsirService {
   private http = inject(HttpClient);
   private cache = new Map<string, Observable<TafsirAyah[]>>();
 
-  readonly editions: TafsirEdition[] = DEFAULT_EDITIONS;
+  editions: TafsirEdition[] = [];
+  private editionsLoaded = false;
 
-  getTafsir(surah: number, edition: string = 'en-tafsir-ibne-kathir'): Observable<TafsirAyah[]> {
+  loadEditions(): Observable<TafsirEdition[]> {
+    if (this.editionsLoaded) {
+      return of(this.editions);
+    }
+    return this.http.get<TafsirEdition[]>(`${TAFSIR_BASE}/editions.json`).pipe(
+      tap(editions => {
+        this.editions = editions;
+        this.editionsLoaded = true;
+      }),
+      catchError(() => {
+        this.editions = [];
+        this.editionsLoaded = true;
+        return of([]);
+      }),
+      shareReplay(1),
+    );
+  }
+
+  getEditionsByLanguage(): Map<string, TafsirEdition[]> {
+    const byLang = new Map<string, TafsirEdition[]>();
+    for (const ed of this.editions) {
+      const list = byLang.get(ed.language) || [];
+      list.push(ed);
+      byLang.set(ed.language, list);
+    }
+    return byLang;
+  }
+
+  getTafsir(surah: number, edition: string): Observable<TafsirAyah[]> {
     const key = `${edition}:${surah}`;
     if (this.cache.has(key)) {
       return this.cache.get(key)!;
     }
 
-    const url = `${TAFSIR_CDN}/${edition}/${surah}.json`;
+    const url = `${TAFSIR_BASE}/${edition}/${surah}.json`;
     const result$ = this.http.get<any>(url).pipe(
       map(response => {
-        // The API returns { ayahs: [...] } or just an array
+        // New format: { blocks: [...], ayahs: [{ ayah, block }] }
+        // Each ayah references a block index to avoid duplicating large commentary text
+        const blocks: string[] = response.blocks || [];
         const ayahs = response.ayahs || response;
         if (!Array.isArray(ayahs)) return [];
         return ayahs.map((a: any) => ({
-          id: a.id || 0,
-          surah_number: a.surah || a.surah_number || surah,
-          ayah_number: a.ayah || a.ayah_number || a.number || 0,
-          text: a.text || '',
+          ayah: a.ayah || a.ayah_number || 0,
+          text: a.block !== undefined && blocks.length > 0
+            ? blocks[a.block] || ''
+            : a.text || '',
         }));
       }),
       catchError(() => of([])),
@@ -60,10 +86,10 @@ export class TafsirService {
     return result$;
   }
 
-  getAyahTafsir(surah: number, ayah: number, edition: string = 'en-tafsir-ibne-kathir'): Observable<string> {
+  getAyahTafsir(surah: number, ayah: number, edition: string): Observable<string> {
     return this.getTafsir(surah, edition).pipe(
       map(ayahs => {
-        const match = ayahs.find(a => a.ayah_number === ayah);
+        const match = ayahs.find(a => a.ayah === ayah);
         return match?.text || '';
       }),
     );

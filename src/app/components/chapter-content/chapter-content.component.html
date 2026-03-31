@@ -206,7 +206,7 @@
                            [(ngModel)]="selectedTafsirEdition"
                            (selectionChange)="onTafsirEditionChange(book.index)"
                            [attr.aria-label]="'book.tafsir' | translate">
-                  <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.slug">{{ ed.name }}</mat-option>
+                  <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.id">{{ ed.name_en }} ({{ ed.language }})</mat-option>
                 </mat-select>
               </div>
               <div class="tafsir-loading" *ngIf="loadingTafsir.has(verse.local_index)">
@@ -422,7 +422,7 @@
                      [(ngModel)]="selectedTafsirEdition"
                      (selectionChange)="onTafsirEditionChange(book.index)"
                      [attr.aria-label]="'book.tafsir' | translate">
-            <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.slug">{{ ed.name }}</mat-option>
+            <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.id">{{ ed.name_en }} ({{ ed.language }})</mat-option>
           </mat-select>
         </div>
         <div class="tafsir-loading" *ngIf="loadingTafsir.has(verse.local_index)">

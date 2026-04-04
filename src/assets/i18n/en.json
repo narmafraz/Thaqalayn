@@ -76,6 +76,8 @@
     "compareAll": "Compare all",
     "hideComparison": "Hide comparison",
     "shareImage": "Share as image",
+    "copyText": "Copy text",
+    "textCopied": "Copied!",
     "showDifferences": "Show text differences",
     "hideDifferences": "Hide differences",
     "jumpToVerse": "Jump to verse",

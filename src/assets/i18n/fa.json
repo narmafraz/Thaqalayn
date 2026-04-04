@@ -84,7 +84,9 @@
     "relatedNarrations": "روایات مرتبط",
     "loadingCommentary": "در حال بارگذاری تفسیر...",
     "unknownBookPart": "متأسفانه نمی‌دانیم چگونه این بخش را نمایش دهیم!",
-    "relatedChapters": "Related Chapters in Other Books"
+    "relatedChapters": "Related Chapters in Other Books",
+    "copyText": "کپی متن",
+    "textCopied": "کپی شد!"
   },
   "narrator": {
     "narratedAhadith": "احادیث روایت شده",

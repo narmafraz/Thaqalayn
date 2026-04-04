@@ -84,7 +84,9 @@
     "relatedNarrations": "روايات ذات صلة",
     "loadingCommentary": "جاري تحميل التفسير...",
     "unknownBookPart": "لا نعرف كيفية عرض هذا الجزء، نعتذر!",
-    "relatedChapters": "فصول ذات صلة في كتب أخرى"
+    "relatedChapters": "فصول ذات صلة في كتب أخرى",
+    "copyText": "نسخ النص",
+    "textCopied": "تم النسخ!"
   },
   "narrator": {
     "narratedAhadith": "الأحاديث المروية",

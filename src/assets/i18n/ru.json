@@ -84,7 +84,9 @@
     "relatedNarrations": "Связанные повествования",
     "loadingCommentary": "Загрузка комментария...",
     "unknownBookPart": "Не знаем, как отобразить эту часть, извините!",
-    "relatedChapters": "Related Chapters in Other Books"
+    "relatedChapters": "Related Chapters in Other Books",
+    "copyText": "Копировать текст",
+    "textCopied": "Скопировано!"
   },
   "narrator": {
     "narratedAhadith": "Переданные хадисы",

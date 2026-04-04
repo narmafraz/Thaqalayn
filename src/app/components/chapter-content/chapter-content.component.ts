@@ -61,6 +61,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // Share as image state
   generatingImageIndex: number | null = null;
 
+  // Copy text state
+  copiedVerseIndex: number | null = null;
+
   // Inline compare state
   expandedCompare = new Map<string, { verse: Verse | null; title: string; loading: boolean; error: string | null }>();
 
@@ -643,6 +646,25 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     const segments = parts.slice(1);
     if (!segments.length) return bookName;
     return `${bookName} ${segments.join(':')}`;
+  }
+
+  async copyHadithText(book: ChapterContent, verse: Verse, crumbs: Crumb[]): Promise<void> {
+    const arabicText = (verse.text || []).join('\n').replace(/<[^>]*>/g, '');
+    const translations = verse.translations || {};
+    const transKeys = Object.keys(translations);
+    const transTexts = transKeys.length > 0 ? translations[transKeys[0]] : [];
+    const translationText = (transTexts || []).join('\n').replace(/<[^>]*>/g, '');
+    const reference = `${verse.part_type} ${verse.local_index}`;
+    const bookTitle = this.getBookName(crumbs) || book.data.titles?.en || book.index;
+
+    const lines = [arabicText, '', translationText, '', `— ${bookTitle}, ${reference}`];
+    await navigator.clipboard.writeText(lines.join('\n'));
+    this.copiedVerseIndex = verse.local_index;
+    this.cdr.markForCheck();
+    setTimeout(() => {
+      this.copiedVerseIndex = null;
+      this.cdr.markForCheck();
+    }, 2000);
   }
 
   async shareAsImage(book: ChapterContent, verse: Verse, crumbs: Crumb[]): Promise<void> {

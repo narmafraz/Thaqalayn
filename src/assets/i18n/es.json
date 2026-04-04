@@ -84,7 +84,9 @@
     "relatedNarrations": "Narraciones relacionadas",
     "loadingCommentary": "Cargando comentario...",
     "unknownBookPart": "No sabemos cómo mostrar esta parte, ¡lo sentimos!",
-    "relatedChapters": "Related Chapters in Other Books"
+    "relatedChapters": "Related Chapters in Other Books",
+    "copyText": "Copiar texto",
+    "textCopied": "¡Copiado!"
   },
   "narrator": {
     "narratedAhadith": "Hadices narrados",

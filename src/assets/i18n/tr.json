@@ -84,7 +84,9 @@
     "relatedNarrations": "İlgili Rivayetler",
     "loadingCommentary": "Tefsir yükleniyor...",
     "unknownBookPart": "Bu bölümü nasıl görüntüleyeceğimizi bilmiyoruz, üzgünüz!",
-    "relatedChapters": "Related Chapters in Other Books"
+    "relatedChapters": "Related Chapters in Other Books",
+    "copyText": "Metni kopyala",
+    "textCopied": "Kopyalandı!"
   },
   "narrator": {
     "narratedAhadith": "Rivayet edilen hadisler",

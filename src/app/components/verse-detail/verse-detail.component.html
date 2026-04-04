@@ -95,6 +95,12 @@
               <mat-icon>{{ linkCopied ? 'check' : 'share' }}</mat-icon>
             </button>
             <button class="action-icon-btn"
+                    (click)="copyHadithText(book)"
+                    [attr.aria-label]="textCopied ? ('book.textCopied' | translate) : ('book.copyText' | translate)"
+                    [matTooltip]="textCopied ? ('book.textCopied' | translate) : ('book.copyText' | translate)">
+              <mat-icon>{{ textCopied ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
+            <button class="action-icon-btn"
                     (click)="shareAsImage(book, currentTranslation)"
                     [disabled]="generatingImage"
                     [attr.aria-label]="'book.shareImage' | translate"

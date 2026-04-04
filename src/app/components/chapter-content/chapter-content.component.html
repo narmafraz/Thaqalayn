@@ -314,6 +314,13 @@
                     [matTooltip]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
               <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
             </button>
+            <!-- Copy text -->
+            <button class="action-icon-btn"
+                    (click)="copyHadithText(book, verse, crumbs)"
+                    [attr.aria-label]="copiedVerseIndex === verse.local_index ? ('book.textCopied' | translate) : ('book.copyText' | translate)"
+                    [matTooltip]="copiedVerseIndex === verse.local_index ? ('book.textCopied' | translate) : ('book.copyText' | translate)">
+              <mat-icon>{{ copiedVerseIndex === verse.local_index ? 'check' : 'content_copy' }}</mat-icon>
+            </button>
             <!-- Share as image -->
             <button class="action-icon-btn"
                     (click)="shareAsImage(book, verse, crumbs)"

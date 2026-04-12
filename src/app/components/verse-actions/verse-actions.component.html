@@ -1,0 +1,93 @@
+<!-- Label (verse-detail mode) -->
+<span class="hadith-label" *ngIf="label">{{ label }}</span>
+
+<!-- View details (chapter mode) -->
+<a *ngIf="detailPath"
+   [routerLink]="['/books', detailPath]"
+   queryParamsHandling="preserve"
+   [attr.aria-label]="'View ' + (verse?.part_type || '') + ' ' + (verse?.local_index || '') + ' details'"
+   class="verse-detail-link"
+   [matTooltip]="'tooltip.viewDetails' | translate">
+  <mat-icon>open_in_new</mat-icon>
+</a>
+
+<!-- Bookmark -->
+<button class="bookmark-icon-btn"
+        (click)="bookmarkToggle.emit()"
+        [attr.aria-label]="isBookmarked ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)"
+        [matTooltip]="isBookmarked ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
+  <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+</button>
+
+<!-- Copy anchor link (chapter mode) -->
+<a *ngIf="anchorFragment"
+   class="action-icon-btn"
+   [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="anchorFragment"
+   [attr.aria-label]="'book.copyLink' | translate"
+   [matTooltip]="'book.copyLink' | translate">
+  <mat-icon>link</mat-icon>
+</a>
+
+<!-- Note toggle -->
+<button class="action-icon-btn"
+        [class.has-note]="hasNote"
+        (click)="noteToggle.emit()"
+        [attr.aria-label]="hasNote ? ('annotation.edit' | translate) : ('annotation.add' | translate)"
+        [matTooltip]="hasNote ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
+  <mat-icon>{{ hasNote ? 'edit_note' : 'note_add' }}</mat-icon>
+</button>
+
+<!-- Share link (verse-detail mode) -->
+<button *ngIf="showShareLink"
+        class="action-icon-btn"
+        (click)="linkShare.emit()"
+        [attr.aria-label]="'book.share' | translate"
+        [matTooltip]="isLinkCopied ? ('book.linkCopied' | translate) : ('book.share' | translate)">
+  <mat-icon>{{ isLinkCopied ? 'check' : 'share' }}</mat-icon>
+</button>
+
+<!-- Copy text -->
+<button class="action-icon-btn"
+        (click)="copyText()"
+        [attr.aria-label]="textCopied ? ('book.textCopied' | translate) : ('book.copyText' | translate)"
+        [matTooltip]="textCopied ? ('book.textCopied' | translate) : ('book.copyText' | translate)">
+  <mat-icon>{{ textCopied ? 'check' : 'content_copy' }}</mat-icon>
+</button>
+
+<!-- Share as image -->
+<button class="action-icon-btn"
+        (click)="imageShare.emit()"
+        [disabled]="isGeneratingImage"
+        [attr.aria-label]="'book.shareImage' | translate"
+        [matTooltip]="'book.shareImage' | translate">
+  <mat-icon>{{ isGeneratingImage ? 'hourglass_empty' : 'image' }}</mat-icon>
+</button>
+
+<!-- View in chapter (verse-detail mode) -->
+<a *ngIf="chapterPath"
+   class="action-icon-btn"
+   [routerLink]="['/books', chapterPath]"
+   [fragment]="anchorFragment"
+   queryParamsHandling="preserve"
+   [attr.aria-label]="'book.viewInChapter' | translate"
+   [matTooltip]="'book.viewInChapter' | translate">
+  <mat-icon>menu_book</mat-icon>
+</a>
+
+<!-- Audio (Quran only) -->
+<button *ngIf="isQuran"
+        class="action-icon-btn audio-icon-btn"
+        (click)="audioToggle.emit()"
+        [attr.aria-label]="isPlaying ? ('audio.pause' | translate) : ('audio.play' | translate)"
+        [matTooltip]="isPlaying ? ('audio.pause' | translate) : ('audio.play' | translate)">
+  <mat-icon>{{ isPlaying ? 'pause_circle' : 'play_circle' }}</mat-icon>
+</button>
+
+<!-- Tafsir (Quran only) -->
+<button *ngIf="isQuran"
+        class="action-icon-btn tafsir-icon-btn"
+        (click)="tafsirToggle.emit()"
+        [attr.aria-label]="'book.tafsir' | translate"
+        [matTooltip]="'book.tafsir' | translate">
+  <mat-icon>{{ isTafsirExpanded ? 'menu_book' : 'auto_stories' }}</mat-icon>
+</button>

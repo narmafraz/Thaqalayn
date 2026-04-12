@@ -74,47 +74,24 @@
       <mat-card-footer>
         <div class="ref">
           <div class="refLink">
-            <span class="hadith-label">{{ book.data.verse.part_type }} {{ book.data.verse.local_index }}</span>
-            <button class="bookmark-icon-btn"
-                    (click)="toggleBookmark(book)"
-                    [attr.aria-label]="isBookmarked ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)"
-                    [matTooltip]="isBookmarked ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
-              <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-            </button>
-            <button class="action-icon-btn"
-                    (click)="showNoteEditor = !showNoteEditor"
-                    [class.has-note]="hasNote"
-                    [attr.aria-label]="hasNote ? ('annotation.edit' | translate) : ('annotation.add' | translate)"
-                    [matTooltip]="hasNote ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
-              <mat-icon>{{ hasNote ? 'edit_note' : 'note_add' }}</mat-icon>
-            </button>
-            <button class="action-icon-btn"
-                    (click)="shareHadith(book.index)"
-                    [attr.aria-label]="'book.share' | translate"
-                    [matTooltip]="linkCopied ? ('book.linkCopied' | translate) : ('book.share' | translate)">
-              <mat-icon>{{ linkCopied ? 'check' : 'share' }}</mat-icon>
-            </button>
-            <button class="action-icon-btn"
-                    (click)="copyHadithText(book)"
-                    [attr.aria-label]="textCopied ? ('book.textCopied' | translate) : ('book.copyText' | translate)"
-                    [matTooltip]="textCopied ? ('book.textCopied' | translate) : ('book.copyText' | translate)">
-              <mat-icon>{{ textCopied ? 'check' : 'content_copy' }}</mat-icon>
-            </button>
-            <button class="action-icon-btn"
-                    (click)="shareAsImage(book, currentTranslation)"
-                    [disabled]="generatingImage"
-                    [attr.aria-label]="'book.shareImage' | translate"
-                    [matTooltip]="'book.shareImage' | translate">
-              <mat-icon>{{ generatingImage ? 'hourglass_empty' : 'image' }}</mat-icon>
-            </button>
-            <a class="action-icon-btn"
-               [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
-               [fragment]="'h' + book.data.verse.local_index"
-               queryParamsHandling="preserve"
-               [attr.aria-label]="'book.viewInChapter' | translate"
-               [matTooltip]="'book.viewInChapter' | translate">
-              <mat-icon>menu_book</mat-icon>
-            </a>
+            <app-verse-actions
+              [versePath]="book.index"
+              [verse]="book.data.verse"
+              [bookTitle]="book.data.chapter_title?.en || book.index"
+              [preferredTranslation]="currentTranslation"
+              [isBookmarked]="isBookmarked"
+              [hasNote]="hasNote"
+              [isGeneratingImage]="generatingImage"
+              [label]="book.data.verse.part_type + ' ' + book.data.verse.local_index"
+              [showShareLink]="true"
+              [isLinkCopied]="linkCopied"
+              [chapterPath]="getChapterRouterLink(book.data.chapter_path)"
+              [anchorFragment]="'h' + book.data.verse.local_index"
+              (bookmarkToggle)="toggleBookmark(book)"
+              (noteToggle)="showNoteEditor = !showNoteEditor"
+              (imageShare)="shareAsImage(book, currentTranslation)"
+              (linkShare)="shareHadith(book.index)">
+            </app-verse-actions>
           </div>
 
           <!-- Inline grading badges -->

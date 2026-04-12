@@ -85,51 +85,25 @@
             <mat-card-footer>
               <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
                 <div class="refLink">
-                  <a [routerLink]="['/books', book.index + ':' + verse.local_index]"
-                     queryParamsHandling="preserve"
-                     [attr.aria-label]="'View ' + verse.part_type + ' ' + verse.local_index + ' details'"
-                     class="verse-detail-link"
-                     [matTooltip]="'tooltip.viewDetails' | translate">
-                    <mat-icon>open_in_new</mat-icon>
-                  </a>
-                  <button class="bookmark-icon-btn"
-                          (click)="toggleVerseBookmark(book.index, verse, crumbs)"
-                          [attr.aria-label]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)"
-                          [matTooltip]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
-                    <mat-icon>{{ isVerseBookmarked(book.index, verse) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-                  </button>
-                  <a class="action-icon-btn"
-                     [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index"
-                     [attr.aria-label]="'book.copyLink' | translate"
-                     [matTooltip]="'book.copyLink' | translate">
-                    <mat-icon>link</mat-icon>
-                  </a>
-                  <button class="action-icon-btn"
-                          [class.has-note]="hasNote(book.index, verse)"
-                          (click)="toggleNoteEditor(book.index, verse)"
-                          [attr.aria-label]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)"
-                          [matTooltip]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
-                    <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
-                  </button>
-                  <button class="action-icon-btn"
-                          (click)="shareAsImage(book, verse, crumbs)"
-                          [disabled]="generatingImageIndex === verse.local_index"
-                          [attr.aria-label]="'book.shareImage' | translate"
-                          [matTooltip]="'book.shareImage' | translate">
-                    <mat-icon>{{ generatingImageIndex === verse.local_index ? 'hourglass_empty' : 'image' }}</mat-icon>
-                  </button>
-                  <button class="action-icon-btn audio-icon-btn" *ngIf="isQuranBook(book.index)"
-                          (click)="toggleAudio(book.index, verse.local_index)"
-                          [attr.aria-label]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate)"
-                          [matTooltip]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate)">
-                    <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
-                  </button>
-                  <button class="action-icon-btn tafsir-icon-btn" *ngIf="isQuranBook(book.index)"
-                          (click)="toggleTafsir(book.index, verse.local_index)"
-                          [attr.aria-label]="'book.tafsir' | translate"
-                          [matTooltip]="'book.tafsir' | translate">
-                    <mat-icon>{{ expandedTafsir.has(verse.local_index) ? 'menu_book' : 'auto_stories' }}</mat-icon>
-                  </button>
+                  <app-verse-actions
+                    [versePath]="book.index + ':' + verse.local_index"
+                    [verse]="verse"
+                    [bookTitle]="getBookName(crumbs) || book.data.titles?.en || book.index"
+                    [preferredTranslation]="(translation$ | async)"
+                    [isBookmarked]="isVerseBookmarked(book.index, verse)"
+                    [hasNote]="hasNote(book.index, verse)"
+                    [isGeneratingImage]="generatingImageIndex === verse.local_index"
+                    [detailPath]="book.index + ':' + verse.local_index"
+                    [anchorFragment]="'h' + verse.local_index"
+                    [isQuran]="isQuranBook(book.index)"
+                    [isPlaying]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index)"
+                    [isTafsirExpanded]="expandedTafsir.has(verse.local_index)"
+                    (bookmarkToggle)="toggleVerseBookmark(book.index, verse, crumbs)"
+                    (noteToggle)="toggleNoteEditor(book.index, verse)"
+                    (imageShare)="shareAsImage(book, verse, crumbs)"
+                    (audioToggle)="toggleAudio(book.index, verse.local_index)"
+                    (tafsirToggle)="toggleTafsir(book.index, verse.local_index)">
+                  </app-verse-actions>
                 </div>
                 <div class="grading-inline" *ngIf="verse.gradings?.length">
                   <ng-container *ngFor="let g of verse.gradings">
@@ -284,65 +258,26 @@
       </mat-card-content>
       <mat-card-footer>
         <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
-          <!-- Primary actions row: always visible -->
           <div class="refLink">
-            <a [routerLink]="['/books', book.index + ':' + verse.local_index]"
-               queryParamsHandling="preserve"
-               [attr.aria-label]="'View ' + verse.part_type + ' ' + verse.local_index + ' details'"
-               class="verse-detail-link"
-               [matTooltip]="'tooltip.viewDetails' | translate">
-              <mat-icon>open_in_new</mat-icon>
-            </a>
-            <button class="bookmark-icon-btn"
-                    (click)="toggleVerseBookmark(book.index, verse, crumbs)"
-                    [attr.aria-label]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)"
-                    [matTooltip]="isVerseBookmarked(book.index, verse) ? ('bookmark.remove' | translate) : ('bookmark.add' | translate)">
-              <mat-icon>{{ isVerseBookmarked(book.index, verse) ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-            </button>
-            <!-- Copy link -->
-            <a class="action-icon-btn"
-               [routerLink]="[]" [queryParamsHandling]="'preserve'" [fragment]="'h' + verse.local_index"
-               [attr.aria-label]="'book.copyLink' | translate"
-               [matTooltip]="'book.copyLink' | translate">
-              <mat-icon>link</mat-icon>
-            </a>
-            <!-- Add/edit note -->
-            <button class="action-icon-btn"
-                    [class.has-note]="hasNote(book.index, verse)"
-                    (click)="toggleNoteEditor(book.index, verse)"
-                    [attr.aria-label]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)"
-                    [matTooltip]="hasNote(book.index, verse) ? ('annotation.edit' | translate) : ('annotation.add' | translate)">
-              <mat-icon>{{ hasNote(book.index, verse) ? 'edit_note' : 'note_add' }}</mat-icon>
-            </button>
-            <!-- Copy text -->
-            <button class="action-icon-btn"
-                    (click)="copyHadithText(book, verse, crumbs)"
-                    [attr.aria-label]="copiedVerseIndex === verse.local_index ? ('book.textCopied' | translate) : ('book.copyText' | translate)"
-                    [matTooltip]="copiedVerseIndex === verse.local_index ? ('book.textCopied' | translate) : ('book.copyText' | translate)">
-              <mat-icon>{{ copiedVerseIndex === verse.local_index ? 'check' : 'content_copy' }}</mat-icon>
-            </button>
-            <!-- Share as image -->
-            <button class="action-icon-btn"
-                    (click)="shareAsImage(book, verse, crumbs)"
-                    [disabled]="generatingImageIndex === verse.local_index"
-                    [attr.aria-label]="'book.shareImage' | translate"
-                    [matTooltip]="'book.shareImage' | translate">
-              <mat-icon>{{ generatingImageIndex === verse.local_index ? 'hourglass_empty' : 'image' }}</mat-icon>
-            </button>
-            <!-- Audio play (Quran only) -->
-            <button class="action-icon-btn audio-icon-btn" *ngIf="isQuranBook(book.index)"
-                    (click)="toggleAudio(book.index, verse.local_index)"
-                    [attr.aria-label]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate)"
-                    [matTooltip]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? ('audio.pause' | translate) : ('audio.play' | translate)">
-              <mat-icon>{{ audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index) ? 'pause_circle' : 'play_circle' }}</mat-icon>
-            </button>
-            <!-- Tafsir (Quran only) -->
-            <button class="action-icon-btn tafsir-icon-btn" *ngIf="isQuranBook(book.index)"
-                    (click)="toggleTafsir(book.index, verse.local_index)"
-                    [attr.aria-label]="'book.tafsir' | translate"
-                    [matTooltip]="'book.tafsir' | translate">
-              <mat-icon>{{ expandedTafsir.has(verse.local_index) ? 'menu_book' : 'auto_stories' }}</mat-icon>
-            </button>
+            <app-verse-actions
+              [versePath]="book.index + ':' + verse.local_index"
+              [verse]="verse"
+              [bookTitle]="getBookName(crumbs) || book.data.titles?.en || book.index"
+              [preferredTranslation]="(translation$ | async)"
+              [isBookmarked]="isVerseBookmarked(book.index, verse)"
+              [hasNote]="hasNote(book.index, verse)"
+              [isGeneratingImage]="generatingImageIndex === verse.local_index"
+              [detailPath]="book.index + ':' + verse.local_index"
+              [anchorFragment]="'h' + verse.local_index"
+              [isQuran]="isQuranBook(book.index)"
+              [isPlaying]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index)"
+              [isTafsirExpanded]="expandedTafsir.has(verse.local_index)"
+              (bookmarkToggle)="toggleVerseBookmark(book.index, verse, crumbs)"
+              (noteToggle)="toggleNoteEditor(book.index, verse)"
+              (imageShare)="shareAsImage(book, verse, crumbs)"
+              (audioToggle)="toggleAudio(book.index, verse.local_index)"
+              (tafsirToggle)="toggleTafsir(book.index, verse.local_index)">
+            </app-verse-actions>
           </div>
           <!-- Grading badges: always visible -->
           <div class="grading-inline" *ngIf="verse.gradings?.length">

@@ -39,7 +39,6 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   );
 
   linkCopied = false;
-  textCopied = false;
   generatingImage = false;
   isBookmarked = false;
   noteText = '';
@@ -224,25 +223,6 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       this.linkCopied = true;
       setTimeout(() => this.linkCopied = false, 2000);
     }
-  }
-
-  async copyHadithText(book: VerseDetail): Promise<void> {
-    const verse = book.data.verse;
-    const arabicText = (verse.text || []).join('\n').replace(/<[^>]*>/g, '');
-    const translations = verse.translations || {};
-    const transTexts = translations[this.currentTranslation] || Object.values(translations)[0] || [];
-    const translationText = transTexts.join('\n').replace(/<[^>]*>/g, '');
-    const reference = `${verse.part_type} ${verse.local_index}`;
-    const bookTitle = book.data.chapter_title?.en || book.index;
-
-    const lines = [arabicText, '', translationText, '', `— ${bookTitle}, ${reference}`];
-    await navigator.clipboard.writeText(lines.join('\n'));
-    this.textCopied = true;
-    this.cdr.markForCheck();
-    setTimeout(() => {
-      this.textCopied = false;
-      this.cdr.markForCheck();
-    }, 2000);
   }
 
   async shareAsImage(book: VerseDetail, translationId: string): Promise<void> {

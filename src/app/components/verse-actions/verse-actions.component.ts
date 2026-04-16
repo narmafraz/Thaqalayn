@@ -64,7 +64,9 @@ export class VerseActionsComponent {
     const verse = this.verse;
     if (!verse) return;
 
-    const arabicText = (verse.text || []).join('\n').replace(/<[^>]*>/g, '');
+    const chainText = (verse.narrator_chain?.text || '').replace(/<[^>]*>/g, '').trim();
+    const bodyText = (verse.text || []).join('\n').replace(/<[^>]*>/g, '');
+    const arabicText = chainText ? `${chainText}\n${bodyText}` : bodyText;
 
     const translations = verse.translations || {};
     let transTexts: string[];

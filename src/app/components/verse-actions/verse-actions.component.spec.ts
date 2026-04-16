@@ -123,6 +123,35 @@ describe('VerseActionsComponent', () => {
       expect(copiedText).not.toContain('</p>');
     }));
 
+    it('should include narrator chain (isnad) in copied text', fakeAsync(() => {
+      component.verse = {
+        ...mockVerse,
+        narrator_chain: {
+          parts: [{ kind: 'narrator', text: 'محمد بن يحيى', path: '/people/narrators/1' }],
+          text: 'محمد بن يحيى عن أحمد بن محمد',
+        },
+      };
+      component.copyText();
+      tick();
+
+      const copiedText = clipboardSpy.calls.first().args[0] as string;
+      expect(copiedText).toContain('محمد بن يحيى عن أحمد بن محمد');
+      // Chain should appear before the verse body text
+      const chainIdx = copiedText.indexOf('محمد بن يحيى');
+      const bodyIdx = copiedText.indexOf('Arabic text here');
+      expect(chainIdx).toBeLessThan(bodyIdx);
+    }));
+
+    it('should not add extra newline when narrator chain is empty', fakeAsync(() => {
+      component.verse = { ...mockVerse, narrator_chain: { parts: [], text: '' } };
+      component.copyText();
+      tick();
+
+      const copiedText = clipboardSpy.calls.first().args[0] as string;
+      // Should start with verse body, not a leading newline
+      expect(copiedText.startsWith('Arabic text here')).toBe(true);
+    }));
+
     it('should handle verse with no translations', fakeAsync(() => {
       component.verse = { ...mockVerse, translations: {} };
       component.copyText();

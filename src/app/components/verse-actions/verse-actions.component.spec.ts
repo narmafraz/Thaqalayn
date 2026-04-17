@@ -142,6 +142,25 @@ describe('VerseActionsComponent', () => {
       expect(chainIdx).toBeLessThan(bodyIdx);
     }));
 
+    it('should reconstruct chain from parts when chain.text is empty', fakeAsync(() => {
+      component.verse = {
+        ...mockVerse,
+        narrator_chain: {
+          parts: [
+            { kind: 'narrator', text: 'محمد', path: '/people/narrators/1' },
+            { kind: 'plain', text: ' عن ', path: '' },
+            { kind: 'narrator', text: 'أحمد', path: '/people/narrators/2' },
+          ],
+          text: '',
+        },
+      };
+      component.copyText();
+      tick();
+
+      const copiedText = clipboardSpy.calls.first().args[0] as string;
+      expect(copiedText).toContain('محمد عن أحمد');
+    }));
+
     it('should not add extra newline when narrator chain is empty', fakeAsync(() => {
       component.verse = { ...mockVerse, narrator_chain: { parts: [], text: '' } };
       component.copyText();
@@ -150,6 +169,36 @@ describe('VerseActionsComponent', () => {
       const copiedText = clipboardSpy.calls.first().args[0] as string;
       // Should start with verse body, not a leading newline
       expect(copiedText.startsWith('Arabic text here')).toBe(true);
+    }));
+
+    it('should use AI translation when preferredTranslation is en.ai', fakeAsync(() => {
+      component.verse = {
+        ...mockVerse,
+        ai: {
+          chunks: [
+            { chunk_type: 'isnad', word_start: 0, word_end: 5, translations: { en: 'Chain translation' } },
+            { chunk_type: 'body', word_start: 5, word_end: 10, translations: { en: 'Body translation' } },
+          ],
+        } as any,
+      };
+      component.preferredTranslation = 'en.ai';
+      component.copyText();
+      tick();
+
+      const copiedText = clipboardSpy.calls.first().args[0] as string;
+      expect(copiedText).toContain('Chain translation');
+      expect(copiedText).toContain('Body translation');
+    }));
+
+    it('should fall back to standard translation when AI translation not available', fakeAsync(() => {
+      component.verse = { ...mockVerse, ai: undefined };
+      component.preferredTranslation = 'en.ai';
+      component.copyText();
+      tick();
+
+      const copiedText = clipboardSpy.calls.first().args[0] as string;
+      // Falls back to first standard translation
+      expect(copiedText).toContain('English translation here');
     }));
 
     it('should handle verse with no translations', fakeAsync(() => {

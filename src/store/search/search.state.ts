@@ -94,12 +94,13 @@ export class SearchState {
     }
 
     const state = ctx.getState();
-    const isFullText = state.mode === 'fulltext';
+    const parsed = this.searchService.parseFilteredQuery(query);
+    const needsFullText = state.mode === 'fulltext' || parsed?.prefix === 'topic';
 
     ctx.patchState({
       query,
       loading: true,
-      fullTextLoading: isFullText && !this.searchService.isFullTextLoaded,
+      fullTextLoading: needsFullText && !this.searchService.isFullTextLoaded,
       error: undefined
     });
 

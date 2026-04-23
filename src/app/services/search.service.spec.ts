@@ -30,6 +30,10 @@ describe('SearchService', () => {
       ],
     });
     service = TestBed.inject(SearchService);
+    // Stub the full-text index load — searchByTopic awaits it but tests don't
+    // need the enriched titles/snippets it provides. The service falls back
+    // gracefully to path-derived labels when the index isn't populated.
+    spyOn(service, 'loadFullTextIndex').and.resolveTo();
   });
 
   it('should be created', () => {
@@ -88,7 +92,17 @@ describe('SearchService', () => {
       expect(results.length).toBe(0);
     });
 
-    it('should deduplicate chapter paths', async () => {
+    it('should return one result per hadith (verse-level paths)', async () => {
+      const results = await service.searchByTopic('divine_unity');
+      // Mock has 2 distinct verses under divine_unity; result should preserve them
+      expect(results.length).toBe(2);
+      const paths = results.map(r => r.path).sort();
+      expect(paths).toEqual(['/books/al-kafi:1:1:1:1', '/books/al-kafi:1:1:1:2']);
+      // Paths should retain the trailing verse index, not collapse to chapter
+      expect(paths.every(p => /:\d+:\d+:\d+:\d+$/.test(p))).toBe(true);
+    });
+
+    it('should deduplicate repeated verse paths', async () => {
       const results = await service.searchByTopic('divine_unity');
       const paths = results.map(r => r.path);
       expect(new Set(paths).size).toBe(paths.length);

@@ -19,7 +19,7 @@ export interface TafsirAyah {
   text: string;
 }
 
-const TAFSIR_BASE = environment.apiBaseUrl + 'tafsir';
+const TAFSIR_BASE = environment.tafsirBaseUrl.replace(/\/$/, '');
 
 @Injectable({ providedIn: 'root' })
 export class TafsirService {

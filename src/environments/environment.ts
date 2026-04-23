@@ -5,6 +5,7 @@
 export const environment = {
   production: false,
   apiBaseUrl: 'http://localhost:8888/',
+  tafsirBaseUrl: 'https://thaqalayntafsir.netlify.app/',
   firebase: {
     apiKey: '',
     authDomain: '',

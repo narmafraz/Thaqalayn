@@ -30,10 +30,6 @@ describe('SearchService', () => {
       ],
     });
     service = TestBed.inject(SearchService);
-    // Stub the full-text index load — searchByTopic awaits it but tests don't
-    // need the enriched titles/snippets it provides. The service falls back
-    // gracefully to path-derived labels when the index isn't populated.
-    spyOn(service, 'loadFullTextIndex').and.resolveTo();
   });
 
   it('should be created', () => {
@@ -78,8 +74,10 @@ describe('SearchService', () => {
     it('should return results for a matching topic', async () => {
       const results = await service.searchByTopic('divine_unity');
       expect(results.length).toBeGreaterThan(0);
-      expect(results[0].snippet).toContain('divine unity');
+      expect(results[0].title).toMatch(/Hadith \d+/);
       expect(results[0].kind).toBe('hadith');
+      // Snippet is populated per-card by the component; the service leaves it empty
+      expect(results[0].snippet).toBe('');
     });
 
     it('should match topics case-insensitively', async () => {

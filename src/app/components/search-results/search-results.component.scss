@@ -269,6 +269,29 @@ h1 {
   overflow: hidden;
 }
 
+// Skeleton shimmer for topic-mode cards while verse_detail is being fetched
+.skeleton-line {
+  height: 13px;
+  margin-top: 6px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--table-stripe, #f0f0f0) 25%, var(--card-bg, #e8e8e8) 50%, var(--table-stripe, #f0f0f0) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-snippet { width: 90%; }
+.skeleton-snippet-short { width: 60%; }
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+:host-context(body.dark-theme) .skeleton-line {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 25%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.06) 75%);
+  background-size: 200% 100%;
+}
+
 .result-footer {
   display: flex;
   align-items: center;

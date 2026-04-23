@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
 import { InitSearchIndex, SearchQuery, SetSearchMode } from '@store/search/search.actions';
 import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
+import { VerseLoaderService } from '@app/services/verse-loader.service';
 import { Observable, Subscription } from 'rxjs';
 
 interface BookFilterEntry {
@@ -18,7 +19,7 @@ interface BookFilterEntry {
     styleUrls: ['./search-results.component.scss'],
     standalone: false
 })
-export class SearchResultsComponent implements OnInit, OnDestroy {
+export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewChecked {
   results$: Observable<SearchResult[]> = inject(Store).select(SearchState.getResults);
   loading$: Observable<boolean> = inject(Store).select(SearchState.isLoading);
   query$: Observable<string> = inject(Store).select(SearchState.getQuery);
@@ -31,11 +32,23 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   filteredResults: SearchResult[] = [];
   activeFilter: { prefix: string; value: string } | null = null;
   displayedCount = 30;
+
+  // Topic-mode lazy-load state: each card fetches its verse_detail as it scrolls into view
+  resolvedSnippets = new Map<string, string>();
+  private observer: IntersectionObserver | null = null;
+  private observedElements = new Set<Element>();
+
   private allResults: SearchResult[] = [];
   private subscriptions: Subscription[] = [];
   private searchService = inject(SearchService);
+  private verseLoader = inject(VerseLoaderService);
+  private el = inject(ElementRef);
 
   constructor(private store: Store, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
+
+  get isTopicMode(): boolean {
+    return this.activeFilter?.prefix === 'topic';
+  }
 
   ngOnInit(): void {
     this.store.dispatch(new InitSearchIndex());
@@ -56,6 +69,8 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
       this.results$.subscribe(results => {
         this.allResults = results;
         this.displayedCount = 30;
+        this.resolvedSnippets.clear();
+        this.destroyObserver();
         this.buildBookFilters(results);
         this.applyFilter();
         this.cdr.markForCheck();
@@ -63,8 +78,16 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     );
   }
 
+  ngAfterViewChecked(): void {
+    if (this.isTopicMode) {
+      this.ensureObserver();
+      this.observeTopicCards();
+    }
+  }
+
   ngOnDestroy(): void {
     this.subscriptions.forEach(s => s.unsubscribe());
+    this.destroyObserver();
   }
 
   setMode(mode: SearchMode): void {
@@ -97,11 +120,59 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   }
 
   get displayedResults(): SearchResult[] {
+    // Topic results render all at once — IntersectionObserver handles content lazy-load per card
+    if (this.isTopicMode) return this.filteredResults;
     return this.filteredResults.slice(0, this.displayedCount);
   }
 
   get hasMoreResults(): boolean {
+    if (this.isTopicMode) return false;
     return this.displayedCount < this.filteredResults.length;
+  }
+
+  private ensureObserver(): void {
+    if (this.observer) return;
+    this.observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const path = (entry.target as HTMLElement).getAttribute('data-topic-path');
+          if (path && !this.resolvedSnippets.has(path)) {
+            this.verseLoader.loadVerse(path).subscribe(verse => {
+              if (!verse) return;
+              const translations = verse.translations || {};
+              const first = Object.values(translations)[0] as string[] | undefined;
+              const en = (first || []).join(' ').replace(/<[^>]*>/g, '').trim();
+              const snippet = en.length > 200 ? en.slice(0, 200) + '...' : en;
+              this.resolvedSnippets.set(path, snippet);
+              this.cdr.markForCheck();
+            });
+          }
+          this.observer?.unobserve(entry.target);
+          this.observedElements.delete(entry.target);
+        });
+      },
+      { rootMargin: '200px' }
+    );
+  }
+
+  private observeTopicCards(): void {
+    if (!this.observer) return;
+    const cards = this.el.nativeElement.querySelectorAll('.result-card[data-topic-path]');
+    cards.forEach((card: Element) => {
+      if (!this.observedElements.has(card)) {
+        this.observer!.observe(card);
+        this.observedElements.add(card);
+      }
+    });
+  }
+
+  private destroyObserver(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+      this.observer = null;
+    }
+    this.observedElements.clear();
   }
 
   loadMore(): void {

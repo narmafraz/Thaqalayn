@@ -72,6 +72,7 @@
         appearance="outlined"
         class="result-card"
         [class.hadith-result]="result.kind !== 'title' && result.kind !== 'chapter'"
+        [attr.data-topic-path]="isTopicMode ? result.path : null"
         [routerLink]="['/books', getBookPath(result)]"
         queryParamsHandling="preserve">
         <mat-card-content>
@@ -80,7 +81,16 @@
             <span *ngIf="result.kind !== 'title'" class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
           </div>
           <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
-          <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
+          <ng-container *ngIf="isTopicMode; else defaultSnippet">
+            <div class="result-snippet" *ngIf="resolvedSnippets.get(result.path) as snippet; else topicSkeleton">{{ snippet }}</div>
+            <ng-template #topicSkeleton>
+              <div class="skeleton-line skeleton-snippet"></div>
+              <div class="skeleton-line skeleton-snippet-short"></div>
+            </ng-template>
+          </ng-container>
+          <ng-template #defaultSnippet>
+            <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
+          </ng-template>
           <div class="result-footer">
             <span class="result-book">{{ result.bookName }}</span>
             <span class="result-path">{{ formatPath(result.path) }}</span>

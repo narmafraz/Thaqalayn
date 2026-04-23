@@ -56,7 +56,6 @@ export class SearchService {
   // Full-text indexes (loaded on demand)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private fullTextDbs: Map<string, any> = new Map();
-  private fullTextDocsByPath = new Map<string, { doc: FullTextDocument; bookName: string; bookSlug: string }>();
   private fullTextLoaded = false;
   private fullTextLoading: Promise<void> | null = null;
 
@@ -143,7 +142,6 @@ export class SearchService {
       await Promise.all(Object.entries(bookFiles).map(async ([bookSlug, filename]) => {
         const url = `${environment.apiBaseUrl}index/search/${filename}`;
         const data = await this.http.get<FullTextDocument[]>(url).toPromise();
-        const bookName = this.slugToDisplayName(bookSlug);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         // TODO: Add 'book: enum' field for faceted search, where filters, and groupBy (requires generator changes)
@@ -168,10 +166,10 @@ export class SearchService {
         if (data) {
           for (const doc of data) {
             await insert(db, doc);
-            this.fullTextDocsByPath.set(doc.p, { doc, bookName, bookSlug });
           }
         }
 
+        const bookName = this.slugToDisplayName(bookSlug);
         this.fullTextDbs.set(bookSlug, { db, bookName });
       }));
 
@@ -337,9 +335,9 @@ export class SearchService {
 
   /** Search by topic using the AI topics index.
    *  Returns one result per hadith/verse tagged with the topic — each linking to
-   *  the individual verse-detail page. Chapter title + translation snippet are
-   *  resolved from the full-text index (loaded lazily); falls back to path-derived
-   *  labels if the index is unavailable.
+   *  the individual verse-detail page. Title/snippet are resolved per-card in
+   *  the view by lazy-loading each verse_detail file as it scrolls into view
+   *  (same pattern as chapter-content).
    */
   async searchByTopic(topicValue: string): Promise<SearchResult[]> {
     const topics = await firstValueFrom(this.aiContentService.getTopics());
@@ -359,51 +357,23 @@ export class SearchService {
     if (matchingPaths.length === 0) return [];
 
     const uniquePaths = [...new Set(matchingPaths)];
-    const topicLabel = topicValue.replace(/_/g, ' ');
 
-    try {
-      await this.loadFullTextIndex();
-    } catch {
-      // Fall through to path-derived labels
-    }
-
-    return uniquePaths.map(path => this.buildTopicResult(path, topicLabel));
-  }
-
-  private buildTopicResult(path: string, topicLabel: string): SearchResult {
-    const stripped = path.startsWith('/books/') ? path.slice(7) : path;
-    const parts = stripped.split(':');
-    const isQuran = parts[0] === 'quran';
-    const verseIdx = parts[parts.length - 1];
-    const kind = (isQuran ? 'verse' : 'hadith') as 'verse' | 'hadith';
-    const fallbackTitle = `${isQuran ? 'Verse' : 'Hadith'} ${verseIdx}`;
-
-    const entry = this.fullTextDocsByPath.get(path);
-    if (entry) {
-      const { doc, bookName } = entry;
-      const snippet = doc.en
-        ? doc.en.substring(0, 200) + (doc.en.length > 200 ? '...' : '')
-        : `Topic: ${topicLabel}`;
+    return uniquePaths.map(path => {
+      const stripped = path.startsWith('/books/') ? path.slice(7) : path;
+      const parts = stripped.split(':');
+      const isQuran = parts[0] === 'quran';
+      const verseIdx = parts[parts.length - 1];
+      const kind = (isQuran ? 'verse' : 'hadith') as 'verse' | 'hadith';
       return {
         path,
-        title: doc.t ? `${doc.t} — ${fallbackTitle}` : fallbackTitle,
+        title: `${isQuran ? 'Verse' : 'Hadith'} ${verseIdx}`,
         titleAr: '',
-        snippet,
-        bookName,
+        snippet: '',
+        bookName: this.bookNameFromPath(path),
         kind,
         score: 1,
       };
-    }
-
-    return {
-      path,
-      title: fallbackTitle,
-      titleAr: '',
-      snippet: `Topic: ${topicLabel}`,
-      bookName: this.bookNameFromPath(path),
-      kind,
-      score: 1,
-    };
+    });
   }
 
   private bookNameFromPath(path: string): string {

@@ -2,69 +2,114 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/e2409c3a-1066-43de-993f-adade270c8bb/deploy-status)](https://app.netlify.com/sites/thaqalayn/deploys)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.1.
+**Live site:** [https://thaqalayn.netlify.app/](https://thaqalayn.netlify.app/)
 
-## Data Aspiration
+An Angular 19 web application for browsing and studying the primary Shi'a Hadith collections and the Qur'an, with AI-enhanced scholarly metadata, multi-language translations, and deep search.
 
-The goal is to host all primary sources of AhlulBayt Ahadith:
+## Features
 
-### Al-Kutub Al-Arb'ah- the Four books
+- **Hierarchical navigation** — books → volumes → chapters → individual hadith, with breadcrumbs and prev/next
+- **Client-side search** (Orama v3.1.18) with title and full-text modes, plus topic / tag / content-type filters
+- **AI-enhanced content** — topic and phrase taxonomies, content-type badges, cross-references, similar-hadith hints, word-by-word analysis, narrator chain diagrams
+- **Qur'an-specific** — audio recitation (4 reciters), tafsir panel with 3 editions
+- **Personalisation** — bookmarks, personal notes, dark mode, keyboard shortcuts, reading progress (Dexie / IndexedDB), optional Firebase cross-device sync
+- **Narrators** — dedicated narrator pages with biographical data and hover cards on narrator chains
+- **Gradings** — colour-coded authenticity badges (sahih / hasan / da'if / etc.) where available
+- **Cross-validation** — diff viewer when the same hadith appears across multiple sources
+- **Internationalisation** — 12 UI languages
+- **PWA** — installable, offline-capable
+- **Sharing** — share a hadith as a styled image, copy link / formatted text, or embed via iframe
+- **Discussion** — optional per-hadith comment threads
 
-1. Kitab al-Kafi of Kulayni (divided into Usul al-Kafi, Furu al-Kafi and Rawdat al-Kafi)
-1. Man La Yahduruhu al-Faqih of Shaikh Saduq
-1. Tahdhib al-Ahkam of Shaikh Tusi
-1. al-Istibsar of Shaikh Tusi
+## Development
 
-### Primary Hadith Collection
+Requires Node.js. The dev server expects the data API at `http://localhost:8888/` (see the sibling `ThaqalaynData` project for local data serving).
 
-(Primary Hadith books are those books which are collected, compiled and written by author or their students themselves).
+```bash
+npm install
+npm start            # http://localhost:4200
+```
 
-1. The Book of Sulaym ibn Qays by Sulaym ibn Qays
-1. Kitab ul Momin by Hussain bin Saeed Ahwazi
-1. al-Mahasin by Ahmad b. Muhammad al-Barqi [Wikidata]
-1. Al-Amali by Shaikh Tusi
-1. Al-Amali of Shaikh Saduq
-1. Al Tawheed (Saduq) [Wikidata] of Shaikh Saduq
-1. Uyun Akhbar al-Ridha by Shaykh Saduq
-1. Tuhaf al-Uqul by Ibn Shuba Harrani [Wikidata]
-1. Al-Amali by Shaikh Mufid
-1. Nahj al-Balaghah by Al-Sharif al-Radi
-1. Khasais of Al Aemmah by Al-Sharif al-Radi
-1. Daim al-Islam by Al-Qadi al-Nu'man
-1. Al-Ihtijaj by Abu Mansur Ahmad Tabrisi [Wikidata]
-1. Kamil al-Ziyarat by Ibn Qulawayh
-1. Al Saqib Fi al-Manâqib by Ibn Hamaza Tusi
-1. Basâ'ir al-darajât by Sheikh Al-Safar al-Qummi [Wikidata]
-1. Al Ghaybah by Muhammad Ibn Ibrahim Ibn Jafar al-Numani
-1. Al Ghaybah of Al Tusi by Shaykh Tusi
+`npm start` sets `NODE_OPTIONS=--openssl-legacy-provider`, required for the current Angular/webpack combination. Plain `ng serve` may fail without it.
 
-## Improvements
+### Build
 
-1. Column headings are not aligned with the hadith index/count numbers
-1. Heading tooltip
-1. Comment section
-1. SubChapters in chapter-list component, so that we can for example show that Al-Kafi Volume 4 Book 3's chapters 106 to 115 belong to "Chapters on Hunting" and chapters 213 onwards belong to a subchapter on "Chapters on Ziyarat" rather than its own volume! Some suggestions [here](https://stackoverflow.com/questions/52217179/angular-material-mat-table-row-grouping) for grouping rows but that makes sorting complicated, so not sure if and how we should fix this.
+```bash
+ng build                                 # development build
+ng build --configuration=production      # production build
+```
 
-## Development server
+### Tests
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+```bash
+# Unit tests (Karma/Jasmine)
+npx ng test --watch=false --browsers=ChromeHeadless
 
-## Code scaffolding
+# On Windows without Chrome, point CHROME_BIN at another Chromium-based browser:
+CHROME_BIN="/c/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe" \
+  npx ng test --watch=false --browsers=ChromeHeadless
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+# E2E tests (Playwright — targets production by default, see playwright.config.ts)
+npx playwright test
+```
 
-## Build
+### Code scaffolding
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```bash
+ng generate component component-name
+```
 
-## Running unit tests
+See `ng help` for more generators (directive, service, pipe, etc.).
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## Data Sources
 
-## Running end-to-end tests
+The goal is to host all primary sources of AhlulBayt Hadith.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+### Al-Kutub Al-Arba'ah — the Four Books
+
+1. Kitab al-Kafi of Kulayni (Usul al-Kafi, Furu al-Kafi, Rawdat al-Kafi)
+1. Man La Yahduruhu al-Faqih of Shaykh Saduq
+1. Tahdhib al-Ahkam of Shaykh Tusi
+1. Al-Istibsar of Shaykh Tusi
+
+### Primary Hadith Collections
+
+(Books compiled, written, or dictated by their authors or their students directly.)
+
+1. Kitab Sulaym ibn Qays, by Sulaym ibn Qays
+1. Kitab al-Mu'min, by Husayn b. Sa'id al-Ahwazi
+1. Al-Mahasin, by Ahmad b. Muhammad al-Barqi
+1. Al-Amali of Shaykh Tusi
+1. Al-Amali of Shaykh Saduq
+1. Al-Tawhid of Shaykh Saduq
+1. 'Uyun Akhbar al-Rida, by Shaykh Saduq
+1. Tuhaf al-'Uqul, by Ibn Shu'ba al-Harrani
+1. Al-Amali of Shaykh Mufid
+1. Nahj al-Balagha, by al-Sharif al-Radi
+1. Khasa'is al-A'imma, by al-Sharif al-Radi
+1. Da'a'im al-Islam, by al-Qadi al-Nu'man
+1. Al-Ihtijaj, by Abu Mansur Ahmad al-Tabrisi
+1. Kamil al-Ziyarat, by Ibn Quluwayh
+1. Al-Thaqib fi al-Manaqib, by Ibn Hamza al-Tusi
+1. Basa'ir al-Darajat, by al-Saffar al-Qummi
+1. Al-Ghayba, by Muhammad b. Ibrahim al-Nu'mani
+1. Al-Ghayba, by Shaykh Tusi
+
+## Known Issues
+
+1. Column headings are not aligned with the hadith index/count numbers in chapter lists.
+1. Heading tooltips are needed where titles are truncated.
+1. Sub-chapters should be grouped in the chapter-list component — e.g., Al-Kafi Vol. 4 Book 3 chapters 106–115 belong to "Chapters on Hunting" and 213+ to "Chapters on Ziyarat" rather than being rendered flat. See [this StackOverflow thread](https://stackoverflow.com/questions/52217179/angular-material-mat-table-row-grouping) for grouping approaches (sorting interacts awkwardly).
+
+See [`docs/CONSOLIDATED_ROADMAP.md`](docs/CONSOLIDATED_ROADMAP.md) for the full work-in-progress backlog and [`docs/_DOC_INDEX.md`](docs/_DOC_INDEX.md) for the documentation index.
+
+## Deployment
+
+Production is auto-deployed to Netlify on push to `master`:
+
+- App: [https://thaqalayn.netlify.app/](https://thaqalayn.netlify.app/)
+- Data API: [https://thaqalayndata.netlify.app/](https://thaqalayndata.netlify.app/) (sibling `ThaqalaynData` project)
 
 ## Further help
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+For Angular CLI usage, run `ng help` or see the [Angular CLI documentation](https://angular.dev/tools/cli).

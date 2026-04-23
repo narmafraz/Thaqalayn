@@ -232,6 +232,65 @@
   .grading-unknown { background-color: rgba(255, 255, 255, 0.08); }
 }
 
+// Tafsir panel (Quran only) — matches chapter-content
+.tafsir-panel {
+  padding: 12px 16px;
+  margin: 0 16px 16px;
+  background: var(--tafsir-bg, #f1f8e9);
+  border-radius: 8px;
+  border-left: 3px solid #558b2f;
+
+  .tafsir-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .tafsir-icon {
+    color: #558b2f;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .tafsir-label {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-primary, #333);
+  }
+
+  .tafsir-select {
+    margin-left: auto;
+    padding: 4px 8px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    font-size: 12px;
+    background: var(--card-bg, #fff);
+    color: var(--text-primary, #333);
+    cursor: pointer;
+  }
+
+  .tafsir-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary, #666);
+  }
+
+  .tafsir-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-primary, #333);
+  }
+}
+
+:host-context(body.dark-theme) .tafsir-panel {
+  background: rgba(85, 139, 47, 0.1);
+}
+
 // Detail sections container
 .detail-sections {
   padding: 0 16px 8px;
@@ -265,14 +324,27 @@
 .relation-group {
   margin-bottom: 6px;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
   gap: 6px;
 
-  .relation-type {
-    font-size: 12px;
+  .ai-relation-type-label {
+    font-size: 10px;
     font-weight: 500;
     color: var(--text-secondary, #666);
+  }
+
+  .ai-relation-chip {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 400;
+    background-color: #e3f2fd;
+    color: #1565c0;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover { opacity: 0.85; }
   }
 
   .relation-link-wrapper {
@@ -288,14 +360,19 @@
     padding: 0;
     color: var(--link-color, #673ab7);
     opacity: 0.4;
-    min-width: 36px;
-    min-height: 36px;
+    min-width: 24px;
+    min-height: 24px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    &:hover { opacity: 1; }
+    &:hover, &.active { opacity: 1; }
     mat-icon { font-size: 14px; width: 14px; height: 14px; }
   }
+}
+
+:host-context(body.dark-theme) .relation-group .ai-relation-chip {
+  background-color: rgba(21, 101, 192, 0.15);
+  color: #64b5f6;
 }
 
 .compare-all-btn {

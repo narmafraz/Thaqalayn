@@ -1,14 +1,16 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { ContentType } from '@app/models/ai-content';
-import { Book, Verse, VerseDetail } from '@app/models';
+import { BOOK_DISPLAY_NAMES, Verse, VerseDetail } from '@app/models';
+import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
-import { BooksService } from '@app/services/books.service';
 import { Comment, DiscussionService } from '@app/services/discussion.service';
 import { SeoService } from '@app/services/seo.service';
 import { ShareCardService, ShareCardData } from '@app/services/share-card.service';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { ExternalLink, ExternalLinksService } from '@app/services/external-links.service';
 import { SyncService } from '@app/services/sync.service';
+import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
+import { VerseLoaderService } from '@app/services/verse-loader.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable, Subscription } from 'rxjs';
@@ -52,6 +54,13 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   compareEntries = new Map<string, CompareEntry>();
   compareExpanded = false;
 
+  // Tafsir state (Quran only)
+  tafsirEditions: TafsirEdition[] = [];
+  selectedTafsirEdition = 'en.mizan';
+  tafsirExpanded = false;
+  tafsirText = '';
+  tafsirLoading = false;
+
   // Discussion state
   discussionEnabled: boolean;
   comments$: Observable<Comment[]>;
@@ -70,17 +79,26 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   constructor(
     private bookmarkService: BookmarkService,
     private cdr: ChangeDetectorRef,
-    private booksService: BooksService,
     private seoService: SeoService,
     private shareCard: ShareCardService,
     private discussionService: DiscussionService,
     private syncService: SyncService,
     private aiPrefs: AiPreferencesService,
     private externalLinksService: ExternalLinksService,
+    public audioService: AudioService,
+    private tafsirService: TafsirService,
+    private verseLoader: VerseLoaderService,
   ) {
     this.discussionEnabled = this.discussionService.isConfigured;
     this.comments$ = this.discussionService.comments$;
     this.discussionLoading$ = this.discussionService.loading$;
+    this.tafsirService.loadEditions().subscribe(editions => {
+      this.tafsirEditions = editions;
+      if (editions.length > 0 && !editions.find(e => e.id === this.selectedTafsirEdition)) {
+        this.selectedTafsirEdition = editions[0].id;
+      }
+      this.cdr.markForCheck();
+    });
   }
 
   ngOnInit(): void {
@@ -266,34 +284,40 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     return this.compareEntries.get(path);
   }
 
+  togglePreview(path: string): void {
+    if (this.compareEntries.has(path)) {
+      this.compareEntries.delete(path);
+      if (this.compareEntries.size === 0) {
+        this.compareExpanded = false;
+      }
+      this.cdr.markForCheck();
+      return;
+    }
+    this.loadCompareVerse(path);
+  }
+
   loadCompareVerse(path: string): void {
     if (this.compareEntries.has(path)) return;
 
-    const entry: CompareEntry = { path, verse: null, chapterTitle: '', loading: true, error: null };
+    const stripped = path.startsWith('/books/') ? path.slice(7) : path;
+    const entry: CompareEntry = {
+      path,
+      verse: null,
+      chapterTitle: this.formatRelationPath(path),
+      loading: true,
+      error: null,
+    };
     this.compareEntries.set(path, entry);
+    this.compareExpanded = true;
     this.cdr.markForCheck();
 
-    // Parse path: /books/quran:59:2 → chapter index "quran:59", verse local_index 2
-    const stripped = path.replace('/books/', '');
-    const parts = stripped.split(':');
-    const verseIdx = parts.length > 1 ? parseInt(parts[parts.length - 1], 10) : 0;
-    const chapterIndex = parts.slice(0, -1).join(':');
-
-    this.booksService.getPart(chapterIndex).subscribe({
-      next: (book: Book) => {
+    this.verseLoader.loadVerse(stripped).subscribe({
+      next: (verse: Verse | null) => {
         entry.loading = false;
-        if (book.kind === 'verse_list' && book.data.verses) {
-          const found = book.data.verses.find(v => v.local_index === verseIdx);
-          entry.verse = found || null;
-          entry.chapterTitle = book.data.titles?.en || chapterIndex;
-          if (!found) {
-            entry.error = `Verse ${verseIdx} not found in chapter`;
-          }
-        } else if (book.kind === 'chapter_list' && book.data.chapters) {
-          // For chapter_list, the verse might be in nested chapters
-          entry.error = 'Content is a chapter list, not verse content';
+        if (verse) {
+          entry.verse = verse;
         } else {
-          entry.error = 'Unexpected data format';
+          entry.error = 'Could not load referenced hadith';
         }
         this.cdr.markForCheck();
       },
@@ -312,6 +336,65 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
         this.loadCompareVerse(path);
       }
     }
+  }
+
+  // Audio + tafsir (Quran)
+  getQuranSurah(bookIndex: string): number {
+    const parts = bookIndex.split(':');
+    return parts.length >= 2 ? parseInt(parts[1], 10) : 0;
+  }
+
+  toggleAudio(bookIndex: string, ayah: number): void {
+    const surah = this.getQuranSurah(bookIndex);
+    if (surah > 0) {
+      this.audioService.togglePlayPause(surah, ayah);
+    }
+  }
+
+  toggleTafsir(bookIndex: string, ayah: number): void {
+    if (this.tafsirExpanded) {
+      this.tafsirExpanded = false;
+      this.cdr.markForCheck();
+      return;
+    }
+    const surah = this.getQuranSurah(bookIndex);
+    if (surah <= 0) return;
+    this.tafsirExpanded = true;
+    this.tafsirLoading = true;
+    this.cdr.markForCheck();
+    this.tafsirService.getAyahTafsir(surah, ayah, this.selectedTafsirEdition)
+      .subscribe(text => {
+        this.tafsirLoading = false;
+        this.tafsirText = text || 'No tafsir available for this verse.';
+        this.cdr.markForCheck();
+      });
+  }
+
+  onTafsirEditionChange(bookIndex: string, ayah: number): void {
+    const surah = this.getQuranSurah(bookIndex);
+    if (surah <= 0 || !this.tafsirExpanded) return;
+    this.tafsirLoading = true;
+    this.cdr.markForCheck();
+    this.tafsirService.getAyahTafsir(surah, ayah, this.selectedTafsirEdition)
+      .subscribe(text => {
+        this.tafsirLoading = false;
+        this.tafsirText = text || 'No tafsir available for this verse.';
+        this.cdr.markForCheck();
+      });
+  }
+
+  stripBooksPrefix(path: string): string {
+    return path.startsWith('/books/') ? path.slice(7) : path;
+  }
+
+  formatRelationPath(path: string): string {
+    const raw = path.startsWith('/books/') ? path.slice(7) : path;
+    const parts = raw.split(':');
+    const bookId = parts[0];
+    const bookName = BOOK_DISPLAY_NAMES[bookId] || bookId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    const segments = parts.slice(1);
+    if (!segments.length) return bookName;
+    return `${bookName} ${segments.join(':')}`;
   }
 
   getFirstTranslation(verse: Verse): string[] | null {

@@ -87,10 +87,15 @@
               [isLinkCopied]="linkCopied"
               [chapterPath]="getChapterRouterLink(book.data.chapter_path)"
               [anchorFragment]="'h' + book.data.verse.local_index"
+              [isQuran]="isQuranBook(book.index)"
+              [isPlaying]="audioService.isPlayingAyah(getQuranSurah(book.index), book.data.verse.local_index)"
+              [isTafsirExpanded]="tafsirExpanded"
               (bookmarkToggle)="toggleBookmark(book)"
               (noteToggle)="showNoteEditor = !showNoteEditor"
               (imageShare)="shareAsImage(book, currentTranslation)"
-              (linkShare)="shareHadith(book.index)">
+              (linkShare)="shareHadith(book.index)"
+              (audioToggle)="toggleAudio(book.index, book.data.verse.local_index)"
+              (tafsirToggle)="toggleTafsir(book.index, book.data.verse.local_index)">
             </app-verse-actions>
           </div>
 
@@ -115,6 +120,25 @@
         </div>
       </mat-card-footer>
 
+      <!-- Tafsir (Quran commentary) -->
+      <div class="tafsir-panel" *ngIf="tafsirExpanded">
+        <div class="tafsir-header">
+          <mat-icon class="tafsir-icon">auto_stories</mat-icon>
+          <span class="tafsir-label">{{ 'book.tafsir' | translate }}</span>
+          <mat-select class="tafsir-select"
+                     [(ngModel)]="selectedTafsirEdition"
+                     (selectionChange)="onTafsirEditionChange(book.index, book.data.verse.local_index)"
+                     [attr.aria-label]="'book.tafsir' | translate">
+            <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.id">{{ ed.name_en }} ({{ ed.language }})</mat-option>
+          </mat-select>
+        </div>
+        <div class="tafsir-loading" *ngIf="tafsirLoading">
+          <mat-spinner diameter="20"></mat-spinner>
+          {{ 'book.loadingCommentary' | translate }}
+        </div>
+        <p class="tafsir-text" *ngIf="!tafsirLoading" [innerHTML]="tafsirText"></p>
+      </div>
+
       <!-- Detail sections (always visible) -->
       <div class="detail-sections">
 
@@ -133,13 +157,17 @@
           </div>
           <ng-container *ngFor="let relation of relations | keyvalue">
             <div class="relation-group" *ngIf="relation.value?.length">
-              <span class="relation-type">{{ relation.key }}:</span>
+              <span class="ai-relation-type-label">{{ relation.key }}:</span>
               <span *ngFor="let rLink of relation.value" class="relation-link-wrapper">
-                <app-path-link [path]="rLink" class="relation-link"></app-path-link>
-                <button class="compare-btn" (click)="loadCompareVerse(rLink)"
-                        *ngIf="!isCompareLoaded(rLink)"
-                        [matTooltip]="'tooltip.previewHadith' | translate">
-                  <mat-icon>visibility</mat-icon>
+                <a class="ai-relation-chip"
+                   [routerLink]="['/books', stripBooksPrefix(rLink)]"
+                   queryParamsHandling="preserve">
+                  {{ formatRelationPath(rLink) }}
+                </a>
+                <button class="compare-btn" (click)="togglePreview(rLink)"
+                        [class.active]="isCompareLoaded(rLink)"
+                        [matTooltip]="isCompareLoaded(rLink) ? ('tooltip.hidePreview' | translate) : ('tooltip.previewHadith' | translate)">
+                  <mat-icon>{{ isCompareLoaded(rLink) ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
               </span>
             </div>

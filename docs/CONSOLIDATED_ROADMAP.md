@@ -1,7 +1,7 @@
 # Consolidated Roadmap
 
 > **Created:** 2026-03-15
-> **Last updated:** 2026-03-15 (post team `ui-improvements` run)
+> **Last updated:** 2026-04-24 (added SEO section — see `SEO_ROADMAP.md` for full detail)
 > **Last verified against source code:** 2026-03-15
 > **Purpose:** Single source of truth for all outstanding work across the Thaqalayn ecosystem.
 > Collates unfinished items from all prior roadmaps and proposals into one prioritized list.
@@ -279,6 +279,25 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 | Cross-device sync via Firebase (optional) | PARTIAL (Firebase installed, sync service exists) | FEATURE_PROPOSALS §3 |
 | Word-by-word QUL data integration | PARTIAL (AI word analysis done, QUL source not integrated) | PHASE3_FEATURE_PROPOSAL §1 |
 | Arabic text cross-validation | PARTIAL (diff-viewer component exists) | PHASE3_FEATURE_PROPOSAL §6 |
+
+---
+
+## Priority 6.5: SEO
+
+**Goal:** Make the site actually indexable and discoverable — covering search engines (Google/Bing) and AI assistants (ChatGPT/Claude/Perplexity).
+
+**Source doc:** `SEO_ROADMAP.md` (2026-04-24) — full detail there. Summary of outstanding items:
+
+| Track | Scope | Status |
+|-------|-------|--------|
+| Manual (owner-only) | Search Console verification, Netlify Prerender install, custom domain decision, IndexNow key | **PENDING — blocks everything else** |
+| Track A (quick wins) | Twitter Card, `BreadcrumbList` JSON-LD, dynamic `<html lang>` + `og:locale`, `lang="ar"` on Arabic, `<lastmod>` in sitemap, wire sitemap into build, AI-crawler policy in robots.txt, per-page OG images, word-boundary description truncation | **OUTSTANDING** |
+| Track B (structural) | Sitemap index (>50K URLs), add all 67K verse-detail URLs, hreflang in sitemap, SSR-inline lazy verse bodies (or Netlify Prerender), soft-404 fix, narrator virtualization | **OUTSTANDING** |
+| GEO (AI search) | `llms.txt`, FAQPage schema per chapter, definitional opening sentences, named author attribution | **OUTSTANDING** |
+| Performance (CWV) | Preconnect, critical CSS, web-vitals field data, INP audit | **OUTSTANDING** |
+| Discovery | IndexNow, Bing Webmaster Tools, internal linking audit, `noindex` on utility pages | **OUTSTANDING** |
+
+Already-done baseline (SEO-01..04 from USER_STORIES): `SeoService`, OG tags, JSON-LD (WebSite/Book/CreativeWork/Person/CollectionPage), canonical URLs, path routing, static sitemap, E2E tests.
 
 ---
 

@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-03-22
+> **Last updated:** 2026-04-24
 
 ## Status Legend
 
@@ -103,3 +103,9 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [BIHAR_MIRAT_SCRAPING_PLAN.md](BIHAR_MIRAT_SCRAPING_PLAN.md) | **ACTIVE** | Scraping plan for Bihar al-Anwar (110 vols) and Mir'at al-Uqul (26 vols) from rafed.net Word API. Includes cross-referencing strategy. |
+
+### 2026-04-24
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [SEO_ROADMAP.md](SEO_ROADMAP.md) | **ACTIVE** | Full SEO plan: ~40 items across quick wins, structural fixes, GEO (LLM search), Core Web Vitals, E-E-A-T, crawl/discovery. Includes manual steps for the site owner (Search Console verification, Netlify Prerender install, custom domain decision). Supersedes `PHASE3_FEATURE_PROPOSAL.md` §8 as the single source of truth for SEO. |

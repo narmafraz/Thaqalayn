@@ -161,12 +161,16 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       if (this.isShellFormat) {
         this.verseRefs = book.data.verse_refs!;
         this.loadedVerses.clear();
-        if (isPlatformServer(this.platformId)) {
-          // Under SSR, IntersectionObserver never fires (no scroll, no
-          // viewport). Prefetch verses synchronously so crawlers and the
-          // Netlify Prerender extension get fully-rendered hadith bodies in
-          // the snapshot. Browser hydration receives them via Angular's
-          // TransferState since provideClientHydration() is enabled.
+        if (isPlatformServer(this.platformId) || isLikelyCrawler()) {
+          // Two cases land here:
+          //   1. True Angular SSR (the 7 prerendered routes don't include
+          //      chapter URLs but might in future)
+          //   2. Netlify Prerender Extension running headless Chromium —
+          //      it executes the browser bundle, not the server bundle,
+          //      so isPlatformServer is FALSE there. Detect via user
+          //      agent / navigator.webdriver instead.
+          // Either way: skip IntersectionObserver and eagerly load verses
+          // so the rendered DOM contains all hadith bodies for crawlers.
           this.prefetchVersesForSsr(book);
         } else {
           this.setupIntersectionObserver();
@@ -745,4 +749,21 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     this.generatingImageIndex = null;
     this.cdr.markForCheck();
   }
+}
+
+// Heuristic to detect crawlers / headless renderers running the browser
+// bundle. Used to switch chapter-content from lazy IntersectionObserver
+// loading to eager prefetch so the rendered DOM contains all hadith
+// bodies. Real users on real browsers fall through to the lazy path.
+//
+// Triggers on:
+//   - navigator.webdriver = true (Selenium, Puppeteer, Playwright,
+//     and notably Netlify Prerender's headless Chromium)
+//   - Common bot UA strings: Googlebot, Bingbot, GPTBot, ClaudeBot,
+//     PerplexityBot, etc., plus the catch-all "HeadlessChrome"
+function isLikelyCrawler(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  if ((navigator as Navigator & { webdriver?: boolean }).webdriver) return true;
+  const ua = navigator.userAgent || '';
+  return /headlesschrome|googlebot|bingbot|gptbot|claudebot|claude-searchbot|perplexitybot|oai-searchbot|applebot|yandexbot|baiduspider|duckduckbot|facebookexternalhit|twitterbot|linkedinbot|slackbot|telegrambot|whatsapp|prerender|netlify[ -]prerender/i.test(ua);
 }

@@ -8,6 +8,12 @@ const DEFAULT_DESCRIPTION = 'Thaqalayn is a free, open digital library of authen
 const DEFAULT_IMAGE = `${BASE_URL}/assets/just-logo_small.png`;
 const META_DESCRIPTION_MAX = 155;
 
+// dateModified gets refreshed on every build, signalling crawlers that the
+// site is actively maintained (an E-E-A-T trust factor). datePublished is a
+// fixed project-launch year — concrete enough to satisfy schema validators.
+const DATE_PUBLISHED = '2020-01-01';
+const DATE_MODIFIED = new Date().toISOString().slice(0, 10);
+
 // Map of i18n language codes to Open Graph locale codes.
 // Languages without a clear region default to the language code alone.
 const OG_LOCALES: Record<string, string> = {
@@ -108,6 +114,8 @@ export class SeoService {
         name: SITE_NAME,
         url: BASE_URL + '/',
         description: DEFAULT_DESCRIPTION,
+        datePublished: DATE_PUBLISHED,
+        dateModified: DATE_MODIFIED,
       },
     });
   }
@@ -149,6 +157,8 @@ export class SeoService {
         url: BASE_URL + path,
         description,
         inLanguage: ['ar', 'en'],
+        datePublished: DATE_PUBLISHED,
+        dateModified: DATE_MODIFIED,
       },
     });
   }
@@ -182,6 +192,8 @@ export class SeoService {
       url: BASE_URL + path,
       description,
       inLanguage: ['ar', 'en'],
+      datePublished: DATE_PUBLISHED,
+      dateModified: DATE_MODIFIED,
       isPartOf: {
         '@type': 'Book',
         name: bookName,
@@ -242,6 +254,8 @@ export class SeoService {
         url: BASE_URL + path,
         description,
         inLanguage: ['ar', 'en'],
+        datePublished: DATE_PUBLISHED,
+        dateModified: DATE_MODIFIED,
         isPartOf: {
           '@type': 'Book',
           name: bookName,

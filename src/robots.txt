@@ -1,3 +1,75 @@
+# Thaqalayn — public scholarly resource for Shia Islamic primary texts.
+# All crawlers (search + AI training + AI retrieval) are intentionally allowed.
+# Goal: maximize discoverability across Google, Bing, and AI assistants
+# (ChatGPT, Claude, Perplexity, Gemini, Copilot).
+
 User-agent: *
 Allow: /
+
+# OpenAI
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# Google AI Overviews / Gemini training (separate token from Googlebot;
+# Allow keeps the content eligible for AI Overviews citations)
+User-agent: Google-Extended
+Allow: /
+
+# Apple Intelligence
+User-agent: Applebot-Extended
+Allow: /
+
+# Common Crawl (used by many open-source training pipelines)
+User-agent: CCBot
+Allow: /
+
+# Meta / Llama
+User-agent: meta-externalagent
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+# ByteDance / Doubao
+User-agent: Bytespider
+Allow: /
+
+# Amazon
+User-agent: Amazonbot
+Allow: /
+
+# Mistral
+User-agent: MistralAI-User
+Allow: /
+
+# Cohere
+User-agent: cohere-ai
+Allow: /
+
 Sitemap: https://thaqalayn.netlify.app/sitemap.xml

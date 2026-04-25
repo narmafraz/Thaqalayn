@@ -32,7 +32,7 @@
         <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
         <span class="crumb-item"><a routerLink="/people/narrators/index" queryParamsHandling="preserve">{{ 'nav.narrators' | translate }}</a></span>
         <mat-icon class="crumb-separator" [class.rtl-flip]="(isRtl$ | async)">chevron_right</mat-icon>
-        <span class="crumb-item"><a [routerLink]="narrator.path" queryParamsHandling="preserve" [innerHTML]="narrator.titles.ar"></a></span>
+        <span class="crumb-item" lang="ar"><a [routerLink]="narrator.path" queryParamsHandling="preserve" [innerHTML]="narrator.titles.ar"></a></span>
       </ng-container>
     </ng-container>
   </div>

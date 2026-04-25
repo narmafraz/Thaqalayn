@@ -42,7 +42,7 @@
            [routerLink]="['/books', topic.path.substring(7)]"
            class="topic-card">
           <div class="topic-title">{{ topic.title }}</div>
-          <div class="topic-arabic" *ngIf="topic.arabicTitle">{{ topic.arabicTitle }}</div>
+          <div class="topic-arabic" lang="ar" dir="rtl" *ngIf="topic.arabicTitle">{{ topic.arabicTitle }}</div>
           <div class="topic-meta">
             <span *ngIf="topic.chapterCount > 0">{{ topic.chapterCount }} {{ 'topics.chapters' | translate }}</span>
           </div>

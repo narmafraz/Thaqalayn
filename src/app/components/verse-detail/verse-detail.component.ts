@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { ContentType } from '@app/models/ai-content';
-import { BOOK_DISPLAY_NAMES, Verse, VerseDetail } from '@app/models';
+import { BOOK_DISPLAY_NAMES, Crumb, Verse, VerseDetail } from '@app/models';
 import { AudioService } from '@app/services/audio.service';
 import { BookmarkService } from '@app/services/bookmark.service';
 import { Comment, DiscussionService } from '@app/services/discussion.service';
-import { SeoService } from '@app/services/seo.service';
+import { I18nService } from '@app/services/i18n.service';
+import { BreadcrumbItem, SeoService } from '@app/services/seo.service';
 import { ShareCardService, ShareCardData } from '@app/services/share-card.service';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { ExternalLink, ExternalLinksService } from '@app/services/external-links.service';
@@ -88,6 +89,8 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     public audioService: AudioService,
     private tafsirService: TafsirService,
     private verseLoader: VerseLoaderService,
+    private i18n: I18nService,
+    private store: Store,
   ) {
     this.discussionEnabled = this.discussionService.isConfigured;
     this.comments$ = this.discussionService.comments$;
@@ -99,6 +102,24 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       }
       this.cdr.markForCheck();
     });
+  }
+
+  // Build breadcrumb items from the navigated-crumbs selector so the rich-result
+  // schema matches the visible breadcrumb UI.
+  private buildBreadcrumbs(_chapterTitleEn: string | undefined, _partType: string, _localIndex: number, _bookIndex: string): BreadcrumbItem[] | undefined {
+    const crumbs = this.store.selectSnapshot(BooksState.getCurrentNavigatedCrumbs) as Crumb[] | undefined;
+    if (!crumbs || crumbs.length === 0) return undefined;
+    const items: BreadcrumbItem[] = [
+      { name: 'Home', url: '/' },
+      { name: 'Books', url: '/books' },
+    ];
+    for (const c of crumbs) {
+      const name = (c.titles && (c.titles as Record<string, string>)['en']) || (c.indexed_titles && (c.indexed_titles as Record<string, string>)['en']) || '';
+      if (name) {
+        items.push({ name, url: c.path });
+      }
+    }
+    return items;
   }
 
   ngOnInit(): void {
@@ -125,6 +146,10 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       const verse = book.data.verse;
       const aiSeoQuestion = verse.ai?.seo_questions?.en || verse.ai?.translations?.en?.seo_question;
       const aiSummary = verse.ai?.summaries?.en || verse.ai?.translations?.en?.summary;
+      const translationText = verse.translations
+        ? Object.values(verse.translations)[0]?.[0]
+        : undefined;
+      const breadcrumbs = this.buildBreadcrumbs(book.data.chapter_title?.en, verse.part_type, verse.local_index, book.index);
       this.seoService.setVerseDetailPageWithAi(
         book.index,
         verse.local_index,
@@ -132,6 +157,9 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
         book.data.chapter_title?.en || '',
         aiSeoQuestion,
         aiSummary,
+        translationText,
+        this.i18n.currentLang,
+        breadcrumbs,
       );
       this.bookmarkService.isBookmarked(path).then(result => {
         this.isBookmarked = result;

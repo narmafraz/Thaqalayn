@@ -13,7 +13,7 @@
     <!-- Profile Hero Header -->
     <section class="profile-hero" [class.imam-hero]="isImam">
       <div class="monogram" [class.imam-monogram]="isImam" aria-hidden="true">
-        <span class="monogram-letter arabic">{{ monogramLetter }}</span>
+        <span class="monogram-letter arabic" lang="ar">{{ monogramLetter }}</span>
       </div>
       <h1 class="hero-name-ar arabic" lang="ar" dir="rtl">{{narrator.titles?.ar}}</h1>
       <h2 class="hero-name-en" *ngIf="narrator.biography?.english_transliteration">

@@ -2,8 +2,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
-import { Book, getChapter, Narrator } from '@app/models';
-import { I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
+import { Book, Crumb, getChapter, Narrator } from '@app/models';
+import { BreadcrumbItem, I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -211,10 +211,11 @@ export class AppComponent implements OnInit, OnDestroy {
       ).subscribe((event: NavigationEnd) => {
         const url = event.urlAfterRedirects || event.url;
         const path = url.replace(/^#?\/?/, '/').split('?')[0];
+        const lang = this.i18n.currentLang;
 
         for (const [route, entry] of Object.entries(AppComponent.STATIC_TITLES)) {
           if (path === route) {
-            this.seo.setStaticPage(route, entry.fallback);
+            this.seo.setStaticPage(route, entry.fallback, lang);
             this.currentPageContext = { type: 'static', data: route };
             this.applyLocalizedTitle();
             return;
@@ -222,14 +223,14 @@ export class AppComponent implements OnInit, OnDestroy {
         }
 
         if (path === '/books' || path === '/' || path === '') {
-          this.seo.setHomePage();
+          this.seo.setHomePage(lang);
           this.currentPageContext = { type: 'home' };
           this.applyLocalizedTitle();
           return;
         }
 
         if (path.startsWith('/people/narrators/index')) {
-          this.seo.setNarratorListPage();
+          this.seo.setNarratorListPage(lang);
           this.currentPageContext = { type: 'narrator-list' };
           this.applyLocalizedTitle();
           return;
@@ -240,6 +241,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.store.select(BooksState.getCurrentNavigatedPart).subscribe((book: Book) => {
         if (!book) return;
+        const lang = this.i18n.currentLang;
+        const breadcrumbs = this.buildBookBreadcrumbs();
         if (book.kind === 'verse_detail') {
           const d = book.data;
           const translationText = d.verse.translations
@@ -250,7 +253,9 @@ export class AppComponent implements OnInit, OnDestroy {
             d.verse.local_index,
             d.verse.part_type,
             d.chapter_title?.en || '',
-            translationText
+            translationText,
+            lang,
+            breadcrumbs,
           );
           this.currentPageContext = { type: 'verse-detail', data: book };
           this.applyLocalizedTitle();
@@ -261,7 +266,9 @@ export class AppComponent implements OnInit, OnDestroy {
           this.seo.setBookPage(
             book.index,
             chapter.titles.en,
-            chapter.descriptions?.en
+            chapter.descriptions?.en,
+            lang,
+            breadcrumbs,
           );
           this.currentPageContext = { type: 'book', data: book };
           this.applyLocalizedTitle();
@@ -277,7 +284,10 @@ export class AppComponent implements OnInit, OnDestroy {
           this.seo.setNarratorPage(
             narrator.index,
             name,
-            narrator.titles.ar
+            narrator.titles.ar,
+            narrator.biography?.biography_summary,
+            narrator.descriptions?.en,
+            this.i18n.currentLang,
           );
           this.currentPageContext = { type: 'narrator', data: narrator };
           this.applyLocalizedTitle();
@@ -291,6 +301,25 @@ export class AppComponent implements OnInit, OnDestroy {
         this.applyLocalizedTitle();
       })
     );
+  }
+
+  // Build a BreadcrumbList for book/verse-detail pages from the existing
+  // crumb selector. Always anchored with Home → Books to give crawlers a
+  // consistent ladder back to site root.
+  private buildBookBreadcrumbs(): BreadcrumbItem[] | undefined {
+    const crumbs = this.store.selectSnapshot(BooksState.getCurrentNavigatedCrumbs) as Crumb[] | undefined;
+    if (!crumbs || crumbs.length === 0) return undefined;
+    const items: BreadcrumbItem[] = [
+      { name: 'Home', url: '/' },
+      { name: 'Books', url: '/books' },
+    ];
+    for (const c of crumbs) {
+      const name = (c.titles && (c.titles as Record<string, string>)['en']) || (c.indexed_titles && (c.indexed_titles as Record<string, string>)['en']) || '';
+      if (name) {
+        items.push({ name, url: c.path });
+      }
+    }
+    return items;
   }
 
   /**

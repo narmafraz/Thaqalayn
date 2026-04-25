@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestro
 import { NavigationEnd, Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { Book, Crumb, getChapter, Narrator } from '@app/models';
-import { BreadcrumbItem, I18nService, SeoService, ThemeService, KeyboardShortcutService } from '@app/services';
+import { BreadcrumbItem, I18nService, SeoService, ThemeService, KeyboardShortcutService, WebVitalsService } from '@app/services';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -71,6 +71,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private i18n: I18nService,
     private themeService: ThemeService,
     private keyboard: KeyboardShortcutService,
+    private webVitals: WebVitalsService,
     private cdr: ChangeDetectorRef,
     public aiPrefs: AiPreferencesService,
     @Inject(PLATFORM_ID) platformId: object,
@@ -178,6 +179,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.store.dispatch(new LoadNarrator('index'));
 
     if (this.isBrowser) {
+      this.webVitals.start();
       this.subscriptions.push(
         this.i18n.isRtl$.subscribe(isRtl => {
           document.documentElement.dir = isRtl ? 'rtl' : 'ltr';

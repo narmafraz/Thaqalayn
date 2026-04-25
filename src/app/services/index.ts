@@ -12,4 +12,5 @@ export * from './share-card.service';
 export * from './sync.service';
 export * from './discussion.service';
 export * from './theme.service';
+export * from './web-vitals.service';
 

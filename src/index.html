@@ -7,6 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="google-site-verification" content="haBRxR-7K-zM53NfDIZi3PhBgbuyc65eJa5POFCw8Qc">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Preconnect to the data API origin so the first JSON fetch skips the
+       DNS lookup + TLS handshake. Improves LCP on chapter and narrator
+       pages where the first JSON request gates content rendering. -->
+  <link rel="preconnect" href="https://thaqalayndata.netlify.app" crossorigin>
+  <link rel="dns-prefetch" href="https://thaqalayndata.netlify.app">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#673ab7">

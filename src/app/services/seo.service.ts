@@ -65,6 +65,9 @@ export class SeoService {
 
     this.titleService.setTitle(fullTitle);
 
+    // Drop any noindex tag a previous 404 navigation might have set.
+    this.meta.removeTag('name="robots"');
+
     this.meta.updateTag({ name: 'description', content: description });
 
     // Open Graph
@@ -267,6 +270,27 @@ export class SeoService {
         description: 'Index of hadith narrators referenced in Al-Kafi.',
       },
     });
+  }
+
+  setNotFoundPage(): void {
+    const url = BASE_URL + (typeof location !== 'undefined' ? location.pathname : '/404');
+    this.titleService.setTitle('Page Not Found - ' + SITE_NAME);
+    this.meta.updateTag({ name: 'description', content: 'The page you requested could not be found on Thaqalayn.' });
+    this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
+    this.meta.updateTag({ property: 'og:title', content: 'Page Not Found - ' + SITE_NAME });
+    this.meta.updateTag({ property: 'og:url', content: url });
+    this.meta.updateTag({ property: 'og:type', content: 'website' });
+    this.updateCanonical(url);
+    this.removeJsonLd();
+    // Strip hreflang on 404 — no language variants exist for a missing page
+    for (const el of this.hreflangElements) el.remove();
+    this.hreflangElements = [];
+  }
+
+  // Pages that have valid content should ensure the noindex tag is removed
+  // (in case the previous navigation set one).
+  clearNoindex(): void {
+    this.meta.removeTag('name="robots"');
   }
 
   setNarratorPage(

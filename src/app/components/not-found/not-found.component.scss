@@ -1,0 +1,25 @@
+.not-found {
+  max-width: 480px;
+  margin: 64px auto;
+  padding: 0 16px;
+  text-align: center;
+
+  h1 {
+    font-size: 1.75rem;
+    margin-bottom: 12px;
+  }
+
+  p {
+    color: var(--text-secondary, #666);
+    margin: 8px 0;
+  }
+
+  a {
+    color: var(--primary-color, #673ab7);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

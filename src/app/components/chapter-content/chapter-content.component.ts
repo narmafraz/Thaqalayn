@@ -14,6 +14,7 @@ import { ShareCardService } from '@app/services/share-card.service';
 import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
 import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
 import { RelatedChaptersService, RelatedChapter } from '@app/services/related-chapters.service';
+import { SeoService } from '@app/services/seo.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RouterState } from '@store/router/router.state';
@@ -114,6 +115,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private aiPrefs: AiPreferencesService,
     private relatedChaptersService: RelatedChaptersService,
+    private seo: SeoService,
   ) {
     this.tafsirService.loadEditions().subscribe(editions => {
       this.tafsirEditions = editions;
@@ -165,7 +167,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
           // Netlify Prerender extension get fully-rendered hadith bodies in
           // the snapshot. Browser hydration receives them via Angular's
           // TransferState since provideClientHydration() is enabled.
-          this.prefetchVersesForSsr();
+          this.prefetchVersesForSsr(book);
         } else {
           this.setupIntersectionObserver();
         }
@@ -209,16 +211,55 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // SSR path: synchronously kick off verse_detail fetches so Angular's
   // pending-task tracking waits for them before serializing the rendered
   // HTML. Caps at SSR_INLINE_VERSE_LIMIT to keep prerender HTML manageable.
-  private prefetchVersesForSsr(): void {
+  private prefetchVersesForSsr(book: ChapterContent): void {
     const refs = this.verseRefs.filter(r => !!r.path).slice(0, ChapterContentComponent.SSR_INLINE_VERSE_LIMIT);
+    let pending = refs.length;
     for (const ref of refs) {
-      this.verseLoader.loadVerse(ref.path!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(verse => {
-        if (verse) {
-          this.loadedVerses.set(ref.path!, verse);
-          this.cdr.markForCheck();
-        }
+      this.verseLoader.loadVerse(ref.path!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: verse => {
+          if (verse) {
+            this.loadedVerses.set(ref.path!, verse);
+            this.cdr.markForCheck();
+          }
+        },
+        complete: () => {
+          pending--;
+          if (pending === 0) this.maybeEmitFaqSeo(book);
+        },
+        error: () => {
+          pending--;
+          if (pending === 0) this.maybeEmitFaqSeo(book);
+        },
       });
     }
+    if (refs.length === 0) this.maybeEmitFaqSeo(book);
+  }
+
+  // Build a FAQ list from per-hadith AI seo_question + summary and re-emit
+  // the chapter's SEO with FAQPage JSON-LD. Falls back silently if no
+  // verses have AI question/answer data — chapter retains the plain Book
+  // schema set by app.component.
+  private maybeEmitFaqSeo(book: ChapterContent): void {
+    const faqs: Array<{ question: string; answer: string }> = [];
+    for (const ref of this.verseRefs) {
+      if (!ref.path) continue;
+      const verse = this.loadedVerses.get(ref.path);
+      const ai = verse?.ai;
+      const q = ai?.seo_questions?.['en'] || ai?.translations?.['en']?.seo_question;
+      const a = ai?.summaries?.['en'] || ai?.translations?.['en']?.summary;
+      if (q && a) faqs.push({ question: q, answer: a });
+    }
+    if (faqs.length === 0) return;
+
+    const titleEn = book.data.titles?.en || book.index;
+    this.seo.setBookPageWithFaq(
+      book.index,
+      titleEn,
+      book.data.descriptions?.en,
+      faqs,
+      this.currentLang,
+      undefined,
+    );
   }
 
   private setupIntersectionObserver(): void {

@@ -14,6 +14,12 @@ const META_DESCRIPTION_MAX = 155;
 const DATE_PUBLISHED = '2020-01-01';
 const DATE_MODIFIED = new Date().toISOString().slice(0, 10);
 
+// Cap on FAQPage entries per chapter. Google's structured-data guidelines
+// recommend keeping FAQ schemas short and topical; very long FAQ lists are
+// flagged as spam and may be ignored entirely. 10 covers the typical
+// chapter (~10 hadith) without bloat.
+const MAX_FAQ = 10;
+
 // Map of i18n language codes to Open Graph locale codes.
 // Languages without a clear region default to the language code alone.
 const OG_LOCALES: Record<string, string> = {
@@ -131,6 +137,59 @@ export class SeoService {
       description: descriptions[path] || DEFAULT_DESCRIPTION,
       url: BASE_URL + path,
       locale: ogLocaleFor(lang),
+    });
+  }
+
+  // Like setBookPage but also emits a FAQPage JSON-LD with up to MAX_FAQ
+  // question/answer pairs derived from per-hadith AI seo_question + summary.
+  // Renders as a @graph with both Book and FAQPage so Google + LLM crawlers
+  // see the chapter as a structured CreativeWork *and* a queryable Q&A.
+  setBookPageWithFaq(
+    bookIndex: string,
+    titleEn: string,
+    descriptionEn: string | undefined,
+    faqs: Array<{ question: string; answer: string }>,
+    lang?: string,
+    breadcrumbs?: BreadcrumbItem[],
+  ): void {
+    const path = '/books/' + bookIndex;
+    const isQuran = bookIndex.startsWith('quran');
+    const isAlKafi = bookIndex.startsWith('al-kafi');
+    const bookName = isQuran ? 'Holy Quran' : isAlKafi ? 'Al-Kafi' : bookIndex;
+    const description = descriptionEn
+      || `Read ${titleEn} from ${bookName} with English translations on Thaqalayn.`;
+
+    const cappedFaqs = faqs.slice(0, MAX_FAQ);
+    const bookSchema: Record<string, unknown> = {
+      '@type': 'Book',
+      name: titleEn,
+      url: BASE_URL + path,
+      description,
+      inLanguage: ['ar', 'en'],
+      datePublished: DATE_PUBLISHED,
+      dateModified: DATE_MODIFIED,
+    };
+    const faqSchema = cappedFaqs.length ? {
+      '@type': 'FAQPage',
+      mainEntity: cappedFaqs.map(f => ({
+        '@type': 'Question',
+        name: f.question,
+        acceptedAnswer: { '@type': 'Answer', text: f.answer },
+      })),
+    } : null;
+
+    const jsonLd: Record<string, unknown> = faqSchema
+      ? { '@context': 'https://schema.org', '@graph': [bookSchema, faqSchema] }
+      : { '@context': 'https://schema.org', ...bookSchema };
+
+    this.setPageMeta({
+      title: titleEn,
+      description,
+      url: BASE_URL + path,
+      type: 'book',
+      locale: ogLocaleFor(lang),
+      breadcrumbs,
+      jsonLd,
     });
   }
 

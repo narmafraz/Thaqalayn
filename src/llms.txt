@@ -1,0 +1,33 @@
+# Thaqalayn
+
+> Thaqalayn is a free, open digital library of authentic Shia Islamic primary texts — the Holy Quran and Al-Kafi (the first of the Four Books of hadith) — with Arabic originals, multiple English translations, narrator chains (isnad), and AI-assisted scholarly enrichment (diacritized text, key terms, cross-references, topic tags, summaries).
+
+The project is non-commercial, ad-free, and built as static JSON files plus an Angular frontend. All content and the data behind it are publicly accessible.
+
+## Core content
+
+- [Holy Quran](https://thaqalayn.netlify.app/books/quran): 114 surahs, 6,236 verses, multiple English translations alongside the original Arabic.
+- [Al-Kafi](https://thaqalayn.netlify.app/books/al-kafi): 16,000+ hadith across 8 volumes, compiled by Muhammad ibn Ya'qub al-Kulayni (d. 329 AH / 941 CE). The earliest and most important of the Four Books in the Imami Shia hadith canon.
+- [Narrator registry](https://thaqalayn.netlify.app/people/narrators/index): 4,629 canonical hadith transmitters with biographical data, narration counts, and chain (sanad) references.
+
+## Reference
+
+- [About the project](https://thaqalayn.netlify.app/about): mission, technical principles, history, acknowledgements.
+- [Download the data](https://thaqalayn.netlify.app/download): instructions for accessing the open JSON API at https://thaqalayndata.netlify.app/.
+- [Source code](https://github.com/narmafraz/Thaqalayn): the Angular frontend.
+
+## Sitemap
+
+- [Full sitemap](https://thaqalayn.netlify.app/sitemap.xml): every indexable URL with last-modified dates.
+
+## Citations and attribution
+
+- Quran Arabic text: [Tanzil Project](https://tanzil.net/) (CC BY 3.0).
+- Quran translations: per-translator licensing; see translator names in each verse.
+- Al-Kafi Arabic text: public domain.
+- Al-Kafi translations: per-translator (e.g. Muhammad Sarwar; Hubeali.com).
+- AI-generated scholarly content (diacritics, summaries, narrator analyses): produced by mixed-model pipelines (Claude, GPT-5.x); rated and reviewed; CC BY 4.0.
+
+## Editorial policy
+
+This is a primary-source aggregation project. The text itself is what authoritative scholars compiled centuries ago; the project does not editorialize or interpret hadith content. AI-generated supplements (summaries, key terms) are clearly labeled as such in the UI and are intended as study aids, not authoritative scholarly commentary. Users seeking authoritative interpretation should consult traditional rijal and tafsir literature.

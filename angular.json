@@ -31,6 +31,7 @@
               "src/_redirects",
               "src/robots.txt",
               "src/sitemap.xml",
+              "src/llms.txt",
               "src/manifest.webmanifest"
             ],
             "styles": [

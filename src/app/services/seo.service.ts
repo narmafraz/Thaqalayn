@@ -4,7 +4,7 @@ import { Meta, Title } from '@angular/platform-browser';
 
 const BASE_URL = 'https://thaqalayn.netlify.app';
 const SITE_NAME = 'Thaqalayn';
-const DEFAULT_DESCRIPTION = 'Read and explore authentic Shia Islamic texts including the Holy Quran and Al-Kafi hadith collection with English translations and narrator information.';
+const DEFAULT_DESCRIPTION = 'Thaqalayn is a free, open digital library of authentic Shia Islamic primary texts — the Holy Quran and the Al-Kafi hadith collection — with Arabic originals, multiple English translations, narrator chains, and scholarly references.';
 const DEFAULT_IMAGE = `${BASE_URL}/assets/just-logo_small.png`;
 const META_DESCRIPTION_MAX = 155;
 

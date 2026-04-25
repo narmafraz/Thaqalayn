@@ -357,9 +357,11 @@ Must declare `xmlns:xhtml="http://www.w3.org/1999/xhtml"` on the root `<urlset>`
 
 Then add a `404.html` in `src/` that ships a static "not found" page. Angular can detect via route guard and redirect too, but SPA fallback takes priority on Netlify — static `/404.html` is the right tool.
 
-### P2.6 Narrator page virtualization (G12)
+### P2.6 Narrator page virtualization (G12) — **already done**
 
-Already on the roadmap as `CONSOLIDATED_ROADMAP §3.1`. Calling it out here because **Googlebot's render timeout is ~5 seconds** — any page that freezes the browser will be dropped from the index. Ship virtualization before attempting to index the long-tail narrator URLs.
+Verified 2026-04-25: commit `38c173b` (FIX-04, pre-dating this roadmap) introduced `mat-paginator` for hadith paths and subchains plus `slice(0, 10)` caps for narrated-from/to lists and top co-narrators. The browser-freeze symptom on narrator #4 (3,116 narrations) and #19 (5,511) is gone. CONSOLIDATED_ROADMAP §3.1 is also stale on this — it's tracked there as outstanding but the code already paginates.
+
+No further action needed for SEO. If Search Console later flags rendering timeouts on specific narrator URLs we can revisit (CDK virtual scroll would be the next step), but pagination is sufficient for crawler indexing.
 
 ---
 

@@ -1,5 +1,5 @@
-import { ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, Input, OnDestroy, OnInit, Renderer2 } from '@angular/core';
+import { isPlatformServer, ViewportScroller } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, Input, OnDestroy, OnInit, PLATFORM_ID, Renderer2 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
@@ -82,6 +82,14 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   private observedElements = new Set<Element>();
 
   private destroyRef = inject(DestroyRef);
+  private platformId = inject(PLATFORM_ID);
+
+  // Cap on how many lazy verses to prefetch under SSR. Keeps prerender HTML
+  // sizes manageable for very long chapters (some Al-Kafi chapters have 100+
+  // hadith). The browser still loads the rest via IntersectionObserver after
+  // hydration, so users see the full chapter — but crawlers see at least the
+  // first SSR_INLINE_VERSE_LIMIT, which is enough for indexing.
+  private static readonly SSR_INLINE_VERSE_LIMIT = 50;
 
   // AI preference visibility flags
   showContentTypeBadges = true;
@@ -151,7 +159,16 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       if (this.isShellFormat) {
         this.verseRefs = book.data.verse_refs!;
         this.loadedVerses.clear();
-        this.setupIntersectionObserver();
+        if (isPlatformServer(this.platformId)) {
+          // Under SSR, IntersectionObserver never fires (no scroll, no
+          // viewport). Prefetch verses synchronously so crawlers and the
+          // Netlify Prerender extension get fully-rendered hadith bodies in
+          // the snapshot. Browser hydration receives them via Angular's
+          // TransferState since provideClientHydration() is enabled.
+          this.prefetchVersesForSsr();
+        } else {
+          this.setupIntersectionObserver();
+        }
         // For shell format, derive AI content from verse_translations
         this.hasAnyAiContent = book.data.verse_translations?.some(id => id.endsWith('.ai')) || false;
       } else {
@@ -188,6 +205,21 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   }
 
   // --- Lazy-loading support ---
+
+  // SSR path: synchronously kick off verse_detail fetches so Angular's
+  // pending-task tracking waits for them before serializing the rendered
+  // HTML. Caps at SSR_INLINE_VERSE_LIMIT to keep prerender HTML manageable.
+  private prefetchVersesForSsr(): void {
+    const refs = this.verseRefs.filter(r => !!r.path).slice(0, ChapterContentComponent.SSR_INLINE_VERSE_LIMIT);
+    for (const ref of refs) {
+      this.verseLoader.loadVerse(ref.path!).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(verse => {
+        if (verse) {
+          this.loadedVerses.set(ref.path!, verse);
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
 
   private setupIntersectionObserver(): void {
     this.destroyObserver();

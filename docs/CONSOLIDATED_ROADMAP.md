@@ -130,7 +130,7 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 
 | Item | Source | Status |
 |------|--------|--------|
-| Narrator profile pages freeze browser for high-narration narrators (#4: 3,116, #19: 5,511) | UX_REVIEW_REPORTS §1 | **OUTSTANDING** — needs lazy loading/virtualization |
+| Narrator profile pages freeze browser for high-narration narrators (#4: 3,116, #19: 5,511) | UX_REVIEW_REPORTS §1 | **DONE** (commit `38c173b`, FIX-04) — `mat-paginator` for hadith paths and subchains; `slice(0, 10)` caps elsewhere |
 | Add English transliteration to narrator names (list + profiles) | PPL-07, UX_REVIEW_REPORTS | **DONE** (commit `ce3cbb6`) — two-line name cell with Arabic + English |
 | Default sort narrators by narration count (not opaque ID) | UX_REVIEW_REPORTS §4 | **OUTSTANDING** |
 

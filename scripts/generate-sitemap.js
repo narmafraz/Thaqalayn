@@ -265,9 +265,20 @@ async function generateRemote() {
 async function main() {
   if (fs.existsSync(DATA_DIR)) {
     await generateLocal();
-  } else {
-    await generateRemote();
+    return;
   }
+  // CI build (no local data dir): if a committed sitemap is already in src/,
+  // leave it alone. Regenerating in remote-mode would silently strip the
+  // ~59K verse-detail URLs that only the local walker can discover, which
+  // happened on the 2026-04-25 deploy. Better to ship the committed full
+  // sitemap unchanged than to deploy a subset.
+  const committedIndex = path.join(OUT_DIR, 'sitemap.xml');
+  const committedAlKafi = path.join(OUT_DIR, 'sitemap-al-kafi.xml');
+  if (fs.existsSync(committedIndex) && fs.existsSync(committedAlKafi)) {
+    console.log('Local data dir absent and committed sitemap files present — leaving them in place. To refresh, run `npm run generate-sitemap` locally and commit the diff.');
+    return;
+  }
+  await generateRemote();
 }
 
 main().catch((err) => {

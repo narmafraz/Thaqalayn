@@ -25,6 +25,10 @@ const OG_LOCALES: Record<string, string> = {
   zh: 'zh_CN',
 };
 
+// Language codes for hreflang alternates. ISO 639-1 codes; Google accepts
+// these without region tags when content isn't region-specific.
+const HREFLANG_LANGS = Object.keys(OG_LOCALES);
+
 export interface BreadcrumbItem {
   name: string;
   url: string;
@@ -44,6 +48,7 @@ export interface PageMeta {
 @Injectable({ providedIn: 'root' })
 export class SeoService {
   private jsonLdElement: HTMLScriptElement | null = null;
+  private hreflangElements: HTMLLinkElement[] = [];
 
   constructor(
     private titleService: Title,
@@ -78,6 +83,7 @@ export class SeoService {
     this.meta.updateTag({ name: 'twitter:image', content: image });
 
     this.updateCanonical(page.url);
+    this.updateHreflang(page.url);
 
     if (page.jsonLd || page.breadcrumbs?.length) {
       this.updateJsonLd(buildJsonLdGraph(page.jsonLd, page.breadcrumbs));
@@ -304,6 +310,42 @@ export class SeoService {
       this.document.head.appendChild(link);
     }
     link.setAttribute('href', url);
+  }
+
+  // Emit one <link rel="alternate" hreflang="…"> per supported language plus
+  // an x-default pointing at the lang-less URL. Reuses the same path with
+  // ?lang= query strings since the site uses query-based language switching;
+  // when we move to subdirectory URLs (Track C), this becomes path-based.
+  private updateHreflang(url: string): void {
+    for (const el of this.hreflangElements) {
+      el.remove();
+    }
+    this.hreflangElements = [];
+
+    const baseUrl = this.stripLangParam(url);
+    const variants: Array<{ hreflang: string; href: string }> = HREFLANG_LANGS.map(lang => ({
+      hreflang: lang,
+      href: this.appendLangParam(baseUrl, lang),
+    }));
+    variants.push({ hreflang: 'x-default', href: baseUrl });
+
+    for (const v of variants) {
+      const el = this.document.createElement('link');
+      el.setAttribute('rel', 'alternate');
+      el.setAttribute('hreflang', v.hreflang);
+      el.setAttribute('href', v.href);
+      this.document.head.appendChild(el);
+      this.hreflangElements.push(el);
+    }
+  }
+
+  private stripLangParam(url: string): string {
+    return url.replace(/([?&])lang=[^&]*&?/, '$1').replace(/[?&]$/, '');
+  }
+
+  private appendLangParam(url: string, lang: string): string {
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}lang=${lang}`;
   }
 
   private updateJsonLd(data: Record<string, unknown>): void {

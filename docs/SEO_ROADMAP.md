@@ -38,7 +38,7 @@ These steps are checklisted here because they cannot be done from code. Each is 
 | M2 | **Submit sitemap** to Search Console: Indexing → Sitemaps → add `https://thaqalayn.netlify.app/sitemap.xml` (or `sitemap_index.xml` once Track B lands). | Search Console → Sitemaps | 2 min | **BLOCKED on M1** |
 | M3 | **Request indexing for key pages** via URL Inspection: homepage, Quran Al-Fatiha, Al-Kafi 1:1:1, narrator index, 3-5 high-priority narrators (e.g. the Imams). Do not over-use this — Google limits daily requests. | Search Console → URL Inspection | 15 min | **BLOCKED on M1** |
 | M4 | **Verify Bing Webmaster Tools** (imports from Search Console — one-click once M1 is done). Submit the sitemap there too. Powers Yahoo, DuckDuckGo, ChatGPT search. | https://www.bing.com/webmasters | 10 min | **BLOCKED on M1** |
-| M5 | **Install Netlify Prerender extension** — Netlify dashboard → Site → Extensions → search "Prerender" → Install → enable for production. Prerenders all routes for bots without any code changes. Then trigger a redeploy. `netlify.toml` already has the reminder comment. | Netlify dashboard | 5 min | **BLOCKED — you only** |
+| M5 | **Install Netlify Prerender Extension (Netlify-built, not Prerender.io)** — Netlify dashboard → Site → Extensions → search "Prerender" → install the one labeled "Netlify Prerender Extension" (free, no API key, GA Dec 2025). Skip the "Prerender.io" extension — same job but adds a third-party dependency, account, and token rotation, with no extra value for our use case. Then trigger a redeploy. See Appendix C (§15) for the comparison. **Caveat:** this won't fix lazy-loaded chapter pages — see P2.3. | Netlify dashboard | 5 min | **BLOCKED — you only** |
 | M6 | **After P1.3 lands**, regenerate the sitemap via `npm run generate-sitemap` and redeploy. Confirm `/sitemap.xml` returns 200 and contains the new URLs. | Terminal + browser | 2 min | Blocked on P1.3 |
 | M7 | **Decide on custom domain.** `thaqalayn.net` / `.org` / `.app` is ~$10-12/year and is the single biggest authority lever available. Every month delayed is lost ranking accumulation. If you commit, Netlify provisions Let's Encrypt automatically; hreflang work in Track B changes little. | Domain registrar → Netlify DNS | 30 min one-time | **Decision needed** |
 | M8 | **IndexNow API key** (optional, Track B). Generate a random hex key, serve it at `/{key}.txt`, then POST URL updates to `https://api.indexnow.org/indexnow`. Bing, Yandex, Naver, Seznam, Yep consume it instantly (Google does not). | Code + deploy | 1 hr | Deferred |
@@ -295,19 +295,27 @@ Quran verse URLs: ~6,236. Al-Kafi hadith URLs: ~16,000. Other books: ~45K more a
 
 ### P2.3 Prerender that sees the hadith text (G3 — critical)
 
-This is the **single highest-impact SEO fix** available. Today, a crawler that fetches `/books/al-kafi:1:1:1` gets the chapter shell with no hadith bodies. The IntersectionObserver never fires on a prerender render.
+This is the **single highest-impact SEO fix** available. Today, a crawler that fetches `/books/al-kafi:1:1:1` gets the chapter shell with no hadith bodies. The `IntersectionObserver` only fires when verse cards scroll into a real viewport, and headless prerenderers don't scroll — so M5 alone does **not** solve this.
 
-Two options:
+**M5 (Netlify Prerender Extension) gets us ~80% of the win on its own:**
+- Homepage, `/about`, `/download`, `/support` — already prerendered by Angular SSR; M5 is redundant but harmless
+- Narrator pages — work because data loads via NGXS resolver on init (no observer)
+- Verse-detail pages — work because all data is fetched synchronously
+- **Chapter pages with verses — still thin.** Headless prerender renders the shell; verses below the fold never fire their observers; verse JSON never gets fetched.
 
-**Option A — Inline verses in the shell when prerendering.**
-Modify `chapter-content.component.ts` to detect `isPlatformServer` (Angular universal) and, under SSR only, pre-fetch the first N verses synchronously before rendering. `VerseLoaderService` already caches with `shareReplay(1)` so client-side hydration isn't broken.
+So P2.3 is **needed regardless of which prerenderer we use**. AI crawlers (GPTBot, ClaudeBot, PerplexityBot) also can't run JavaScript at all — they need real HTML.
 
-**Option B — Netlify Prerender extension (M5).**
-The extension runs a headless Chromium, waits for network idle, and returns the fully-rendered DOM to bots. Requires no code changes; works for all routes. **This is the pragmatic path.** Cost: Netlify's prerender has a fair-use quota; for thaqalayn's traffic it should stay free.
+**Implementation: SSR-inline the verses.**
 
-**Recommended:** Ship M5 first (Track A). If bot traffic later proves the quota is an issue, implement Option A for the long tail.
+Modify `chapter-content.component.ts`:
+- Inject `PLATFORM_ID`; check `isPlatformServer(platformId)`
+- Under SSR only: synchronously prefetch all verse_detail JSON for the chapter and inline the rendered verse bodies into the initial HTML
+- Skip the `IntersectionObserver` setup under SSR
+- Browser-side hydration continues to use `VerseLoaderService` which already caches with `shareReplay(1)` — verses arrive pre-cached if hydration sees them inline
 
-**After either lands:** Use Search Console's URL Inspection "View rendered HTML" on 5-10 random verse-detail URLs to confirm the Arabic + translation text appears.
+For very long chapters (>100 verses), inline only the first ~50 to keep prerender HTML under ~500 KB; the long tail can be picked up by the live page.
+
+**After it lands:** Use Search Console's URL Inspection "View Crawled Page" on 5-10 random chapter URLs to confirm the Arabic + translation text appears in the rendered HTML.
 
 ### P2.4 Hreflang via XML sitemap (G7)
 
@@ -628,7 +636,46 @@ For this project (public scholarly corpus), **allow all** is the right policy. T
 
 ---
 
-## 15. Appendix C — Source documents
+## 15. Appendix C — Decision Log: Netlify Prerender Extension over Prerender.io
+
+**Date:** 2026-04-25
+**Decision:** Use the **Netlify Prerender Extension** (Netlify-built, GA Dec 2025) for M5, not the Prerender.io extension.
+
+### Comparison
+
+| Aspect | Netlify Prerender Extension | Prerender.io Extension |
+|--------|-----------------------------|------------------------|
+| Cost | Free; only standard Netlify Function invocation billing | Free tier: ~250 prerenders/day, 1,000 cached pages. Cache freshness control needs $349/mo plan |
+| Setup | One-click install, no API key | Sign up at prerender.io → API token → paste into Netlify extension config |
+| Mechanism | Netlify Edge Function detects bots → invokes Netlify Function with headless Chromium → returns rendered HTML | Edge Function detects bots → routes to prerender.io's external rendering service |
+| Maturity | GA Dec 2025; ~5 months old | Operating since 2013, enterprise-vetted |
+| Analytics | Logging in Netlify dashboard | Full analytics, cache-hit/miss insights, render logs |
+| Known issues | Breaks branch-deploy previews; may trigger Google Ads cloaking false-positive | Same Google Ads cloaking false-positive |
+| Lazy-load behavior | Not documented; doesn't scroll | Configurable scroll triggers (paid tier) |
+
+### Reasoning
+
+1. **Free is actually free** — no third-party billing relationship, no token rotation, no separate dashboard
+2. **Single vendor** — Netlify dashboard remains the source of truth for hosting, deploy, prerender; one less integration to manage
+3. **Google Ads cloaking risk doesn't apply** — the project doesn't run paid ads
+4. **Branch-deploy preview breakage is acceptable** — can be disabled per non-production branch in extension config
+5. **Lazy-load gap is the same either way** — neither extension scrolls the page, so neither sees `IntersectionObserver`-triggered content. P2.3 (SSR-inline verses) is required regardless of choice
+
+### Trade-offs accepted
+
+- Newer product; less battle-tested than Prerender.io. Mitigation: P2.3 reduces our dependency on the prerender working correctly (chapter pages will be SSR'd inline rather than depending on the prerender's headless Chromium catching them)
+- No analytics dashboard for cache hit/miss. Mitigation: Search Console's "Crawled Page" view + Netlify Function logs provide enough visibility to diagnose issues
+
+### Re-evaluation triggers
+
+Switch to Prerender.io if:
+- Netlify Function invocation costs become material (unlikely on a free Netlify plan with our traffic)
+- Prerender quality issues appear on critical routes that P2.3 doesn't cover
+- Netlify deprecates or paywalls their built-in extension
+
+---
+
+## 16. Appendix D — Source documents
 
 - `docs/PHASE3_FEATURE_PROPOSAL.md` §8 — Original SEO plan (2026-02-27). Covered hash→path, prerender, meta, robots, sitemap. Items 8.1-8.7 largely done; 8.8 (Angular SSG) partially implemented.
 - `docs/USER_STORIES.md` §12 — SEO-01..04 marked DONE (title, OG, JSON-LD, canonical). This roadmap treats those as **table stakes** and adds ~40 further items.

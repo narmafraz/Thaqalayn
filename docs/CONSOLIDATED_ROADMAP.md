@@ -282,22 +282,24 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 
 ---
 
-## Priority 6.5: SEO
+## Priority 6.5: SEO (✅ majority shipped 2026-04-25)
 
 **Goal:** Make the site actually indexable and discoverable — covering search engines (Google/Bing) and AI assistants (ChatGPT/Claude/Perplexity).
 
-**Source doc:** `SEO_ROADMAP.md` (2026-04-24) — full detail there. Summary of outstanding items:
+**Source doc:** `SEO_ROADMAP.md` — full detail there. Summary:
 
 | Track | Scope | Status |
 |-------|-------|--------|
-| Manual (owner-only) | Search Console verification, Netlify Prerender install, custom domain decision, IndexNow key | **PENDING — blocks everything else** |
-| Track A (quick wins) | Twitter Card, `BreadcrumbList` JSON-LD, dynamic `<html lang>` + `og:locale`, `lang="ar"` on Arabic, `<lastmod>` in sitemap, wire sitemap into build, AI-crawler policy in robots.txt, per-page OG images, word-boundary description truncation | **OUTSTANDING** |
-| Track B (structural) | Sitemap index (>50K URLs), add all 67K verse-detail URLs, hreflang in sitemap, SSR-inline lazy verse bodies (or Netlify Prerender), soft-404 fix, narrator virtualization | **OUTSTANDING** |
-| GEO (AI search) | `llms.txt`, FAQPage schema per chapter, definitional opening sentences, named author attribution | **OUTSTANDING** |
-| Performance (CWV) | Preconnect, critical CSS, web-vitals field data, INP audit | **OUTSTANDING** |
-| Discovery | IndexNow, Bing Webmaster Tools, internal linking audit, `noindex` on utility pages | **OUTSTANDING** |
+| Manual (owner-only) | M1-M5 (Search Console + Bing verification, sitemap submission, Prerender install) | **✅ DONE 2026-04-25** |
+| Track A (quick wins) | Twitter Card, `BreadcrumbList` JSON-LD, dynamic `<html lang>` + `og:locale`, `lang="ar"` on Arabic, `<lastmod>` in sitemap, wire sitemap into build, AI-crawler policy in robots.txt, word-boundary description truncation | **✅ DONE** (commits `5caeddb`, `ac2a5c9`) |
+| Track B (structural) | Sitemap index, 72K verse-detail URLs, hreflang alternates, SSR-inline lazy verse bodies + crawler-detection fallback, soft-404 fix | **✅ DONE** (commits `91c5225`, `e9ba0b0`, `722ffe7`, `2cd3d02`, `1b0cef8`) |
+| GEO (AI search) | `llms.txt`, FAQPage schema per chapter, definitional homepage description | **✅ DONE** (commits `1001b7c`, `00961a4`) |
+| Performance (CWV) | Preconnect tags, web-vitals telemetry service (logs to console) | **✅ DONE** (commit `54a5a1a`) |
+| E-E-A-T | datePublished + dateModified in JSON-LD | **✅ DONE** (commit `f7abec8`) |
+| Narrator virtualization | mat-paginator on narrator profile pages | **✅ Already done** in commit `38c173b` (FIX-04, pre-dating SEO roadmap) |
+| **Outstanding (decisions needed)** | Custom domain (M7), IndexNow key (M8), web-vitals → analytics endpoint (M10), per-page OG images (M11), definitional hero copy on homepage + /about, named author/maintainer, Track C subdirectory language URLs | **⏳ PENDING — see SEO_ROADMAP §2** |
 
-Already-done baseline (SEO-01..04 from USER_STORIES): `SeoService`, OG tags, JSON-LD (WebSite/Book/CreativeWork/Person/CollectionPage), canonical URLs, path routing, static sitemap, E2E tests.
+Baseline (pre-2026-04-25, SEO-01..04 from USER_STORIES): `SeoService`, OG tags, JSON-LD (WebSite/Book/CreativeWork/Person/CollectionPage), canonical URLs, path routing, static sitemap, E2E tests — all live before this roadmap's work began.
 
 ---
 

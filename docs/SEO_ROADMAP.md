@@ -1,7 +1,8 @@
 # SEO Roadmap
 
 > **Created:** 2026-04-24
-> **Last verified against source code:** 2026-04-24
+> **Last updated:** 2026-04-25 (Track A + Track B + GEO/CWV/E-E-A-T quick wins shipped)
+> **Last verified against source code:** 2026-04-25
 > **Purpose:** Single source of truth for SEO work across Thaqalayn. Consolidates prior plans from `PHASE3_FEATURE_PROPOSAL.md` §8 (2026-02-27), expands with 2026 best practices (GEO, llms.txt, INP, hreflang-in-sitemap, AI crawler policy), and lists manual steps the site owner must perform.
 
 **Audience for this doc:**
@@ -12,19 +13,44 @@
 
 ## 1. Executive summary
 
-Thaqalayn shipped the SEO baseline in early 2026 (path routing, `SeoService`, OG, JSON-LD, robots.txt, sitemap, E2E tests) and marked `USER_STORIES` items SEO-01..04 as DONE. A code-level audit on 2026-04-24 shows the baseline is **functionally correct but materially incomplete**:
+**Status as of 2026-04-25:** Track A, Track B, plus GEO/CWV/E-E-A-T quick wins have all shipped. The site is now in a strong indexable state.
 
-- Search Console is **not actually verified** (`index.html` still has the placeholder token)
-- The sitemap covers ~7,349 URLs but **omits all 67,715 individual hadith pages** that were built in VRS-07
-- Hadith bodies are lazy-loaded by `VerseLoaderService` via `IntersectionObserver` → crawlers and prerenderers may never see the actual Arabic + translation text
-- No Twitter Card, no hreflang, no `BreadcrumbList` schema, `<html lang>` hardcoded, Arabic text not marked `lang="ar"`
-- `scripts/generate-sitemap.js` exists but is not wired into `npm run build` → the sitemap drifts every time data is regenerated
-- No `<lastmod>` on any sitemap URL → wastes crawl budget
-- No AI-crawler policy (GPTBot, ClaudeBot, PerplexityBot not addressed)
-- No GEO structure (definitional openings, FAQ schema per hadith, llms.txt)
-- High-narration narrator pages (#4: 3,116 narrations, #19: 5,511) **freeze the browser** — Googlebot will abandon crawl
+### What was wrong (April audit)
 
-**Two-track plan below.** Track A is ~1 day of work and fixes the bleeding. Track B is structural (sitemap index, prerender-waits-for-lazy-data, hreflang, custom domain) and is a 1-3 week effort.
+Thaqalayn shipped the SEO baseline in early 2026 (path routing, `SeoService`, OG, JSON-LD, robots.txt, sitemap, E2E tests) and marked `USER_STORIES` items SEO-01..04 as DONE. A code-level audit on 2026-04-24 found the baseline was functionally correct but materially incomplete: Search Console wasn't actually verified, the sitemap omitted all 67K hadith pages, lazy-loaded verses were invisible to crawlers, and there was no Twitter Card, hreflang, BreadcrumbList, AI-crawler policy, llms.txt, FAQ schema, or Core Web Vitals telemetry.
+
+### What's now in place
+
+| Area | State |
+|------|-------|
+| **Search Console** | Verified (token `haBRxR-7K-zM…`); sitemap submitted |
+| **Bing Webmaster Tools** | Imported from Search Console |
+| **Netlify Prerender Extension** | Installed (Netlify-built variant) — bot UAs get prerendered HTML |
+| **Sitemap** | `/sitemap.xml` is now a sitemap-index referencing 26 per-book buckets; **72,112 URLs** (vs 13,290 before), every URL with `<lastmod>` |
+| **Build pipeline** | `prebuild` hook auto-regenerates sitemap from current data on every Netlify deploy |
+| **Lazy verse fix** | Chapter-content prefetches up to 50 verses synchronously under SSR (`isPlatformServer`) so crawlers see actual hadith bodies |
+| **Soft-404s** | Wildcard route → NotFoundComponent emits `<meta name="robots" content="noindex">` |
+| **Twitter Card** | `summary_large_image` on every page |
+| **OG / hreflang / `<html lang>`** | Per-page OG tags including `og:locale`; hreflang alternates for 12 supported languages + x-default |
+| **JSON-LD** | WebSite, Book, CreativeWork, Person, CollectionPage, BreadcrumbList, FAQPage (chapters with AI Q/A); all include `datePublished` + `dateModified` |
+| **AI crawler policy** | robots.txt explicitly allows GPTBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, CCBot, etc. |
+| **llms.txt** | Published at `/llms.txt` for AI-crawler discovery |
+| **Core Web Vitals telemetry** | `WebVitalsService` reports LCP/INP/CLS/FCP/TTFB to console (ready to wire to analytics) |
+| **Preconnect** | `<link rel="preconnect">` for the data API origin + Google Fonts |
+| **Arabic `lang="ar"`** | Added on remaining unwrapped Arabic spans |
+
+### What's still outstanding
+
+- **P1.8 per-page OG images** — needs design assets (1200×630 branded PNGs)
+- **P3.3 definitional opening copy** — homepage hero + /about intro paragraph (content/UX decision)
+- **P5 named author / editorial voice on /about** — content decision
+- **P6 IndexNow integration** — needs you to generate an API key
+- **P7 Custom domain** — the highest-impact remaining lever; ~$10-12/yr
+- **Track C subdirectory language URLs** — bigger architectural change
+
+### What this doc still serves as
+
+The historical record of what was missing, why each fix matters, and the source-verified status of each item. Future sessions should read §3 (gap inventory) for the audit baseline; the rest is now mostly status-tracking.
 
 ---
 
@@ -34,14 +60,17 @@ These steps are checklisted here because they cannot be done from code. Each is 
 
 | # | Step | Where | Time | Status |
 |---|------|-------|------|--------|
-| M1 | **Verify Google Search Console ownership** (pick Domain property if you later move off `netlify.app`; otherwise URL-prefix property for `https://thaqalayn.netlify.app/`). Get the HTML meta tag verification code and replace `PLACEHOLDER_VERIFICATION_CODE` in `src/index.html:8`. | https://search.google.com/search-console | 10 min | **BLOCKED — you only** |
-| M2 | **Submit sitemap** to Search Console: Indexing → Sitemaps → add `https://thaqalayn.netlify.app/sitemap.xml` (or `sitemap_index.xml` once Track B lands). | Search Console → Sitemaps | 2 min | **BLOCKED on M1** |
-| M3 | **Request indexing for key pages** via URL Inspection: homepage, Quran Al-Fatiha, Al-Kafi 1:1:1, narrator index, 3-5 high-priority narrators (e.g. the Imams). Do not over-use this — Google limits daily requests. | Search Console → URL Inspection | 15 min | **BLOCKED on M1** |
-| M4 | **Verify Bing Webmaster Tools** (imports from Search Console — one-click once M1 is done). Submit the sitemap there too. Powers Yahoo, DuckDuckGo, ChatGPT search. | https://www.bing.com/webmasters | 10 min | **BLOCKED on M1** |
-| M5 | **Install Netlify Prerender Extension (Netlify-built, not Prerender.io)** — Netlify dashboard → Site → Extensions → search "Prerender" → install the one labeled "Netlify Prerender Extension" (free, no API key, GA Dec 2025). Skip the "Prerender.io" extension — same job but adds a third-party dependency, account, and token rotation, with no extra value for our use case. Then trigger a redeploy. See Appendix C (§15) for the comparison. **Caveat:** this won't fix lazy-loaded chapter pages — see P2.3. | Netlify dashboard | 5 min | **BLOCKED — you only** |
-| M6 | **After P1.3 lands**, regenerate the sitemap via `npm run generate-sitemap` and redeploy. Confirm `/sitemap.xml` returns 200 and contains the new URLs. | Terminal + browser | 2 min | Blocked on P1.3 |
-| M7 | **Decide on custom domain.** `thaqalayn.net` / `.org` / `.app` is ~$10-12/year and is the single biggest authority lever available. Every month delayed is lost ranking accumulation. If you commit, Netlify provisions Let's Encrypt automatically; hreflang work in Track B changes little. | Domain registrar → Netlify DNS | 30 min one-time | **Decision needed** |
-| M8 | **IndexNow API key** (optional, Track B). Generate a random hex key, serve it at `/{key}.txt`, then POST URL updates to `https://api.indexnow.org/indexnow`. Bing, Yandex, Naver, Seznam, Yep consume it instantly (Google does not). | Code + deploy | 1 hr | Deferred |
+| M1 | **Verify Google Search Console ownership** (URL-prefix property for `https://thaqalayn.netlify.app/`, HTML tag method). | https://search.google.com/search-console | 10 min | **✅ DONE 2026-04-25** — token live in `index.html`, ownership verified |
+| M2 | **Submit sitemap** to Search Console. | Search Console → Sitemaps | 2 min | **✅ DONE 2026-04-25** — `/sitemap.xml` submitted; auto-recrawls the new sitemap-index format |
+| M3 | **Request indexing for key pages** via URL Inspection. Daily quota ~10. | Search Console → URL Inspection | 15 min | **✅ Quota used 2026-04-25** — homepage + key URLs submitted; quota exceeded by end of day. Resume tomorrow if more nudges needed |
+| M4 | **Verify Bing Webmaster Tools** (one-click import from Search Console). | https://www.bing.com/webmasters | 10 min | **✅ DONE 2026-04-25** |
+| M5 | **Install Netlify Prerender Extension (Netlify-built variant)** — settings: "Skip CSS/images/etc" ON, "Skip user-agents supporting JavaScript" OFF. | Netlify dashboard | 5 min | **✅ DONE 2026-04-25** — verified live: bot UAs get prerendered HTML, browser UAs get the SPA shell |
+| M6 | **After P1.3 lands**, regenerate the sitemap and redeploy. | Terminal + browser | 2 min | **✅ DONE** — `prebuild` hook auto-regenerates on every Netlify build |
+| M7 | **Decide on custom domain.** `thaqalayn.net` / `.org` / `.app` is ~$10-12/year — single biggest remaining authority lever. | Domain registrar → Netlify DNS | 30 min one-time | **⏳ PENDING decision** |
+| M8 | **IndexNow API key** (optional). Generate a random hex key, serve it at `/{key}.txt`, then POST URL updates to `https://api.indexnow.org/indexnow`. | Code + deploy | 1 hr | **⏳ PENDING — needs key from you** |
+| M9 | **Resubmit sitemap to Search Console + Bing** after the sitemap-index migration deployed (URL is the same `/sitemap.xml` but content is now an index). Click "Resubmit" or wait for auto-recrawl. | Search Console + Bing WMT | 2 min | **⏳ Recommended after Track B deploy** |
+| M10 | **Wire web-vitals telemetry to a real endpoint.** Edit `src/app/services/web-vitals.service.ts` `report()` to send to GA4 / Plausible / custom endpoint. Currently logs to console. Without this we have no field-data on INP/LCP/CLS. | Code | 30 min | **⏳ PENDING — needs your analytics target** |
+| M11 | **Replace placeholder per-page OG images** (P1.8a) with branded 1200×630 PNGs: one each for Quran, Al-Kafi, narrator pages, default. Drop in `src/assets/og-*.png`, then update `SeoService` to pick by page type. | Design + code | 1-2 hrs | **⏳ PENDING — needs design** |
 
 **Bolded "you only" steps** are non-recoverable from Claude Code — these should be ticked in calendar time, not queued behind dev work.
 
@@ -92,7 +121,7 @@ These steps are checklisted here because they cannot be done from code. Each is 
 
 ---
 
-## 4. Priority 1 — Track A: Quick wins (ship this week)
+## 4. Priority 1 — Track A: Quick wins (✅ shipped 2026-04-25)
 
 Every item here is a self-contained code change with a clear blast radius. Together they close G1, G5, G6, G8-G11, G15, G20.
 
@@ -262,7 +291,7 @@ Sitemap: https://thaqalayn.netlify.app/sitemap_index.xml
 
 ---
 
-## 5. Priority 2 — Track B: Structural work
+## 5. Priority 2 — Track B: Structural work (✅ shipped 2026-04-25)
 
 ### P2.1 Sitemap index for >50K URLs
 
@@ -293,7 +322,25 @@ G2 depends on P2.1 (won't fit in one file). After P2.1, the generator must walk 
 
 Quran verse URLs: ~6,236. Al-Kafi hadith URLs: ~16,000. Other books: ~45K more as they come online. Priority drops to 0.5 (individual verses are less important than chapter pages for ranking).
 
-### P2.3 Prerender that sees the hadith text (G3 — critical)
+### P2.3 Prerender that sees the hadith text (G3 — critical) — **shipped 2026-04-25**
+
+**Final implementation:**
+- `chapter-content.component.ts` checks both `isPlatformServer(platformId)` AND `isLikelyCrawler()` (a browser-side heuristic on `navigator.webdriver` + bot UA patterns) before deciding between eager prefetch vs `IntersectionObserver`.
+- Either path triggers `prefetchVersesForSsr(book)` which fires up to `SSR_INLINE_VERSE_LIMIT = 50` parallel verse_loader fetches and tracks completion to emit FAQPage JSON-LD once they resolve.
+- Browser hydration receives the verses pre-cached via `provideClientHydration() + TransferState`.
+
+**Why both checks were needed (post-mortem 2026-04-25):**
+The original P2.3 design assumed Netlify Prerender ran Angular SSR (`isPlatformServer === true`). It doesn't. Netlify Prerender executes the **browser bundle** in headless Chromium, so `isPlatformServer` is false there. Verification on the deployed site confirmed only 2 of ~10 hadith were rendered for Googlebot UA. Adding the browser-side `isLikelyCrawler()` heuristic closed the gap.
+
+**Crawler detection criteria:**
+- `navigator.webdriver === true` (Puppeteer, Playwright, Selenium, headless Chromium)
+- UA matches `/headlesschrome|googlebot|bingbot|gptbot|claudebot|claude-searchbot|perplexitybot|oai-searchbot|applebot|yandexbot|baiduspider|duckduckbot|facebookexternalhit|twitterbot|linkedinbot|slackbot|telegrambot|whatsapp|prerender|netlify-prerender/i`
+
+**Trade-off accepted:** a UA-spoofing tool (e.g. "User-Agent Switcher" extension) that sets a bot UA will trigger eager-load. Bandwidth cost is bounded by the 50-verse cap. Real users on real browsers continue to use lazy loading.
+
+**Original (pre-fix) plan kept below for reference:**
+
+This is the **single highest-impact SEO fix** available. Today, a crawler that fetches `/books/al-kafi:1:1:1` gets the chapter shell with no hadith bodies. The `IntersectionObserver` only fires when verse cards scroll into a real viewport, and headless prerenderers don't scroll — so M5 alone does **not** solve this.
 
 This is the **single highest-impact SEO fix** available. Today, a crawler that fetches `/books/al-kafi:1:1:1` gets the chapter shell with no hadith bodies. The `IntersectionObserver` only fires when verse cards scroll into a real viewport, and headless prerenderers don't scroll — so M5 alone does **not** solve this.
 
@@ -365,7 +412,7 @@ No further action needed for SEO. If Search Console later flags rendering timeou
 
 ---
 
-## 6. Priority 3 — GEO (Generative Engine Optimization)
+## 6. Priority 3 — GEO (Generative Engine Optimization) (✅ partially shipped 2026-04-25)
 
 This project is **exceptionally well-suited for GEO** because the AI content pipeline already generates `seo_question`, `summary`, and scholarly context per hadith. We can expose that material in structures LLM crawlers (GPTBot, PerplexityBot, ClaudeBot) preferentially ingest.
 
@@ -436,7 +483,7 @@ The canonical narrator registry is unique value. Expose it to crawlers via struc
 
 ---
 
-## 7. Priority 4 — Performance (Core Web Vitals)
+## 7. Priority 4 — Performance (Core Web Vitals) (✅ partially shipped 2026-04-25)
 
 2026 thresholds (75th-percentile of real users):
 - **LCP < 2.0s** (was 2.5s — tightened)
@@ -461,7 +508,7 @@ Install [`web-vitals`](https://www.npmjs.com/package/web-vitals) and log INP/LCP
 
 ---
 
-## 8. Priority 5 — Content quality & E-E-A-T
+## 8. Priority 5 — Content quality & E-E-A-T (partial; ✅ dateModified shipped)
 
 Google 2026 emphasis: **Trust** is the most important of the four E-E-A-T pillars. A page with low trust cannot rank regardless of other signals. Religious/scholarly content touches YMYL borders when it gives life guidance — treat accordingly.
 

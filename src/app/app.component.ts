@@ -50,9 +50,9 @@ export class AppComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
   mobileSearchOpen = false;
 
-  private static readonly STATIC_TITLES: Record<string, { i18nKey: string; fallback: string }> = {
+  private static readonly STATIC_TITLES: Record<string, { i18nKey: string; fallback: string; noindex?: boolean }> = {
     '/about': { i18nKey: 'pageTitle.about', fallback: 'About' },
-    '/bookmarks': { i18nKey: 'pageTitle.bookmarks', fallback: 'Bookmarks' },
+    '/bookmarks': { i18nKey: 'pageTitle.bookmarks', fallback: 'Bookmarks', noindex: true },
     '/download': { i18nKey: 'pageTitle.download', fallback: 'Download' },
     '/support': { i18nKey: 'pageTitle.support', fallback: 'Support' },
     '/topics': { i18nKey: 'pageTitle.topics', fallback: 'Topics' },
@@ -217,7 +217,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
         for (const [route, entry] of Object.entries(AppComponent.STATIC_TITLES)) {
           if (path === route) {
-            this.seo.setStaticPage(route, entry.fallback, lang);
+            this.seo.setStaticPage(route, entry.fallback, lang, entry.noindex);
             this.currentPageContext = { type: 'static', data: route };
             this.applyLocalizedTitle();
             return;

@@ -126,7 +126,7 @@ export class SeoService {
     });
   }
 
-  setStaticPage(path: string, title: string, lang?: string): void {
+  setStaticPage(path: string, title: string, lang?: string, noindex = false): void {
     const descriptions: Record<string, string> = {
       '/about': 'Learn about the Thaqalayn project and its mission to provide accessible Islamic texts.',
       '/download': 'Download Quran and hadith data from the Thaqalayn project.',
@@ -138,6 +138,13 @@ export class SeoService {
       url: BASE_URL + path,
       locale: ogLocaleFor(lang),
     });
+    // Per-user utility pages (e.g. /bookmarks) should not be indexed — they
+    // are thin from a crawler's perspective (no shared content) and risk a
+    // duplicate-content / thin-content penalty. setPageMeta strips robots
+    // tags by default, so we apply noindex AFTER the base meta is set.
+    if (noindex) {
+      this.meta.updateTag({ name: 'robots', content: 'noindex, follow' });
+    }
   }
 
   // Like setBookPage but also emits a FAQPage JSON-LD with up to MAX_FAQ

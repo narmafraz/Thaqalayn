@@ -1,8 +1,8 @@
 # SEO Roadmap
 
 > **Created:** 2026-04-24
-> **Last updated:** 2026-04-25 (Track A + Track B + GEO/CWV/E-E-A-T quick wins shipped)
-> **Last verified against source code:** 2026-04-25
+> **Last updated:** 2026-04-26 (P3.3 definitional /about + /bookmarks noindex shipped; P5 named author deferred; P6 IndexNow declined)
+> **Last verified against source code:** 2026-04-26
 > **Purpose:** Single source of truth for SEO work across Thaqalayn. Consolidates prior plans from `PHASE3_FEATURE_PROPOSAL.md` §8 (2026-02-27), expands with 2026 best practices (GEO, llms.txt, INP, hreflang-in-sitemap, AI crawler policy), and lists manual steps the site owner must perform.
 
 **Audience for this doc:**
@@ -13,7 +13,7 @@
 
 ## 1. Executive summary
 
-**Status as of 2026-04-25:** Track A, Track B, plus GEO/CWV/E-E-A-T quick wins have all shipped. The site is now in a strong indexable state.
+**Status as of 2026-04-26:** Track A, Track B, plus GEO/CWV/E-E-A-T quick wins have all shipped. P3.3 (definitional /about) and `/bookmarks` noindex shipped 2026-04-26. The site is now in a strong indexable state.
 
 ### What was wrong (April audit)
 
@@ -42,9 +42,9 @@ Thaqalayn shipped the SEO baseline in early 2026 (path routing, `SeoService`, OG
 ### What's still outstanding
 
 - **P1.8 per-page OG images** — needs design assets (1200×630 branded PNGs)
-- **P3.3 definitional opening copy** — homepage hero + /about intro paragraph (content/UX decision)
-- **P5 named author / editorial voice on /about** — content decision
-- **P6 IndexNow integration** — needs you to generate an API key
+- **P3.3 homepage hero copy** — `/about` shipped 2026-04-26 with a definitional opening; the homepage `DEFAULT_DESCRIPTION` in `src/app/services/seo.service.ts` still says "the Al-Kafi hadith collection" and should be updated to "the major Shia hadith collections" for consistency. One-line fix
+- **P5 named author / editorial voice on /about** — **deferred 2026-04-26** by site owner; revisit if/when E-E-A-T trust signal becomes a bottleneck
+- **P6 IndexNow integration** — **declined 2026-04-26** by site owner; corpus updates are infrequent batch events and the Bing/Yandex/Naver win is small. Revisit if the pipeline starts pushing daily AI updates
 - **P7 Custom domain** — the highest-impact remaining lever; ~$10-12/yr
 - **Track C subdirectory language URLs** — bigger architectural change
 
@@ -461,12 +461,19 @@ When a chapter has N hadith and each hadith has an `ai_seo_question` + `ai_summa
 
 **Caution:** Google restricted FAQ rich results in 2023 to "well-known authoritative sites" — we may not qualify yet. However, even without rich-result display, the schema is read by LLM crawlers and can surface in AI Overviews. Keep ≤10 Q&A per page.
 
-### P3.3 Definitional openings
+### P3.3 Definitional openings — **`/about` shipped 2026-04-26; homepage still pending**
 
-GEO research (2025-2026) shows pages whose opening sentence is clearly definitional are cited significantly more by LLMs. Audit the homepage, `/about`, book-level pages to open with one sentence defining what the page is:
+GEO research (2025-2026) shows pages whose opening sentence is clearly definitional are cited significantly more by LLMs.
 
-- **Before (current homepage hero):** "Browse Quran and hadith collections."
-- **After:** "Thaqalayn is a free, open digital library of authentic Shia Islamic primary texts — the Holy Quran and Al-Kafi hadith collection — in Arabic with English translations, narrator chains, and scholarly references."
+**Shipped — `/about` rewrite (2026-04-26):**
+- Definitional opening sentence: *"Thaqalayn is a free, open digital library of authentic Shia Islamic primary texts — the Holy Quran and the major Shia hadith collections — with Arabic originals, multiple English translations, narrator chains, and scholarly references."*
+- Replaced rambling personal-blog content (Heroku/COVID anecdotes) with: explicit content scope (Quran + 20+ hadith collections inc. the Four Books with named compilers and dates), preserved project objectives, build principles (open data / reproducible / free), acknowledgements with licensing notes (Tanzil CC BY 3.0).
+- E-E-A-T-relevant attribution: names al-Kulayni (d. 329 AH), al-Tusi, and al-Saduq with their works; gives LLMs concrete entities to cite.
+- Translated across all 12 supported languages with identical 31-key structure (`about.*`). Validation script confirms key parity across `en, ar, bn, de, es, fa, fr, id, ru, tr, ur, zh`.
+
+**Still pending — homepage:**
+- `DEFAULT_DESCRIPTION` in `src/app/services/seo.service.ts` (used by `setHomePage`) still names "the Al-Kafi hadith collection" only. Update to match the new `/about` intro: "the major Shia hadith collections". One-line copy fix.
+- The visible homepage UI hero copy itself wasn't audited; revisit if/when the homepage UX is touched.
 
 ### P3.4 Authoritative attribution visible on page
 
@@ -514,9 +521,9 @@ Google 2026 emphasis: **Trust** is the most important of the four E-E-A-T pillar
 
 | Item | Why |
 |------|-----|
-| Named author or editorial entity on `/about` | Google rates anonymous content lower. Consider "Maintained by [name/org], [role]" visible on About + in footer |
+| Named author or editorial entity on `/about` | Google rates anonymous content lower. Consider "Maintained by [name/org], [role]" visible on About + in footer. **Deferred 2026-04-26** — site owner opted not to attach a personal name. The /about rewrite added project-level attribution (named compilers al-Kulayni / al-Tusi / al-Saduq, Tanzil CC BY 3.0 licensing) which provides scholarly trust signal even without a maintainer name |
 | Source citations visible on every hadith | Already done — sanad chain + grading. Make sure it's visible to crawlers (i.e. SSR'd, not lazy) |
-| Transparency about AI-generated enrichment | We already do this implicitly with the AI toggle. Add explicit disclosure on `/about` and a small badge on each hadith when AI content is shown |
+| Transparency about AI-generated enrichment | **Partially shipped 2026-04-26** — `/about` now describes AI enrichment under "What you'll find" with the disclosure "clearly labelled as AI-generated and toggleable". Per-hadith AI badge still pending |
 | Last-updated dates on key pages | Signals freshness to Google. Emit `datePublished` + `dateModified` in JSON-LD |
 | Contact method (email at minimum) | Trust signal per QRG. We have a support page — add a clear contact |
 | External authoritative citations | Cross-link WikiShia narrator articles where available (ties into `RESEARCH_TAHDHIB_ISTIBSAR_SOURCES`) |
@@ -528,11 +535,11 @@ Google 2026 emphasis: **Trust** is the most important of the four E-E-A-T pillar
 
 | Item | Notes |
 |------|-------|
-| **IndexNow** (Bing, Yandex, Naver, Seznam, Yep; **not Google**) | After the data pipeline writes new/updated hadith, POST the URLs to `https://api.indexnow.org/indexnow?url=...&key=...`. Generate a hex key, serve at `/{key}.txt`. A hook in `ThaqalaynDataGenerator` can batch-emit on each run |
+| **IndexNow** (Bing, Yandex, Naver, Seznam, Yep; **not Google**) | After the data pipeline writes new/updated hadith, POST the URLs to `https://api.indexnow.org/indexnow?url=...&key=...`. Generate a hex key, serve at `/{key}.txt`. A hook in `ThaqalaynDataGenerator` can batch-emit on each run. **Declined 2026-04-26** — corpus updates are infrequent batch events; Bing/Yandex/Naver crawlers pick up new URLs from the sitemap on their normal cadence anyway, and Google (the larger source of organic traffic) doesn't honour IndexNow. Revisit if/when the AI pipeline starts pushing daily updates and faster Bing-via-ChatGPT-search latency matters |
 | **Bing Webmaster Tools** | 17% of Bing clicks now come via IndexNow. Bing also powers ChatGPT search. Free, fast, no reason to skip |
 | **Internal linking audit** | Today verse-detail pages only link "up" to chapter. Add "previous/next hadith in volume", related narrator links, cross-references. Crawlers use internal links as relevance signals |
 | **Canonical consistency** | Every URL should have one canonical form. Today `?lang=` is stripped from canonical (good) but `?aiMode=` or other query strings may sneak in — audit |
-| **noindex on utility pages** | `/bookmarks` is per-user — should be `noindex`. `/topics` and `/phrases` are discovery pages — keep indexable but verify they aren't thin |
+| **noindex on utility pages** | **`/bookmarks` shipped 2026-04-26** — `setStaticPage` accepts an optional `noindex` flag, wired via `STATIC_TITLES` in `app.component.ts` (emits `<meta name="robots" content="noindex, follow">`). `/topics` and `/phrases` are discovery pages — keep indexable but verify they aren't thin |
 | **Pagination** | High-narration narrator pages when virtualized should use proper `rel="canonical"` on each page and `rel="prev/next"` (deprecated by Google but still used by Bing) |
 
 ---

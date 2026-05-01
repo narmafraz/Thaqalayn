@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "ثقلین",
-    "skipToContent": "رفتن به محتوا"
+    "skipToContent": "رفتن به محتوا",
+    "closeMenu": "بستن منو",
+    "breadcrumbAria": "مسیر ناوبری",
+    "mainNavAria": "ناوبری اصلی"
   },
   "ai": {
     "summary": "خلاصه",
@@ -86,7 +89,16 @@
     "unknownBookPart": "متأسفانه نمی‌دانیم چگونه این بخش را نمایش دهیم!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "کپی متن",
-    "textCopied": "کپی شد!"
+    "textCopied": "کپی شد!",
+    "toggleDiacritics": "تغییر اِعراب",
+    "wordByWordAnalysis": "تحلیل کلمه به کلمه",
+    "wordDetails": "جزئیات کلمه",
+    "wordTranslationLanguage": "زبان ترجمه کلمه",
+    "shuffleQuran": "آیه دیگری نشان بده",
+    "shuffleHadith": "حدیث دیگری نشان بده",
+    "viewOnThaqalayn": "مشاهده در ثقلین",
+    "surahLabel": "سوره",
+    "ayahLabel": "آیه"
   },
   "narrator": {
     "narratedAhadith": "احادیث روایت شده",
@@ -179,7 +191,8 @@
     "clear": "پاک کردن",
     "bookNavigation": "پیمایش کتاب‌ها",
     "collapse": "بستن",
-    "expand": "باز کردن"
+    "expand": "باز کردن",
+    "close": "بستن"
   },
   "breadcrumb": {
     "home": "صفحه اصلی"
@@ -247,7 +260,9 @@
     "delete": "حذف",
     "placeholder": "یادداشت شخصی خود را اینجا بنویسید...",
     "notes": "یادداشت‌های من",
-    "noNotes": "هنوز یادداشتی ندارید. هنگام مطالعه یادداشت اضافه کنید."
+    "noNotes": "هنوز یادداشتی ندارید. هنگام مطالعه یادداشت اضافه کنید.",
+    "personalNote": "یادداشت شخصی",
+    "writeComment": "نوشتن نظر"
   },
   "topics": {
     "title": "موضوعات",
@@ -271,7 +286,8 @@
     "post": "ارسال",
     "flag": "گزارش",
     "delete": "حذف",
-    "signInPrompt": "برای شرکت در بحث وارد شوید."
+    "signInPrompt": "برای شرکت در بحث وارد شوید.",
+    "scholarVerified": "توسط دانشمند تأیید شده"
   },
   "sync": {
     "title": "همگام‌سازی ابری",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "جستجوی عبارات...",
     "noResults": "عبارتی مطابقت ندارد.",
     "comingSoon": "فهرست عبارات به زودی."
+  },
+  "partType": {
+    "hadith": "حدیث",
+    "verse": "آیه",
+    "chapter": "باب",
+    "heading": "عنوان",
+    "volume": "جلد",
+    "book": "کتاب",
+    "section": "بخش",
+    "surah": "سوره",
+    "ayah": "آیه"
   }
 }

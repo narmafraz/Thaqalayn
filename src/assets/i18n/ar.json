@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "الثقلين",
-    "skipToContent": "انتقل إلى المحتوى"
+    "skipToContent": "انتقل إلى المحتوى",
+    "closeMenu": "إغلاق القائمة",
+    "breadcrumbAria": "مسار التنقل",
+    "mainNavAria": "التنقل الرئيسي"
   },
   "ai": {
     "summary": "ملخص",
@@ -86,7 +89,16 @@
     "unknownBookPart": "لا نعرف كيفية عرض هذا الجزء، نعتذر!",
     "relatedChapters": "فصول ذات صلة في كتب أخرى",
     "copyText": "نسخ النص",
-    "textCopied": "تم النسخ!"
+    "textCopied": "تم النسخ!",
+    "toggleDiacritics": "تبديل التشكيل",
+    "wordByWordAnalysis": "تحليل كلمة بكلمة",
+    "wordDetails": "تفاصيل الكلمة",
+    "wordTranslationLanguage": "لغة ترجمة الكلمة",
+    "shuffleQuran": "أظهر آية أخرى",
+    "shuffleHadith": "أظهر حديثاً آخر",
+    "viewOnThaqalayn": "عرض في ثقلين",
+    "surahLabel": "سورة",
+    "ayahLabel": "آية"
   },
   "narrator": {
     "narratedAhadith": "الأحاديث المروية",
@@ -191,7 +203,8 @@
     "clear": "مسح",
     "bookNavigation": "تصفح الكتب",
     "collapse": "طي",
-    "expand": "توسيع"
+    "expand": "توسيع",
+    "close": "إغلاق"
   },
   "breadcrumb": {
     "home": "الرئيسية"
@@ -259,7 +272,9 @@
     "delete": "حذف",
     "placeholder": "اكتب ملاحظتك الشخصية هنا...",
     "notes": "ملاحظاتي",
-    "noNotes": "لا توجد ملاحظات بعد. أضف ملاحظات على الآيات أثناء القراءة للعثور عليها هنا."
+    "noNotes": "لا توجد ملاحظات بعد. أضف ملاحظات على الآيات أثناء القراءة للعثور عليها هنا.",
+    "personalNote": "ملاحظة شخصية",
+    "writeComment": "اكتب تعليقاً"
   },
   "topics": {
     "title": "المواضيع",
@@ -283,7 +298,8 @@
     "post": "نشر",
     "flag": "إبلاغ",
     "delete": "حذف",
-    "signInPrompt": "سجّل الدخول للمشاركة في النقاش."
+    "signInPrompt": "سجّل الدخول للمشاركة في النقاش.",
+    "scholarVerified": "تم التحقق من قبل عالم"
   },
   "sync": {
     "title": "المزامنة السحابية",
@@ -398,5 +414,16 @@
     "searchPlaceholder": "بحث في العبارات...",
     "noResults": "لا توجد عبارات تطابق بحثك.",
     "comingSoon": "فهرس العبارات قادم قريباً."
+  },
+  "partType": {
+    "hadith": "حديث",
+    "verse": "آية",
+    "chapter": "باب",
+    "heading": "عنوان",
+    "volume": "مجلد",
+    "book": "كتاب",
+    "section": "قسم",
+    "surah": "سورة",
+    "ayah": "آية"
   }
 }

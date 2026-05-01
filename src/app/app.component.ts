@@ -253,7 +253,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.seo.setVerseDetailPage(
             book.index,
             d.verse.local_index,
-            d.verse.part_type,
+            this.i18n.translatePartType(d.verse.part_type),
             d.chapter_title?.en || '',
             translationText,
             lang,
@@ -376,7 +376,7 @@ export class AppComponent implements OnInit, OnDestroy {
           const segments = book.index.split(':');
           const bookSlug = segments[0];
           const bookName = bookSlug === 'quran' ? 'Holy Quran' : bookSlug === 'al-kafi' ? 'Al-Kafi' : bookSlug;
-          pageTitle = `${d.verse.part_type} ${d.verse.local_index} - ${chapterTitle} - ${bookName}`;
+          pageTitle = `${this.i18n.translatePartType(d.verse.part_type)} ${d.verse.local_index} - ${chapterTitle} - ${bookName}`;
         }
         break;
       }

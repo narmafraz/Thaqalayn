@@ -51,6 +51,17 @@ export class I18nService {
     return typeof current === 'string' ? current : key;
   }
 
+  /**
+   * Translate a part_type enum value (e.g. "Hadith", "Verse", "Chapter") to the current language.
+   * Falls back to the original string if no translation is found.
+   */
+  translatePartType(partType: string | undefined | null): string {
+    if (!partType) return '';
+    const key = `partType.${partType.toLowerCase()}`;
+    const result = this.get(key);
+    return result === key ? partType : result;
+  }
+
   setLanguage(lang: string): void {
     if (this.isBrowser) {
       localStorage.setItem(STORAGE_KEY, lang);

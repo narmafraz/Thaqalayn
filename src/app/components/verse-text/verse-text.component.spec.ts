@@ -527,7 +527,8 @@ describe('VerseTextComponent', () => {
 
       const closeBtn = fixture.nativeElement.querySelector('.word-popup-close');
       expect(closeBtn).toBeTruthy();
-      expect(closeBtn.getAttribute('aria-label')).toBe('Close');
+      // aria-label is bound via translate pipe — without i18n strings loaded the pipe returns the key
+      expect(closeBtn.getAttribute('aria-label')).toBe('common.close');
     });
   });
 });

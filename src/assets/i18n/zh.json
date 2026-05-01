@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Thaqalayn",
-    "skipToContent": "跳转到内容"
+    "skipToContent": "跳转到内容",
+    "closeMenu": "关闭菜单",
+    "breadcrumbAria": "面包屑导航",
+    "mainNavAria": "主导航"
   },
   "ai": {
     "summary": "摘要",
@@ -86,7 +89,16 @@
     "unknownBookPart": "抱歉，不确定如何显示这部分！",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "复制文本",
-    "textCopied": "已复制！"
+    "textCopied": "已复制！",
+    "toggleDiacritics": "切换符号",
+    "wordByWordAnalysis": "逐字分析",
+    "wordDetails": "单词详情",
+    "wordTranslationLanguage": "单词翻译语言",
+    "shuffleQuran": "显示另一节",
+    "shuffleHadith": "显示另一条圣训",
+    "viewOnThaqalayn": "在 Thaqalayn 上查看",
+    "surahLabel": "章",
+    "ayahLabel": "节"
   },
   "narrator": {
     "narratedAhadith": "所传圣训",
@@ -179,7 +191,8 @@
     "clear": "清除",
     "bookNavigation": "经典导航",
     "collapse": "收起",
-    "expand": "展开"
+    "expand": "展开",
+    "close": "关闭"
   },
   "breadcrumb": {
     "home": "首页"
@@ -247,7 +260,9 @@
     "delete": "删除",
     "placeholder": "在此写下您的个人笔记...",
     "notes": "我的笔记",
-    "noNotes": "暂无笔记。阅读时为经文添加笔记即可在此找到。"
+    "noNotes": "暂无笔记。阅读时为经文添加笔记即可在此找到。",
+    "personalNote": "个人笔记",
+    "writeComment": "写评论"
   },
   "topics": {
     "title": "主题",
@@ -271,7 +286,8 @@
     "post": "发布",
     "flag": "举报",
     "delete": "删除",
-    "signInPrompt": "登录以参与讨论。"
+    "signInPrompt": "登录以参与讨论。",
+    "scholarVerified": "学者已验证"
   },
   "sync": {
     "title": "云同步",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "搜索短语...",
     "noResults": "没有匹配的短语。",
     "comingSoon": "短语索引即将推出。"
+  },
+  "partType": {
+    "hadith": "圣训",
+    "verse": "节",
+    "chapter": "章节",
+    "heading": "标题",
+    "volume": "卷",
+    "book": "书",
+    "section": "部分",
+    "surah": "章",
+    "ayah": "节"
   }
 }

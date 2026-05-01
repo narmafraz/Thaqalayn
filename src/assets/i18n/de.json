@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Thaqalayn",
-    "skipToContent": "Zum Inhalt springen"
+    "skipToContent": "Zum Inhalt springen",
+    "closeMenu": "Menü schließen",
+    "breadcrumbAria": "Brotkrümelnavigation",
+    "mainNavAria": "Hauptnavigation"
   },
   "ai": {
     "summary": "Zusammenfassung",
@@ -86,7 +89,16 @@
     "unknownBookPart": "Leider wissen wir nicht, wie dieser Teil angezeigt werden soll!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "Text kopieren",
-    "textCopied": "Kopiert!"
+    "textCopied": "Kopiert!",
+    "toggleDiacritics": "Tashkīl umschalten",
+    "wordByWordAnalysis": "Wort-für-Wort-Analyse",
+    "wordDetails": "Wort-Details",
+    "wordTranslationLanguage": "Wortübersetzungssprache",
+    "shuffleQuran": "Anderen Vers zeigen",
+    "shuffleHadith": "Anderen Hadith zeigen",
+    "viewOnThaqalayn": "Auf Thaqalayn ansehen",
+    "surahLabel": "Sure",
+    "ayahLabel": "Aya"
   },
   "narrator": {
     "narratedAhadith": "Überlieferte Ahadith",
@@ -179,7 +191,8 @@
     "clear": "Löschen",
     "bookNavigation": "Buchnavigation",
     "collapse": "Einklappen",
-    "expand": "Aufklappen"
+    "expand": "Aufklappen",
+    "close": "Schließen"
   },
   "breadcrumb": {
     "home": "Startseite"
@@ -247,7 +260,9 @@
     "delete": "Löschen",
     "placeholder": "Schreiben Sie hier Ihre persönliche Notiz...",
     "notes": "Meine Notizen",
-    "noNotes": "Noch keine Notizen. Fügen Sie beim Lesen Notizen zu Versen hinzu."
+    "noNotes": "Noch keine Notizen. Fügen Sie beim Lesen Notizen zu Versen hinzu.",
+    "personalNote": "Persönliche Notiz",
+    "writeComment": "Kommentar schreiben"
   },
   "topics": {
     "title": "Themen",
@@ -271,7 +286,8 @@
     "post": "Veröffentlichen",
     "flag": "Melden",
     "delete": "Löschen",
-    "signInPrompt": "Melden Sie sich an, um an der Diskussion teilzunehmen."
+    "signInPrompt": "Melden Sie sich an, um an der Diskussion teilzunehmen.",
+    "scholarVerified": "Von Gelehrtem verifiziert"
   },
   "sync": {
     "title": "Cloud-Synchronisierung",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "Phrasen suchen...",
     "noResults": "Keine Phrasen gefunden.",
     "comingSoon": "Phrasen-Index kommt bald."
+  },
+  "partType": {
+    "hadith": "Hadith",
+    "verse": "Vers",
+    "chapter": "Kapitel",
+    "heading": "Überschrift",
+    "volume": "Band",
+    "book": "Buch",
+    "section": "Abschnitt",
+    "surah": "Sure",
+    "ayah": "Aya"
   }
 }

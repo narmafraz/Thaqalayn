@@ -10,7 +10,7 @@
             <ng-container *ngFor="let ref of verseRefs">
               <mat-option *ngIf="ref.part_type === 'Hadith' || ref.part_type === 'Verse'"
                           [value]="ref.local_index">
-                {{ ref.part_type }} {{ ref.local_index }}
+                {{ translatedPartType(ref.part_type) }} {{ ref.local_index }}
               </mat-option>
             </ng-container>
           </ng-container>
@@ -18,7 +18,7 @@
             <ng-container *ngFor="let verse of book.data.verses; let i = index">
               <mat-option *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'"
                           [value]="verse.local_index">
-                {{ verse.part_type }} {{ verse.local_index }}
+                {{ translatedPartType(verse.part_type) }} {{ verse.local_index }}
               </mat-option>
             </ng-container>
           </ng-template>
@@ -115,7 +115,7 @@
                 </div>
                 <button class="metadata-toggle-btn"
                         (click)="toggleMetadata(verse.local_index)"
-                        [attr.aria-label]="isMetadataExpanded(verse.local_index) ? 'Hide details' : 'Show details'"
+                        [attr.aria-label]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)"
                         [matTooltip]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)">
                   <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
                 </button>
@@ -123,20 +123,20 @@
                   <div class="ai-toggles-footer" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasNarratorChain">
                     <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
                             [class.active]="vt.showChainDiagram"
-                            [attr.aria-label]="vt.showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"
+                            [attr.aria-label]="vt.showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
                             [matTooltip]="'narrator.chainDiagram' | translate">
                       <mat-icon>{{ vt.showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
                     </button>
                     <button *ngIf="vt.hasAiText" class="ai-toggle-btn" (click)="vt.toggleDiacritics()"
                             [class.active]="vt.showDiacritics"
-                            [attr.aria-label]="vt.showDiacritics ? 'Show original text' : 'Show diacritized text'"
-                            matTooltip="Toggle diacritics (tashkeel)">
+                            [attr.aria-label]="vt.showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
+                            [matTooltip]="'book.toggleDiacritics' | translate">
                       <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
                     </button>
                     <button *ngIf="vt.hasWordAnalysis" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
                             [class.active]="vt.showWordAnalysis"
-                            [attr.aria-label]="vt.showWordAnalysis ? 'Hide word analysis' : 'Show word-by-word analysis'"
-                            matTooltip="Word-by-word analysis">
+                            [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
+                            [matTooltip]="'book.wordByWordAnalysis' | translate">
                       <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
                     </button>
                     <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && verse.ai?.diacritics_status">
@@ -159,7 +159,7 @@
                         [placeholder]="'annotation.placeholder' | translate"
                         rows="3"
                         class="note-textarea"
-                        aria-label="Personal note"></textarea>
+                        [attr.aria-label]="'annotation.personalNote' | translate"></textarea>
               <div class="note-actions">
                 <button mat-raised-button color="primary" (click)="saveNote(book.index, verse)">
                   <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
@@ -291,7 +291,7 @@
           <!-- Expand/collapse toggle for secondary metadata -->
           <button class="metadata-toggle-btn"
                   (click)="toggleMetadata(verse.local_index)"
-                  [attr.aria-label]="isMetadataExpanded(verse.local_index) ? 'Hide details' : 'Show details'"
+                  [attr.aria-label]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)"
                   [matTooltip]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)">
             <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
           </button>
@@ -301,20 +301,20 @@
             <div class="ai-toggles-footer" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasNarratorChain">
               <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
                       [class.active]="vt.showChainDiagram"
-                      [attr.aria-label]="vt.showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"
+                      [attr.aria-label]="vt.showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
                       [matTooltip]="'narrator.chainDiagram' | translate">
                 <mat-icon>{{ vt.showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
               </button>
               <button *ngIf="vt.hasAiText" class="ai-toggle-btn" (click)="vt.toggleDiacritics()"
                       [class.active]="vt.showDiacritics"
-                      [attr.aria-label]="vt.showDiacritics ? 'Show original text' : 'Show diacritized text'"
-                      matTooltip="Toggle diacritics (tashkeel)">
+                      [attr.aria-label]="vt.showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
+                      [matTooltip]="'book.toggleDiacritics' | translate">
                 <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
               </button>
               <button *ngIf="vt.hasWordAnalysis" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
                       [class.active]="vt.showWordAnalysis"
-                      [attr.aria-label]="vt.showWordAnalysis ? 'Hide word analysis' : 'Show word-by-word analysis'"
-                      matTooltip="Word-by-word analysis">
+                      [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
+                      [matTooltip]="'book.wordByWordAnalysis' | translate">
                 <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
               </button>
               <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && verse.ai?.diacritics_status">
@@ -341,7 +341,7 @@
                   [placeholder]="'annotation.placeholder' | translate"
                   rows="3"
                   class="note-textarea"
-                  aria-label="Personal note"></textarea>
+                  [attr.aria-label]="'annotation.personalNote' | translate"></textarea>
         <div class="note-actions">
           <button mat-raised-button color="primary" (click)="saveNote(book.index, verse)">
             <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}

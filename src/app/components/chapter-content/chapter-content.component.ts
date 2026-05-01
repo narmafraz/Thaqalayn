@@ -366,7 +366,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       result += title + ' ';
     });
 
-    result += verse.part_type + ' ' + verse.local_index;
+    result += this.i18nService.translatePartType(verse.part_type) + ' ' + verse.local_index;
 
     return result;
   }
@@ -377,6 +377,10 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       return crumbs[0].titles[lang] || crumbs[0].titles['en'] || crumbs[0].titles['ar'] || '';
     }
     return '';
+  }
+
+  translatedPartType(partType: string | undefined | null): string {
+    return this.i18nService.translatePartType(partType);
   }
 
   isVerseBookmarked(bookIndex: string, verse: Verse): boolean {
@@ -732,7 +736,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       const transKeys = Object.keys(translations);
       const transTexts = transKeys.length > 0 ? translations[transKeys[0]] : [];
       const translationText = (transTexts || []).join(' ').replace(/<[^>]*>/g, '');
-      const reference = `${verse.part_type} ${verse.local_index}`;
+      const reference = `${this.i18nService.translatePartType(verse.part_type)} ${verse.local_index}`;
       const bookTitle = this.getBookName(crumbs) || book.data.titles?.en || book.index;
       const grading = verse.gradings?.[0] ? this.parseGrading(verse.gradings[0]).term : undefined;
 

@@ -174,7 +174,7 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       });
       // Track reading progress
       const title = (book.data.chapter_title?.en || '') + ' ' +
-        book.data.verse.part_type + ' ' + book.data.verse.local_index;
+        this.i18n.translatePartType(book.data.verse.part_type) + ' ' + book.data.verse.local_index;
       this.bookmarkService.updateReadingProgress(path, title);
       // Compute external links
       this.externalLinks = this.externalLinksService.getExternalLinks(
@@ -221,6 +221,10 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
     return bookIndex.startsWith('quran:') || bookIndex === 'quran';
   }
 
+  translatedPartType(partType: string | undefined | null): string {
+    return this.i18n.translatePartType(partType);
+  }
+
   getNavRouterLink(path: string): string {
     return path.replace('/books/', '');
   }
@@ -228,7 +232,7 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
   async toggleBookmark(book: VerseDetail): Promise<void> {
     const path = '/books/' + book.index;
     const title = (book.data.chapter_title?.en || '') + ' ' +
-      book.data.verse.part_type + ' ' + book.data.verse.local_index;
+      this.i18n.translatePartType(book.data.verse.part_type) + ' ' + book.data.verse.local_index;
     const arabicTitle = book.data.chapter_title?.ar;
     this.isBookmarked = await this.bookmarkService.toggleBookmark(path, title, arabicTitle);
     this.cdr.markForCheck();
@@ -280,7 +284,7 @@ export class VerseDetailComponent implements OnInit, OnDestroy {
       const translations = verse.translations || {};
       const transTexts = translations[translationId] || Object.values(translations)[0] || [];
       const translationText = transTexts.join(' ').replace(/<[^>]*>/g, '');
-      const reference = `${verse.part_type} ${verse.local_index}`;
+      const reference = `${this.i18n.translatePartType(verse.part_type)} ${verse.local_index}`;
       const bookTitle = book.data.chapter_title?.en || book.index;
       const grading = verse.gradings?.[0] ? this.parseGradingTerm(verse.gradings[0]) : undefined;
 

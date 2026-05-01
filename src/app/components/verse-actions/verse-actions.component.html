@@ -5,7 +5,7 @@
 <a *ngIf="detailPath"
    [routerLink]="['/books', detailPath]"
    queryParamsHandling="preserve"
-   [attr.aria-label]="'View ' + (verse?.part_type || '') + ' ' + (verse?.local_index || '') + ' details'"
+   [attr.aria-label]="('tooltip.viewDetails' | translate) + ' — ' + translatedPartType(verse?.part_type) + ' ' + (verse?.local_index || '')"
    class="verse-detail-link"
    [matTooltip]="'tooltip.viewDetails' | translate">
   <mat-icon>open_in_new</mat-icon>

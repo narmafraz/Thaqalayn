@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "সাকালাইন",
-    "skipToContent": "বিষয়বস্তুতে যান"
+    "skipToContent": "বিষয়বস্তুতে যান",
+    "closeMenu": "মেনু বন্ধ করুন",
+    "breadcrumbAria": "ব্রেডক্রাম্ব",
+    "mainNavAria": "প্রধান নেভিগেশন"
   },
   "ai": {
     "summary": "সারাংশ",
@@ -86,7 +89,16 @@
     "unknownBookPart": "দুঃখিত, এই অংশটি কীভাবে প্রদর্শন করতে হবে!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "টেক্সট কপি",
-    "textCopied": "কপি হয়েছে!"
+    "textCopied": "কপি হয়েছে!",
+    "toggleDiacritics": "ডায়াক্রিটিক্স টগল",
+    "wordByWordAnalysis": "শব্দ-দ্বারা-শব্দ বিশ্লেষণ",
+    "wordDetails": "শব্দের বিবরণ",
+    "wordTranslationLanguage": "শব্দ অনুবাদের ভাষা",
+    "shuffleQuran": "অন্য আয়াত দেখান",
+    "shuffleHadith": "অন্য হাদিস দেখান",
+    "viewOnThaqalayn": "ছাকালাইনে দেখুন",
+    "surahLabel": "সূরা",
+    "ayahLabel": "আয়াত"
   },
   "narrator": {
     "narratedAhadith": "বর্ণিত হাদিস",
@@ -179,7 +191,8 @@
     "clear": "মুছুন",
     "bookNavigation": "কিতাব নেভিগেশন",
     "collapse": "সংকুচিত",
-    "expand": "প্রসারিত"
+    "expand": "প্রসারিত",
+    "close": "বন্ধ করুন"
   },
   "breadcrumb": {
     "home": "হোম"
@@ -247,7 +260,9 @@
     "delete": "মুছুন",
     "placeholder": "এখানে আপনার ব্যক্তিগত নোট লিখুন...",
     "notes": "আমার নোট",
-    "noNotes": "এখনো কোনো নোট নেই। পড়ার সময় আয়াতে নোট যোগ করুন।"
+    "noNotes": "এখনো কোনো নোট নেই। পড়ার সময় আয়াতে নোট যোগ করুন।",
+    "personalNote": "ব্যক্তিগত নোট",
+    "writeComment": "একটি মন্তব্য লিখুন"
   },
   "topics": {
     "title": "বিষয়সমূহ",
@@ -271,7 +286,8 @@
     "post": "পোস্ট",
     "flag": "রিপোর্ট",
     "delete": "মুছুন",
-    "signInPrompt": "আলোচনায় অংশ নিতে সাইন ইন করুন।"
+    "signInPrompt": "আলোচনায় অংশ নিতে সাইন ইন করুন।",
+    "scholarVerified": "পণ্ডিত যাচাইকৃত"
   },
   "sync": {
     "title": "ক্লাউড সিঙ্ক",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "বাক্যাংশ অনুসন্ধান...",
     "noResults": "কোনো বাক্যাংশ মেলেনি।",
     "comingSoon": "বাক্যাংশ সূচক শীঘ্রই আসছে।"
+  },
+  "partType": {
+    "hadith": "হাদিস",
+    "verse": "আয়াত",
+    "chapter": "অধ্যায়",
+    "heading": "শিরোনাম",
+    "volume": "খণ্ড",
+    "book": "বই",
+    "section": "বিভাগ",
+    "surah": "সূরা",
+    "ayah": "আয়াত"
   }
 }

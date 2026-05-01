@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Сакалейн",
-    "skipToContent": "Перейти к содержанию"
+    "skipToContent": "Перейти к содержанию",
+    "closeMenu": "Закрыть меню",
+    "breadcrumbAria": "Навигационная цепочка",
+    "mainNavAria": "Главная навигация"
   },
   "ai": {
     "summary": "Резюме",
@@ -86,7 +89,16 @@
     "unknownBookPart": "Не знаем, как отобразить эту часть, извините!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "Копировать текст",
-    "textCopied": "Скопировано!"
+    "textCopied": "Скопировано!",
+    "toggleDiacritics": "Переключить огласовки",
+    "wordByWordAnalysis": "Пословный анализ",
+    "wordDetails": "Детали слова",
+    "wordTranslationLanguage": "Язык перевода слов",
+    "shuffleQuran": "Показать другой аят",
+    "shuffleHadith": "Показать другой хадис",
+    "viewOnThaqalayn": "Открыть на Thaqalayn",
+    "surahLabel": "Сура",
+    "ayahLabel": "Аят"
   },
   "narrator": {
     "narratedAhadith": "Переданные хадисы",
@@ -179,7 +191,8 @@
     "clear": "Очистить",
     "bookNavigation": "Навигация по книгам",
     "collapse": "Свернуть",
-    "expand": "Развернуть"
+    "expand": "Развернуть",
+    "close": "Закрыть"
   },
   "breadcrumb": {
     "home": "Главная"
@@ -247,7 +260,9 @@
     "delete": "Удалить",
     "placeholder": "Напишите вашу личную заметку здесь...",
     "notes": "Мои заметки",
-    "noNotes": "Заметок пока нет. Добавляйте заметки к аятам при чтении."
+    "noNotes": "Заметок пока нет. Добавляйте заметки к аятам при чтении.",
+    "personalNote": "Личная заметка",
+    "writeComment": "Написать комментарий"
   },
   "topics": {
     "title": "Темы",
@@ -271,7 +286,8 @@
     "post": "Опубликовать",
     "flag": "Пожаловаться",
     "delete": "Удалить",
-    "signInPrompt": "Войдите, чтобы присоединиться к обсуждению."
+    "signInPrompt": "Войдите, чтобы присоединиться к обсуждению.",
+    "scholarVerified": "Подтверждено учёным"
   },
   "sync": {
     "title": "Облачная синхронизация",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "Поиск фраз...",
     "noResults": "Фразы не найдены.",
     "comingSoon": "Индекс фраз скоро появится."
+  },
+  "partType": {
+    "hadith": "Хадис",
+    "verse": "Аят",
+    "chapter": "Глава",
+    "heading": "Заголовок",
+    "volume": "Том",
+    "book": "Книга",
+    "section": "Раздел",
+    "surah": "Сура",
+    "ayah": "Аят"
   }
 }

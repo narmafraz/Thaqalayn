@@ -42,7 +42,7 @@
   <!-- Word-by-word analysis (replaces Arabic text when active) -->
   <div *ngIf="showWordAnalysis && hasWordAnalysis" class="word-analysis-grid" dir="rtl" lang="ar">
     <div class="word-analysis-lang-select">
-      <select [(ngModel)]="wordAnalysisLang" aria-label="Word translation language" class="word-lang-select">
+      <select [(ngModel)]="wordAnalysisLang" [attr.aria-label]="'book.wordTranslationLanguage' | translate" class="word-lang-select">
         <option value="en">English</option>
         <option value="ur">اردو</option>
         <option value="tr">Türkçe</option>
@@ -77,7 +77,7 @@
          [style.left.px]="wordPopup.x"
          [style.top.px]="wordPopup.y"
          role="dialog"
-         aria-label="Word details">
+         [attr.aria-label]="'book.wordDetails' | translate">
       <div class="word-popup-arabic" lang="ar" dir="rtl">{{ wordPopup.entry.word }}</div>
       <div class="word-popup-pos">
         <span class="word-popup-pos-badge" [style.background-color]="getPosColor(wordPopup.entry.pos)">
@@ -88,7 +88,7 @@
         <span class="word-popup-lang-label">{{ getWordLangLabel(wordAnalysisLang) }}</span>
         <span class="word-popup-trans-text">{{ wordPopup.entry.translation[wordAnalysisLang] }}</span>
       </div>
-      <button class="word-popup-close" (click)="closeWordPopup()" aria-label="Close" tabindex="0">&times;</button>
+      <button class="word-popup-close" (click)="closeWordPopup()" [attr.aria-label]="'common.close' | translate" tabindex="0">&times;</button>
     </div>
   </div>
 

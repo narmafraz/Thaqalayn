@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Thaqalayn",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "closeMenu": "Close menu",
+    "breadcrumbAria": "Breadcrumb",
+    "mainNavAria": "Main navigation"
   },
   "ai": {
     "summary": "Summary",
@@ -94,7 +97,16 @@
     "relatedNarrations": "Related Narrations",
     "loadingCommentary": "Loading commentary...",
     "unknownBookPart": "Not sure how to display this book part, sorry!",
-    "relatedChapters": "Related Chapters in Other Books"
+    "relatedChapters": "Related Chapters in Other Books",
+    "toggleDiacritics": "Toggle diacritics (tashkeel)",
+    "wordByWordAnalysis": "Word-by-word analysis",
+    "wordDetails": "Word details",
+    "wordTranslationLanguage": "Word translation language",
+    "shuffleQuran": "Show another verse",
+    "shuffleHadith": "Show another hadith",
+    "viewOnThaqalayn": "View on Thaqalayn",
+    "surahLabel": "Surah",
+    "ayahLabel": "Ayah"
   },
   "narrator": {
     "narratedAhadith": "Narrated Ahadith",
@@ -205,7 +217,8 @@
     "clear": "Clear",
     "bookNavigation": "Book navigation",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "close": "Close"
   },
   "breadcrumb": {
     "home": "Home"
@@ -274,7 +287,9 @@
     "delete": "Delete",
     "placeholder": "Write your personal note here...",
     "notes": "My Notes",
-    "noNotes": "No notes yet. Add notes to verses while reading to find them here."
+    "noNotes": "No notes yet. Add notes to verses while reading to find them here.",
+    "personalNote": "Personal note",
+    "writeComment": "Write a comment"
   },
   "topics": {
     "title": "Topics",
@@ -298,7 +313,8 @@
     "post": "Post",
     "flag": "Report",
     "delete": "Delete",
-    "signInPrompt": "Sign in to join the discussion."
+    "signInPrompt": "Sign in to join the discussion.",
+    "scholarVerified": "Scholar verified"
   },
   "sync": {
     "title": "Cloud Sync",
@@ -430,5 +446,16 @@
     "searchPlaceholder": "Search phrases...",
     "noResults": "No phrases match your search.",
     "comingSoon": "Key phrase index is coming soon. Phrases will be extracted from AI hadith analysis."
+  },
+  "partType": {
+    "hadith": "Hadith",
+    "verse": "Verse",
+    "chapter": "Chapter",
+    "heading": "Heading",
+    "volume": "Volume",
+    "book": "Book",
+    "section": "Section",
+    "surah": "Surah",
+    "ayah": "Ayah"
   }
 }

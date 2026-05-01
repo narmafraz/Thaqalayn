@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Thaqalayn",
-    "skipToContent": "Langsung ke konten"
+    "skipToContent": "Langsung ke konten",
+    "closeMenu": "Tutup menu",
+    "breadcrumbAria": "Tautan navigasi",
+    "mainNavAria": "Navigasi utama"
   },
   "ai": {
     "summary": "Ringkasan",
@@ -86,7 +89,16 @@
     "unknownBookPart": "Maaf, tidak yakin bagaimana menampilkan bagian ini!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "Salin teks",
-    "textCopied": "Tersalin!"
+    "textCopied": "Tersalin!",
+    "toggleDiacritics": "Beralih harakat",
+    "wordByWordAnalysis": "Analisis kata demi kata",
+    "wordDetails": "Detail kata",
+    "wordTranslationLanguage": "Bahasa terjemahan kata",
+    "shuffleQuran": "Tampilkan ayat lain",
+    "shuffleHadith": "Tampilkan hadis lain",
+    "viewOnThaqalayn": "Lihat di Thaqalayn",
+    "surahLabel": "Surat",
+    "ayahLabel": "Ayat"
   },
   "narrator": {
     "narratedAhadith": "Hadis yang diriwayatkan",
@@ -179,7 +191,8 @@
     "clear": "Hapus",
     "bookNavigation": "Navigasi kitab",
     "collapse": "Ciutkan",
-    "expand": "Perluas"
+    "expand": "Perluas",
+    "close": "Tutup"
   },
   "breadcrumb": {
     "home": "Beranda"
@@ -247,7 +260,9 @@
     "delete": "Hapus",
     "placeholder": "Tulis catatan pribadi Anda di sini...",
     "notes": "Catatan saya",
-    "noNotes": "Belum ada catatan. Tambahkan catatan pada ayat saat membaca untuk menemukannya di sini."
+    "noNotes": "Belum ada catatan. Tambahkan catatan pada ayat saat membaca untuk menemukannya di sini.",
+    "personalNote": "Catatan pribadi",
+    "writeComment": "Tulis komentar"
   },
   "topics": {
     "title": "Topik",
@@ -271,7 +286,8 @@
     "post": "Kirim",
     "flag": "Laporkan",
     "delete": "Hapus",
-    "signInPrompt": "Masuk untuk bergabung dalam diskusi."
+    "signInPrompt": "Masuk untuk bergabung dalam diskusi.",
+    "scholarVerified": "Diverifikasi ulama"
   },
   "sync": {
     "title": "Sinkronisasi cloud",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "Cari frasa...",
     "noResults": "Tidak ada frasa yang cocok.",
     "comingSoon": "Indeks frasa segera hadir."
+  },
+  "partType": {
+    "hadith": "Hadis",
+    "verse": "Ayat",
+    "chapter": "Bab",
+    "heading": "Judul",
+    "volume": "Jilid",
+    "book": "Kitab",
+    "section": "Bagian",
+    "surah": "Surat",
+    "ayah": "Ayat"
   }
 }

@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Thaqalayn",
-    "skipToContent": "Aller au contenu"
+    "skipToContent": "Aller au contenu",
+    "closeMenu": "Fermer le menu",
+    "breadcrumbAria": "Fil d'Ariane",
+    "mainNavAria": "Navigation principale"
   },
   "ai": {
     "summary": "Résumé",
@@ -86,7 +89,16 @@
     "unknownBookPart": "Nous ne savons pas afficher cette partie, désolé !",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "Copier le texte",
-    "textCopied": "Copié !"
+    "textCopied": "Copié !",
+    "toggleDiacritics": "Afficher/masquer le tachkîl",
+    "wordByWordAnalysis": "Analyse mot à mot",
+    "wordDetails": "Détails du mot",
+    "wordTranslationLanguage": "Langue de traduction du mot",
+    "shuffleQuran": "Afficher un autre verset",
+    "shuffleHadith": "Afficher un autre hadith",
+    "viewOnThaqalayn": "Voir sur Thaqalayn",
+    "surahLabel": "Sourate",
+    "ayahLabel": "Verset"
   },
   "narrator": {
     "narratedAhadith": "Ahadiths rapportés",
@@ -179,7 +191,8 @@
     "clear": "Effacer",
     "bookNavigation": "Navigation des livres",
     "collapse": "Réduire",
-    "expand": "Développer"
+    "expand": "Développer",
+    "close": "Fermer"
   },
   "breadcrumb": {
     "home": "Accueil"
@@ -247,7 +260,9 @@
     "delete": "Supprimer",
     "placeholder": "Écrivez votre note personnelle ici...",
     "notes": "Mes notes",
-    "noNotes": "Aucune note pour le moment. Ajoutez des notes aux versets en lisant pour les retrouver ici."
+    "noNotes": "Aucune note pour le moment. Ajoutez des notes aux versets en lisant pour les retrouver ici.",
+    "personalNote": "Note personnelle",
+    "writeComment": "Écrire un commentaire"
   },
   "topics": {
     "title": "Sujets",
@@ -271,7 +286,8 @@
     "post": "Publier",
     "flag": "Signaler",
     "delete": "Supprimer",
-    "signInPrompt": "Connectez-vous pour participer à la discussion."
+    "signInPrompt": "Connectez-vous pour participer à la discussion.",
+    "scholarVerified": "Vérifié par un savant"
   },
   "sync": {
     "title": "Synchronisation cloud",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "Rechercher des phrases...",
     "noResults": "Aucune phrase ne correspond.",
     "comingSoon": "Index des phrases arrive bientôt."
+  },
+  "partType": {
+    "hadith": "Hadith",
+    "verse": "Verset",
+    "chapter": "Chapitre",
+    "heading": "En-tête",
+    "volume": "Volume",
+    "book": "Livre",
+    "section": "Section",
+    "surah": "Sourate",
+    "ayah": "Verset"
   }
 }

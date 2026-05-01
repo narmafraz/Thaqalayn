@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Thaqalayn",
-    "skipToContent": "Ir al contenido"
+    "skipToContent": "Ir al contenido",
+    "closeMenu": "Cerrar menú",
+    "breadcrumbAria": "Ruta de navegación",
+    "mainNavAria": "Navegación principal"
   },
   "ai": {
     "summary": "Resumen",
@@ -86,7 +89,16 @@
     "unknownBookPart": "No sabemos cómo mostrar esta parte, ¡lo sentimos!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "Copiar texto",
-    "textCopied": "¡Copiado!"
+    "textCopied": "¡Copiado!",
+    "toggleDiacritics": "Mostrar/ocultar tashkīl",
+    "wordByWordAnalysis": "Análisis palabra por palabra",
+    "wordDetails": "Detalles de la palabra",
+    "wordTranslationLanguage": "Idioma de traducción de palabra",
+    "shuffleQuran": "Mostrar otro versículo",
+    "shuffleHadith": "Mostrar otro hadiz",
+    "viewOnThaqalayn": "Ver en Thaqalayn",
+    "surahLabel": "Sura",
+    "ayahLabel": "Aleya"
   },
   "narrator": {
     "narratedAhadith": "Hadices narrados",
@@ -179,7 +191,8 @@
     "clear": "Limpiar",
     "bookNavigation": "Navegación de libros",
     "collapse": "Contraer",
-    "expand": "Expandir"
+    "expand": "Expandir",
+    "close": "Cerrar"
   },
   "breadcrumb": {
     "home": "Inicio"
@@ -247,7 +260,9 @@
     "delete": "Eliminar",
     "placeholder": "Escriba su nota personal aquí...",
     "notes": "Mis notas",
-    "noNotes": "Aún no hay notas. Añada notas a los versículos mientras lee para encontrarlas aquí."
+    "noNotes": "Aún no hay notas. Añada notas a los versículos mientras lee para encontrarlas aquí.",
+    "personalNote": "Nota personal",
+    "writeComment": "Escribir un comentario"
   },
   "topics": {
     "title": "Temas",
@@ -271,7 +286,8 @@
     "post": "Publicar",
     "flag": "Reportar",
     "delete": "Eliminar",
-    "signInPrompt": "Inicie sesión para unirse a la discusión."
+    "signInPrompt": "Inicie sesión para unirse a la discusión.",
+    "scholarVerified": "Verificado por erudito"
   },
   "sync": {
     "title": "Sincronización en la nube",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "Buscar frases...",
     "noResults": "Ninguna frase coincide.",
     "comingSoon": "Índice de frases llegará pronto."
+  },
+  "partType": {
+    "hadith": "Hadiz",
+    "verse": "Versículo",
+    "chapter": "Capítulo",
+    "heading": "Encabezado",
+    "volume": "Volumen",
+    "book": "Libro",
+    "section": "Sección",
+    "surah": "Sura",
+    "ayah": "Aleya"
   }
 }

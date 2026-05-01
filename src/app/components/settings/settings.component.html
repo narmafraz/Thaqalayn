@@ -2,7 +2,7 @@
   <mat-icon>settings</mat-icon>
   <app-translation-selection></app-translation-selection>
 
-  <button class="ai-settings-btn" (click)="toggleAiSettings()" matTooltip="AI feature settings">
+  <button class="ai-settings-btn" (click)="toggleAiSettings()" [matTooltip]="'settings.ai.title' | translate">
     <mat-icon>{{ showAiSettings ? 'tune' : 'auto_awesome' }}</mat-icon>
   </button>
 

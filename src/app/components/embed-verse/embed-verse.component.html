@@ -9,7 +9,7 @@
     <!-- Verse Detail embed (single hadith/verse page) -->
     <ng-container *ngIf="book.kind === 'verse_detail'">
       <div class="embed-header">
-        <span class="embed-title">{{ book.data.chapter_title?.en || '' }} {{ book.data.verse.part_type }} {{ book.data.verse.local_index }}</span>
+        <span class="embed-title">{{ book.data.chapter_title?.en || '' }} {{ translatedPartType(book.data.verse.part_type) }} {{ book.data.verse.local_index }}</span>
         <a class="embed-logo" href="https://thaqalayn.netlify.app/books/{{ book.index }}" target="_blank" rel="noopener">Thaqalayn</a>
       </div>
 
@@ -37,7 +37,7 @@
       <div class="embed-footer">
         <span class="embed-ref">{{ book.data.chapter_title?.en || book.index }}</span>
         <a class="embed-view-link" href="https://thaqalayn.netlify.app/books/{{ book.index }}" target="_blank" rel="noopener">
-          View on Thaqalayn →
+          {{ 'book.viewOnThaqalayn' | translate }} →
         </a>
       </div>
     </ng-container>
@@ -64,7 +64,7 @@
       <div class="embed-footer">
         <span class="embed-ref">{{ book.data.titles?.en || book.index }}</span>
         <a class="embed-view-link" href="https://thaqalayn.netlify.app/books/{{ book.index }}" target="_blank" rel="noopener">
-          View on Thaqalayn →
+          {{ 'book.viewOnThaqalayn' | translate }} →
         </a>
       </div>
     </ng-container>

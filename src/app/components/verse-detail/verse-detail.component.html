@@ -21,7 +21,7 @@
         <div class="verse-detail-toggles" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasNarratorChain">
           <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
                   [class.active]="vt.showChainDiagram"
-                  [attr.aria-label]="vt.showChainDiagram ? 'Hide chain diagram' : 'Show narrator chain diagram'"
+                  [attr.aria-label]="vt.showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
                   [matTooltip]="'narrator.chainDiagram' | translate">
             <mat-icon>{{ vt.showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
           </button>
@@ -82,7 +82,7 @@
               [isBookmarked]="isBookmarked"
               [hasNote]="hasNote"
               [isGeneratingImage]="generatingImage"
-              [label]="book.data.verse.part_type + ' ' + book.data.verse.local_index"
+              [label]="translatedPartType(book.data.verse.part_type) + ' ' + book.data.verse.local_index"
               [showShareLink]="true"
               [isLinkCopied]="linkCopied"
               [chapterPath]="getChapterRouterLink(book.data.chapter_path)"
@@ -206,7 +206,7 @@
                  [fragment]="getQuranRefFragment(qref.ref)"
                  queryParamsHandling="preserve"
                  class="ai-quran-link">
-                Surah {{ qref.ref.split(':')[0] }}, Ayah {{ qref.ref.split(':')[1] }}
+                {{ 'book.surahLabel' | translate }} {{ qref.ref.split(':')[0] }}, {{ 'book.ayahLabel' | translate }} {{ qref.ref.split(':')[1] }}
               </a>
               <span [class]="'ai-quran-rel-badge ai-quran-rel-' + qref.relationship">{{ qref.relationship }}</span>
             </div>
@@ -276,7 +276,7 @@
                   [placeholder]="'annotation.placeholder' | translate"
                   rows="3"
                   class="note-textarea"
-                  aria-label="Personal note"></textarea>
+                  [attr.aria-label]="'annotation.personalNote' | translate"></textarea>
         <div class="note-actions">
           <button mat-raised-button color="primary" (click)="saveNote(book)">
             <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
@@ -314,7 +314,7 @@
             <div class="comment-item" *ngFor="let comment of comments$ | async">
               <div class="comment-meta">
                 <span class="comment-author">
-                  <mat-icon *ngIf="comment.scholarVerified" class="scholar-badge" matTooltip="Scholar verified">verified</mat-icon>
+                  <mat-icon *ngIf="comment.scholarVerified" class="scholar-badge" [matTooltip]="'discussion.scholarVerified' | translate">verified</mat-icon>
                   {{ comment.authorName }}
                 </span>
                 <span class="comment-date">{{ comment.createdAt | date:'short' }}</span>
@@ -344,7 +344,7 @@
                       [placeholder]="'discussion.placeholder' | translate"
                       rows="2"
                       class="comment-textarea"
-                      aria-label="Write a comment"></textarea>
+                      [attr.aria-label]="'annotation.writeComment' | translate"></textarea>
             <button mat-raised-button color="primary" (click)="postComment(book)"
                     [disabled]="!newCommentText.trim()">
               <mat-icon>send</mat-icon> {{ 'discussion.post' | translate }}

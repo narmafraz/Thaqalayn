@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "Thaqalayn",
-    "skipToContent": "İçeriğe atla"
+    "skipToContent": "İçeriğe atla",
+    "closeMenu": "Menüyü kapat",
+    "breadcrumbAria": "İçerik haritası",
+    "mainNavAria": "Ana navigasyon"
   },
   "ai": {
     "summary": "Özet",
@@ -86,7 +89,16 @@
     "unknownBookPart": "Bu bölümü nasıl görüntüleyeceğimizi bilmiyoruz, üzgünüz!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "Metni kopyala",
-    "textCopied": "Kopyalandı!"
+    "textCopied": "Kopyalandı!",
+    "toggleDiacritics": "Hareke göster/gizle",
+    "wordByWordAnalysis": "Kelime kelime analiz",
+    "wordDetails": "Kelime ayrıntıları",
+    "wordTranslationLanguage": "Kelime çeviri dili",
+    "shuffleQuran": "Başka bir ayet göster",
+    "shuffleHadith": "Başka bir hadis göster",
+    "viewOnThaqalayn": "Thaqalayn'da görüntüle",
+    "surahLabel": "Sure",
+    "ayahLabel": "Ayet"
   },
   "narrator": {
     "narratedAhadith": "Rivayet edilen hadisler",
@@ -179,7 +191,8 @@
     "clear": "Temizle",
     "bookNavigation": "Kitap navigasyonu",
     "collapse": "Daralt",
-    "expand": "Genişlet"
+    "expand": "Genişlet",
+    "close": "Kapat"
   },
   "breadcrumb": {
     "home": "Ana Sayfa"
@@ -247,7 +260,9 @@
     "delete": "Sil",
     "placeholder": "Kişisel notunuzu buraya yazın...",
     "notes": "Notlarım",
-    "noNotes": "Henüz not yok. Okurken ayetlere not ekleyin."
+    "noNotes": "Henüz not yok. Okurken ayetlere not ekleyin.",
+    "personalNote": "Kişisel not",
+    "writeComment": "Yorum yaz"
   },
   "topics": {
     "title": "Konular",
@@ -271,7 +286,8 @@
     "post": "Gönder",
     "flag": "Bildir",
     "delete": "Sil",
-    "signInPrompt": "Tartışmaya katılmak için giriş yapın."
+    "signInPrompt": "Tartışmaya katılmak için giriş yapın.",
+    "scholarVerified": "Âlim onaylı"
   },
   "sync": {
     "title": "Bulut senkronizasyonu",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "İfade ara...",
     "noResults": "Eşleşen ifade yok.",
     "comingSoon": "İfade dizini yakında."
+  },
+  "partType": {
+    "hadith": "Hadis",
+    "verse": "Ayet",
+    "chapter": "Bölüm",
+    "heading": "Başlık",
+    "volume": "Cilt",
+    "book": "Kitap",
+    "section": "Bölüm",
+    "surah": "Sure",
+    "ayah": "Ayet"
   }
 }

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input } from '@
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { Book, VerseDetail, ChapterContent } from '@app/models';
+import { I18nService } from '@app/services/i18n.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { Observable } from 'rxjs';
@@ -27,10 +28,14 @@ export class EmbedVerseComponent {
 
   private destroyRef = inject(DestroyRef);
 
-  constructor(private route: ActivatedRoute) {
+  constructor(private route: ActivatedRoute, private i18n: I18nService) {
     this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       this.theme = params['theme'] || 'auto';
     });
+  }
+
+  translatedPartType(partType: string | undefined | null): string {
+    return this.i18n.translatePartType(partType);
   }
 
   getGradingClass(term: string): string {

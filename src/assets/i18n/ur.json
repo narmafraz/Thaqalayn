@@ -1,7 +1,10 @@
 {
   "app": {
     "title": "ثقلین",
-    "skipToContent": "مواد پر جائیں"
+    "skipToContent": "مواد پر جائیں",
+    "closeMenu": "مینو بند کریں",
+    "breadcrumbAria": "بریڈکرمب",
+    "mainNavAria": "مرکزی نیویگیشن"
   },
   "ai": {
     "summary": "خلاصہ",
@@ -86,7 +89,16 @@
     "unknownBookPart": "معذرت، اس حصے کو دکھانے کا طریقہ معلوم نہیں!",
     "relatedChapters": "Related Chapters in Other Books",
     "copyText": "متن کاپی کریں",
-    "textCopied": "کاپی ہو گیا!"
+    "textCopied": "کاپی ہو گیا!",
+    "toggleDiacritics": "اعراب چالو/بند کریں",
+    "wordByWordAnalysis": "لفظ بہ لفظ تجزیہ",
+    "wordDetails": "لفظ کی تفصیلات",
+    "wordTranslationLanguage": "لفظ کی ترجمے کی زبان",
+    "shuffleQuran": "دوسری آیت دکھائیں",
+    "shuffleHadith": "دوسری حدیث دکھائیں",
+    "viewOnThaqalayn": "ثقلین پر دیکھیں",
+    "surahLabel": "سورہ",
+    "ayahLabel": "آیت"
   },
   "narrator": {
     "narratedAhadith": "مروی احادیث",
@@ -179,7 +191,8 @@
     "clear": "صاف",
     "bookNavigation": "کتابوں کی نیویگیشن",
     "collapse": "سکیڑیں",
-    "expand": "پھیلائیں"
+    "expand": "پھیلائیں",
+    "close": "بند کریں"
   },
   "breadcrumb": {
     "home": "ہوم"
@@ -247,7 +260,9 @@
     "delete": "حذف",
     "placeholder": "اپنا ذاتی نوٹ یہاں لکھیں...",
     "notes": "میرے نوٹس",
-    "noNotes": "ابھی کوئی نوٹ نہیں۔ پڑھتے وقت آیات پر نوٹ شامل کریں۔"
+    "noNotes": "ابھی کوئی نوٹ نہیں۔ پڑھتے وقت آیات پر نوٹ شامل کریں۔",
+    "personalNote": "ذاتی نوٹ",
+    "writeComment": "تبصرہ لکھیں"
   },
   "topics": {
     "title": "موضوعات",
@@ -271,7 +286,8 @@
     "post": "پوسٹ",
     "flag": "رپورٹ",
     "delete": "حذف",
-    "signInPrompt": "بحث میں شامل ہونے کے لیے سائن ان کریں۔"
+    "signInPrompt": "بحث میں شامل ہونے کے لیے سائن ان کریں۔",
+    "scholarVerified": "عالم کی تصدیق"
   },
   "sync": {
     "title": "کلاؤڈ سنک",
@@ -386,5 +402,16 @@
     "searchPlaceholder": "عبارات تلاش کریں...",
     "noResults": "کوئی عبارت نہیں ملی۔",
     "comingSoon": "عبارات کا اشاریہ جلد آ رہا ہے۔"
+  },
+  "partType": {
+    "hadith": "حدیث",
+    "verse": "آیت",
+    "chapter": "باب",
+    "heading": "عنوان",
+    "volume": "جلد",
+    "book": "کتاب",
+    "section": "حصہ",
+    "surah": "سورہ",
+    "ayah": "آیت"
   }
 }

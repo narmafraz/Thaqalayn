@@ -48,7 +48,7 @@
           </div>
         </div>
 
-        <nav class="crumbs" aria-label="Breadcrumb"><app-breadcrumbs></app-breadcrumbs></nav>
+        <nav class="crumbs" [attr.aria-label]="'app.breadcrumbAria' | translate"><app-breadcrumbs></app-breadcrumbs></nav>
     </header>
 
     <!-- Mobile search overlay -->
@@ -63,7 +63,7 @@
     <aside class="mobile-menu-panel" [class.open]="mobileMenuOpen">
       <div class="mobile-menu-header">
         <span>{{ 'app.title' | translate }}</span>
-        <button (click)="mobileMenuOpen = false" aria-label="Close menu">
+        <button (click)="mobileMenuOpen = false" [attr.aria-label]="'app.closeMenu' | translate">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -128,6 +128,12 @@
                  (change)="aiPrefs.set('showTopicTags', $any($event.target).checked)">
           <span>{{ 'settings.ai.showTopicTags' | translate }}</span>
         </label>
+        <label class="mobile-setting-checkbox">
+          <input type="checkbox"
+                 [checked]="aiPrefs.get('showAiTranslationDisclaimer')"
+                 (change)="aiPrefs.set('showAiTranslationDisclaimer', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
+        </label>
       </div>
     </aside>
   </ng-container>
@@ -145,7 +151,7 @@
       <a routerLink="/support">{{ 'nav.support' | translate }}</a> |
       <a routerLink="/about">{{ 'nav.about' | translate }}</a>
     </footer>
-    <nav class="bottom-nav" aria-label="Main navigation" *ngIf="activeSection$ | async as section">
+    <nav class="bottom-nav" [attr.aria-label]="'app.mainNavAria' | translate" *ngIf="activeSection$ | async as section">
       <a routerLink="/" class="bottom-nav-item" [class.active]="section === 'home'" queryParamsHandling="preserve">
         <mat-icon>home</mat-icon>
         <span>{{ 'nav.home' | translate }}</span>

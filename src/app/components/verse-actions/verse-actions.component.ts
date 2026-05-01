@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Verse } from '@app/models';
 import { isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
+import { I18nService } from '@app/services/i18n.service';
 
 @Component({
   selector: 'app-verse-actions',
@@ -59,7 +60,11 @@ export class VerseActionsComponent {
   // Internal copy feedback state
   textCopied = false;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  constructor(private cdr: ChangeDetectorRef, private i18n: I18nService) {}
+
+  translatedPartType(partType: string | undefined | null): string {
+    return this.i18n.translatePartType(partType);
+  }
 
   async copyText(): Promise<void> {
     const verse = this.verse;
@@ -89,7 +94,7 @@ export class VerseActionsComponent {
     }
     const translationText = (transTexts || []).join('\n').replace(/<[^>]*>/g, '');
 
-    const reference = `${verse.part_type} ${verse.local_index}`;
+    const reference = `${this.i18n.translatePartType(verse.part_type)} ${verse.local_index}`;
     const link = `${window.location.origin}/books/${this.versePath}`;
 
     const lines = [arabicText, '', translationText, '', `— ${this.bookTitle}, ${reference}`, link];

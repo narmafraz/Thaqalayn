@@ -8,10 +8,8 @@ import AxeBuilder from '@axe-core/playwright';
 // FIXED: M2 image-alt (added alt="Thaqalayn logo")
 // FIXED: M4 link-name (added aria-label to verse anchor links)
 // FIXED: M5 page-has-heading-one (changed titles to <h1>)
-const KNOWN_ISSUE_RULES_TO_SKIP = [
-  // M3+: ARIA sort buttons without accessible names (WCAG 4.1.2) - Material table sort headers
-  'aria-command-name',
-];
+// FIXED: M3+ aria-command-name (added [attr.aria-label] to mat-sort-header th elements in people-list)
+const KNOWN_ISSUE_RULES_TO_SKIP: string[] = [];
 
 test.describe('Accessibility - Homepage', () => {
   test('should have no critical accessibility violations', async ({ page }) => {

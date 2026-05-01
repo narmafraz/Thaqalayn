@@ -138,11 +138,9 @@ The `npm start` script includes `NODE_OPTIONS=--openssl-legacy-provider` to supp
 ### Accessibility
 The app uses semantic HTML5 landmarks (`<header>`, `<nav>`, `<main>`, `<footer>`) and a skip-to-content link. Page titles use `<h1>` (via `book-titles` component with `headingLevel` input). Verse reference links have `aria-label` attributes.
 
-**Remaining accessibility issues** tracked in `e2e/tests/accessibility.spec.ts` as `KNOWN_ISSUE_RULES_TO_SKIP`:
-- **M1** Arabic text lacks `lang="ar"` attributes (screen readers mispronounce) — needs `lang="ar"` on `.arabic` containers
-- Narrator sort headers lack accessible names — `aria-command-name` (Material table sort, third-party component)
+**Remaining accessibility issues** are now empty (`KNOWN_ISSUE_RULES_TO_SKIP = []`) after `aria-command-name` was fixed by adding `[attr.aria-label]` to the `mat-sort-header` th elements in `people-list.component.html`. Arabic text already has `lang="ar"` attributes throughout templates.
 
-As issues are fixed, remove the corresponding rule from `KNOWN_ISSUE_RULES_TO_SKIP` in `accessibility.spec.ts` so the test enforces the fix going forward.
+As new issues arise, add the rule id to `KNOWN_ISSUE_RULES_TO_SKIP` in `accessibility.spec.ts` with a comment, and remove it once fixed so the test enforces the fix going forward.
 
 ### E2E Test Structure
 Tests live in `e2e/tests/` and use Playwright with `@axe-core/playwright` for accessibility:

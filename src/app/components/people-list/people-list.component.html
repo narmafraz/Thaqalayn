@@ -108,13 +108,15 @@
 
           <!-- Id Column -->
           <ng-container matColumnDef="index">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="left-index">{{ 'common.number' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="left-index"
+                [attr.aria-label]="'common.number' | translate">{{ 'common.number' | translate }}</th>
             <td mat-cell *matCellDef="let row" class="left-index">{{row.index}}</td>
           </ng-container>
 
           <!-- Combined Name Column (two-line: Arabic + English) -->
           <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'common.name' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header
+                [attr.aria-label]="'common.name' | translate">{{ 'common.name' | translate }}</th>
             <td mat-cell *matCellDef="let row" class="name-cell">
               <div class="name-two-line">
                 <span class="role-badge imam-badge" *ngIf="isImam(row.index)">{{ 'narrator.roleImam' | translate }}</span>
@@ -126,7 +128,8 @@
 
           <!-- narrations Column with colored pill -->
           <ng-container matColumnDef="narrations">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'narrator.narrations' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+                [attr.aria-label]="'narrator.narrations' | translate">{{ 'narrator.narrations' | translate }}</th>
             <td mat-cell *matCellDef="let row" class="center">
               <span class="narration-pill" [ngClass]="getNarrationPillClass(row.narrations)">{{ row.narrations | number }}</span>
             </td>
@@ -134,18 +137,21 @@
 
           <!-- narrated_from Column -->
           <ng-container matColumnDef="narrated_from">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'narrator.narratedFrom' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+                [attr.aria-label]="'narrator.narratedFrom' | translate">{{ 'narrator.narratedFrom' | translate }}</th>
             <td mat-cell *matCellDef="let row" class="center">{{row.narrated_from}}</td>
           </ng-container>
 
           <!-- narrated_to Column -->
           <ng-container matColumnDef="narrated_to">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'narrator.narratedTo' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+                [attr.aria-label]="'narrator.narratedTo' | translate">{{ 'narrator.narratedTo' | translate }}</th>
             <td mat-cell *matCellDef="let row" class="center">{{row.narrated_to}}</td>
           </ng-container>
 
           <ng-container matColumnDef="conarrators">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'narrator.conarratorCount' | translate }}</th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+                [attr.aria-label]="'narrator.conarratorCount' | translate">{{ 'narrator.conarratorCount' | translate }}</th>
             <td mat-cell *matCellDef="let row" class="center">{{row.conarrators}}</td>
           </ng-container>
 

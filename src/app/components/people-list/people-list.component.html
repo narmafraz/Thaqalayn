@@ -47,6 +47,7 @@
             </button>
           </mat-form-field>
           <button class="filter-toggle-btn" (click)="toggleFilters()" [class.active]="showFilters || hasActiveFilters"
+                  [attr.aria-label]="'narrator.filters' | translate"
                   [matTooltip]="'narrator.filters' | translate">
             <mat-icon>tune</mat-icon>
           </button>

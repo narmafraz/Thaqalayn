@@ -23,8 +23,8 @@ test.describe('Accessibility - Homepage', () => {
   test('should have no critical accessibility violations', async ({ page }) => {
     await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
-    // Wait for Angular to render the book list
-    await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
+    // Wait for Angular to render the books homepage (random verse cards + book tree)
+    await page.locator('app-book-dispatcher .random-verse-card, app-book-dispatcher h2, app-book-tree').first().waitFor({ state: 'visible', timeout: 10000 });
 
     const results = await new AxeBuilder({ page })
       .disableRules(KNOWN_ISSUE_RULES_TO_SKIP)
@@ -65,7 +65,7 @@ test.describe('Accessibility - Homepage', () => {
   test('should have visible focus indicators on interactive elements', async ({ page }) => {
     await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
-    await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('app-book-dispatcher .random-verse-card, app-book-dispatcher h2, app-book-tree').first().waitFor({ state: 'visible', timeout: 10000 });
 
     // Tab to the first interactive element and check it receives focus
     await page.keyboard.press('Tab');
@@ -109,7 +109,7 @@ test.describe('Accessibility - Quran Page', () => {
   test('should have proper heading structure', async ({ page }) => {
     await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
-    await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('h1, h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
     const headings = await page.locator('h1, h2, h3, h4, h5, h6').allTextContents();
     expect(headings.length).toBeGreaterThan(0);
@@ -124,7 +124,7 @@ test.describe('Accessibility - Quran Page', () => {
   test('should have navigable links with accessible names', async ({ page }) => {
     await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
-    await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('h1, h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
     const results = await new AxeBuilder({ page })
       .include('a')
@@ -305,7 +305,7 @@ test.describe('Accessibility - Responsive', () => {
     await page.setViewportSize({ width: 360, height: 640 });
     await page.goto('/books/quran:1');
     await page.waitForLoadState('networkidle');
-    await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('h1, h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
     const results = await new AxeBuilder({ page })
       .disableRules(KNOWN_ISSUE_RULES_TO_SKIP)
@@ -334,7 +334,7 @@ test.describe('Accessibility - Color Contrast', () => {
   test('should meet WCAG AA contrast requirements on homepage', async ({ page }) => {
     await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
-    await page.locator('table').first().waitFor({ state: 'visible', timeout: 10000 });
+    await page.locator('app-book-dispatcher .random-verse-card, app-book-dispatcher h2, app-book-tree').first().waitFor({ state: 'visible', timeout: 10000 });
 
     const results = await new AxeBuilder({ page })
       .withRules(['color-contrast'])

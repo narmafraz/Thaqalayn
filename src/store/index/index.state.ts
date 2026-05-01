@@ -70,12 +70,33 @@ export class IndexState implements NgxsOnInit {
         ctx.patchState({ books: { ...currentBooks, [action.language]: booksData } as Record<string, IndexedTitles> });
       }),
       catchError(() => {
-        // When a language index file 404s (e.g., books.fa.json), fall back to English index
-        const currentBooks = ctx.getState().books;
-        if (currentBooks['en'] && action.language !== 'en') {
-          ctx.patchState({ books: { ...currentBooks, [action.language]: currentBooks['en'] } });
+        // When a non-English language index file 404s, fall back to English. If English
+        // is already loaded, copy it immediately. Otherwise fetch English first (race-safe
+        // — without this, ngxsOnInit dispatches en/ar/userLang in parallel and the userLang
+        // 404 can fire before en resolves, leaving books[userLang] undefined and rendering
+        // "undefined undefined" in breadcrumbs).
+        if (action.language === 'en') {
+          return of(null);
         }
-        return of(null);
+        const currentBooks = ctx.getState().books;
+        if (currentBooks['en']) {
+          ctx.patchState({ books: { ...currentBooks, [action.language]: currentBooks['en'] } });
+          return of(null);
+        }
+        return this.http.get<IndexedTitles>(`${IndexState.indexUrl}/books.en.json`).pipe(
+          tap((enData) => {
+            const cb = ctx.getState().books;
+            const fallback = cb['en'] || enData;
+            ctx.patchState({
+              books: {
+                ...cb,
+                en: fallback,
+                [action.language]: fallback,
+              },
+            });
+          }),
+          catchError(() => of(null))
+        );
       })
     );
   }

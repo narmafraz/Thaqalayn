@@ -85,8 +85,8 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 
 | Item | Severity | Source | Status |
 |------|----------|--------|--------|
-| `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 | **NEEDS INVESTIGATION** — worker-p2 assessed but may need deeper routing fix |
-| Missing `books.{lang}.json` for 8 languages — causes "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 | **OUTSTANDING** — requires generator-side changes to produce index files |
+| `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 | **AWAITING PROD VERIFICATION** — `i18n.service.ts:67-87` reads URL on construction; new e2e tests in `i18n.spec.ts` ("Fresh-session ?lang= URL parameter") assert fa/ar/fr render correctly. If they pass against production, item closed |
+| Missing `books.{lang}.json` for 10 languages — was causing "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 | **PARTIALLY DONE** — race-safe English fallback in `IndexState.loadIndex` (commit `8570ba6`) prevents "undefined undefined" rendering. Generating actual translated index files still blocked on P1.4 (chapter title AI batch, ~$6 GPT-5-mini) |
 | About + Support pages entirely hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-01 | **DONE** — `about.component.html` and `support.component.html` use `about.*` / `support.*` keys; all 12 locales populated |
 | AI Settings panel labels hardcoded in English (7 strings) | HIGH | UX_REVIEW_2026_03_10 D-02 | **DONE** — `settings.component.html` uses `settings.ai.*` keys (lines 28, 38, 43, 48, 53, 56) |
 | Verse-detail section headers hardcoded ("Quran References", etc.) | HIGH | UX_REVIEW_2026_03_10 D-03 | **DONE** — `verse-detail.component.html` lines 148, 202, 218, 232 use `book.crossReferences`, `book.quranReferences`, `book.keyPhrases`, `book.relatedNarrations` |

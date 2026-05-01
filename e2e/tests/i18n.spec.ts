@@ -72,6 +72,69 @@ test.describe('Internationalization (i18n)', () => {
   });
 });
 
+test.describe('Fresh-session ?lang= URL parameter', () => {
+  // Verifies that the language URL parameter is honored on a *fresh* session
+  // (no localStorage, no cookies, no prior visit). This is critical for
+  // shared-link use cases — copy-pasting `?lang=fa` to a friend should render
+  // in Persian, not English. See CONSOLIDATED_ROADMAP.md §2.1 and PR6.
+  test('?lang=fa renders Persian UI on a fresh session', async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    try {
+      await page.goto('/books?lang=fa');
+      await page.waitForLoadState('networkidle');
+
+      const htmlLang = await page.locator('html').getAttribute('lang');
+      expect(htmlLang).toBe('fa');
+
+      const dir = await page.locator('html').getAttribute('dir');
+      expect(dir).toBe('rtl');
+
+      // Footer should contain Persian translations of nav items.
+      // درباره = "About" in Persian, دانلود = "Download" in Persian.
+      const footer = page.locator('#footer');
+      await expect(footer).toContainText(/درباره|دانلود|پشتیبانی/);
+    } finally {
+      await context.close();
+    }
+  });
+
+  test('?lang=ar renders Arabic UI on a fresh session', async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    try {
+      await page.goto('/books?lang=ar');
+      await page.waitForLoadState('networkidle');
+
+      const htmlLang = await page.locator('html').getAttribute('lang');
+      expect(htmlLang).toBe('ar');
+
+      const footer = page.locator('#footer');
+      await expect(footer).toContainText('حول'); // "About" in Arabic
+    } finally {
+      await context.close();
+    }
+  });
+
+  test('?lang=fr renders French UI on a fresh session', async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    try {
+      await page.goto('/books?lang=fr');
+      await page.waitForLoadState('networkidle');
+
+      const htmlLang = await page.locator('html').getAttribute('lang');
+      expect(htmlLang).toBe('fr');
+
+      const footer = page.locator('#footer');
+      // "À propos" = About in French
+      await expect(footer).toContainText(/À propos|propos/);
+    } finally {
+      await context.close();
+    }
+  });
+});
+
 test.describe('Language Switching', () => {
   test('should display Arabic UI strings when lang=ar', async ({ page }) => {
     await page.goto('/books?lang=ar');

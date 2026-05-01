@@ -85,7 +85,7 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 
 | Item | Severity | Source | Status |
 |------|----------|--------|--------|
-| `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 | **AWAITING PROD VERIFICATION** — `i18n.service.ts:67-87` reads URL on construction; new e2e tests in `i18n.spec.ts` ("Fresh-session ?lang= URL parameter") assert fa/ar/fr render correctly. If they pass against production, item closed |
+| `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 | **DONE** (verified 2026-05-01) — fresh-session e2e tests for fa/ar/fr all pass against production. URL param honored on first visit with no localStorage |
 | Missing `books.{lang}.json` for 10 languages — was causing "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 | **PARTIALLY DONE** — race-safe English fallback in `IndexState.loadIndex` (commit `8570ba6`) prevents "undefined undefined" rendering. Generating actual translated index files still blocked on P1.4 (chapter title AI batch, ~$6 GPT-5-mini) |
 | About + Support pages entirely hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-01 | **DONE** — `about.component.html` and `support.component.html` use `about.*` / `support.*` keys; all 12 locales populated |
 | AI Settings panel labels hardcoded in English (7 strings) | HIGH | UX_REVIEW_2026_03_10 D-02 | **DONE** — `settings.component.html` uses `settings.ai.*` keys (lines 28, 38, 43, 48, 53, 56) |
@@ -94,7 +94,7 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 | Phrase list page entirely hardcoded | HIGH | UX_REVIEW_2026_03_10 D-05 | **DONE** — `phrase-list.component.html` 100% translated using `phrases.*` keys |
 | ~20 raw i18n keys leak as visible text | HIGH | UX_REVIEW_REPORTS §3 | **DONE** — keys (`annotation.add`, `translation.compare`, `search.tipsTitle`, `pwa.installPrompt`, etc.) exist in all 12 locales |
 | ~15 hardcoded English content labels (Summary, Key Terms, etc.) | MEDIUM | UI_REVIEW_DETAILS.md | **DONE** — `verse-text.component.html:233,237` use `ai.summary`, `ai.keyTerms` (keys exist in all 12 locales) |
-| Residual hardcoded aria-labels & matTooltips (chapter-content, verse-text, app shell, embed-verse) | MEDIUM | source audit 2026-05-01 | **OUTSTANDING** — ~25 strings remain in attribute values |
+| Residual hardcoded aria-labels & matTooltips (chapter-content, verse-text, app shell, embed-verse) | MEDIUM | source audit 2026-05-01 | **DONE** (commit `2121177`) — 16 new keys × 12 locales replaced ~25 hardcoded strings; `partType.*` keys + `I18nService.translatePartType()` helper localize the verse reference enum across SEO titles, share text, copy-text, and bookmark titles |
 | AI toggle aria-labels hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-08 | **DONE** (commit `4eff213`) — replaced with translated strings |
 | Settings close + book-tree tooltips hardcoded | MEDIUM | UX_REVIEW_2026_03_10 | **DONE** (commit `e0ca470`) — i18n keys added to all 12 locales |
 

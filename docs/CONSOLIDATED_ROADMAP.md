@@ -87,13 +87,14 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 |------|----------|--------|--------|
 | `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 | **NEEDS INVESTIGATION** — worker-p2 assessed but may need deeper routing fix |
 | Missing `books.{lang}.json` for 8 languages — causes "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 | **OUTSTANDING** — requires generator-side changes to produce index files |
-| About + Support pages entirely hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-01 | **OUTSTANDING** |
-| AI Settings panel labels hardcoded in English (7 strings) | HIGH | UX_REVIEW_2026_03_10 D-02 | **OUTSTANDING** |
-| Verse-detail section headers hardcoded ("Quran References", etc.) | HIGH | UX_REVIEW_2026_03_10 D-03 | **OUTSTANDING** |
-| Topics page tabs/content hardcoded | HIGH | UX_REVIEW_2026_03_10 D-04 | **OUTSTANDING** |
-| Phrase list page entirely hardcoded | HIGH | UX_REVIEW_2026_03_10 D-05 | **OUTSTANDING** |
-| ~20 raw i18n keys leak as visible text | HIGH | UX_REVIEW_REPORTS §3 | **OUTSTANDING** |
-| ~15 hardcoded English content labels (Summary, Key Terms, etc.) | MEDIUM | UI_REVIEW_DETAILS.md | **OUTSTANDING** |
+| About + Support pages entirely hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-01 | **DONE** — `about.component.html` and `support.component.html` use `about.*` / `support.*` keys; all 12 locales populated |
+| AI Settings panel labels hardcoded in English (7 strings) | HIGH | UX_REVIEW_2026_03_10 D-02 | **DONE** — `settings.component.html` uses `settings.ai.*` keys (lines 28, 38, 43, 48, 53, 56) |
+| Verse-detail section headers hardcoded ("Quran References", etc.) | HIGH | UX_REVIEW_2026_03_10 D-03 | **DONE** — `verse-detail.component.html` lines 148, 202, 218, 232 use `book.crossReferences`, `book.quranReferences`, `book.keyPhrases`, `book.relatedNarrations` |
+| Topics page tabs/content hardcoded | HIGH | UX_REVIEW_2026_03_10 D-04 | **DONE** — `topics.component.html` 100% translated using `topics.*` keys |
+| Phrase list page entirely hardcoded | HIGH | UX_REVIEW_2026_03_10 D-05 | **DONE** — `phrase-list.component.html` 100% translated using `phrases.*` keys |
+| ~20 raw i18n keys leak as visible text | HIGH | UX_REVIEW_REPORTS §3 | **DONE** — keys (`annotation.add`, `translation.compare`, `search.tipsTitle`, `pwa.installPrompt`, etc.) exist in all 12 locales |
+| ~15 hardcoded English content labels (Summary, Key Terms, etc.) | MEDIUM | UI_REVIEW_DETAILS.md | **DONE** — `verse-text.component.html:233,237` use `ai.summary`, `ai.keyTerms` (keys exist in all 12 locales) |
+| Residual hardcoded aria-labels & matTooltips (chapter-content, verse-text, app shell, embed-verse) | MEDIUM | source audit 2026-05-01 | **OUTSTANDING** — ~25 strings remain in attribute values |
 | AI toggle aria-labels hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-08 | **DONE** (commit `4eff213`) — replaced with translated strings |
 | Settings close + book-tree tooltips hardcoded | MEDIUM | UX_REVIEW_2026_03_10 | **DONE** (commit `e0ca470`) — i18n keys added to all 12 locales |
 
@@ -102,19 +103,19 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 | Item | Severity | Source | Status |
 |------|----------|--------|--------|
 | AI toggle buttons too small for touch on mobile (~20px) | HIGH | UX_REVIEW_2026_03_10 M-01 | **DONE** (commit `4eff213`) — padding increased to 6px with flexbox centering |
-| Topic category headers used as buttons without ARIA role | HIGH | UX_REVIEW_2026_03_10 A-01 | **OUTSTANDING** |
+| Topic category headers used as buttons without ARIA role | HIGH | UX_REVIEW_2026_03_10 A-01 | **DONE** — `topics.component.html:77-83` has `role="button"`, `tabindex="0"`, `aria-expanded`, keyboard handlers |
 | AI settings checkboxes lack proper label pairing | HIGH | UX_REVIEW_2026_03_10 A-02 | **DONE** (commit `4eff213`) — explicit id/for pairing added |
-| Discussion section toggle lacks ARIA attributes | MEDIUM | UX_REVIEW_2026_03_10 A-03 | **OUTSTANDING** |
+| Discussion section toggle lacks ARIA attributes | MEDIUM | UX_REVIEW_2026_03_10 A-03 | **DONE** — `verse-detail.component.html:295-301` has `role="button"`, `tabindex="0"`, `aria-expanded`, keyboard handlers |
 | Embed verse component lacks dynamic lang attributes | MEDIUM | UX_REVIEW_2026_03_10 A-04 | **DONE** (commit `4eff213`) — dynamic lang attributes added |
-| Search dropdown missing ARIA selected state / keyboard nav | MEDIUM | UX_REVIEW_2026_03_10 A-05 | **OUTSTANDING** |
+| Search dropdown missing ARIA selected state / keyboard nav | MEDIUM | UX_REVIEW_2026_03_10 A-05 | **DONE** — `search-bar.component.html` has `role="combobox"`, `aria-activedescendant`, `aria-selected`, `role="listbox"`, `role="option"`; ArrowUp/Down/Enter/Escape implemented in `search-bar.component.ts:99-130` |
 | Narrator sort headers lack accessible names (known issue) | LOW | QA_REPORT.md | **OUTSTANDING** |
 
 ### 2.3 Mobile Issues
 
 | Item | Severity | Source | Status |
 |------|----------|--------|--------|
-| Word-analysis popup may overflow viewport on mobile | HIGH | UX_REVIEW_2026_03_10 M-02 | **OUTSTANDING** |
-| Mobile menu lacks AI settings | MEDIUM | UX_REVIEW_2026_03_10 M-03 | **OUTSTANDING** |
+| Word-analysis popup may overflow viewport on mobile | HIGH | UX_REVIEW_2026_03_10 M-02 | **DONE** — `verse-text.component.ts:137-149` clamps x/y with `Math.max`/`Math.min` against container and viewport bounds |
+| Mobile menu lacks AI settings | MEDIUM | UX_REVIEW_2026_03_10 M-03 | **PARTIAL** — `app.component.html:111-131` has 3 of 4 AI toggles; `showAiTranslationDisclaimer` still missing |
 | ~~Bottom navigation missing Narrators link~~ | ~~MEDIUM~~ | ~~UX_REVIEW_2026_03_10 M-04~~ | **DONE** — code shows 5 nav items including Narrators |
 | Compact header breadcrumb text 9px — illegible | MEDIUM | UX_REVIEW_2026_03_10 M-05 | **DONE** (commit `4eff213`) — minimum increased to 11px |
 

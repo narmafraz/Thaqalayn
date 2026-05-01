@@ -1,7 +1,7 @@
 # SEO Roadmap
 
 > **Created:** 2026-04-24
-> **Last updated:** 2026-04-26 (P3.3 definitional /about + /bookmarks noindex shipped; P5 named author deferred; P6 IndexNow declined)
+> **Last updated:** 2026-05-01 (added §17 — first Search Console signals review)
 > **Last verified against source code:** 2026-04-26
 > **Purpose:** Single source of truth for SEO work across Thaqalayn. Consolidates prior plans from `PHASE3_FEATURE_PROPOSAL.md` §8 (2026-02-27), expands with 2026 best practices (GEO, llms.txt, INP, hreflang-in-sitemap, AI crawler policy), and lists manual steps the site owner must perform.
 
@@ -738,3 +738,57 @@ Switch to Prerender.io if:
 - `docs/CONSOLIDATED_ROADMAP.md` §3.1 (narrator freeze) — intersects with P2.6.
 - `docs/ARCHITECTURE.md` — path-based routing decision.
 - External references: [Core Web Vitals 2026 thresholds](https://www.corewebvitals.io/core-web-vitals), [llms.txt state](https://www.aeo.press/ai/the-state-of-llms-txt-in-2026), [Google sitemaps for large sites](https://developers.google.com/search/docs/crawling-indexing/sitemaps/large-sitemaps), [Hreflang in sitemap](https://developers.google.com/search/docs/specialty/international/localized-versions), [AI crawler landscape 2026](https://nohacks.co/blog/ai-user-agents-landscape-2026), [E-E-A-T + AI content 2026](https://developers.google.com/search/docs/fundamentals/creating-helpful-content), [IndexNow participants 2026](https://www.indexnow.org/faq).
+
+---
+
+## 17. Search Console signals — review 2026-05-01
+
+First substantive Search Console review since the site reached a strong indexable state (post-Track A/B + 2026-04-26 follow-ups).
+
+### Coverage
+
+| Status | Count | Read |
+|--------|-------|------|
+| Discovered – currently not indexed | 30,851 | Crawl-budget bottleneck. Custom domain (M7) is the primary unblock |
+| Crawled – currently not indexed | 24 | Small, ignorable |
+| Indexed | TBD — owner to fill from Search Console | — |
+
+The 30,851 "discovered but not indexed" is the dominant signal. This is normal for a `*.netlify.app` subdomain at this scale (72K URLs in sitemap) — Google allocates limited crawl budget to subdomains it doesn't recognise as authoritative. **Primary unblock: custom domain (M7).** Established for a few months, it will move a meaningful chunk of these URLs into indexed.
+
+### Indexing errors
+
+#### Server error (5xx) — 9 pages, intermittent
+
+URLs reported (2026-04-26 to 2026-04-28):
+- 8 × `/books/tahdhib-al-ahkam:*` (verses)
+- 1 × `/books/al-istibsar:1:191:4`
+
+**Diagnosis (2026-05-01):** Not a code bug. All 9 backing `verse_detail` JSON files exist locally and serve 200 from the data API (`thaqalayndata.netlify.app`). When tested with Googlebot UA against the live site, ~50% of the 9 URLs returned 500 in any single round, with **different URLs erroring on different requests** — consistent with Netlify Prerender Extension function timeouts/cold-starts rather than a structural bug.
+
+**Likely root cause:** the SSR-inline-verses logic (P2.3) prefetches up to 50 verse_detail files synchronously when crawler-detected. The prerender function intermittently exceeds its time/memory budget, returning 5xx.
+
+**Mitigation options (lowest-risk first):**
+- **Wait and re-test (recommended).** Google retries failed crawls. Failure rate of 9 URLs across 72K is ~0.01%. Re-check Search Console in 2-4 weeks.
+- **Lower the prefetch cap.** Reduce `SSR_INLINE_VERSE_LIMIT` from 50 → 20 in `chapter-content.component.ts`. Same SEO content density, less prerender load.
+- **Investigate prerender function logs.** Netlify dashboard → Functions → look for the prerender function's recent 5xx invocations. Will distinguish timeout vs JS error.
+
+#### Alternate page with proper canonical tag — 3 pages
+
+- `https://thaqalayn.netlify.app/?lang=ar` — expected (hreflang variant)
+- `https://thaqalayn.netlify.app/?lang=bn` — expected (hreflang variant)
+- `https://thaqalayn.netlify.app/books/al-kafi:7:3:49` — benign noise
+
+**Diagnosis:** Working as designed (2 pages) + benign noise (1 page).
+
+The `?lang=` variants are emitted by `SeoService.updateHreflang`. Each variant page has a `<link rel="canonical">` pointing to the lang-less master URL, so Google correctly files them as "alternate of canonical." Expected behaviour.
+
+The third URL returns 200 with a self-referential canonical. Most likely Google originally crawled a legacy variant (e.g. hash-based `#/books/...` or with a query string) and is filing the lang-less canonical under "alternate of itself." Not actionable.
+
+### Action items from this review
+
+| Action | Priority | Owner |
+|--------|----------|-------|
+| Decide on custom domain (M7) — biggest indexing unblock for the 30,851 discovered URLs | High | Site owner |
+| Re-check 5xx error count in 2-4 weeks; if persistent, lower `SSR_INLINE_VERSE_LIMIT` to 20 | Medium | Either |
+| Internal linking improvements (prev/next hadith in volume, related cross-references) — see §9. Helps crawl depth, reduces dependence on sitemap-only discovery | Medium | Code change |
+| Capture the "Indexed" page count from Search Console for baseline | Low | Site owner |

@@ -1,8 +1,8 @@
 # Consolidated Roadmap
 
 > **Created:** 2026-03-15
-> **Last updated:** 2026-04-24 (added SEO section — see `SEO_ROADMAP.md` for full detail)
-> **Last verified against source code:** 2026-03-15
+> **Last updated:** 2026-05-01 (SEO P3.3 /about + /bookmarks noindex shipped 2026-04-26; P5 named author deferred; P6 IndexNow declined; Tahdhib/Istibsar marked done; book count goal corrected; Search Console signals review noted in `SEO_ROADMAP.md` §17)
+> **Last verified against source code:** 2026-05-01
 > **Purpose:** Single source of truth for all outstanding work across the Thaqalayn ecosystem.
 > Collates unfinished items from all prior roadmaps and proposals into one prioritized list.
 > All status assessments verified against actual source code, not documentation.
@@ -207,7 +207,7 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 
 ## Priority 5: Data — New Book Integration
 
-**Goal:** Expand from 2 books (Quran + Al-Kafi) to 30+ including the Four Books.
+**Goal:** Expand the corpus to all major Shia primary sources. **23 books shipped** as of 2026-05-01: Quran, all Four Books (Al-Kafi, Tahdhib al-Ahkam, al-Istibsar, Man La Yahduruhu al-Faqih), Nahj al-Balagha, the two Amali compilations (al-Mufid, al-Saduq), and ~14 other primary collections (al-Khisal, al-Tawhid, Fada'il al-Shi'a, Kamal al-Din, Kamil al-Ziyarat, Kitab al-Du'afa', the two Kitab al-Ghayba, Kitab al-Mu'min, Kitab al-Zuhd, Ma'ani al-Akhbar, Mu'jam al-Ahadith al-Mu'tabara, Risalat al-Huquq, Sifat al-Shi'a, Thawab al-A'mal, Uyun Akhbar al-Rida). Bihar al-Anwar + Mir'at al-Uqul still pending — see `BIHAR_MIRAT_SCRAPING_PLAN.md`.
 
 **Source docs:** `SCHEMA_PROPOSAL.md`, `PARSER_ARCHITECTURE.md`, `RESEARCH_TAHDHIB_ISTIBSAR_SOURCES.md`, `MASTER_ROADMAP.md`
 
@@ -231,8 +231,9 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 | `thaqalayn_api.py` — generic parser for ThaqalaynAPI JSON | PARSER_ARCHITECTURE §2 | **DONE** — functional parser |
 | `thaqalayn_net.py` — HTML parser for mirror books | PARSER_ARCHITECTURE §3 | **DONE** — file exists (verified by worker-p5) |
 | `ai_content_merger.py` — merge AI content into data | — | **DONE** — functional |
-| Tahdhib al-Ahkam sourcing (hadith.inoor.ir API or ghbook.ir) | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | **OUTSTANDING** |
-| al-Istibsar sourcing | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | **OUTSTANDING** |
+| Tahdhib al-Ahkam sourcing (hadith.inoor.ir API or ghbook.ir) | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | **DONE** — book live at `/books/tahdhib-al-ahkam:*` |
+| al-Istibsar sourcing | RESEARCH_TAHDHIB_ISTIBSAR_SOURCES | **DONE** — book live at `/books/al-istibsar:*` |
+| Bihar al-Anwar (110 vols) + Mir'at al-Uqul (26 vols) sourcing | BIHAR_MIRAT_SCRAPING_PLAN | **OUTSTANDING** |
 
 ### 5.3 Data Optimization (Remaining)
 
@@ -282,11 +283,11 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 
 ---
 
-## Priority 6.5: SEO (✅ majority shipped 2026-04-25)
+## Priority 6.5: SEO (✅ majority shipped 2026-04-25 → 2026-04-26)
 
 **Goal:** Make the site actually indexable and discoverable — covering search engines (Google/Bing) and AI assistants (ChatGPT/Claude/Perplexity).
 
-**Source doc:** `SEO_ROADMAP.md` — full detail there. Summary:
+**Source doc:** `SEO_ROADMAP.md` — full detail there, including §17 "Search Console signals — review 2026-05-01". Summary:
 
 | Track | Scope | Status |
 |-------|-------|--------|
@@ -296,8 +297,19 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 | GEO (AI search) | `llms.txt`, FAQPage schema per chapter, definitional homepage description | **✅ DONE** (commits `1001b7c`, `00961a4`) |
 | Performance (CWV) | Preconnect tags, web-vitals telemetry service (logs to console) | **✅ DONE** (commit `54a5a1a`) |
 | E-E-A-T | datePublished + dateModified in JSON-LD | **✅ DONE** (commit `f7abec8`) |
+| GEO P3.3 / E-E-A-T | `/about` full rewrite (definitional opening, content scope describing Quran + 20+ collections with named compilers, project objectives, build principles, acknowledgements with CC BY 3.0 licensing); 12-language translations with parity-checked 31-key structure | **✅ DONE 2026-04-26** (commit `58d2455`) |
+| Discovery hygiene | `/bookmarks` per-user utility page now emits `<meta name="robots" content="noindex, follow">` | **✅ DONE 2026-04-26** (commit `58d2455`) |
 | Narrator virtualization | mat-paginator on narrator profile pages | **✅ Already done** in commit `38c173b` (FIX-04, pre-dating SEO roadmap) |
-| **Outstanding (decisions needed)** | Custom domain (M7), IndexNow key (M8), web-vitals → analytics endpoint (M10), per-page OG images (M11), definitional hero copy on homepage + /about, named author/maintainer, Track C subdirectory language URLs | **⏳ PENDING — see SEO_ROADMAP §2** |
+| **Outstanding (decisions needed)** | Custom domain (M7) — **highest-impact remaining lever** for the 30,851 "discovered – currently not indexed" pages; web-vitals → analytics endpoint (M10); per-page OG images (M11); homepage hero `DEFAULT_DESCRIPTION` one-line copy fix; Track C subdirectory language URLs | **⏳ PENDING — see SEO_ROADMAP §2 + §17** |
+| **Deferred / declined** | Named author / maintainer on `/about` — **deferred 2026-04-26** by site owner; IndexNow integration (M8) — **declined 2026-04-26** (corpus updates are infrequent batch events, Bing/Yandex/Naver win is small, Google doesn't honour IndexNow) | — |
+
+**Search Console signals (review 2026-05-01):**
+- 30,851 URLs "discovered – currently not indexed" — large but expected on a `*.netlify.app` subdomain; primary unblock is custom domain (M7).
+- 9 URLs with intermittent 5xx errors (all Tahdhib/Istibsar verse-detail) — diagnosed as Netlify Prerender Extension function timeouts, not a code bug. Mitigation if it persists: lower `SSR_INLINE_VERSE_LIMIT` from 50 → 20.
+- 3 URLs flagged "alternate page with proper canonical" — 2 are expected `?lang=` hreflang variants, 1 is benign legacy noise. No action.
+- 24 URLs "crawled – currently not indexed" — small, ignorable.
+
+Full diagnosis + action items in `SEO_ROADMAP.md` §17.
 
 Baseline (pre-2026-04-25, SEO-01..04 from USER_STORIES): `SeoService`, OG tags, JSON-LD (WebSite/Book/CreativeWork/Person/CollectionPage), canonical URLs, path routing, static sitemap, E2E tests — all live before this roadmap's work began.
 

@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-04-24
+> **Last updated:** 2026-05-01
 
 ## Status Legend
 

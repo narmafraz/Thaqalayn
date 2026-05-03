@@ -1,8 +1,8 @@
 # SEO Roadmap
 
 > **Created:** 2026-04-24
-> **Last updated:** 2026-05-01 (added §17 — first Search Console signals review)
-> **Last verified against source code:** 2026-04-26
+> **Last updated:** 2026-05-01 (added §17 Search Console signals review; closed homepage `DEFAULT_DESCRIPTION` half of P3.3)
+> **Last verified against source code:** 2026-05-01
 > **Purpose:** Single source of truth for SEO work across Thaqalayn. Consolidates prior plans from `PHASE3_FEATURE_PROPOSAL.md` §8 (2026-02-27), expands with 2026 best practices (GEO, llms.txt, INP, hreflang-in-sitemap, AI crawler policy), and lists manual steps the site owner must perform.
 
 **Audience for this doc:**
@@ -42,7 +42,6 @@ Thaqalayn shipped the SEO baseline in early 2026 (path routing, `SeoService`, OG
 ### What's still outstanding
 
 - **P1.8 per-page OG images** — needs design assets (1200×630 branded PNGs)
-- **P3.3 homepage hero copy** — `/about` shipped 2026-04-26 with a definitional opening; the homepage `DEFAULT_DESCRIPTION` in `src/app/services/seo.service.ts` still says "the Al-Kafi hadith collection" and should be updated to "the major Shia hadith collections" for consistency. One-line fix
 - **P5 named author / editorial voice on /about** — **deferred 2026-04-26** by site owner; revisit if/when E-E-A-T trust signal becomes a bottleneck
 - **P6 IndexNow integration** — **declined 2026-04-26** by site owner; corpus updates are infrequent batch events and the Bing/Yandex/Naver win is small. Revisit if the pipeline starts pushing daily AI updates
 - **P7 Custom domain** — the highest-impact remaining lever; ~$10-12/yr
@@ -461,7 +460,7 @@ When a chapter has N hadith and each hadith has an `ai_seo_question` + `ai_summa
 
 **Caution:** Google restricted FAQ rich results in 2023 to "well-known authoritative sites" — we may not qualify yet. However, even without rich-result display, the schema is read by LLM crawlers and can surface in AI Overviews. Keep ≤10 Q&A per page.
 
-### P3.3 Definitional openings — **`/about` shipped 2026-04-26; homepage still pending**
+### P3.3 Definitional openings — **shipped (`/about` 2026-04-26, homepage `DEFAULT_DESCRIPTION` 2026-05-01)**
 
 GEO research (2025-2026) shows pages whose opening sentence is clearly definitional are cited significantly more by LLMs.
 
@@ -471,8 +470,8 @@ GEO research (2025-2026) shows pages whose opening sentence is clearly definitio
 - E-E-A-T-relevant attribution: names al-Kulayni (d. 329 AH), al-Tusi, and al-Saduq with their works; gives LLMs concrete entities to cite.
 - Translated across all 12 supported languages with identical 31-key structure (`about.*`). Validation script confirms key parity across `en, ar, bn, de, es, fa, fr, id, ru, tr, ur, zh`.
 
-**Still pending — homepage:**
-- `DEFAULT_DESCRIPTION` in `src/app/services/seo.service.ts` (used by `setHomePage`) still names "the Al-Kafi hadith collection" only. Update to match the new `/about` intro: "the major Shia hadith collections". One-line copy fix.
+**Shipped — homepage `DEFAULT_DESCRIPTION` (2026-05-01):**
+- One-line copy fix in `src/app/services/seo.service.ts:7` — "the Holy Quran and the Al-Kafi hadith collection" → "the Holy Quran and the major Shia hadith collections". Now matches the `/about` intro and accurately reflects the 23 books shipped.
 - The visible homepage UI hero copy itself wasn't audited; revisit if/when the homepage UX is touched.
 
 ### P3.4 Authoritative attribution visible on page

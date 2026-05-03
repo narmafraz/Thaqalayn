@@ -301,7 +301,7 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 | GEO P3.3 / E-E-A-T | `/about` full rewrite (definitional opening, content scope describing Quran + 20+ collections with named compilers, project objectives, build principles, acknowledgements with CC BY 3.0 licensing); 12-language translations with parity-checked 31-key structure | **✅ DONE 2026-04-26** (commit `58d2455`) |
 | Discovery hygiene | `/bookmarks` per-user utility page now emits `<meta name="robots" content="noindex, follow">` | **✅ DONE 2026-04-26** (commit `58d2455`) |
 | Narrator virtualization | mat-paginator on narrator profile pages | **✅ Already done** in commit `38c173b` (FIX-04, pre-dating SEO roadmap) |
-| **Outstanding (decisions needed)** | Custom domain (M7) — **highest-impact remaining lever** for the 30,851 "discovered – currently not indexed" pages; web-vitals → analytics endpoint (M10); per-page OG images (M11); homepage hero `DEFAULT_DESCRIPTION` one-line copy fix; Track C subdirectory language URLs | **⏳ PENDING — see SEO_ROADMAP §2 + §17** |
+| **Outstanding (decisions needed)** | Custom domain (M7) — **highest-impact remaining lever** for the 30,851 "discovered – currently not indexed" pages; web-vitals → analytics endpoint (M10); per-page OG images (M11); Track C subdirectory language URLs | **⏳ PENDING — see SEO_ROADMAP §2 + §17** |
 | **Deferred / declined** | Named author / maintainer on `/about` — **deferred 2026-04-26** by site owner; IndexNow integration (M8) — **declined 2026-04-26** (corpus updates are infrequent batch events, Bing/Yandex/Naver win is small, Google doesn't honour IndexNow) | — |
 
 **Search Console signals (review 2026-05-01):**

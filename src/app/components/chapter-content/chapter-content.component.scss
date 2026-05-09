@@ -91,6 +91,7 @@ mat-mdc-card.highlight-pulse {
 }
 
 mat-mdc-card {
+  position: relative;
   background-color: var(--card-bg, rgba(255, 255, 255, 0.5));
 	border-radius: 10px;
 	margin: var(--space-base) var(--space-xs) var(--space-md) var(--space-xs);
@@ -121,6 +122,47 @@ mat-mdc-card {
 
   &:nth-child(even) {
     background-color: rgba(255, 255, 255, 0.03);
+  }
+}
+
+// Hadith number indicator: small pill in top-right of each verse card
+.hadith-number {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-family-latin);
+  color: var(--link-color, #5F9999);
+  background: rgba(95, 153, 153, 0.1);
+  padding: 2px 8px;
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+[dir="rtl"] .hadith-number {
+  right: auto;
+  left: 10px;
+}
+
+:host-context(body.dark-theme) .hadith-number {
+  background: rgba(142, 197, 197, 0.12);
+  color: var(--link-color);
+}
+
+@media (max-width: 600px) {
+  .hadith-number {
+    top: 6px;
+    right: 8px;
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+  [dir="rtl"] .hadith-number {
+    right: auto;
+    left: 8px;
   }
 }
 

@@ -40,6 +40,7 @@
       <ng-container *ngIf="ref.part_type === 'Hadith' || ref.part_type === 'Verse'">
         <ng-container *ngIf="loadedVerses.get(ref.path!) as verse; else skeleton">
           <mat-card appearance="outlined">
+            <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ ref.local_index }}</span>
             <mat-card-title>
               <div class="titles">
                 <a [id]="'h' + ref.local_index" style="visibility: hidden"></a>
@@ -194,6 +195,7 @@
         </ng-container>
         <ng-template #skeleton>
           <mat-card appearance="outlined" class="verse-skeleton" [attr.data-path]="ref.path">
+            <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ ref.local_index }}</span>
             <mat-card-title>
               <div class="titles">
                 <a [id]="'h' + ref.local_index" style="visibility: hidden"></a>
@@ -214,6 +216,7 @@
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse" [headingLevel]="2"></app-book-titles>
     <mat-card appearance="outlined" *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'">
+      <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ verse.local_index }}</span>
       <mat-card-title>
         <div class="titles">
           <a [id]="'h' + verse.local_index" style="visibility: hidden"></a>

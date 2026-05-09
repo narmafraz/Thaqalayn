@@ -8,6 +8,8 @@ Thaqalayn is an Angular 19 web application for hosting and displaying Islamic Ha
 
 ## Development Commands
 
+> **See also:** [`docs/COMMANDS.md`](docs/COMMANDS.md) — full ecosystem-wide reference (scraping, AI pipeline, monitoring, deployment, etc.). The notes below cover Angular-only commands.
+
 ### Running the Application
 ```bash
 npm start                # Development server with legacy OpenSSL provider (required)

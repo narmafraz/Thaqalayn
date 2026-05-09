@@ -225,6 +225,59 @@ describe('VerseTextComponent', () => {
     expect(component.diacritizedText).toBe('بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ');
   });
 
+  it('should reconstruct diacritized text from chunks when both diacritized_text and word_analysis are absent (v4 lean format)', () => {
+    // v4 lean format: merger drops diacritized_text and word_tags but
+    // keeps chunks[].arabic_text (Phase 1 LLM canonical). Component must
+    // fall back to joining chunk arabic_text.
+    const aiV4Lean: AiContent = {
+      diacritics_status: 'validated',
+      content_type: 'creedal',
+      tags: ['theology'],
+      isnad_matn: { has_chain: true, narrators: [] },
+      chunks: [
+        {
+          chunk_type: 'isnad',
+          arabic_text: 'عدة من أصحابنا',
+          word_start: 0,
+          word_end: 3,
+          translations: { en: 'A number of our companions' },
+        },
+        {
+          chunk_type: 'body',
+          arabic_text: 'قال الإمام',
+          word_start: 3,
+          word_end: 5,
+          translations: { en: 'The Imam said' },
+        },
+      ],
+    };
+    component.verse = { ...mockVerse, ai: aiV4Lean };
+    expect(component.hasAiText).toBe(true);
+    expect(component.diacritizedText).toBe('عدة من أصحابنا قال الإمام');
+  });
+
+  it('hasAiText is false when chunks have no inline arabic_text and no other source', () => {
+    const aiNoArabic: AiContent = {
+      diacritics_status: 'validated',
+      content_type: 'creedal',
+      tags: ['theology'],
+      isnad_matn: { has_chain: false, narrators: [] },
+      // chunks present but with no arabic_text — equivalent to v3 stripped
+      // shape with no word_analysis. Should not register as having AI text.
+      chunks: [
+        {
+          chunk_type: 'body',
+          word_start: 0,
+          word_end: 1,
+          translations: { en: 'something' },
+        },
+      ],
+    };
+    component.verse = { ...mockVerse, ai: aiNoArabic };
+    expect(component.hasAiText).toBe(false);
+    expect(component.diacritizedText).toBe('');
+  });
+
   it('should identify first isnad chunk correctly', () => {
     component.verse = {
       ...mockVerse,

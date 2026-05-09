@@ -199,14 +199,25 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   }
 
   get hasAiText(): boolean {
-    return !!this.verse?.ai?.diacritized_text || !!this.verse?.ai?.word_analysis?.length;
+    return !!this.verse?.ai?.diacritized_text
+      || !!this.verse?.ai?.word_analysis?.length
+      || !!this.verse?.ai?.chunks?.some(c => !!c.arabic_text);
   }
 
-  /** Reconstruct diacritized text from word_analysis if diacritized_text is not present */
+  /** Diacritized Arabic text. Source priority:
+   *  1. ai.diacritized_text (legacy v4 / pre-leanness output)
+   *  2. word_analysis joined by word (v3)
+   *  3. chunks[].arabic_text joined (current v4 — chunks are LLM canonical)
+   */
   get diacritizedText(): string {
     if (this.verse?.ai?.diacritized_text) return this.verse.ai.diacritized_text;
     const wa = this.verse?.ai?.word_analysis;
-    return wa ? wa.map(e => e.word).join(' ') : '';
+    if (wa?.length) return wa.map(e => e.word).join(' ');
+    const chunks = this.verse?.ai?.chunks;
+    if (chunks?.length) {
+      return chunks.map(c => c.arabic_text || '').filter(Boolean).join(' ');
+    }
+    return '';
   }
 
   get hasWordAnalysis(): boolean {

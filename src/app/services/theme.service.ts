@@ -88,10 +88,6 @@ export class ThemeService {
     if (saved === 'light' || saved === 'dark') {
       return saved;
     }
-    // Respect system preference
-    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
     return 'light';
   }
 
@@ -115,7 +111,7 @@ export class ThemeService {
     // Update meta theme-color for mobile browsers
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      meta.setAttribute('content', theme === 'dark' ? '#1a1a2e' : '#7ba7a7');
+      meta.setAttribute('content', theme === 'dark' ? '#1a1a1a' : '#7ba7a7');
     }
   }
 

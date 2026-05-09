@@ -39,7 +39,7 @@
 
 :host-context(body.dark-theme) #header {
   background-image: none;
-  background-color: #16213e;
+  background-color: #242424;
 }
 
 #header > * {
@@ -345,7 +345,7 @@ a:hover {
 
 :host-context(body.dark-theme) #footer {
   background-image: none;
-  background-color: #16213e;
+  background-color: #242424;
 }
 
 #footer a{
@@ -598,7 +598,7 @@ a:hover {
 }
 
 :host-context(body.dark-theme) .bottom-nav {
-  background: var(--bg-primary, #1a1a2e);
+  background: var(--bg-primary, #1a1a1a);
   border-top-color: var(--border-color, #333);
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
 }

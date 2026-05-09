@@ -72,17 +72,17 @@ describe('ThemeService', () => {
       expect(freshService.currentTheme).toBe('light');
     });
 
-    it('should fall back to system dark preference when localStorage has no theme', () => {
+    it('should default to light for first-time visitors regardless of system dark preference', () => {
       matchMediaResult = true;
       (window.matchMedia as jasmine.Spy).and.callFake((query: string) => {
         return { matches: true } as MediaQueryList;
       });
 
       const freshService = new ThemeService('browser' as unknown as object);
-      expect(freshService.currentTheme).toBe('dark');
+      expect(freshService.currentTheme).toBe('light');
     });
 
-    it('should ignore invalid localStorage theme values and use system preference', () => {
+    it('should ignore invalid localStorage theme values and default to light', () => {
       localStorageStore['thaqalayn-theme'] = 'blue';
       matchMediaResult = true;
       (window.matchMedia as jasmine.Spy).and.callFake(() => {
@@ -90,10 +90,10 @@ describe('ThemeService', () => {
       });
 
       const freshService = new ThemeService('browser' as unknown as object);
-      expect(freshService.currentTheme).toBe('dark');
+      expect(freshService.currentTheme).toBe('light');
     });
 
-    it('should default to light when localStorage is invalid and system has no preference', () => {
+    it('should default to light when localStorage is invalid', () => {
       localStorageStore['thaqalayn-theme'] = 'invalid';
 
       const freshService = new ThemeService('browser' as unknown as object);
@@ -182,7 +182,7 @@ describe('ThemeService', () => {
       service.setTheme('dark');
       const meta = document.querySelector('meta[name="theme-color"]');
       expect(meta).toBeTruthy();
-      expect(meta!.getAttribute('content')).toBe('#1a1a2e');
+      expect(meta!.getAttribute('content')).toBe('#1a1a1a');
     });
 
     it('should update meta theme-color to light value for light theme', () => {

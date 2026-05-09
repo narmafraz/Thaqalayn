@@ -90,24 +90,25 @@
 
 /* ===================== Dark Theme ===================== */
 body.dark-theme {
-  --bg-primary: #1a1a2e;
-  --bg-secondary: #16213e;
-  --text-primary: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --text-muted: #888888;
-  --link-color: #7fb8b8;
-  --link-hover: #a0d8d8;
-  --border-color: #2a2a4a;
-  --card-bg: #1e1e3a;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --crumb-bg: rgba(0, 0, 0, 0.3);
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #242424;
+  --text-primary: #e8e8e8;
+  --text-secondary: #b8b8b8;
+  --text-muted: #8a8a8a;
+  --link-color: #8ec5c5;
+  --link-hover: #a8d8d8;
+  --border-color: #3a3a3a;
+  --card-bg: #2b2b2b;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --crumb-bg: rgba(255, 255, 255, 0.06);
   --table-stripe: rgba(255, 255, 255, 0.03);
   --table-hover: rgba(255, 255, 255, 0.06);
-  --error-bg: #3a1a1a;
-  --error-text: #ff6b6b;
-  --success-bg: #1a3a1a;
-  --success-text: #6bff6b;
+  --error-bg: #3a1f1f;
+  --error-text: #ff8a8a;
+  --success-bg: #1f3a1f;
+  --success-text: #8aff8a;
   --overlay-bg: rgba(0, 0, 0, 0.7);
+  --verse-alt-bg: rgba(255, 255, 255, 0.025);
 
   /* Override Angular Material for dark mode */
   .mat-mdc-card {

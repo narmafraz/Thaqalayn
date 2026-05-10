@@ -950,4 +950,48 @@ and cost. Full project plan: `WORDS_PROJECT_PLAN.md`.
 
 **Decision:** Option 1 — Commit raw data. Per `completeness > ease`: source URLs and dataset versions change (sites go down, datasets get updated breaking parsers). Locking the exact source state into git ensures reproducibility. The repo size stays well within GitHub's comfortable range (<2GB).
 
+### D052: Wiktextract full slim output stays out of git (100 MB GitHub limit) (2026-05-10)
+
+**Context:** The Wiktextract Arabic dump processes to ~221 MB JSON of slimmed-down entries (word → senses + etymology + IPA + forms). Multiple files exceed GitHub's per-file 100MB hard limit even with Git LFS unavailable.
+
+**Options considered:**
+1. **Split the slim into per-letter shards (~5-10MB each)** — More files but each fits the limit. Adds split/recombine logic.
+2. **Commit only a summary index (~5MB), keep the full slim cached locally** — Smaller WordSources, the slim is regenerable from the raw dump (also gitignored). Loss: anyone cloning WordSources can't directly read the full slim.
+3. **Use git LFS for the slim** — Requires LFS install + bandwidth costs on push/pull.
+
+**Decision:** Option 2 — commit only `summary_index.json` (5MB) to WordSources. The full slim (`wiktextract_arabic_lemmas.json`, 221MB) and the raw JSONL (499MB) live in `ThaqalaynDataGenerator/tmp/wiktextract_cache/` (gitignored). Re-derive with `python scripts/download_wiktextract_arabic.py`. The summary is enough for the page builder's "does Wiktionary have this lemma?" check; the full slim is only needed when LLM synthesis or merging Wiktionary translations into a lemma page actually happens (a later session).
+
+### D053: Lane's Lexicon Buckwalter conversion deferred to page builder (2026-05-11)
+
+**Context:** Perseus's TEI XML stores Arabic head-forms in Buckwalter transliteration with Perseus-specific extensions (`^` markers, digits like `1`). The orth_index keys are therefore Buckwalter-encoded, but the page builder needs Arabic NFC keys to look up against (matched against lemma's Arabic form).
+
+**Options considered:**
+1. **Pre-convert orth_index keys at download time** — Adds CAMeL dependency to the downloader script. Risk: changing the conversion rule later requires re-downloading or maintaining two source files.
+2. **Convert on-the-fly in the page builder** — Page builder already loads CAMeL Tools for morphology. Re-runs cheaply when conversion logic changes.
+3. **Maintain a hand-tuned Perseus-BW → Arabic char map** — Highest fidelity if we discover Perseus-specific char-pairs that CAMeL's bw2ar mishandles.
+
+**Decision:** Option 2 — convert in the page builder via `build_lanes_arabic_index()` + `perseus_bw_to_arabic()`. Strip `^` and digits before passing to CAMeL's `bw2ar` CharMapper. Future option 3 layer if we find systematic mistranslations. Build-time cost: ~2s for the full 46,924-entry orth_index, run once per page-build session.
+
+### D054: Canonical lemma slug = past-3ms (verbs) / first-gen (nouns) (2026-05-11)
+
+**Context:** CAMeL Tools' `lex` field returns the lemma identifier (undiacritized: `قال` for "to say"), but the project's slug rule says "diacritized Arabic itself". For consistency between surface page's `lemma_link` and lemma page's `slug`, both sides must derive the same diacritized form.
+
+**Options considered:**
+1. **Use CAMeL `lex` as slug** — Undiacritized; clean but violates the diacritized-slug rule.
+2. **Run paradigm generator to pick the "citation form"** — past_3ms for verbs (`قالَ`), singular nominative for nouns. Adds ~50ms per unique lemma.
+3. **Have the orchestrator hand-pick a "representative surface"** per lemma — uses the most common surface from the corpus as the lemma's display form. Per-lemma cost negligible but couples slugs to corpus data (which is OK since the lemma only matters in corpus context).
+
+**Decision:** Option 2 — `canonical_diacritized_lemma(lex, pos)` runs the paradigm generator and returns the citation form. LRU-cached (20K entries) so the ~10K-15K unique lemmas pay only one paradigm-gen call each. Falls back to NFC(lex) when no paradigm is producible (rare). This makes surface→lemma slugs deterministic from CAMeL alone, no corpus dependency. Trade-off: ~50ms per unique lemma during the build (acceptable: 8-15min for full corpus).
+
+### D055: Per-surface occurrence_paths are not capped (PoC) (2026-05-11)
+
+**Context:** High-frequency surfaces (e.g. `قَالَ` appears 28,709 times across 12,901 verse paths) produce surface JSON files of ~400KB dominated by the occurrence_paths array. With 102K unique surfaces, this drives total output size to ~250-300MB.
+
+**Options considered:**
+1. **No cap — store every occurrence path** — Maximal completeness. Big files for common words.
+2. **Cap at top-N paths per surface (e.g. 50)** — Smaller files. Loses ability to enumerate all narrations using a word.
+3. **Sample stratified by book** — e.g. 10 paths per book the word appears in. Preserves cross-book diversity but loses cardinality.
+
+**Decision:** Option 1 for the PoC. The UI can request a single surface page and use the count + path list directly for "all narrations containing this word". A 400KB JSON over a CDN with immutable cache is acceptable. Revisit only if/when the size becomes a real problem.
+
 ---

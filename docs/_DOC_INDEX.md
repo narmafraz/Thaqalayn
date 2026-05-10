@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-05-01
+> **Last updated:** 2026-05-10
 
 ## Status Legend
 
@@ -109,3 +109,9 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [SEO_ROADMAP.md](SEO_ROADMAP.md) | **ACTIVE** | Full SEO plan: ~40 items across quick wins, structural fixes, GEO (LLM search), Core Web Vitals, E-E-A-T, crawl/discovery. Includes manual steps for the site owner (Search Console verification, Netlify Prerender install, custom domain decision). Supersedes `PHASE3_FEATURE_PROPOSAL.md` §8 as the single source of truth for SEO. |
+
+### 2026-05-10
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **ACTIVE** | Per-word Arabic dictionary project plan. ~50K unique surface forms, ~10K lemmas. Per-lemma pages with translations, etymology, root, conjugations, classical lexicon entries, corpus occurrences. Resurrects the dormant `word_dictionary.py` module. Includes researched data sources (Quranic Arabic Corpus, Lane's Lexicon, Wiktextract/Kaikki, CAMeL Tools, Mufradat al-Quran, Lisan al-Arab) and proposes a separate `ThaqalaynWords` repo + Netlify deployment. Multi-session project (~6-10 sessions). Cost: $300-2000 depending on tier. |

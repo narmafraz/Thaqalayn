@@ -2,6 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "types": [
       "jasmine",
       "node"
@@ -13,6 +15,7 @@
   ],
   "include": [
     "src/**/*.spec.ts",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "src/**/*.fixture.json"
   ]
 }

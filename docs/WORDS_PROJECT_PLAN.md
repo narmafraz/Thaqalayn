@@ -797,11 +797,11 @@ Both new repos exist + git-init'd. My earlier-session commits intact.
 
 | Phase | Status | Started | Finished | Commits | Notes |
 |---|---|---|---|---|---|
-| 0 — scaffolding + NFC util | starting | 2026-05-10 | | | |
-| 1 — CAMeL Tools wrapper | pending | | | | |
-| 2 — corpus extraction | pending | | | | |
-| 3 — bulk downloaders | pending | | | | |
-| 4 — scrapers (if needed) | pending | | | | |
+| 0 — scaffolding + NFC util | **done** | 2026-05-10 | 2026-05-10 | `e637286` | `app/words/{__init__,normalize}.py` + 1000-form fixture + 18 tests. Slug = NFC only. `normalize_for_match` for fuzzy lookups (adds ta-marbuta unification to match the existing search service). 1745 total tests pass. |
+| 1 — CAMeL Tools wrapper | **done** | 2026-05-10 | 2026-05-10 | `5ca802c` | Install worked cleanly (pip + `camel_data -i defaults`). `app/words/morphology.py` with analyzer + generator + paradigm-by-role + POS translator. 26 tests. **Corpus coverage: 96.5%** on 200 random surface forms — gap is proper nouns (tribal nisbas like الْقَزْوِينِيُّ) which we'll handle as no-lemma surface pages. |
+| 2 — corpus extraction | **done** | 2026-05-10 | 2026-05-10 | Gen `66e0c8e`, Sources `70754df` | `app/words/corpus_extract.py` — format-aware (v3 word_analysis OR v4 chunks.arabic_text). 15 tests. **Real corpus: 102K unique surfaces, 1.1M tokens, 9.6s extraction.** Output committed to `ThaqalaynWordSources/extracted/corpus_surface_set.json` (39MB, 1.3M lines pretty-printed). |
+| 3 — bulk downloaders | **done** | 2026-05-10 | 2026-05-10 | Gen `e2a3c14`, `7c4e1b8`, `1a23a47`; Sources `f34c825`, `acea60e` | Three bulk sources captured: (3a) **QAC v0.4** — `download_quranic_arabic_corpus.py` parses 130K Quran morphology rows into lemma_index (4,776 lemmas), root_index (1,651 roots), parsed_rows.json. (3b) **Wiktextract Arabic** — `download_wiktextract_arabic.py` pulled 499MB JSONL from kaikki.org; full slim (221MB) stays in `tmp/wiktextract_cache/` (gitignored, exceeds GitHub 100MB), `summary_index.json` (5MB) committed to WordSources. (3c) **Lane's Lexicon** — `download_lanes_lexicon.py` downloaded 36 TEI XML files + parsed into 48,103 entries / 5,187 roots / 46,924 head-forms. Buckwalter-encoded — bw2ar conversion deferred to Phase 5 builder. (3d) Lisan al-Arab — deferred per D048. |
+| 4 — scrapers (if needed) | **skipped** | 2026-05-10 | 2026-05-10 | | Bulk sources covered the planned third-party data. No throttling-risk scraping needed for the PoC. |
 | 5 — page builders | pending | | | | |
 | 6 — validation | pending | | | | |
 | 7 — index builders | pending | | | | |

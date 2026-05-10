@@ -849,3 +849,105 @@ ThaqalaynData is deployed as-is to Netlify CDN. Everything in that repo gets ser
 **Rationale:** Avoids cross-project data pipeline changes. Author data is static and small (~24 entries). Can be migrated to data index later if needed. Includes English + Arabic names for all books.
 
 ---
+
+## ThaqalaynWords Project Decisions (2026-05-10)
+
+Decisions made during the autonomous session that scaffolds the
+ThaqalaynWords project. Bias: **completeness > ease**, balance benefit
+and cost. Full project plan: `WORDS_PROJECT_PLAN.md`.
+
+### D045: Repo naming — singular "Word" in compound source repo (2026-05-10)
+
+**Context:** Need a name for the raw-sources repo paralleling the existing `ThaqalaynDataSources`.
+
+**Options considered:**
+1. **`ThaqalaynWordsSources`** — letter-by-letter parallelism with `ThaqalaynDataSources`
+2. **`ThaqalaynWordSources`** — English compound-noun grammar (modifier nouns are singular)
+
+**Decision:** Option 2 — `ThaqalaynWordSources` (singular `Word` as modifier).
+
+**Rationale:** English compound nouns use singular modifier ("car factory" not "cars factory", "data source" not "datas source"). `ThaqalaynDataSources` already follows this rule — `Data` is the singular modifier of plural `Sources`. The letter-parallelism argument was the wrong test; grammatical parallelism is what matters and `Word` as modifier should also be singular. Served-output repo (`ThaqalaynWords`) is plural because it's not a compound — it's the content itself.
+
+**Trade-offs:** None significant. The string "WordsSources" reads slightly more parallel visually but is grammatically off. The asymmetry between `ThaqalaynWords` (plural, content noun) and `ThaqalaynWordSources` (compound, singular modifier) is internally consistent with how `Data`/`DataSources` works.
+
+### D046: Slug format — diacritized Arabic word as filename (2026-05-10)
+
+**Context:** Need stable URL slugs for ~50K surface forms and ~10K lemmas that the Angular UI can derive trivially from any chunk's surface form.
+
+**Options considered:**
+1. **Transliterated slug** (e.g. `qala`, `wa-bi-al-ahd`) — readable URLs, but requires the UI to lemmatize/transliterate the surface form (needs CAMeL Tools — not available in the browser) or a global surface→slug index
+2. **Diacritized Arabic word as filename** (e.g. `وَقَالَ.json`) — UI derives slug via standard NFC normalization (`s.normalize('NFC')`), no transliteration scheme, no lookup
+3. **Hash-based slug** (e.g. `a3f9b2c1.json`) — opaque URLs, requires a lookup index everywhere
+
+**Decision:** Option 2 — diacritized Arabic word, NFC-normalized, as both filename and URL slug.
+
+**Rationale:**
+- UI derives slug deterministically with zero infrastructure (standard library NFC normalization in both Python and JS)
+- No transliteration scheme to design or coordinate
+- Homographs handled by diacritization (different vowels → different file)
+- Generator and UI agree on slug derivation via a single locked normalization function tested against a 1000-form fixture
+- Matches the persistence-rule precedent: Arabic IS the canonical text
+
+**Trade-offs:**
+- URL bar shows percent-encoded UTF-8 when copied (`%D9%88...`) — cosmetic; modern browsers display Arabic in the address bar
+- Filesystems need UTF-8 awareness (modern git/Netlify/Windows handle this)
+- Slightly longer URLs over the wire
+
+### D047: Lane's Lexicon source pick — pending Phase 4 exploration (2026-05-10)
+
+**Context:** Lane's Arabic-English Lexicon is public-domain and available from multiple sources of varying quality. Need to pick one for bulk download.
+
+**Options considered:**
+1. **Perseus Digital Library XML** — Original TEI-XML digitization, most authoritative, complete markup, ~50-100 MB
+2. **lanelexicon.github.io repo** — GitHub-hosted fork of the Perseus data, may have cleaner JSON conversion
+3. **Internet Archive scans (text)** — OCR'd text, may have OCR errors, harder to parse structurally
+4. **arabiclexicon.hawramani.com aggregator** — No bulk download; would need scraping
+
+**Decision (provisional):** Investigate options 1 and 2 first, pick whichever has the cleanest already-parsed structure with markup retained. Fall back to scraping option 4 if neither offers usable data. **Per `completeness > ease`: prefer the source with most markup intact, even if parsing is harder.**
+
+**Reasoning will be logged in this entry once exploration during Phase 4 completes.**
+
+### D048: Lisan al-Arab inclusion — defer parsing, persist raw (2026-05-10)
+
+**Context:** Lisan al-Arab is the most comprehensive classical Arabic dictionary, public-domain. Available as `.docx` zip archives on Internet Archive — non-trivial to parse into structured data.
+
+**Options considered:**
+1. **Include in this session** — Parse `.docx` archives into structured JSON entries during Phase 4. Substantial parsing work.
+2. **Defer to a focused future session** — Lane's + Wiktextract + QAC already provide substantial classical-lexicon coverage.
+3. **Include raw only — defer parsing** — Download the file and persist raw, parse in a future session.
+
+**Decision:** Option 3 — Download raw `.docx` archives now and persist in `ThaqalaynWordSources/sources/lisan-al-arab/`; parsing deferred to a future session. Per `completeness > ease`: the raw data lands now so we don't have to re-acquire later; parsing is the deferrable work.
+
+### D049: Wiktextract scope — full Arabic dump persisted (2026-05-10)
+
+**Context:** Wiktextract (Kaikki.org) provides Wiktionary Arabic entries as JSONL. The full dump is ~100MB; only a fraction of entries correspond to lemmas in our corpus.
+
+**Options considered:**
+1. **Download + persist full dump** — Keep all entries available for future lookups (e.g. when corpus grows)
+2. **Download full + filter to corpus lemmas** — Smaller persisted footprint, but loses future-corpus entries
+3. **Download only entries for our lemmas** — Not possible (no per-entry API)
+
+**Decision:** Option 1 — Download full dump, store in raw form. Per `completeness > ease`: the storage cost (~100MB) is small compared to the cost of re-downloading or re-extracting later when corpus grows.
+
+### D050: CAMeL Tools dataset depth — `light` (2026-05-10)
+
+**Context:** After CAMeL Tools install, `camel_data -i {profile}` downloads pretrained models. Profiles: `light` (analyzer + MLE disambiguation, ~600MB), `all` (adds NER + sentiment + dialect-ID, ~2GB).
+
+**Options considered:**
+1. **`light`** — Sufficient for analyzer + generator + disambiguation
+2. **`all`** — Future-proof but uses 4× the disk for features the Words project doesn't use
+
+**Decision:** Option 1 — `light`. Reason: analyzer and generator are the only CAMeL Tools features the Words project needs. NER/sentiment etc. aren't part of the plan. Easy to upgrade later if a use case emerges.
+
+### D051: Raw downloaded data committed to `ThaqalaynWordSources` (2026-05-10)
+
+**Context:** Bulk-downloaded reference data (QAC v0.4, Wiktextract Arabic dump, Lane's Lexicon, Lisan al-Arab raw) ranges from 10 MB to 200 MB+ per source. Question: commit into the git repo or `.gitignore` and require re-download?
+
+**Options considered:**
+1. **Commit raw data into `ThaqalaynWordSources`** — Total repo size ~500MB-1.5GB. Single clone gives full reference data. Reproducible.
+2. **`.gitignore` raw data; document re-download steps** — Smaller repo (~50MB). Requires re-running downloaders. Risk: source URLs change.
+3. **Git LFS for the large files** — Smaller working clones, adds LFS-config complexity.
+
+**Decision:** Option 1 — Commit raw data. Per `completeness > ease`: source URLs and dataset versions change (sites go down, datasets get updated breaking parsers). Locking the exact source state into git ensures reproducibility. The repo size stays well within GitHub's comfortable range (<2GB).
+
+---

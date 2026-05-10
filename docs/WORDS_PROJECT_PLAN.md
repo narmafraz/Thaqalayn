@@ -773,3 +773,39 @@ Existing dormant infrastructure (Thaqalayn-side):
 Pick this back up in Session 1 above: install CAMeL Tools, lemmatize a 100-verse
 sample, sanity-check coverage and quality, then lock the schema and repo
 decision before any production code is written.
+
+---
+
+## Implementation log (autonomous session, 2026-05-10)
+
+Running unattended — owner is AFK and a parallel pipeline is generating new
+v4 corpus responses in `ThaqalaynDataSources/`. Status appended after each
+phase. No LLM calls. No pushes. Local commits only.
+
+### Repo state at session start
+
+| Repo | Latest commit | Status |
+|---|---|---|
+| `ThaqalaynDataGenerator` | `5952278` Preamble strip | clean; untracked files unrelated |
+| `Thaqalayn` | `52e7060` forms[] paradigm | clean |
+| `ThaqalaynWordSources` | `da571bf` README | clean |
+| `ThaqalaynWords` | `460f7d7` Initial commit | clean |
+
+Both new repos exist + git-init'd. My earlier-session commits intact.
+
+### Phase progress
+
+| Phase | Status | Started | Finished | Commits | Notes |
+|---|---|---|---|---|---|
+| 0 — scaffolding + NFC util | starting | 2026-05-10 | | | |
+| 1 — CAMeL Tools wrapper | pending | | | | |
+| 2 — corpus extraction | pending | | | | |
+| 3 — bulk downloaders | pending | | | | |
+| 4 — scrapers (if needed) | pending | | | | |
+| 5 — page builders | pending | | | | |
+| 6 — validation | pending | | | | |
+| 7 — index builders | pending | | | | |
+| 8 — NFC parity (TS side) | pending | | | | |
+| 9 — PoC dry run | pending | | | | |
+
+

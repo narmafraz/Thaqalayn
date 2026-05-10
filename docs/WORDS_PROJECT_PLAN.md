@@ -2,7 +2,7 @@
 
 **Status:** Planning. No code yet. Multi-session project (~6-10 sessions estimated).
 **Created:** 2026-05-10
-**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic, generator inside ThaqalaynDataGenerator, raw data inside ThaqalaynDataSources, served output in new ThaqalaynWords repo)
+**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic, generator inside ThaqalaynDataGenerator, raw data in NEW ThaqalaynWordsSources repo, served output in NEW ThaqalaynWords repo)
 **Owner:** Sadegh Shahrbaf
 
 ## Vision
@@ -217,11 +217,14 @@ Every lemma page includes:
 
 ## Repo decisions (locked 2026-05-10)
 
+Five-repo ecosystem: existing three plus two new (`ThaqalaynWords` and
+`ThaqalaynWordsSources`). Words project keeps DataSources untouched.
+
 | Concern | Decision |
 |---|---|
 | **Generator** | **Reuse `ThaqalaynDataGenerator`.** Add an `app/words/` module. Reuses existing config, logging, OpenAI backend, JSON encoders, narrator-registry pattern. One Python venv covers everything. |
-| **Raw data + LLM responses** | **Reuse `ThaqalaynDataSources`.** Adds a top-level `words/` folder for raw scraped sources + LLM responses per lemma. DataSources is currently 2.5 GB; words project will push it to ~3-3.5 GB — manageable for now. Re-evaluate if it pushes past ~5 GB. |
-| **Generated served output** | **New `ThaqalaynWords` repo + Netlify deployment.** Cleanly separates the words content product (~250-700 MB) from the existing ThaqalaynData. The Angular app fetches from `https://thaqalaynwords.netlify.app/...` for word data, the same way it fetches from `thaqalaynd ata.netlify.app` for verse data today. |
+| **Raw data + LLM responses** | **New `ThaqalaynWordsSources` repo.** Holds raw scraped lexicon dumps + LLM responses per lemma. Keeps the existing `ThaqalaynDataSources` (2.5 GB) untouched — the hadith corpus and word corpus grow independently and have very different cadences. |
+| **Generated served output** | **New `ThaqalaynWords` repo + Netlify deployment.** Cleanly separates the words content product (~250-700 MB) from the existing ThaqalaynData. The Angular app fetches from `https://thaqalaynwords.netlify.app/...` for word data, the same way it fetches from `thaqalayndata.netlify.app` for verse data today. |
 | **UI** | (existing) `Thaqalayn` — gains a `WordsService` + word-page route + verse-link integration. |
 
 ### `ThaqalaynWords` repo layout
@@ -259,24 +262,29 @@ reflect content type (surfaces, lemmas, indexes), not namespace.
 - `/words/{surface}` — surface page (the route a clicked word in a chunk navigates to)
 - `/words/lemmas/{lemma}` — lemma page (linked to from a surface card or browse index)
 
-### `ThaqalaynDataSources/words/` layout
+### `ThaqalaynWordsSources` repo layout
 
 ```
-ThaqalaynDataSources/words/
+ThaqalaynWordsSources/
 ├── lemmas/
-│   ├── قَالَ.json          ← raw LLM response + scraped sources per lemma
-│   └── ...
-├── surfaces/               ← optional: persist surface-form analysis output if useful
-│   └── ...
-└── sources/
-    ├── lanes-lexicon/      ← raw scraped XML/text
-    ├── wiktextract-arabic/ ← Wiktionary Arabic JSONL dump
-    ├── quranic-arabic-corpus/  ← v0.4 morphology data
-    └── lisan-al-arab/      ← raw scraped/downloaded entries
+│   ├── قَالَ.json          ← raw LLM response per lemma (the canonical
+│   └── ...                   sacred output, never stripped — mirrors
+│                              ThaqalaynDataSources/ai-content/corpus/responses/)
+├── surfaces/               ← optional: persist CAMeL Tools morphological
+│   └── ...                   analysis per surface form for reuse + audit
+└── sources/                ← raw third-party data we depend on
+    ├── lanes-lexicon/      ← raw scraped XML/text from Lane's Lexicon
+    ├── wiktextract-arabic/ ← Wiktionary Arabic JSONL dump (Kaikki.org)
+    ├── quranic-arabic-corpus/  ← v0.4 morphology data (one-time download)
+    └── lisan-al-arab/      ← raw scraped/downloaded classical entries
 ```
 
-Mirrors the `ai-content/` pattern: persistent raw data per lemma is
-sacred; lean shipped data lives in `ThaqalaynWords`.
+Mirrors the `ThaqalaynDataSources/ai-content/` persistence pattern:
+LLM responses + scraped data are sacred; lean shipped data is built from
+them and lives in `ThaqalaynWords`. The strip-and-reconstruct contract
+established for hadith content (`build_lean_ai_content` etc.) carries
+over to words (a `build_lean_word_content` will trim Phase-2-derivable
+fields when writing to ThaqalaynWords).
 
 ## Pipeline architecture
 
@@ -591,12 +599,17 @@ based on quality of the synthesized prose; Tier 4 strictly optional.
 
 | Repo | Today | After Words project | Notes |
 |---|---|---|---|
-| `ThaqalaynDataSources` | 2.5 GB | ~3-3.5 GB | Adds `words/` folder: ~10K lemma raw responses (~30-100KB each) + scraped sources (Lane's + Wiktextract + QAC + Lisan ≈ 200-500MB total) |
+| `ThaqalaynDataSources` | 2.5 GB | **unchanged** | Words project doesn't touch this; new repo `ThaqalaynWordsSources` instead |
+| `ThaqalaynWordsSources` (new) | n/a | ~500 MB - 1.5 GB | ~10K lemma raw responses (30-100KB each) + scraped third-party sources (Lane's ~50MB + Wiktextract Arabic ~50MB + QAC ~10MB + Lisan ~200MB+ depending on scope) |
 | `ThaqalaynWords` (new) | n/a | 250-700 MB | 50K surface JSONs (~3-5KB each) + 10K lemma JSONs (~20-50KB each) + indexes |
 | `ThaqalaynData` | 919 MB | unchanged | Words deployment is separate |
+| `ThaqalaynDataGenerator` | small | small | Source code; gains an `app/words/` module |
 | `Thaqalayn` (Angular) | <100 MB | unchanged | Source code only, gains a `WordsService` and a few components |
 
-Total ecosystem footprint goes from ~3.5 GB to ~4.5-5 GB. Within reason for git/GitHub; if DataSources crosses ~5 GB consider splitting the `scraped/` and `ai-content/` folders into separate repos at that point.
+Total ecosystem footprint goes from ~3.5 GB to ~4.5-5.7 GB across six
+repos. Each repo stays in the comfortable range for git/GitHub; the
+biggest one (`ThaqalaynDataSources`) stays at 2.5 GB rather than growing
+because words live in their own dedicated source repo.
 
 ## Sources (research, 2026-05-10)
 

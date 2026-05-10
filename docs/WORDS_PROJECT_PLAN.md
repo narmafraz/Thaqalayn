@@ -2,7 +2,7 @@
 
 **Status:** Planning. No code yet. Multi-session project (~6-10 sessions estimated).
 **Created:** 2026-05-10
-**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic, generator inside ThaqalaynDataGenerator, raw data in NEW ThaqalaynWordsSources repo, served output in NEW ThaqalaynWords repo)
+**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic; generator inside ThaqalaynDataGenerator; raw data in NEW ThaqalaynWordsSources repo; served output in NEW ThaqalaynWords repo; surface pages carry full `occurrence_paths`, lemma pages don't; navigation to narrations uses `?highlight={surface}` query param)
 **Owner:** Sadegh Shahrbaf
 
 ## Vision
@@ -377,13 +377,22 @@ coverage, definition non-empty).
       "stem_pos": "N",
       "stem_form": "عَهْد"
     },
-    "example_occurrences": [
-      {"verse_path": "/books/al-kafi:2:5:3:1", "chunk_excerpt": "..."},
+    "occurrence_paths": [
+      "/books/al-kafi:2:5:3:1",
+      "/books/al-kafi:1:7:2:4",
+      "/books/man-la-yahduruhu-al-faqih:3:2:21:88",
       ...
     ]
   }
 }
 ```
+
+`occurrence_paths` is the **complete** list of narration paths where this
+exact diacritized surface form appears (no truncation, no frequency cap).
+For the highest-frequency surfaces (e.g. `قَالَ` at ~8400 occurrences), this
+gives a ~250 KB raw / ~25 KB gzipped file — acceptable. Snippets are NOT
+embedded; the UI fetches `verse_detail` JSONs lazily for the few occurrences
+the user wants to preview.
 
 The `lemma` field in each decomposition entry is the lemma's slug (= the
 diacritized lemma Arabic itself). UI fetches `/lemmas/{lemma}.json`
@@ -431,10 +440,6 @@ to render each card on the surface page.
     ],
     "frequency": 12850,
     "frequency_rank": 3,
-    "example_occurrences": [
-      {"verse_path": "/books/al-kafi:1:1:1:1", "chunk_excerpt": "..."},
-      ...
-    ],
     "related_lemmas": [
       {"lemma": "قَوْل",   "relationship": "verbal_noun"},
       {"lemma": "قَائِل", "relationship": "active_participle"},
@@ -455,6 +460,14 @@ to render each card on the surface page.
   }
 }
 ```
+
+**Note: lemma pages do not carry `occurrence_paths`.** Path data lives only
+on surface pages (the canonical occurrence index). Lemma pages are the
+cross-form aggregation view (`surface_forms_in_corpus` shows each form +
+count). This avoids duplicating thousands of paths across both layers and
+keeps lemma pages comparatively lean. To see actual narrations, the user
+drills `lemma → click a surface form → surface page → click a path →
+narration` (3 clicks). Direct `surface → narration` is 2 clicks.
 
 ### `index/surfaces.json` (browse list)
 
@@ -487,54 +500,124 @@ to render each card on the surface page.
 }
 ```
 
+## Word highlighting on narrations
+
+When a user clicks a path on a surface page, they navigate to a narration with
+the matching word visually highlighted. Convention:
+
+```
+/books/al-kafi:1:1:1:1?highlight=وَقَالَ
+```
+
+The narration component (`verse-text` and `chapter-content` in the existing
+Angular app) reads `?highlight=` from the route once on init and:
+
+1. **NFC-normalizes** the param (same `s.normalize('NFC')` call used at
+   slug-derivation time — both sides apply the identical normalization
+   so a copy-paste mismatch can't break highlighting).
+2. **Walks each chunk's `arabic_text`**, splits on whitespace, normalizes
+   each token, compares to the param.
+3. **Wraps matching tokens** in `<mark class="highlighted-word">` at render
+   time. Uses an Angular pipe or a small renderer helper — non-invasive
+   change to the chunk rendering.
+4. **Scrolls to the first highlighted occurrence** on page load (using
+   `scrollIntoView({behavior: 'smooth', block: 'center'})`).
+
+CSS for `.highlighted-word`: a soft background fill (e.g. `background:
+rgba(255, 215, 0, 0.4)` — gold-ish), maybe a brief flash animation to draw
+the eye on initial scroll.
+
+**Surface pages emit `?highlight={surface}` query param when linking to a
+path.** Each `occurrence_paths` entry is rendered as a link with the
+surface form pre-injected:
+
+```html
+<a [routerLink]="['/books', verse_path]" [queryParams]="{highlight: surface}">
+  {{ verse_path }}
+</a>
+```
+
+**Multiple matches in a narration**: all are highlighted (same surface form
+can appear several times). Scroll-to lands on the first.
+
+**Lemma → narration is two-step** (per the path-duplication policy above):
+the user picks a surface form first, then navigates from there. The
+`?highlight=` param always carries an *exact diacritized surface form* —
+never a lemma. This keeps the highlight match precise rather than
+fuzzy-matching across all forms of a lemma.
+
 ## Angular UX
 
 ### New routes
 
-- `/words` → browse index (alphabetic A-Z by transliteration, filter by POS, search box)
-- `/words/{slug}` → individual word page
-- `/words/roots/{root_slug}` → optional secondary index of all lemmas under a
-  root
+- `/words` → browse index (alphabetic A-Z by transliteration, filter by POS, search box) — paired data file `index/surfaces.json`
+- `/words/{surface}` → surface page (e.g. `/words/وَقَالَ`)
+- `/words/lemmas/{lemma}` → lemma page (e.g. `/words/lemmas/قَالَ`)
+- `/words/roots/{root}` → optional secondary index of all lemmas under a root
 
-### Word page sections (rendered top-to-bottom)
+### Surface page sections (rendered top-to-bottom)
+
+1. **Header card**: surface form + transliteration + audio (lazy from primary lemma)
+2. **Decomposition**: cards for each constituent lemma (`وَ`, `بِ`, `ال`, `عَهْد`), each lazy-loaded from `/lemmas/{lemma}.json`
+3. **Surface-specific morphology**: case, definiteness, etc. (CAMeL Tools output for THIS form)
+4. **Occurrences**: paginated list of `occurrence_paths` linking to narrations with `?highlight={surface}` query param
+
+### Lemma page sections (rendered top-to-bottom)
 
 1. **Header card**: lemma + transliteration + audio play button + POS chip
 2. **Quick meaning**: 1-line gloss, root with click-through
 3. **Translations**: language selector, full translations.{lang}
 4. **Definition**: synthesized prose definition
-5. **Conjugation table** (verbs) or **declensions** (nouns)
-6. **Surface forms in corpus**: paginated list of forms + occurrence counts
-7. **Example occurrences**: scrolling card list of verses, each linking to
-   `/books/...`
-8. **Related lemmas**: pills with same root
-9. **Classical lexicon entries**: collapsible Lane's, Lisan, Mufradat sections
-10. **Hans Wehr link**: outbound
-11. **Etymology + cognates**: collapsible
+5. **Conjugation table** (verbs) or **declensions** (nouns) — generated by CAMeL Tools
+6. **Surface forms in corpus**: list of `surface_forms_in_corpus[]` (form + count, each linking to its surface page)
+7. **Related lemmas**: pills with same root
+8. **Classical lexicon entries**: collapsible Lane's, Lisan, Mufradat sections
+9. **Hans Wehr link**: outbound
+10. **Etymology + cognates**: collapsible
 
 ### Verse-page integration (the big UX win)
 
 In `verse-text.component`:
 - Each word in `chunks[].arabic_text` becomes a clickable span
-- On click → navigate to `/words/{slug}`
-- On hover (desktop) → tooltip card with mini-summary (lemma + EN gloss + root)
-- The slug is derived: surface form → normalized form → lookup in
-  `/words/index.json` (cached) → slug
-- For unmatched surface forms (rare classical words not yet processed),
-  fall back to "Look up word →" link to Hans Wehr or skip the link
-- Lazy-loaded: full word JSON only fetched when the user clicks (mirrors
-  the `VerseLoaderService` pattern already in use)
+- On click → navigate to `/words/{NFC-normalized surface form}`
+- On hover (desktop) → tooltip card with mini-summary fetched from the
+  surface page (constituent lemmas + each lemma's en gloss)
+- **No index lookup**: the slug is the NFC-normalized surface form itself
+  (`s.normalize('NFC')`). Generator and UI use the identical normalization
+  function — locked by a 1000-form unit test.
+- For surface forms not yet processed (e.g. when corpus grows but words
+  haven't been re-built yet): the surface page returns 404; component
+  shows a "Look up word →" outbound link to Hans Wehr as fallback.
+- Lazy-loaded: surface JSON fetched only on click; lemma cards lazy-load
+  in turn (mirrors the `VerseLoaderService` pattern already in use).
 
-This is the path that makes per-narration `word_analysis` obsolete (per
-your request) — every renderable word data lives in `/words/{slug}.json`,
+This is the path that makes per-narration `word_analysis` obsolete — every
+renderable word data lives in `/words/{surface}.json` + `/words/lemmas/{lemma}.json`,
 fetched on demand, not embedded per narration.
+
+### Click-flow narrative
+
+| Goal | Steps | Highlight |
+|---|---|---|
+| See a word's full lemma data from a chunk | click word → surface page → click lemma card → lemma page | n/a |
+| Find narrations using a specific surface form | navigate to `/words/{surface}` → see `occurrence_paths` list | n/a |
+| Read a narration with the word context-highlighted | click a path on surface page → narration loads with `?highlight={surface}` → matched words wrapped in `<mark>` + first occurrence scrolled into view | yes |
+| See narrations using any form of a lemma | lemma page → click a specific surface form → surface page → click a path | yes (per chosen surface) |
+| Browse all words alphabetically | `/words` index → paginated list, filter by POS or root | n/a |
+| Free-text search | existing search bar; results show narrations (existing) + suggested word pages (new) | n/a |
+
+`?highlight=` always carries an exact diacritized surface form, never a
+lemma. Lemma → narration goes via a surface form first; this keeps the
+highlight matching precise rather than fuzzy across all inflections.
 
 ### Discovery surfaces
 
 - Bottom nav addition: "Words" item alongside Books, Narrators
-- Search integration: extend Orama index to include lemmas (slug, lemma,
-  root, en gloss) so the global search bar finds words
-- From Quran verses: each Quranic word also links to its word page (extra
-  rich because we have the Quranic Arabic Corpus data for those)
+- Search integration: extend Orama index to include surfaces and lemmas
+  (surface, lemma, root, en gloss) so the global search bar finds words
+  alongside narrations
+- From Quran verses: each Quranic word also links to its surface page
+  (extra rich because we have the Quranic Arabic Corpus data for those)
 
 ## Roadmap (proposed sessions)
 
@@ -601,7 +684,7 @@ based on quality of the synthesized prose; Tier 4 strictly optional.
 |---|---|---|---|
 | `ThaqalaynDataSources` | 2.5 GB | **unchanged** | Words project doesn't touch this; new repo `ThaqalaynWordsSources` instead |
 | `ThaqalaynWordsSources` (new) | n/a | ~500 MB - 1.5 GB | ~10K lemma raw responses (30-100KB each) + scraped third-party sources (Lane's ~50MB + Wiktextract Arabic ~50MB + QAC ~10MB + Lisan ~200MB+ depending on scope) |
-| `ThaqalaynWords` (new) | n/a | 250-700 MB | 50K surface JSONs (~3-5KB each) + 10K lemma JSONs (~20-50KB each) + indexes |
+| `ThaqalaynWords` (new) | n/a | 250-700 MB | 50K surface JSONs (typical 3-5KB each, top-frequency surfaces up to ~250KB raw / ~25KB gzipped due to full `occurrence_paths` lists) + 10K lemma JSONs (~20-50KB each) + indexes |
 | `ThaqalaynData` | 919 MB | unchanged | Words deployment is separate |
 | `ThaqalaynDataGenerator` | small | small | Source code; gains an `app/words/` module |
 | `Thaqalayn` (Angular) | <100 MB | unchanged | Source code only, gains a `WordsService` and a few components |
@@ -610,6 +693,21 @@ Total ecosystem footprint goes from ~3.5 GB to ~4.5-5.7 GB across six
 repos. Each repo stays in the comfortable range for git/GitHub; the
 biggest one (`ThaqalaynDataSources`) stays at 2.5 GB rather than growing
 because words live in their own dedicated source repo.
+
+### Surface page size at the high end
+
+Per-surface page size is dominated by `occurrence_paths` for the highest-
+frequency surfaces. The most common surface (`قَالَ`, ~8,400 occurrences)
+projects to:
+
+- ~8,400 paths × ~30 bytes/path = ~250 KB raw JSON
+- After gzip (Netlify serves gzipped): ~25 KB over the wire
+- Page metadata (decomposition, morphology) adds ~1 KB
+
+Worst-case load is comparable to a single hadith verse_detail. Median
+surface page is much smaller (most surfaces have <50 occurrences ≈ 2-3 KB).
+No frequency cap or pagination needed — the static-file delivery path
+handles the asymmetry naturally.
 
 ## Sources (research, 2026-05-10)
 

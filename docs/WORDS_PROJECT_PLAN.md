@@ -2,7 +2,7 @@
 
 **Status:** Planning. No code yet. Multi-session project (~6-10 sessions estimated).
 **Created:** 2026-05-10
-**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic; generator inside ThaqalaynDataGenerator; raw data in NEW ThaqalaynWordsSources repo; served output in NEW ThaqalaynWords repo; surface pages carry full `occurrence_paths`, lemma pages don't; navigation to narrations uses `?highlight={surface}` query param)
+**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic; generator inside ThaqalaynDataGenerator; raw data in NEW ThaqalaynWordsSources repo; served output in NEW ThaqalaynWords repo; surface pages carry full `occurrence_paths`, lemma pages don't; navigation to narrations uses `?highlight={surface}` query param; lemma pages render full CAMeL-Tools-generated paradigm with `in_corpus` flags so all forms appear, with attested ones clickable + counted)
 **Owner:** Sadegh Shahrbaf
 
 ## Vision
@@ -296,16 +296,29 @@ fields when writing to ThaqalaynWords).
             │
             ▼
 ┌─────────────────────────┐
-│ Phase A: Extract        │  Walk all chunks, tokenize, dedup
-│ extract_unique_words()  │  → list of (surface, count) pairs
-│ (already exists ✓)      │
+│ Phase A: Extract        │  Walk all chunks, tokenize, dedup, NFC-normalize
+│ extract_unique_words()  │  → corpus_surface_set: dict mapping surface →
+│ (already exists ✓)      │    {count, first_path, all_paths[]}
+│                         │  This dict is the single source of truth that
+│                         │  Phases B & E look up against.
 └─────────────────────────┘
             │
             ▼
 ┌─────────────────────────┐
-│ Phase B: Lemmatize+POS  │  Run CAMeL Tools morphological analyzer
-│ camel_tools             │  on each surface form → (surface, lemma,
-│ (new module)            │  root, POS, form, …)
+│ Phase B: Morph analysis │  For each surface form in corpus_surface_set:
+│ camel_tools.analyzer    │    Run CAMeL Tools morphological analyzer
+│ + .generator            │    → (surface, lemma, root, POS, clitics, …)
+│ (new module)            │  Aggregate analyses by lemma to find unique
+│                         │  lemmas + their surface form mapping.
+│                         │
+│                         │  For each unique lemma:
+│                         │    Run CAMeL Tools morphological *generator*
+│                         │    → full paradigm (~30-50 forms): every
+│                         │      conjugation/declension form the lemma
+│                         │      could produce, regardless of corpus.
+│                         │    For each generated form, look up against
+│                         │    corpus_surface_set →
+│                         │      in_corpus: bool, count: int|None
 └─────────────────────────┘
             │
             ▼
@@ -315,32 +328,40 @@ fields when writing to ThaqalaynWords).
 │                         │   - Lane's Lexicon entry (XML)
 │                         │   - Mufradat al-Quran (when applicable)
 │                         │   - Lisan al-Arab entry
-│                         │  Persist raw scraped data per lemma
+│                         │  Persist raw scraped data per lemma in
+│                         │  ThaqalaynWordsSources/sources/...
 └─────────────────────────┘
             │
             ▼
 ┌─────────────────────────┐
 │ Phase D: LLM synthesis  │  For each lemma, send to LLM:
-│ (new prompt + module)   │   - lemma + root + POS + scraped sources
-│                         │     + corpus usage examples
+│ (new prompt + module)   │   - lemma + root + POS + paradigm + scraped
+│                         │     sources + corpus usage examples
 │                         │   - Get back: 11-language translations,
-│                         │     definition prose, usage notes,
+│                         │     definition prose, usage notes, per-form
+│                         │     labels (e.g. "he said" / "she said"),
 │                         │     hadith-specific commentary, etc.
 │                         │  Persist response per lemma in
-│                         │  ThaqalaynWordsSources/lemmas/{slug}.json
+│                         │  ThaqalaynWordsSources/lemmas/{lemma}.json
 └─────────────────────────┘
             │
             ▼
 ┌─────────────────────────┐
-│ Phase E: Build pages    │  Merge scrape + LLM + computed (corpus
-│ (new merger)            │  occurrences, frequency, surface forms)
-│                         │  → write lean /words/{slug}.json
+│ Phase E: Build pages    │  For each lemma:
+│ (new merger)            │    Merge LLM + scraped + paradigm (with
+│                         │    in_corpus/count from Phase B set lookup)
+│                         │    → write ThaqalaynWords/lemmas/{lemma}.json
+│                         │
+│                         │  For each surface in corpus_surface_set:
+│                         │    Compute decomposition + occurrence_paths
+│                         │    + morphology
+│                         │    → write ThaqalaynWords/surfaces/{surface}.json
 └─────────────────────────┘
             │
             ▼
 ┌─────────────────────────┐
-│ Phase F: Index page     │  Build /words/index.json (browse/search list:
-│                         │   slug, lemma_ar, root, en_gloss, freq, POS)
+│ Phase F: Index pages    │  Build ThaqalaynWords/index/surfaces.json and
+│                         │  index/lemmas.json (browse lists with frequency)
 └─────────────────────────┘
 ```
 
@@ -423,19 +444,17 @@ to render each card on the surface page.
       "ur": "...",
       ...
     },
-    "conjugation": {
-      "past_3ms": "قَالَ",
-      "present_3ms": "يَقُولُ",
-      "imperative_2ms": "قُلْ",
-      "verbal_noun": "قَوْل",
-      "active_participle": "قَائِل",
-      "passive_participle": "مَقُول",
-      ...
-    },
-    "surface_forms_in_corpus": [
-      {"form": "قَالَ",  "count": 8421},
-      {"form": "قُلْتُ", "count": 1247},
-      {"form": "يَقُولُ", "count": 982},
+    "forms": [
+      {"role": "past_3ms",          "form": "قَالَ",   "label": "he said",         "in_corpus": true,  "count": 8421},
+      {"role": "past_3fs",          "form": "قَالَتْ",  "label": "she said",        "in_corpus": true,  "count": 124},
+      {"role": "past_2ms",          "form": "قُلْتَ",   "label": "you (m) said",    "in_corpus": true,  "count": 892},
+      {"role": "past_2fs",          "form": "قُلْتِ",   "label": "you (f) said",    "in_corpus": false},
+      {"role": "past_1cs",          "form": "قُلْتُ",   "label": "I said",          "in_corpus": true,  "count": 1247},
+      {"role": "present_3ms",       "form": "يَقُولُ",  "label": "he says",         "in_corpus": true,  "count": 982},
+      {"role": "imperative_2ms",    "form": "قُلْ",    "label": "say! (m sg)",      "in_corpus": true,  "count": 312},
+      {"role": "verbal_noun",       "form": "قَوْل",   "label": "saying, speech",  "in_corpus": true,  "count": 2034},
+      {"role": "active_participle", "form": "قَائِل",  "label": "speaker",         "in_corpus": true,  "count": 187},
+      {"role": "passive_participle","form": "مَقُول",  "label": "(thing) said",   "in_corpus": false},
       ...
     ],
     "frequency": 12850,
@@ -568,12 +587,19 @@ fuzzy-matching across all forms of a lemma.
 2. **Quick meaning**: 1-line gloss, root with click-through
 3. **Translations**: language selector, full translations.{lang}
 4. **Definition**: synthesized prose definition
-5. **Conjugation table** (verbs) or **declensions** (nouns) — generated by CAMeL Tools
-6. **Surface forms in corpus**: list of `surface_forms_in_corpus[]` (form + count, each linking to its surface page)
-7. **Related lemmas**: pills with same root
-8. **Classical lexicon entries**: collapsible Lane's, Lisan, Mufradat sections
-9. **Hans Wehr link**: outbound
-10. **Etymology + cognates**: collapsible
+5. **Paradigm table**: one row per `forms[]` entry — full conjugation
+   (verbs) or declension (nouns) generated by CAMeL Tools, **regardless
+   of corpus presence**. Each row shows the role label (e.g. "he said",
+   "you f said"), the diacritized form, and a count column. Forms with
+   `in_corpus: true` render as a hyperlink to their surface page +
+   show the corpus count; forms with `in_corpus: false` render as
+   gray plain text with no link (a `—` in the count column). Gives
+   the reader the complete linguistic paradigm at a glance and lets
+   them click through any attested form.
+6. **Related lemmas**: pills with same root
+7. **Classical lexicon entries**: collapsible Lane's, Lisan, Mufradat sections
+8. **Hans Wehr link**: outbound
+9. **Etymology + cognates**: collapsible
 
 ### Verse-page integration (the big UX win)
 
@@ -624,8 +650,8 @@ highlight matching precise rather than fuzzy across all inflections.
 | Session | Deliverable | Notes |
 |---|---|---|
 | **0 (this)** | Plan + research doc + locked decisions | This document; key decisions finalized 2026-05-10 |
-| **1** | CAMeL Tools setup; lemma+clitic-extraction PoC on 100 corpus verses; NFC normalization parity test | Python with CAMeL Tools install, run on a sample, sanity-check coverage and clitic decomposition for compound surfaces |
-| **2** | Scrapers for Wiktionary + Lane's Lexicon + Quranic Arabic Corpus + Lisan al-Arab | Persist raw data per lemma in `ThaqalaynDataSources/words/sources/` |
+| **1** | CAMeL Tools setup; lemma+clitic-extraction PoC on 100 corpus verses; NFC normalization parity test; **paradigm-correctness spot-check on 50 random lemmas** (manually compare CAMeL Tools generator output against Hans Wehr / Lane's for 10-15 of them — measures coverage on classical forms before scaling) | Python with CAMeL Tools install, run on a sample, sanity-check analyzer coverage, generator paradigm fidelity, and clitic decomposition for compound surfaces |
+| **2** | Scrapers for Wiktionary + Lane's Lexicon + Quranic Arabic Corpus + Lisan al-Arab | Persist raw data per lemma in `ThaqalaynWordsSources/sources/` |
 | **3** | LLM synthesis prompt + batch pipeline on 100 sample lemmas, validate | Probably gpt-5.4 batch like main pipeline |
 | **4** | Generator: build `/words/{slug}.json` + `/words/index.json` writers | Mirrors `ai_content_merger.py` pattern |
 | **5** | Full corpus run on all ~10K lemmas | Cost projection $400-2000 depending on tier |

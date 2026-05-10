@@ -2,6 +2,7 @@
 
 **Status:** Planning. No code yet. Multi-session project (~6-10 sessions estimated).
 **Created:** 2026-05-10
+**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic, generator inside ThaqalaynDataGenerator, raw data inside ThaqalaynDataSources, served output in new ThaqalaynWords repo)
 **Owner:** Sadegh Shahrbaf
 
 ## Vision
@@ -54,23 +55,39 @@ lemma count grows sublinearly because most new narrations reuse vocabulary.
 
 ## Word identity model
 
-The single biggest design decision. Three layers:
+Two-tier identity (locked 2026-05-10):
 
-| Layer | Granularity | Use as page slug? |
-|---|---|---|
-| **Surface form** | Exact token as written in chunk (e.g. وَقَالَ) | No — too many variants per concept |
-| **Lemma** | Dictionary form, normalized inflection (e.g. قَالَ) | **Yes — primary** |
-| **Root** | Tri/quadliteral skeleton (e.g. ق-و-ل) | Optional — secondary index page |
+| Tier | Granularity | URL | Slug |
+|---|---|---|---|
+| **Surface form** | Exact token as written in chunk (e.g. وَقَالَ) | `/words/{surface}` | The diacritized Arabic surface form itself, NFC-normalized |
+| **Lemma** | Dictionary form (e.g. قَالَ) | `/words/lemmas/{lemma}` | The diacritized Arabic lemma itself, NFC-normalized |
 
-**Decision:** lemma is the primary page identity. Surface forms in chunks link
-to their lemma's page. Each lemma page lists its root + root-mates. Optionally
-a separate `/words/roots/{root}` index page browses all lemmas under that root
-(traditional Arabic dictionary navigation pattern).
+**Decision:** every unique surface form gets its own page (~50K pages,
+lightweight). Each surface page references its constituent lemma(s) and
+lazy-loads their full content from `/words/lemmas/{lemma}.json`. Heavy
+content (definitions, etymology, classical lexicon entries, conjugation
+table, etc.) lives once per lemma; surface pages are small composition
+views.
 
-**Slug format proposal:** `{transliterated-lemma}-{disambiguator}` for URL
-friendliness, e.g. `qala`, `kataba`, `salah`. For homographs (multiple lemmas
-sharing the same surface), append the root: `qadara-q-d-r` vs `qadara-q-d-y`.
-Final slug stable, never reused (same canonical-id rule as narrators).
+**Slug = the diacritized Arabic word itself.** Filenames and URLs use the
+Arabic text directly (UTF-8 on disk, percent-encoded in HTTP). The UI
+derives the slug trivially from any chunk's surface form by applying
+NFC Unicode normalization — no lookup, no transliteration coordination
+needed. Same function on generator and UI sides:
+
+- Python (generator): `unicodedata.normalize('NFC', surface_form)`
+- TypeScript (UI): `surface_form.normalize('NFC')`
+
+A shared 1000-form fixture test asserts both implementations produce
+byte-identical output. NFC is required because Arabic Unicode allows
+multiple representations of the same character (e.g. `لا` as a ligature
+vs the two-codepoint sequence `ل + ا`; shadda+vowel as combined codepoint
+vs sequence). Without normalization, the same word might miss its own page.
+
+**Compound surfaces** (Arabic clitics — e.g. `وَبِالْعَهْدِ` = wa- + bi- + al-
++ stem `عَهْد`) are decomposed by CAMeL Tools at generation time. The
+surface page lists each component as a card linking to its respective
+lemma page; each card lazy-loads the lemma JSON when displayed.
 
 ## Per-word page content
 
@@ -198,37 +215,68 @@ Every lemma page includes:
   [important Arabic dictionaries](https://iqraonline.net/list-of-important-arabic-dictionaries-for-quran-and-hadith-studies/)
   that may name additional Imami lexicons worth scraping.
 
-## Repo decision: separate `ThaqalaynWords` repo
+## Repo decisions (locked 2026-05-10)
 
-**Decision:** create a separate repo + Netlify deployment, mirroring the
-`Thaqalayn{DataGenerator,DataSources,Data}` structure.
-
-| Concern | Argument for separate | Argument for inline |
-|---|---|---|
-| Size | 8-15K JSON files × 5-50KB ≈ 80MB-700MB | Could fit in ThaqalaynData |
-| Deployment | Netlify free tier handles either | Either works |
-| Conceptual cleanliness | Words are reusable across multiple data sources (Quran, hadith, future Sunni corpus, etc.) — they're not specifically Thaqalayn data | If we never branch out, keeping in one place is simpler |
-| Build cadence | Words rebuild rarely, hadith data rebuilds often — different cadences argue for separate | Coupled rebuilds are simpler |
-| URL clarity | `words.thaqalayn.com/qala` reads as a separate corpus product | `thaqalayn.com/words/qala` is one site |
-| Git repo size | ~700MB max in DataGenerator's view of /Words/ — manageable but separating keeps each repo lean | Risks bloating ThaqalaynData |
-
-The deciding factor is **conceptual reusability**: words are a knowledge graph
-that other Islamic-text products could consume. A separate `ThaqalaynData_Words`
-or `ThaqalaynWords` makes that explicit. Future API endpoints + downloads
-become natural.
-
-**Proposed repos:**
-
-| Repo | Purpose |
+| Concern | Decision |
 |---|---|
-| `ThaqalaynWordsSources` | Scraped raw data (Lane's Lexicon dumps, Quranic Arabic Corpus, Wiktionary, classical lexicons) + LLM responses per lemma |
-| `ThaqalaynWords` | Generated lean `/words/{slug}.json` files served to UI |
-| `ThaqalaynWordsGenerator` | Pipeline: extract → enrich → scrape → LLM-synthesize → write |
-| (existing) `Thaqalayn` | Angular UI, gains a `WordsService` and word-page route |
+| **Generator** | **Reuse `ThaqalaynDataGenerator`.** Add an `app/words/` module. Reuses existing config, logging, OpenAI backend, JSON encoders, narrator-registry pattern. One Python venv covers everything. |
+| **Raw data + LLM responses** | **Reuse `ThaqalaynDataSources`.** Adds a top-level `words/` folder for raw scraped sources + LLM responses per lemma. DataSources is currently 2.5 GB; words project will push it to ~3-3.5 GB — manageable for now. Re-evaluate if it pushes past ~5 GB. |
+| **Generated served output** | **New `ThaqalaynWords` repo + Netlify deployment.** Cleanly separates the words content product (~250-700 MB) from the existing ThaqalaynData. The Angular app fetches from `https://thaqalaynwords.netlify.app/...` for word data, the same way it fetches from `thaqalaynd ata.netlify.app` for verse data today. |
+| **UI** | (existing) `Thaqalayn` — gains a `WordsService` + word-page route + verse-link integration. |
 
-OR — a lighter touch — keep the generator inside `ThaqalaynDataGenerator`
-since most of the pipeline infrastructure already exists there and we'd just
-add a `app/words/` module. Decide in Session 1.
+### `ThaqalaynWords` repo layout
+
+```
+ThaqalaynWords/
+├── surfaces/
+│   ├── وَقَالَ.json        ← /words/{surface} navigates here (~50K files)
+│   ├── قَالَ.json
+│   └── ...
+├── lemmas/
+│   ├── قَالَ.json          ← lazy-loaded by surface pages (~10K files)
+│   ├── عَهْد.json
+│   └── ...
+├── index/
+│   ├── surfaces.json       ← browse/search index for /words listing
+│   └── lemmas.json         ← optional: lemma-side browse
+├── serve.py                ← local dev server (mirrors ThaqalaynData)
+├── netlify.toml
+└── README.md
+```
+
+No `/words/` prefix inside the repo — the repo *is* words. Subfolders
+reflect content type (surfaces, lemmas, indexes), not namespace.
+
+**URLs:**
+- `https://thaqalaynwords.netlify.app/surfaces/{surface}.json`
+- `https://thaqalaynwords.netlify.app/lemmas/{lemma}.json`
+
+**Angular data fetch paths:**
+- `WordsService.getSurface(surface)` → `${WORDS_API}/surfaces/${surface}.json`
+- `WordsService.getLemma(lemma)` → `${WORDS_API}/lemmas/${lemma}.json`
+
+**Angular user-facing routes** (independent of fetch paths):
+- `/words/{surface}` — surface page (the route a clicked word in a chunk navigates to)
+- `/words/lemmas/{lemma}` — lemma page (linked to from a surface card or browse index)
+
+### `ThaqalaynDataSources/words/` layout
+
+```
+ThaqalaynDataSources/words/
+├── lemmas/
+│   ├── قَالَ.json          ← raw LLM response + scraped sources per lemma
+│   └── ...
+├── surfaces/               ← optional: persist surface-form analysis output if useful
+│   └── ...
+└── sources/
+    ├── lanes-lexicon/      ← raw scraped XML/text
+    ├── wiktextract-arabic/ ← Wiktionary Arabic JSONL dump
+    ├── quranic-arabic-corpus/  ← v0.4 morphology data
+    └── lisan-al-arab/      ← raw scraped/downloaded entries
+```
+
+Mirrors the `ai-content/` pattern: persistent raw data per lemma is
+sacred; lean shipped data lives in `ThaqalaynWords`.
 
 ## Pipeline architecture
 
@@ -298,18 +346,51 @@ coverage, definition non-empty).
 
 ## Schema sketch
 
-### `/words/{slug}.json` (served lean format)
+### `surfaces/{surface}.json` (light, deterministic-slug page)
 
 ```json
 {
-  "index": "qala",
-  "kind": "word_content",
+  "index": "وَبِالْعَهْدِ",
+  "kind": "word_surface",
+  "data": {
+    "surface": "وَبِالْعَهْدِ",
+    "transliteration": "wa-bi-al-ʿahd",
+    "frequency": 47,
+    "frequency_rank": 8214,
+    "decomposition": [
+      {"role": "proclitic", "form": "وَ",   "lemma": "وَ",   "label": "and"},
+      {"role": "proclitic", "form": "بِ",   "lemma": "بِ",   "label": "by/with"},
+      {"role": "definite_article", "form": "ال", "lemma": "ال", "label": "the"},
+      {"role": "stem",      "form": "عَهْدِ", "lemma": "عَهْد", "label": "pact, covenant"}
+    ],
+    "morphology": {
+      "case": "genitive",
+      "definite": true,
+      "stem_pos": "N",
+      "stem_form": "عَهْد"
+    },
+    "example_occurrences": [
+      {"verse_path": "/books/al-kafi:2:5:3:1", "chunk_excerpt": "..."},
+      ...
+    ]
+  }
+}
+```
+
+The `lemma` field in each decomposition entry is the lemma's slug (= the
+diacritized lemma Arabic itself). UI fetches `/lemmas/{lemma}.json`
+to render each card on the surface page.
+
+### `lemmas/{lemma}.json` (heavy, lazy-loaded content)
+
+```json
+{
+  "index": "قَالَ",
+  "kind": "word_lemma",
   "data": {
     "lemma": "قَالَ",
-    "lemma_normalized": "قال",
     "transliteration": "qāla",
     "root": "ق-و-ل",
-    "root_slug": "q-w-l",
     "pos": "V",
     "pos_label": "Verb",
     "verb_form": "I",
@@ -335,7 +416,7 @@ coverage, definition non-empty).
       ...
     },
     "surface_forms_in_corpus": [
-      {"form": "قَالَ", "count": 8421},
+      {"form": "قَالَ",  "count": 8421},
       {"form": "قُلْتُ", "count": 1247},
       {"form": "يَقُولُ", "count": 982},
       ...
@@ -347,15 +428,12 @@ coverage, definition non-empty).
       ...
     ],
     "related_lemmas": [
-      {"slug": "qawl", "lemma": "قَوْل", "relationship": "verbal_noun"},
-      {"slug": "qaaim", "lemma": "قَائِل", "relationship": "active_participle"},
+      {"lemma": "قَوْل",   "relationship": "verbal_noun"},
+      {"lemma": "قَائِل", "relationship": "active_participle"},
       ...
     ],
     "classical_lexicon": {
-      "lanes_lexicon": {
-        "raw_text": "...",
-        "scraped_from": "https://lanelexicon.com/..."
-      },
+      "lanes_lexicon": { "raw_text": "...", "scraped_from": "https://lanelexicon.com/..." },
       "mufradat_al_quran": null,
       "lisan_al_arab": "..."
     },
@@ -370,18 +448,31 @@ coverage, definition non-empty).
 }
 ```
 
-### `/words/index.json` (browse / search index)
+### `index/surfaces.json` (browse list)
 
 ```json
 {
-  "kind": "word_list",
+  "kind": "word_surface_list",
+  "data": {
+    "total_surfaces": 49099,
+    "surfaces": [
+      {"surface": "قَالَ",   "transliteration": "qāla",     "freq": 8421},
+      {"surface": "وَقَالَ", "transliteration": "wa-qāla",  "freq": 2113},
+      ...
+    ]
+  }
+}
+```
+
+### `index/lemmas.json` (browse list)
+
+```json
+{
+  "kind": "word_lemma_list",
   "data": {
     "total_lemmas": 12847,
     "lemmas": [
-      {
-        "slug": "qala", "lemma": "قَالَ", "root": "ق-و-ل",
-        "pos": "V", "en": "to say, speak", "freq": 12850
-      },
+      {"lemma": "قَالَ", "root": "ق-و-ل", "pos": "V", "en": "to say, speak", "freq": 12850},
       ...
     ]
   }
@@ -441,9 +532,9 @@ fetched on demand, not embedded per narration.
 
 | Session | Deliverable | Notes |
 |---|---|---|
-| **0 (this)** | Plan + research doc | This document |
-| **1** | Decision finalize: separate repo y/n; CAMeL Tools setup; lemma-extraction PoC on 100 corpus verses | First Python with CAMeL Tools install, run on a sample, sanity-check coverage |
-| **2** | Schema lock-in + scraper for Wiktionary + Lane's Lexicon + Quranic Arabic Corpus | Persist raw data per lemma in WordsSources |
+| **0 (this)** | Plan + research doc + locked decisions | This document; key decisions finalized 2026-05-10 |
+| **1** | CAMeL Tools setup; lemma+clitic-extraction PoC on 100 corpus verses; NFC normalization parity test | Python with CAMeL Tools install, run on a sample, sanity-check coverage and clitic decomposition for compound surfaces |
+| **2** | Scrapers for Wiktionary + Lane's Lexicon + Quranic Arabic Corpus + Lisan al-Arab | Persist raw data per lemma in `ThaqalaynDataSources/words/sources/` |
 | **3** | LLM synthesis prompt + batch pipeline on 100 sample lemmas, validate | Probably gpt-5.4 batch like main pipeline |
 | **4** | Generator: build `/words/{slug}.json` + `/words/index.json` writers | Mirrors `ai_content_merger.py` pattern |
 | **5** | Full corpus run on all ~10K lemmas | Cost projection $400-2000 depending on tier |
@@ -467,38 +558,45 @@ once the schema is locked in Session 2.
 Recommendation: start with Tier 1+2 in Session 5. Decide on Tier 3 expansion
 based on quality of the synthesized prose; Tier 4 strictly optional.
 
-## Open questions to resolve in Session 1
+## Open questions for Session 1
 
-1. **Single repo or separate?** Concrete decision needed. Default proposal:
-   start in `ThaqalaynDataGenerator` for simplicity, plan to extract to a
-   separate repo if size grows past Netlify-free-tier comfort. Avoids upfront
-   repo-juggling cost.
-
-2. **CAMeL Tools coverage on classical Arabic.** The library is trained on
+1. **CAMeL Tools coverage on classical Arabic.** The library is trained on
    modern + classical mix. Need to PoC on a sample of 100 corpus surface forms
-   and measure: % returning a lemma+root+POS, % accuracy spot-check. If
-   coverage is poor, fallback to LLM-driven lemmatization (more expensive).
+   and measure: % returning a lemma+root+POS, % accuracy spot-check, % handling
+   clitic decomposition correctly for compound surfaces. If coverage is poor,
+   fallback to LLM-driven lemmatization (more expensive).
 
-3. **Slug stability for homographs.** Same surface form, different lemmas
-   (e.g. أَمَرَ "to command" vs أَمْرٌ "matter"). Disambiguator strategy:
-   `{translit}-{root}` if collision, else just `{translit}`. Need to lock
-   the rule.
-
-4. **Classical lexicon scraping legality.** Lane's Lexicon is public domain
+2. **Classical lexicon scraping legality.** Lane's Lexicon is public domain
    — confirmed. Lisan al-Arab is public domain — confirmed. Mufradat al-Quran
    is public domain — confirmed. Hans Wehr is NOT — link out only. Wiktionary
-   is CC-BY-SA — must include attribution. Need to verify each source's
-   licensing before scraping at scale.
+   is CC-BY-SA — must include attribution. Verify each source's terms before
+   scraping at scale.
 
-5. **Audio pronunciation.** TTS via Google Cloud / Amazon Polly / OpenAI TTS.
+3. **NFC normalization parity.** Build the shared normalization function in
+   Python and TypeScript; unit-test on a 1000-form fixture that the two produce
+   byte-identical output. Lock that fixture into both repos (generator + UI)
+   so future divergence is caught.
+
+4. **Audio pronunciation.** TTS via Google Cloud / Amazon Polly / OpenAI TTS.
    Cost: ~$0.001-0.004 per lemma for synthesis + storage. Defer to Tier 4.
 
-6. **Plural / irregular forms.** CAMeL Tools generator can produce conjugations.
+5. **Plural / irregular forms.** CAMeL Tools generator can produce conjugations.
    For irregular nouns the LLM is more reliable. Probably hybrid.
 
-7. **Shia-specific scholarly content.** Beyond Mufradat al-Quran, are there
-   Imami-specific lexicons we should source from? Need to ask scholarly contacts
-   or research further (Iqraonline link from sources is a starting point).
+6. **Shia-specific scholarly content.** Beyond Mufradat al-Quran, are there
+   Imami-specific lexicons we should source from? Need to research further
+   (Iqraonline link in sources is a starting point).
+
+## Storage projection
+
+| Repo | Today | After Words project | Notes |
+|---|---|---|---|
+| `ThaqalaynDataSources` | 2.5 GB | ~3-3.5 GB | Adds `words/` folder: ~10K lemma raw responses (~30-100KB each) + scraped sources (Lane's + Wiktextract + QAC + Lisan ≈ 200-500MB total) |
+| `ThaqalaynWords` (new) | n/a | 250-700 MB | 50K surface JSONs (~3-5KB each) + 10K lemma JSONs (~20-50KB each) + indexes |
+| `ThaqalaynData` | 919 MB | unchanged | Words deployment is separate |
+| `Thaqalayn` (Angular) | <100 MB | unchanged | Source code only, gains a `WordsService` and a few components |
+
+Total ecosystem footprint goes from ~3.5 GB to ~4.5-5 GB. Within reason for git/GitHub; if DataSources crosses ~5 GB consider splitting the `scraped/` and `ai-content/` folders into separate repos at that point.
 
 ## Sources (research, 2026-05-10)
 

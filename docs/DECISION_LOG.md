@@ -1044,4 +1044,28 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 
 **Decision:** Drop both. Easy to add back if a use case appears. Saves ~10-15 MB across the full corpus output.
 
+### D060: Use existing source data on lemma pages before calling the LLM (2026-05-11)
+
+**Context:** Original plan had `definition`, `etymology`, `translations` fields on lemma pages all populated by a dedicated LLM phase (estimated $400–$1,500 for 13K lemmas). But the Wiktextract slim cache (221 MB, 57,912 Arabic entries) already on disk contains English glosses, etymology, IPA, and usage examples for each lemma. User pushback: "use what's available, augment with LLM only if necessary".
+
+**Options considered:**
+1. **Skip the free data; LLM-fills everything from scratch.** Highest scholarly quality + corpus-context awareness. Highest cost.
+2. **Use Wiktextract for `definition`/`etymology`/`ipa`; LLM only fills gaps + non-English translations.** ~76% lemma coverage for free. LLM cost drops sharply because it only augments where data is missing or generic.
+3. **Use Wiktextract + Lane's body content for `definition`; LLM only fills the remaining ~10-15% with no classical attestation.** Higher quality (Lane's is the canonical classical English lexicon) but requires parsing Perseus TEI XML body and Buckwalter→Arabic conversion on example text.
+
+**Decision:** Option 2 for Session 1. `_build_definition_from_wiktextract` / `_build_etymology_from_wiktextract` / `_build_ipa_from_wiktextract` extract structured content from the cached slim. `translations` stays null because Wiktionary's Arabic-side entries don't carry foreign-language translations — the LLM phase still needs to fill the 10 non-English target languages. Lane's body parsing (Option 3) deferred to a future session — adds value but more engineering effort. Coverage achieved: 9,975 lemmas (76.1%) got definition/etymology/IPA merged in for $0.
+
+**Trade-off:** Wiktionary glosses are generic (e.g., "to say" for قال without distinguishing the prophetic-narration-specific usage). The LLM augmentation pass will still be valuable for corpus-context nuances, but it now operates as an "enrichment" pass rather than the primary generator — significantly cheaper.
+
+### D061: Corpus-filtered Wiktextract slim stays gitignored (154 MB > GitHub limit) (2026-05-11)
+
+**Context:** `build_word_pages.py` writes a corpus-filtered Wiktextract slim (`wiktextract_corpus_lemmas.json`) to WordSources containing only the ~10K Wiktionary entries our lemmas matched. The idea was to commit it so re-runs wouldn't need the full 221 MB cache. Actual file size came out to **154 MB** — still exceeds GitHub's 100 MB per-file limit even after filtering.
+
+**Options considered:**
+1. **Letter-shard the slim** into ~10 MB files (e.g., one per Arabic letter). Re-merger logic in the builder needed.
+2. **Gitignore it** (consistent with the full slim's policy from D052). Regenerable by running the build with the local cache.
+3. **Drop more content per entry** (e.g., remove all examples). Loses fidelity for future LLM grounding.
+
+**Decision:** Option 2 — gitignore. The per-lemma JSON pages in `ThaqalaynWords/lemmas/` already contain the extracted senses/etymology/IPA in final form. The slim was a "convenience cache for re-runs", not load-bearing. If a future session needs to re-build, the rebuilder loads the full 221 MB cache (also gitignored, sits in `ThaqalaynDataGenerator/tmp/wiktextract_cache/`).
+
 ---

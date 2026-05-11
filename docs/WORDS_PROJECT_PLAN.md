@@ -1,8 +1,8 @@
 # ThaqalaynWords — Per-Word Pages Project Plan
 
-**Status:** Planning. No code yet. Multi-session project (~6-10 sessions estimated).
+**Status:** **Session 1 PoC complete + deployed.** Full per-word data API live at <https://thaqalaynwords.netlify.app/>. Deterministic content (paradigms, cross-references, ~76% of lemmas with Wiktextract-merged definitions/etymology/IPA) shipped. Remaining work: Angular UI integration + LLM augmentation for translations and remaining-25% definitions. See "Remaining work" table at end of doc.
 **Created:** 2026-05-10
-**Last updated:** 2026-05-10 (architectural decisions locked: surface-form-as-slug with full Arabic; generator inside ThaqalaynDataGenerator; raw data in NEW ThaqalaynWordsSources repo; served output in NEW ThaqalaynWords repo; surface pages carry full `occurrence_paths`, lemma pages don't; navigation to narrations uses `?highlight={surface}` query param; lemma pages render full CAMeL-Tools-generated paradigm with `in_corpus` flags so all forms appear, with attested ones clickable + counted)
+**Last updated:** 2026-05-11 (Session 1 PoC + deployment complete)
 **Owner:** Sadegh Shahrbaf
 
 ## Vision
@@ -807,5 +807,85 @@ Both new repos exist + git-init'd. My earlier-session commits intact.
 | 7 — index builders | **done** | 2026-05-11 | 2026-05-11 | Gen `53c41b0` | `scripts/build_word_indexes.py` walks output and produces `index/surfaces.json` (slug, count, lemma, pos) + `index/lemmas.json` (slug, root, pos, frequency, paradigm_size, in_corpus_forms, has_qac, has_wiktextract, has_lanes) — sorted by descending frequency for UI defaults. |
 | 8 — NFC parity (TS side) | **done** | 2026-05-11 | 2026-05-11 | UI `925befe` | `Thaqalayn/src/app/services/word-normalize.ts` mirrors Python `app/words/normalize.py`: `slug()` = trim+NFC, `normalizeForMatch()` strips diacritics + unifies alif/ya/ta-marbuta variants. Spec replays the same 1000-form fixture committed in the generator repo and asserts byte-identical output (11/11 tests pass). Required `resolveJsonModule` in `tsconfig.spec.json`. |
 | 9 — PoC dry run | **done** | 2026-05-11 | 2026-05-11 | Words `f0508b9` (scaffold) + bulk-output commit | **Full corpus built**: 102,003 surfaces analyzed (6,156 = 6.0% with no morphology — proper nouns/Latin chars), 13,686 unique lemmas (within the 8-15K projected). Cross-reference hits: QAC 32.1%, Wiktextract 77.0%, Lane's 68.1%. **Validation: 0 issues** across all files (only 6,156 no_link entries, matching the no_morph count). Output size: 232 MB (172 MB surfaces + 50 MB lemmas + 9.5 MB indexes). Within projected 250-700 MB range. |
+| 10 — PoC review & polish (lemma dedup + roots) | **done** | 2026-05-11 | 2026-05-11 | Gen `34867aa`, Words second-rebuild, UI `72e86b7` | User-driven review surfaced (a) **lemma dedup bug**: `get_best_analysis` was using the unpopulated `pos_freq` field, picking the first analysis arbitrarily → 581 spurious lemma pages. Fixed by switching to `lex_logprob` + exact-diac match (D058). (b) **Root pages**: the "lemmas sharing a root" sibling list was originally going to be inlined per-lemma; refactored to `roots/{slug}.json` as single source of truth, lemmas store only `root_link` (D056). Root slugs use `_` as URL-safe weak-radical placeholder (D057). (c) **Dropped redundant fields**: `paradigm[].diacritized` (= `form` after NFC) and `surface.morphology.lex` (unused by UI) (D059). Validation extended for `root_slug`/`root_link` + new lemma→root link integrity check. **Rebuild stats: 102,003 surfaces; 13,105 lemmas (-581); 2,769 roots.** 9 new tests, total 97 words tests pass. |
+| 11 — Wiktextract content merge (definition/etymology/IPA) | **done** | 2026-05-11 | 2026-05-11 | Gen `a26d75b`, Sources `093a97a`, Words third-rebuild | User feedback: "use what's available, augment with LLM only if necessary". `WordPageBuilder` extended to consume the 221 MB Wiktextract slim. `_build_definition_from_wiktextract` extracts senses (gloss + tags + 2 examples per sense, tagged by POS). `_build_etymology_from_wiktextract` extracts `etymology_text` with dedup across multi-POS entries. `_build_ipa_from_wiktextract` returns deduped IPA list. **Coverage on full corpus: 9,975 lemmas (76.1%) got Wiktextract definitions merged in.** translations field stays null (Wiktionary's Arabic-side entries don't carry foreign-language translations; LLM phase still needed for the 10 non-English target languages). Corpus-filtered slim is 154 MB — exceeds GitHub's 100MB/file limit — so it's gitignored too (regenerable). 19 new tests, total 116 words tests pass. Validation: 0 issues. |
+| 12 — Deployment | **done** | 2026-05-11 | 2026-05-11 | Words `de3e111` (final config) | All 4 repos pushed to GitHub. **ThaqalaynWords deployed to Netlify at <https://thaqalaynwords.netlify.app/>.** Verified live: `/index/roots.json` returns 200 (206 KB, 2,769 roots), `/lemmas/قالَ.json` returns 200 (9.3 KB, full paradigm + root_link), `/roots/ق-_-ل.json` returns 200 (985 B, 17 lemmas under that root). CORS headers `Access-Control-Allow-Origin: *` confirmed; immutable cache on `/surfaces/*.json` `/lemmas/*.json` `/roots/*.json`, 24h cache on `/index/*.json` per `netlify.toml`. |
+
+### Final state (2026-05-11, end of Session 1)
+
+- **102,003** surface pages
+- **13,102** lemma pages (76.1% with Wiktextract-merged definitions)
+- **2,769** root pages
+- **3** index files (surfaces/lemmas/roots — all sorted by descending frequency)
+- **248 MB** total output
+- **0 validation issues** across all files
+- **116 words tests** passing on the generator side + **11 TS parity tests** on the UI side
+- **Live**: `https://thaqalaynwords.netlify.app/`
+
+## Next steps
+
+Items grouped by track. Items within a track are listed in roughly the order you'd execute them.
+
+### Track A — UI integration (no LLM, no cost)
+
+The data API is live but no UI consumes it yet. This is the most-visible next milestone for users.
+
+| # | Item | Effort | Notes |
+|---|---|---|---|
+| A1 | Add `wordsApi` to Angular `environment.{ts,prod.ts}` → `http://localhost:8889/` (dev) / `https://thaqalaynwords.netlify.app/` (prod) | <30 min | Mirrors the existing `apiUrl` pattern |
+| A2 | Write `WordsService` (`src/app/services/words.service.ts`) with `getSurface(slug)`, `getLemma(slug)`, `getRoot(slug)` — each returning `Observable<...>` with `shareReplay(1)` cache | ~1 hour | Mirrors `BooksService` pattern; will need TS types per JSON shape |
+| A3 | TypeScript types for surface / lemma / root pages (matches the README field reference) | ~1 hour | Add `src/app/models/word.ts` |
+| A4 | Word-page routes (`/words/{surface}`, `/words/lemmas/{slug}`, `/words/roots/{slug}`) + components | 1 session | Mirrors `book-dispatcher` / `chapter-content` pattern |
+| A5 | Word-detail components: surface page (light, navigates to lemma), lemma page (heavy, with paradigm table + sibling-root expansion), root page (lemma family browser) | 1-2 sessions | New components |
+| A6 | Wire chunk renderer in `verse-text` to make each word a clickable link `/words/{surface}` (use `word-normalize.ts` `slug()` to derive the URL) | ~1 hour | The TS twin from Phase 8 exists for this |
+| A7 | Add Words browse page (`/words` route showing the surfaces + lemmas + roots indexes) — paginated table with frequency-descending default sort | 1 session | Uses `index/*.json` files |
+| A8 | E2E Playwright tests for word pages | ~1 hour | Cover routing, lemma-link integrity, paradigm rendering |
+| A9 | Cross-link Quran/hadith verse references on lemma pages → existing `/books/...` paths | ~30 min | `cross_references.qac` has location info; link to `/books/quran:X:Y` |
+
+### Track B — Free-data enrichment (no LLM, no cost)
+
+Squeezing more value from sources already on disk before paying for LLM augmentation.
+
+| # | Item | Effort | Notes |
+|---|---|---|---|
+| B1 | **Lane's Lexicon body parsing.** Parse Perseus TEI XML body for each `entry_ids` we already store. Extract definition text, source citations (S=Sihah, K=Kamoos), examples. Buckwalter→Arabic on cited Arabic. Populate a new `lanes_definition` field per lemma. | 1 session | Adds classical-attestation coverage for ~25% of lemmas Wiktextract doesn't have, plus enriches the 76% it does have. Most-valuable free augmentation we have left. |
+| B2 | **Mufradat al-Quran integration.** ~120 specifically-Quranic high-value theological terms (e.g. تقوى, رحمة) get Imami-perspective exegetical interpretations from al-Raghib al-Isfahani. Public-domain text available at arabiclexicon.hawramani.com. | 0.5 session | Small but high-quality for theological lemmas |
+| B3 | **Lisan al-Arab raw scrape** (per D048 — deferred from Phase 3d). Multi-volume; parse pattern is similar to Lane's. | 1-2 sessions | Adds the most-comprehensive classical lexicon. Marginal value beyond Lane's for most words but useful for rare ones |
+| B4 | **Multi-language Wiktionary dumps** (Persian, Turkish, French, etc.). Each target language's Wiktionary dump has Arabic→that-language entries that could populate `translations` without LLM. | 1 session per target | Most cost-effective alternative to LLM for translation work |
+
+### Track C — LLM augmentation (cost: $50-$2000 depending on scope)
+
+What we still need an LLM for. Defer until UI is shipped so we can budget by user-feedback priority.
+
+| # | Item | Effort | Cost | Notes |
+|---|---|---|---|---|
+| C1 | **`translations`** in 10 non-English target languages, on 13K lemmas | 1 session | $400-$1,500 | Highest-value LLM spend. Wiktionary's Arabic-side entries don't carry these |
+| C2 | **Corpus-context definitions** on lemmas where Wiktextract is generic — prompt: "given hadith corpus usage X, refine the English gloss for Imami / classical context" | 0.5 session | $200-$500 | Quality-of-life. Only worth doing on the most-frequent lemmas |
+| C3 | **Definitions on lemmas without Wiktextract entry** (~24% of lemmas — typically rare or technical). LLM grounded in any Lane's content we extracted in B1 | 0.5 session | $50-$300 | After B1 lands |
+| C4 | **Root-page semantic gloss** — one paragraph per root summarizing the family meaning (e.g. for ق-و-ل: "concepts of speech, utterance, statement"). Cheap because there are only 2,769 roots | 0.5 session | $50-$200 | After C1/C2 so the LLM has lemma-level context |
+| C5 | **Etymology on lemmas where Wiktionary has none** | 0.25 session | $30-$100 | Lowest priority — etymology is "nice to have" |
+
+### Track D — Optimizations & polish (low priority)
+
+| # | Item | Effort | Notes |
+|---|---|---|---|
+| D1 | Path interning in surface pages (replace per-surface path arrays with integer IDs → single `index/paths.json` resolves IDs to paths). Saves ~30 MB | 0.5 session | Only if file sizes become a problem |
+| D2 | UI display: render `ق.#.ل` and `ق-_-ل` slugs as `ق-و-ل` (substitute the actual weak letter from the canonical lemma form) — purely display-layer | <30 min | Currently shows `_` placeholder |
+| D3 | Verify Netlify file-count + bandwidth dashboard after first user-traffic spike | 30 min | Confirm we're within the 500K files / 100GB monthly free-tier limits |
+| D4 | Add lemma → narration deep links via `?highlight={surface}` query param so clicking a paradigm form takes the reader to an attested hadith with the word highlighted | 0.5 session | Plan section calls this out as the navigation pattern |
+| D5 | Re-run pipeline when Bihar al-Anwar / Mir'at al-Uqul corpora land (per pipeline P5). New surfaces/lemmas will be incremental — `seen_lemmas` dedup makes this fast | ~30 min build, then validate | Triggered by external corpus growth |
+
+### Suggested ordering when you pick this back up
+
+1. **A1 → A6** (UI integration) — unblocks user value. ~2-3 sessions.
+2. **B1** (Lane's body parsing) — biggest free win on content quality. 1 session.
+3. **C1** (translations LLM pass) — first paid step, by far the highest user impact. Run after A is shipped so you can see UI-driven priority. 1 session.
+4. **C3** (LLM definitions for the gap) — uses Lane's from B1 as grounding.
+5. **C4** (root semantic glosses) — small but visible feature.
+6. **D2** + **A8** (E2E tests + slug display polish) — final QA pass before announcing.
+
+Total remaining estimated effort: **6-9 sessions** + **$680-$2,600** in LLM costs depending on scope.
+
+
 
 

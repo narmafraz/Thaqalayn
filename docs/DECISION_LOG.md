@@ -994,4 +994,54 @@ and cost. Full project plan: `WORDS_PROJECT_PLAN.md`.
 
 **Decision:** Option 1 for the PoC. The UI can request a single surface page and use the count + path list directly for "all narrations containing this word". A 400KB JSON over a CDN with immutable cache is acceptable. Revisit only if/when the size becomes a real problem.
 
+### D056: Roots get their own JSON pages; lemma sibling list NOT inlined (2026-05-11)
+
+**Context:** Arabic roots (e.g., ق-و-ل) are shared by multiple lemmas (قالَ Form I "to say", قاوَلَ Form III "to negotiate", أَقالَ Form IV "to dismiss", قَوْل noun "saying", etc.). Each lemma has its own paradigm but the "list of sibling lemmas under the same root" is a property of the root, not the lemma. Question: where to store the sibling list?
+
+**Options considered:**
+1. **Inline `related_lemmas` on every lemma page** — Single fetch returns everything. But for a root with 18 lemmas the same sibling list is duplicated 18 times. 13K lemmas × avg 3-5 lemmas/root × ~150 bytes/entry = ~10 MB of pure duplication.
+2. **Separate `roots/{slug}.json` page; lemma page only has `root_link`** — Single source of truth. UI needs a second fetch when it wants siblings, but that's lazy (typically only on "see other words with this root" click).
+3. **Surface pages aggregate into `roots`** — Wrong granularity; surfaces are too noisy.
+
+**Decision:** Option 2 — match the existing surface→lemma lazy-fetch pattern. Root pages live in `roots/{slug}.json`; lemma pages only carry `root_slug` + `root_link` fields. Build script accumulates lemmas-per-root in memory and writes root pages after the main loop. `index/roots.json` lists all roots sorted by descending total_frequency for browse.
+
+### D057: Root slugs use `_` as URL-safe weak-radical placeholder (2026-05-11)
+
+**Context:** CAMeL Tools represents roots like `ق.#.ل` where `.` separates radicals and `#` marks a weak/hollow radical. Both characters are problematic in URLs: `.` can be treated as a file extension by some routers, and `#` is the URL fragment marker. We need a URL-safe slug.
+
+**Options considered:**
+1. **Replace `#` with the actual weak letter from the lemma form** — would produce e.g. `ق-و-ل` for قالَ. But this could collide with concrete roots: if some lemma genuinely has root `ق-و-ل` (sound, not hollow), the two would conflict.
+2. **Replace `#` with `_`** — `_` is URL-safe in path segments AND never appears in CAMeL root strings (Arabic letters + `.` + `#` only), so no collision possible.
+3. **Percent-encode `#`** — `%23` in URLs. Works but slugs are no longer human-readable, and Netlify routing can sometimes interpret the encoded sequence weirdly.
+4. **Keep `.` in the slug** — Tried; some routers fight us on this.
+
+**Decision:** Option 2 — `root_to_slug()` maps `.` → `-` and `#` → `_`. So `ق.#.ل` becomes `ق-_-ل`. Clean, unambiguous, URL-safe. UI can render `_` as a visible placeholder or substitute a real weak letter for display purposes (the lemma form makes the actual weak letter recoverable).
+
+### D058: Disambiguator uses lex_logprob, not pos_freq (2026-05-11)
+
+**Context:** `get_best_analysis()` is called for every surface form in the corpus to pick the canonical (lex, pos) for that surface. Initial implementation used CAMeL Tools' `pos_freq` field for disambiguation — but this field is **unpopulated (returns None)** for every analysis in the calima-msa-r13 database. The result: max() over a constant just picked the first analysis, which was effectively arbitrary order.
+
+**Symptoms:** Sibling surfaces of the same verb (قَالَ vs قُلْتُ vs قِيلَ) were resolving to different lex values and therefore different lemma pages. The corpus ended up with 18 spurious lemma pages for the root ق-و-ل alone when only ~5 are real distinct lemmas.
+
+**Options considered:**
+1. **`lex_logprob`** — Log-probability of (surface, lex, pos). Populated in calima-msa-r13.
+2. **`pos_lex_logprob`** — Same as above but conditioning on POS.
+3. **BERT-based disambiguation** — `camel_tools.disambig.bert.BERTUnfactoredDisambiguator`. State-of-the-art accuracy but ~100 MB model + slow inference.
+4. **MLE disambiguator** — `camel_tools.disambig.mle.MLEDisambiguator`. Loaded as part of `camel_data -i defaults`. Faster than BERT but still has model-load overhead.
+
+**Decision:** Mix Option 1 with an additional pre-filter:
+1. If any analysis's `diac` exactly equals the input surface (NFC-normalized), prefer those.
+2. Among the preferred pool, max by `lex_logprob`, tiebreak by `pos_lex_logprob`.
+3. Insertion order as last resort.
+
+Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now all resolve to `lex=قال` (Form I "to say"). تَقَيَّلَ resolves to `lex=أَقال` (Form IV "to dismiss") — correctly distinct. Future work: layer in MLE disambiguator (Option 4) for the residual ambiguity if the corpus shows it matters.
+
+### D059: Drop redundant fields from word JSONs (2026-05-11)
+
+**Context:** During Phase 5 review, two output fields were identified as redundant:
+- `paradigm[].diacritized` — Always equals `paradigm[].form` after NFC normalization. Stored as a separate field "in case future normalization rules change". They haven't.
+- `surface.morphology.lex` — CAMeL's undiacritized lemma identifier. Used by the page builder internally but not consumed downstream because `surface.morphology.lemma_slug` (the diacritized canonical form) is what `lemma_link` points to.
+
+**Decision:** Drop both. Easy to add back if a use case appears. Saves ~10-15 MB across the full corpus output.
+
 ---

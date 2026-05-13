@@ -3,7 +3,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AiLanguage, AiTranslationEntry, Chunk, ContentType, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { NarratorMetadata, Verse } from '@app/models';
 import { SpecialText } from '@app/models/book';
-import { LemmaPage } from '@app/models/word';
+import { LemmaPage, SurfacePage } from '@app/models/word';
 import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
 import { WordsService } from '@app/services/words.service';
 import { slug as wordSlug } from '@app/services/word-normalize';
@@ -36,6 +36,16 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   /** Lemma data fetched lazily on word-card click, keyed by surface slug. */
   popupLemma: LemmaPage | null = null;
   popupLemmaLoading = false;
+
+  /**
+   * Per-card surface data fetched eagerly when word-by-word view is
+   * toggled on for a hadith with no v3 word_analysis. The surface
+   * page is small and gives us POS for the inline card display
+   * (translation still requires the heavier lemma fetch on click).
+   */
+  surfaceCardData = new Map<string, SurfacePage>();
+  /** Set of surface slugs we're currently fetching. */
+  private surfaceCardLoading = new Set<string>();
 
   @Input() verse: Verse;
   @Input() isQuran = false;
@@ -96,10 +106,53 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     if (this.showWordAnalysis) {
       this._previousDiacritics = this.showDiacritics;
       this.showDiacritics = false;
+      // Pre-fetch surface data for each token when we lack v3 word_analysis
+      // so POS lights up on each card without requiring a click.
+      if (!this.hasWordAnalysis) {
+        this.prefetchSurfaceData();
+      }
     } else {
       this.showDiacritics = this._previousDiacritics;
     }
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Eagerly fetch the surface page for every word token in the verse.
+   * Results land in surfaceCardData; the template reads it via
+   * cardPos() / cardLemmaSlug() to show inline morphology on each card.
+   * WordsService.shareReplay caches all fetches for the session so this
+   * is idempotent across re-toggles and across hadiths sharing a word.
+   */
+  private prefetchSurfaceData(): void {
+    for (const token of this.wordTokens) {
+      const key = token.word;
+      if (this.surfaceCardData.has(key) || this.surfaceCardLoading.has(key)) {
+        continue;
+      }
+      this.surfaceCardLoading.add(key);
+      this.words.getSurface(key).subscribe(surfacePage => {
+        this.surfaceCardLoading.delete(key);
+        if (surfacePage) {
+          this.surfaceCardData.set(key, surfacePage);
+          this.cdr.markForCheck();
+        }
+      });
+    }
+  }
+
+  /** Read-only helper: POS for a card, sourced from inline v3 entry or
+   *  eagerly-loaded surface data (whichever's available). */
+  cardPos(entry: WordAnalysisEntry): string {
+    if (entry.pos) return entry.pos;
+    const data = this.surfaceCardData.get(entry.word);
+    return data?.morphology?.pos || '';
+  }
+
+  /** Read-only helper: lemma slug for a card link target. */
+  cardLemmaSlug(entry: WordAnalysisEntry): string | null {
+    const data = this.surfaceCardData.get(entry.word);
+    return data?.morphology?.lemma_slug || null;
   }
 
   toggleChainDiagram(): void {
@@ -126,6 +179,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
       this.wordPopup = null;
       this.popupLemma = null;
       this.popupLemmaLoading = false;
+      this.cdr.markForCheck();
       return;
     }
     this.activeWordIndex = index;

@@ -352,6 +352,41 @@ Users can still opt out with `--skip-scholarly` or override `--phase3-model`. Co
 - `--phase3-model` CLI flag added (default: `sonnet` to preserve the claude path; auto-overrides to `qwen36-fast` under `--backend spark`)
 - `scholarly_phase._spark_scholarly_schema()` added — strict JSON-schema with `enriched_summary` + regex-validated `additional_quran_refs`
 - `enrich_scholarly()` now accepts `backend="spark"` (alias for `openai`), auto-attaches the schema when `is_spark_model(model)` is True. Default-config path keeps the existing free-form parser.
+
+## Round J — hallucination guards (Layer 1 + Layer 2)
+
+The Round H bench surfaced one hallucination class: compiler misattribution. 1/10 verses had P3 claiming *"al-Kulayni's al-Tawhid"* (al-Tawhid is by al-Saduq, not al-Kulayni). Two cheap guards added.
+
+**Layer 1 — prompt-level prevention** (in `build_scholarly_prompt`):
+- `_lookup_compiler(book_name)` queries `app.book_registry.get_book_config(slug)` for the EN author. For `al-tawhid` returns `Shaykh al-Saduq`.
+- Phase 3 user prompt now reads `Book: al-tawhid (compiled by Shaykh al-Saduq)` instead of just `Book: al-tawhid`. Zero post-hoc work; just removes the model's need to guess.
+- ~5 LOC.
+
+**Layer 2 — post-hoc detection** (in `enrich_scholarly`):
+- `_detect_compiler_mismatch(enriched_summary, actual_compiler)` regex-scans the summary for any of ~10 Shia compiler nisbas (al-Kulayni, al-Saduq, al-Tusi, al-Mufid, ibn Babawayh aliasing al-Saduq, al-Radi for Nahj al-Balagha, ibn Qulawayh for Kamil al-Ziyarat, al-Numani, etc.).
+- If a mentioned nisba doesn't match the actual compiler: attach `_phase3_compiler_mismatches: [{mentioned, actual}, ...]` to the result and log a warning.
+- We DON'T silently rewrite — rewording risks distorting meaning. The flag is a signal for review tooling.
+- Stays in the response file (matches the `_phase4_calls_failed` / `_phase4_mode` pattern of descriptive metadata that doesn't get popped).
+- ~50 LOC including the nisba table.
+
+**Re-bench result** (same 10 al-tawhid verses, Layer 1+2 in place):
+
+| Metric | Round H (no guards) | Round J (with guards) |
+|---|---|---|
+| Compiler hallucinations | 1/10 | **0/10** |
+| Verses correctly naming al-Saduq | unknown (not counted) | 9/10 (1 didn't mention any compiler) |
+| Layer 2 flagged mismatches | n/a | 0 |
+
+The previously hallucinated 2_1_11 changed from *"this hadith from al-Kulayni's al-Tawhid..."* to *"Recorded by Shaykh al-Saduq in *al-Tawhid*, this hadith links..."*. Rest of enrichment quality preserved (still introduces sacred geography of Mecca, *Tawhid*, Shia scholarly framing).
+
+Layer 2 self-test (synthetic input to verify the catch-net):
+- Input: `"This hadith from al-Kulayni's al-Tawhid..."` + actual compiler `"Shaykh al-Saduq"` → flagged
+- Input: `"Recorded by al-Shaykh al-Saduq..."` + actual `"Shaykh al-Saduq"` → no flag
+- Input: `"Ibn Babawayh records this..."` + actual `"Shaykh al-Saduq"` → no flag (alias recognised)
+
+**Verdict**: Layer 1 alone appears to eliminate this hallucination class. Layer 2 is the safety net for the residual case. If the corpus rebuild surfaces 0 mismatches, we can consider the guard solved; if some slip through, Layer 2 will catch them and we'll decide whether to rewrite or move to review.
+
+Generalisation path for other hallucination classes (Imam misattribution, narrator reliability claims, Quran ref accuracy) is documented but not yet implemented — see deferred items.
 - **Native-speaker review for ur/bn**: I can't reliably judge these languages. Before committing to Spark for production runs, get a one-page native check.
 - **Spark uptime concern**: 14+ days of dedicated Spark runtime is a real operational consideration (concurrent ComfyUI/Goose/Hermes use blocked, network/container hiccups across 2 weeks). Mitigation: corpus is resumable (`is_complete` skips already-processed verses), so interruption isn't catastrophic.
 - **Auto-merge into ThaqalaynData**: Existing `build_lean_ai_content()` merger should work as-is since Qwen output is the same shape as OpenAI output. Untested.

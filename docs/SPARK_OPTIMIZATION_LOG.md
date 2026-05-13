@@ -301,7 +301,7 @@ Wired Spark into the production pipeline. Changes:
 **Production usage**:
 ```bash
 AI_CONTENT_SUBDIR=corpus PYTHONPATH="$PWD:$PWD/app" SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
-  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend openai \
+  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend spark \
   --phase1-model qwen36-fast --phase4-model qwen36-fast \
   --book al-tawhid --workers 8
 ```
@@ -338,12 +338,12 @@ Override the endpoint with `SPARK_BASE_URL=http://192.168.0.66:8000/v1` (the def
 ```bash
 # Most aggressive cost savings (~$1,330 saved on 48K verses, ~17 days Spark wall time)
 PYTHONPATH="$PWD:$PWD/app" SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
-  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend openai \
+  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend spark \
   --phase1-model qwen36-fast --phase4-model qwen36-fast --book al-tawhid --workers 8
 
 # Recommended hybrid (~$270 saved, ~3 days, preserves Phase 1 chunk granularity)
 PYTHONPATH="$PWD:$PWD/app" SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
-  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend openai \
+  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend spark \
   --phase1-model gpt-5.4 --phase4-model qwen36-fast --book al-tawhid --workers 8
 ```
 
@@ -539,7 +539,7 @@ source .venv/Scripts/activate
 AI_CONTENT_SUBDIR=corpus PYTHONPATH="$PWD:$PWD/app" \
     SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
     DESTINATION_DIR="../ThaqalaynData/" \
-    python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend openai \
+    python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend spark \
     --phase1-model qwen36-fast --phase4-model qwen36-fast \
     --book <bookname> --workers 8
 
@@ -607,7 +607,7 @@ The 4 "parse error" quarantines are Qwen P1 JSON-parse failures (rare; typically
 The all-Spark pipeline is production-ready. The committed code uses:
 - **Phase 1**: Qwen 3.6 + strict JSON schema (closed enums) + few-shot chunk examples + thinking-disabled. Auto-routed when `--phase1-model qwen36-*`.
 - **Phase 4**: Qwen 3.6 + per-(chunk, language) calls + strict JSON schema + max_tokens=600/400 + 1-retry on parse failure. Auto-routed when `--phase4-model qwen36-*`.
-- **All-Spark mode**: `--phase1-model qwen36-fast --phase4-model qwen36-fast --backend openai`. `SPARK_BASE_URL` env var optionally overrides the default `http://192.168.0.66:8000/v1`.
+- **All-Spark mode**: `--phase1-model qwen36-fast --phase4-model qwen36-fast --backend spark`. `SPARK_BASE_URL` env var optionally overrides the default `http://192.168.0.66:8000/v1`.
 
 ## Things I would try next session (deferred)
 

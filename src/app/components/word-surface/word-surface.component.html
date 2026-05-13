@@ -29,8 +29,8 @@
         <ng-container *ngIf="m.root">
           <dt>Root</dt>
           <dd>
-            <a *ngIf="rootSlug(m.root)"
-               [routerLink]="['/words/roots', rootSlug(m.root)]"
+            <a *ngIf="m.root_slug"
+               [routerLink]="['/words/roots', m.root_slug]"
                lang="ar" dir="rtl" class="root-link">
               <code>{{ m.root }}</code>
             </a>

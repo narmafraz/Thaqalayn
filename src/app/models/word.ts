@@ -20,6 +20,8 @@ export interface SurfaceMorphology {
   lemma_slug: string;
   /** Arabic root in CAMeL dotted notation, e.g. "ق.#.ل". `#` = weak radical. */
   root: string | null;
+  /** URL-safe form of `root`: `.` → `-`, `#` → `_`. E.g. `ق.#.ل` → `ق-_-ل`. */
+  root_slug: string | null;
   /** Compact POS code: V/N/ADJ/ADV/PREP/CONJ/PRON/DET/PART/INTJ/REL/DEM/NEG/COND/INTERR. */
   pos: string | null;
   /** Full CAMeL Tools POS, e.g. "verb", "noun_prop", "adj.act". */
@@ -46,6 +48,8 @@ export interface SurfacePage {
   morphology: SurfaceMorphology | null;
   /** Path to the lemma page (`/words/lemmas/{lemma_slug}`). Null when morphology is null. */
   lemma_link: string | null;
+  /** Path to the root page (`/words/roots/{root_slug}`). Null when morphology is null or root is null. */
+  root_link: string | null;
 }
 
 /** A single form in a lemma's full paradigm. */

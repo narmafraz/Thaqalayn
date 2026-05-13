@@ -114,7 +114,7 @@
 
 | Document | Status | Summary |
 |----------|--------|---------|
-| [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **ACTIVE** (Session 1 complete + deployed) | Per-word Arabic dictionary. **Session 1 done 2026-05-11**: 102K surface pages + 13K lemma pages + 2,769 root pages live at <https://thaqalaynwords.netlify.app/>. 76% of lemmas have Wiktextract-merged definitions/etymology/IPA already. Deterministic build (CAMeL Tools + 4 source indexes — QAC, Wiktextract, Lane's, Mufradat) with full validation. Next: UI integration (Track A), Lane's body parsing (Track B), then optional LLM augmentation for translations + corpus-context definitions (Track C, $680-$2,600). |
+| [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **ACTIVE** (Sessions 1+2 complete; Path B = LLM translation is the next step, ~$3) | Per-word Arabic dictionary. **Sessions 1+2 done 2026-05-13**: data API live at <https://thaqalaynwords.netlify.app/> (102K surfaces + 13K lemmas + 2,769 roots, 76% Wiktextract definitions, Lane's body parsed, hawramani classical lexicons on top 15%); Angular UI shipped (browse + word pages + in-verse word-by-word toggle on every hadith with lazy popups); temporary English-gloss-on-lemma-index ("Path C") wired in 2026-05-13 to put translations on every word card pending Path B. **Path B (10-lang LLM translation of all 13K lemmas via gpt-4.1-mini batch, ~$3)** is the next major step; full plan in the doc. Path C reverts when Path B lands (commits `34ff19c` + `d0ce4a9`). |
 
 ### 2026-05-12
 

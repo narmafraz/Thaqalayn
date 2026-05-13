@@ -1,8 +1,8 @@
 # ThaqalaynWords — Per-Word Pages Project Plan
 
-**Status:** **Session 1 PoC complete + deployed.** Full per-word data API live at <https://thaqalaynwords.netlify.app/>. Deterministic content (paradigms, cross-references, ~76% of lemmas with Wiktextract-merged definitions/etymology/IPA) shipped. Remaining work: Angular UI integration + LLM augmentation for translations and remaining-25% definitions. See "Remaining work" table at end of doc.
+**Status:** **Sessions 1 + 2 complete.** Per-word data API live at <https://thaqalaynwords.netlify.app/>. Full Angular UI shipped (`/words` browse, surface/lemma/root pages, in-verse word-by-word view on every hadith with lazy-loaded morphology + clickable popups). Free-data enrichment partly done (Lane's body parsing complete; hawramani multi-lexicon aggregator covers top ~15% of lemmas; rest blocked on rate-limiting). Temporary English-only gloss-on-index ("Path C") rolled out 2026-05-13 so every word card shows a translation; it is explicitly throwaway and reverts when Path B (LLM translations) lands. **Outstanding:** Path B (10-language LLM translation of lemmas), the gloss tooltip-truncation issue (deferred), and the small Track D polish items.
 **Created:** 2026-05-10
-**Last updated:** 2026-05-11 (Session 1 PoC + deployment complete)
+**Last updated:** 2026-05-13 (Track A complete + Path C temporary glosses + UI polish round)
 **Owner:** Sadegh Shahrbaf
 
 ## Vision
@@ -811,82 +811,302 @@ Both new repos exist + git-init'd. My earlier-session commits intact.
 | 11 — Wiktextract content merge (definition/etymology/IPA) | **done** | 2026-05-11 | 2026-05-11 | Gen `a26d75b`, Sources `093a97a`, Words third-rebuild | User feedback: "use what's available, augment with LLM only if necessary". `WordPageBuilder` extended to consume the 221 MB Wiktextract slim. `_build_definition_from_wiktextract` extracts senses (gloss + tags + 2 examples per sense, tagged by POS). `_build_etymology_from_wiktextract` extracts `etymology_text` with dedup across multi-POS entries. `_build_ipa_from_wiktextract` returns deduped IPA list. **Coverage on full corpus: 9,975 lemmas (76.1%) got Wiktextract definitions merged in.** translations field stays null (Wiktionary's Arabic-side entries don't carry foreign-language translations; LLM phase still needed for the 10 non-English target languages). Corpus-filtered slim is 154 MB — exceeds GitHub's 100MB/file limit — so it's gitignored too (regenerable). 19 new tests, total 116 words tests pass. Validation: 0 issues. |
 | 12 — Deployment | **done** | 2026-05-11 | 2026-05-11 | Words `de3e111` (final config) | All 4 repos pushed to GitHub. **ThaqalaynWords deployed to Netlify at <https://thaqalaynwords.netlify.app/>.** Verified live: `/index/roots.json` returns 200 (206 KB, 2,769 roots), `/lemmas/قالَ.json` returns 200 (9.3 KB, full paradigm + root_link), `/roots/ق-_-ل.json` returns 200 (985 B, 17 lemmas under that root). CORS headers `Access-Control-Allow-Origin: *` confirmed; immutable cache on `/surfaces/*.json` `/lemmas/*.json` `/roots/*.json`, 24h cache on `/index/*.json` per `netlify.toml`. |
 | 13 — Track B1 (Lane's body parsing) | **done** | 2026-05-12 | 2026-05-12 | Gen (this commit), Sources (lanes_entries.json) | New `app/words/lanes.py` module parses 36 Perseus TEI XML files into 44,826 structured entries with typed body segments (italic_en/arabic/text/quote/page_break), Buckwalter→Arabic conversion on embedded Arabic, and source-citation code extraction. New `scripts/build_lanes_structured.py` builds `sources/lanes-lexicon/lanes_entries.json` (78.8 MB, fits under GitHub limit). WordPageBuilder accepts the structured index and emits `lanes_definition` on lemma pages. `cross_references.lanes` gains `search_url` (WordPress search on lanelexicon.com — no per-entry deep linking exists). **No truncation** per user direction — full body content preserved. README expanded with `lanes_definition` field reference, body-segment-kind guide, and source-citation legend covering the most-common ~30 codes. 12 new tests, 120 total words tests pass. |
-| 14 — Track B2+ (hawramani multi-lexicon aggregator) | **partial — high-frequency lemmas covered; mid/low-freq scrape blocked by 429 rate-limits** | 2026-05-12 | 2026-05-13 | Gen `c650d19`, Sources `c667ac2`, Words (rebuild commit) | Originally B2 was "Mufradat only" (~120 entries). Discovery: hawramani.com aggregates **38–40 classical Arabic lexicons** per page (al-Mufradat, Lisan al-Arab, Taj al-'Arus, Sihah, Asas al-Balagha, Misbah al-Munir, al-Mughrib, Mufradat (Farahi), etc. — collapses B2 + B3 into one source). New modules: `scripts/scrape_hawramani.py` (concurrent fetch with adaptive 429-backoff, dedup by diacritic-stripped form, resumable), `app/words/hawramani.py` (BeautifulSoup parser + allowlist HTML sanitizer + LEXICON_LEGEND covering all 38 lexicons), `scripts/build_hawramani_structured.py`. WordPageBuilder gains `classical_definitions` field. **Pre-flight: 95% hit rate on top-100 after diacritic-strip fix**. Scrape paused at **1,366 pages** (top-frequency lemmas, ~10% of corpus) because hawramani's rate-limiting becomes severe past the top tier — 429s exhaust retries, masking hit/miss classification. **Output: 1,922 lemmas (14.7%) have `classical_definitions` merged** (more than 1,366 because hawramani's per-stripped-form page serves multiple diacritization-variant lemmas). Raw HTML dump gitignored (~140 MB, regenerable); structured `hawramani_entries.json` (77 MB) committed to WordSources. Re-run `scripts/scrape_hawramani.py --full` later to extend coverage — script is resumable, skips files already on disk. 28 new tests, 148 total words tests pass. |
+| 14 — Track B2+ (hawramani multi-lexicon aggregator) | **partial — high-frequency lemmas covered; mid/low-freq scrape blocked by 429 rate-limits** | 2026-05-12 | 2026-05-13 | Gen `c650d19`, Sources `c667ac2`, Words (rebuild commit) | Originally B2 was "Mufradat only" (~120 entries). Discovery: hawramani.com aggregates **38–40 classical Arabic lexicons** per page (al-Mufradat, Lisan al-Arab, Taj al-'Arus, Sihah, Asas al-Balagha, Misbah al-Munir, al-Mughrib, Mufradat (Farahi), etc. — collapses B2 + B3 into one source). New modules: `scripts/scrape_hawramani.py` (concurrent fetch with adaptive 429-backoff, dedup by diacritic-stripped form, resumable), `app/words/hawramani.py` (BeautifulSoup parser + allowlist HTML sanitizer + LEXICON_LEGEND covering all 38 lexicons), `scripts/build_hawramani_structured.py`. WordPageBuilder gains `classical_definitions` field. **Pre-flight: 95% hit rate on top-100 after diacritic-strip fix**. Scrape paused at **1,366 pages** (top-frequency lemmas, ~10% of corpus) because hawramani's rate-limiting becomes severe past the top tier — 429s exhaust retries, masking hit/miss classification. Eventually CDN issued an HTTP 436 block. **Output: 1,922 lemmas (14.7%) have `classical_definitions` merged** (more than 1,366 because hawramani's per-stripped-form page serves multiple diacritization-variant lemmas). Raw HTML dump gitignored (~140 MB, regenerable); structured `hawramani_entries.json` (98.8 MB) committed to WordSources. Re-run `scripts/scrape_hawramani.py --full` later to extend coverage — script is resumable, skips files already on disk. 28 new tests, 148 total words tests pass. |
+| 15 — Track A (Angular UI integration) | **done** | 2026-05-12 | 2026-05-13 | UI A1–A9 commits + perf/UX iteration commits (see Phase 17) | Full UI shipped end-to-end. **A1–A3:** `environment.wordsApiBaseUrl` plumbing (`http://localhost:8889/` dev, `https://thaqalaynwords.netlify.app/` prod), `WordsService` with `shareReplay(1)` cache mirroring `VerseLoaderService`, full TypeScript models in `models/word.ts`. **A4 lazy module:** `features/words/words.module.ts` registers `/words`, `/words/{surface}`, `/words/lemmas/{slug}`, `/words/roots/{slug}` via `RouterModule.forChild` (132 KB lazy chunk). **A5 components:** `words-list` (CDK virtual scroll for 102K-row browse list with mode toggle for surfaces/lemmas/roots), `word-surface` (clickable root, decomposition cards, occurrence list), `word-lemma` (paradigm table with corpus-attestation flags, sibling lemmas under same root, accordion-collapsed classical lexicon entries, sanitized HTML rendering via `DomSanitizer.bypassSecurityTrustHtml`), `word-root` (lemma-family browser). **A6 in-verse linkage:** `verse-text` chunk renderer makes every word in v3 `word_analysis` OR v4 `chunks[].arabic_text` a clickable card. v4-only verses (no `word_analysis`) get fallback tokenization on whitespace + Arabic punctuation strip; clicking a card opens a popup with morphology + translation, lazy-loading the surface page + lemma page on demand. **A7 cross-cutting:** `verse-detail` toggle now uses `vt.hasWordByWord` so every hadith page (not just v3 ones) shows the word-by-word toggle. **A8 E2E:** `e2e/tests/words.spec.ts` covers routing, lemma-link integrity, paradigm rendering. **A9 cross-links:** lemma pages link Quran/hadith refs back to existing `/books/...` paths via `cross_references.qac` location info. |
+| 16 — Path C (temporary English glosses on lemmas index) | **done — to be reverted when Path B lands** | 2026-05-13 | 2026-05-13 | Gen `d0ce4a9`, UI `34ff19c` | Word cards rendered Arabic + POS but no inline translation, because the lemma index didn't carry a gloss. Quick stopgap: extract the first POS-aligned Wiktextract sense gloss per lemma at index-build time and stash it in `lemma.gloss`. `_pick_aligned_gloss` in `scripts/build_word_indexes.py` uses a CAMeL→Wiktextract POS-family map (e.g. `prep`→`{prep, preposition}`) so إِلَى returns its preposition sense rather than the homograph verb sense ("to promise"). Function-word POS skips the senses[0] fallback so we never surface a wrong-POS gloss for them; content-word POS (verb/noun/adj/adv) falls back. **Index grew 2.4 → 2.8 MB.** UI: `LemmaIndexEntry.gloss` typed in `models/word.ts`, `WordsService.getLemmaGlossMap()` builds a session-cached `Map<lemmaSlug, gloss>`, `VerseTextComponent.cardTranslation()` reads from inline v3 entry → gloss map → lazy-loaded lemma. **This is throwaway**: it's English-only (Wiktextract is English-only), the 80-char truncation crops some glosses (deliberately not addressed per user direction 2026-05-13), and Path B will produce higher-quality, all-language coverage. Tracked for revert in memory `project-path-c-temporary-glosses` with the exact commits and revert recipe. |
+| 17 — UI polish round (popup correctness + perf) | **done** | 2026-05-13 | 2026-05-13 | UI `c6816d3`, `20cd672`, `875451a`, `6893af7`, `99dbf9e` | Round of bug fixes against the production UI. **(a) Popup empty until click race**: `setActiveWord` ran `loadPopupLemma` after laying out the popup, and the document:click HostListener fired before stopPropagation could short-circuit it. Fixed with explicit `$event.stopPropagation()` on card click + eager `prefetchSurfaceData()` so POS lit up per-card on toggle-on. **(b) Clickable root on surface page**: root chip now navigates to `/words/roots/{slug}`. **(c) WBW toggle on verse-detail**: gated on `vt.hasWordByWord` (was `hasWordAnalysis`) so v4-only hadiths show the toggle. **(d) Prefetch on saved-pref boot**: only `toggleWordAnalysis()` was calling `prefetchSurfaceData()`, so users whose `viewMode` preference was `word-by-word` landed on a page of empty cards (no POS, no translation) until they flipped the toggle off-and-on. `applyViewMode()` now also triggers the prefetch when WBW becomes active via the preference subscription. **(e) Click-scroll-to-top + popup spinner regression**: `wordTokens` was a getter recomputing a fresh `WordAnalysisEntry[]` on every change-detection tick — Angular's `*ngFor` identity diff was tearing down + rebuilding all 20 word cards on every popup open/close. Symptom in small viewports: visible layout jump. Fix: cache per-verse + `trackBy` on the *ngFor. Same commit also rewired `popupTranslation`/`popupPos` getters to fall back to `lemmaGlossMap`/`surfaceCardData` so the popup hydrates instantly from the cards' own caches instead of spinning while we re-fetch the lemma. Native `[title]` on the truncated translation span shows the full text on hover (until Path B lands and broadens it). |
 
-### Final state (2026-05-11, end of Session 1)
+### Final state (2026-05-13, end of Session 2 — UI + free-data enrichment complete)
 
+**Data API** (deployed at `https://thaqalaynwords.netlify.app/`):
 - **102,003** surface pages
-- **13,102** lemma pages (76.1% with Wiktextract-merged definitions)
+- **13,102** lemma pages
+  - 76.1% with Wiktextract-merged definitions, etymology, IPA
+  - 14.7% with hawramani `classical_definitions` (top-frequency lemmas)
+  - All carry Lane's `lanes_definition` body where attested (~68% have a Lane's entry)
+  - ~99.x% carry the throwaway Path C English `gloss` field in `index/lemmas.json` (Wiktextract first-aligned-sense, ≤ 80 chars)
 - **2,769** root pages
-- **3** index files (surfaces/lemmas/roots — all sorted by descending frequency)
-- **248 MB** total output
+- **3** index files (`surfaces`, `lemmas`, `roots` — sorted by descending frequency)
+- **~330 MB** total output (grew from 248 MB after Lane's body parsing + hawramani; index added ~400 KB for Path C glosses)
 - **0 validation issues** across all files
-- **116 words tests** passing on the generator side + **11 TS parity tests** on the UI side
-- **Live**: `https://thaqalaynwords.netlify.app/`
+- **148 words tests** passing on the generator side + **11 TS parity tests** on the UI side
 
-## Next steps
+**Angular UI** (live at `https://thaqalayn.netlify.app/`):
+- `/words`, `/words/{surface}`, `/words/lemmas/{slug}`, `/words/roots/{slug}` routes — lazy-loaded 132 KB chunk
+- Browse list uses CDK virtual scroll over all 102K rows
+- Lemma pages render paradigm table with corpus-attestation flags, sibling-lemma list, accordion-collapsed Lane's + classical-definition entries (sanitized HTML)
+- **Every hadith** (v3 OR v4) gets a word-by-word toggle in `verse-text`; clicking any word opens a popup with lazy-loaded morphology + translation; clicking "Full word page →" navigates to the surface/lemma pages
+- `cdkVirtualScrollViewport` + `shareReplay(1)` caches throughout — repeat fetches of the same slug within a session don't hit the network
+- 43/43 verse-text unit tests pass; full Angular suite 367+ tests pass
 
-Items grouped by track. Items within a track are listed in roughly the order you'd execute them.
+**Known temporary state:**
+- Path C (English gloss-on-index) lives until Path B replaces it — see "Path B" section below for the revert recipe and commit list.
 
-### Track A — UI integration (no LLM, no cost)
+## Outstanding work (as of 2026-05-13)
 
-The data API is live but no UI consumes it yet. This is the most-visible next milestone for users.
+Tracks A (UI), B1 (Lane's), and B2-partial (hawramani) are **done** (see Implementation log Phases 13–17). What remains:
 
-| # | Item | Effort | Notes |
+### Track A status — DONE ✓
+
+| # | Item | Status |
+|---|---|---|
+| A1–A3 | env config + `WordsService` + TS models | done (Phase 15) |
+| A4–A5 | routes + surface/lemma/root components | done (Phase 15) |
+| A6 | clickable words in `verse-text` | done (Phase 15) |
+| A7 | `/words` browse list with virtual scroll | done (Phase 15) |
+| A8 | Playwright E2E | done (Phase 15) — covered by `e2e/tests/words.spec.ts` |
+| A9 | Quran/hadith cross-links on lemma pages | done (Phase 15) |
+
+### Track B status — partly done
+
+| # | Item | Status | Notes |
 |---|---|---|---|
-| A1 | Add `wordsApi` to Angular `environment.{ts,prod.ts}` → `http://localhost:8889/` (dev) / `https://thaqalaynwords.netlify.app/` (prod) | <30 min | Mirrors the existing `apiUrl` pattern |
-| A2 | Write `WordsService` (`src/app/services/words.service.ts`) with `getSurface(slug)`, `getLemma(slug)`, `getRoot(slug)` — each returning `Observable<...>` with `shareReplay(1)` cache | ~1 hour | Mirrors `BooksService` pattern; will need TS types per JSON shape |
-| A3 | TypeScript types for surface / lemma / root pages (matches the README field reference) | ~1 hour | Add `src/app/models/word.ts` |
-| A4 | Word-page routes (`/words/{surface}`, `/words/lemmas/{slug}`, `/words/roots/{slug}`) + components | 1 session | Mirrors `book-dispatcher` / `chapter-content` pattern |
-| A5 | Word-detail components: surface page (light, navigates to lemma), lemma page (heavy, with paradigm table + sibling-root expansion), root page (lemma family browser) | 1-2 sessions | New components |
-| A6 | Wire chunk renderer in `verse-text` to make each word a clickable link `/words/{surface}` (use `word-normalize.ts` `slug()` to derive the URL) | ~1 hour | The TS twin from Phase 8 exists for this |
-| A7 | Add Words browse page (`/words` route showing the surfaces + lemmas + roots indexes) — paginated table with frequency-descending default sort | 1 session | Uses `index/*.json` files |
-| A8 | E2E Playwright tests for word pages | ~1 hour | Cover routing, lemma-link integrity, paradigm rendering |
-| A9 | Cross-link Quran/hadith verse references on lemma pages → existing `/books/...` paths | ~30 min | `cross_references.qac` has location info; link to `/books/quran:X:Y` |
+| B1 | Lane's Lexicon body parsing | **done** (Phase 13) | All 44,826 entries structured + merged |
+| B2 | Mufradat al-Quran | **superseded by hawramani aggregator** | hawramani.com serves Mufradat alongside 37 other lexicons per page; B2 collapsed into B2+ |
+| B2+ | hawramani multi-lexicon scrape | **partial — 1,922 lemmas (14.7%)** | Blocked on hawramani rate-limit/CDN. Resumable: rerun `scripts/scrape_hawramani.py --full` after waiting it out, eventually expect ~80%+ coverage. |
+| B3 | Lisan al-Arab direct scrape | not started | Lisan IS one of the 38 lexicons hawramani aggregates, so B3 is largely covered by B2+. Direct-scrape only worth doing if hawramani permanently blocks us. |
+| B4 | Multi-language Wiktionary dumps | not started | A "free" alternative path to Track C C1 (LLM translation); each target language's Wiktionary has Arabic→that-language entries. Worth piloting on one language (e.g. Persian) before committing to LLM. |
 
-### Track B — Free-data enrichment (no LLM, no cost)
+### Track C status — Path B (LLM translation) is the next paid spend
 
-Squeezing more value from sources already on disk before paying for LLM augmentation.
+`Path B` is what users actually call the C1 step. **The plan for it is below ("Path B detailed plan").** C2–C5 are deferred until the UI surfaces real demand.
 
-| # | Item | Effort | Notes |
+### Track D status — small polish
+
+| # | Item | Status | Notes |
 |---|---|---|---|
-| B1 | **Lane's Lexicon body parsing.** Parse Perseus TEI XML body for each `entry_ids` we already store. Extract definition text, source citations (S=Sihah, K=Kamoos), examples. Buckwalter→Arabic on cited Arabic. Populate a new `lanes_definition` field per lemma. | 1 session | Adds classical-attestation coverage for ~25% of lemmas Wiktextract doesn't have, plus enriches the 76% it does have. Most-valuable free augmentation we have left. |
-| B2 | **Mufradat al-Quran integration.** ~120 specifically-Quranic high-value theological terms (e.g. تقوى, رحمة) get Imami-perspective exegetical interpretations from al-Raghib al-Isfahani. Public-domain text available at arabiclexicon.hawramani.com. | 0.5 session | Small but high-quality for theological lemmas |
-| B3 | **Lisan al-Arab raw scrape** (per D048 — deferred from Phase 3d). Multi-volume; parse pattern is similar to Lane's. | 1-2 sessions | Adds the most-comprehensive classical lexicon. Marginal value beyond Lane's for most words but useful for rare ones |
-| B4 | **Multi-language Wiktionary dumps** (Persian, Turkish, French, etc.). Each target language's Wiktionary dump has Arabic→that-language entries that could populate `translations` without LLM. | 1 session per target | Most cost-effective alternative to LLM for translation work |
+| D1 | Path interning to shrink surface pages | not needed | Output is 330 MB, well within Netlify limits |
+| D2 | Display `ق-و-ل` instead of `ق-_-ل` slugs | not started | Pure UI substitution; pull weak letter from the canonical lemma form |
+| D3 | Verify Netlify free-tier headroom | not started | Confirm after first traffic spike |
+| D4 | `?highlight={surface}` deep links on paradigm forms | not started | Lemma → click form → narration with the word highlighted |
+| D5 | Rebuild after Bihar / Mir'at land | not started | Incremental via `seen_lemmas` dedup |
 
-### Track C — LLM augmentation (cost: $50-$2000 depending on scope)
+---
 
-What we still need an LLM for. Defer until UI is shipped so we can budget by user-feedback priority.
+## Path B — LLM translation of lemmas (the next major spend)
 
-| # | Item | Effort | Cost | Notes |
-|---|---|---|---|---|
-| C1 | **`translations`** in 10 non-English target languages, on 13K lemmas | 1 session | $400-$1,500 | Highest-value LLM spend. Wiktionary's Arabic-side entries don't carry these |
-| C2 | **Corpus-context definitions** on lemmas where Wiktextract is generic — prompt: "given hadith corpus usage X, refine the English gloss for Imami / classical context" | 0.5 session | $200-$500 | Quality-of-life. Only worth doing on the most-frequent lemmas |
-| C3 | **Definitions on lemmas without Wiktextract entry** (~24% of lemmas — typically rare or technical). LLM grounded in any Lane's content we extracted in B1 | 0.5 session | $50-$300 | After B1 lands |
-| C4 | **Root-page semantic gloss** — one paragraph per root summarizing the family meaning (e.g. for ق-و-ل: "concepts of speech, utterance, statement"). Cheap because there are only 2,769 roots | 0.5 session | $50-$200 | After C1/C2 so the LLM has lemma-level context |
-| C5 | **Etymology on lemmas where Wiktionary has none** | 0.25 session | $30-$100 | Lowest priority — etymology is "nice to have" |
+**Goal:** every lemma gets a high-quality short gloss + sense-paragraph in all 11 supported app languages (`en, ar, fa, ur, tr, id, bn, es, fr, de, ru, zh`), so every word card in `verse-text` and every lemma page shows the correct translation in whatever `wordAnalysisLang` the user selected. The English gloss comes from Wiktextract already; the other 10 languages are what we're paying the LLM to produce.
 
-### Track D — Optimizations & polish (low priority)
+**Why "Path B" not "C1":** the user calls it Path B in conversation (Path A = WBW UI, Path B = LLM translations, Path C = temporary English glosses on the index). C1 is the same scope under the original roadmap naming.
 
-| # | Item | Effort | Notes |
-|---|---|---|---|
-| D1 | Path interning in surface pages (replace per-surface path arrays with integer IDs → single `index/paths.json` resolves IDs to paths). Saves ~30 MB | 0.5 session | Only if file sizes become a problem |
-| D2 | UI display: render `ق.#.ل` and `ق-_-ل` slugs as `ق-و-ل` (substitute the actual weak letter from the canonical lemma form) — purely display-layer | <30 min | Currently shows `_` placeholder |
-| D3 | Verify Netlify file-count + bandwidth dashboard after first user-traffic spike | 30 min | Confirm we're within the 500K files / 100GB monthly free-tier limits |
-| D4 | Add lemma → narration deep links via `?highlight={surface}` query param so clicking a paradigm form takes the reader to an attested hadith with the word highlighted | 0.5 session | Plan section calls this out as the navigation pattern |
-| D5 | Re-run pipeline when Bihar al-Anwar / Mir'at al-Uqul corpora land (per pipeline P5). New surfaces/lemmas will be incremental — `seen_lemmas` dedup makes this fast | ~30 min build, then validate | Triggered by external corpus growth |
+### Scope
 
-### Suggested ordering when you pick this back up
+- **13,105 lemmas** to translate (the count after the dedup fix in Phase 10)
+- Per lemma we send the LLM: lemma Arabic + Wiktextract English gloss + POS + optional Lane's first-sentence context
+- Per lemma we get back: an object `{en, ar, fa, ur, tr, id, bn, es, fr, de, ru, zh}` of short noun-phrase / verb-phrase glosses (≤ 80 chars each) plus an optional longer `definition` paragraph in each language
+- Surfaces inherit their lemma's translations (we do NOT pay to translate each of the 102K surface forms — that's combinatorially worse and most surfaces are inflections of the same lemma)
+- For verbs we DO want per-paradigm-role label translation eventually (so card for `قَالَتْ` reads "she said" not "to say") — but that's mechanical (we have the role: `past_3fs`, we just need the per-language role-label table). Treat this as a one-time fixed-asset translation table loaded by the UI, not an LLM call per form.
 
-1. **A1 → A6** (UI integration) — unblocks user value. ~2-3 sessions.
-2. **B1** (Lane's body parsing) — biggest free win on content quality. 1 session.
-3. **C1** (translations LLM pass) — first paid step, by far the highest user impact. Run after A is shipped so you can see UI-driven priority. 1 session.
-4. **C3** (LLM definitions for the gap) — uses Lane's from B1 as grounding.
-5. **C4** (root semantic glosses) — small but visible feature.
-6. **D2** + **A8** (E2E tests + slug display polish) — final QA pass before announcing.
+### Cost
 
-Total remaining estimated effort: **6-9 sessions** + **$680-$2,600** in LLM costs depending on scope.
+Using **gpt-4.1-mini** via Batch API (50% off list, matches the Phase 4 production model):
+- Input per lemma ≈ 150 tokens (system prompt cached + lemma data + few-shot)
+- Output per lemma ≈ 200 tokens (11 langs × ~15 tokens each, JSON overhead)
+- Pricing 2026: `$0.40/1M input` / `$1.60/1M output` × 0.5 batch
+- Per-lemma: `(150 × 0.20 + 200 × 0.80) / 1M = $0.000190` ≈ **2 hundredths of a cent**
+- **13,105 lemmas total: ~$2.50**, plus a few dollars overhead for retries
+
+That's the cheap-and-good band. We could pay more for gpt-5.4 ($1.25/$10 per 1M, ~30× cost: $75) if quality on rarer lemmas suffers — recommend running gpt-4.1-mini first, spot-checking the worst-quality lemmas (likely classical religious terminology + foreign loanwords), and re-running only those on gpt-5.4 if needed.
+
+### Pipeline architecture
+
+Mirrors the verse pipeline's batch flow (`app/pipeline_cli/openai_batch.py`). New module: `app/words/translation.py`.
+
+```
+┌────────────────────────────┐
+│ 1. Extract                 │  Walk ThaqalaynWords/lemmas/*.json
+│ scripts/extract_lemma_     │  → emit (slug, lemma_ar, pos, en_gloss,
+│ translation_prompts.py     │     lane_snippet) tuples for every lemma
+│                            │  → write to
+│                            │  ThaqalaynWordSources/translation/
+│                            │  prompts.jsonl
+└────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────┐
+│ 2. Submit batch            │  OpenAI Batch API: 13K requests, 1 file.
+│ scripts/submit_lemma_      │  System prompt asks for strict JSON object
+│ translations_batch.py      │  {lemma_ar: ..., glosses: {en, ar, fa, ...},
+│                            │   definitions: {en, ar, fa, ...}}.
+│                            │  State persisted to
+│                            │  WordSources/translation/batch_state.json
+└────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────┐
+│ 3. Poll until completed    │  ~3-24 h depending on OpenAI queue
+│ scripts/poll_lemma_        │  Resumable across reboots (state file holds
+│ translations_batch.py      │  batch ID).
+└────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────┐
+│ 4. Download + validate     │  Parse responses, validate JSON, check each
+│ scripts/download_lemma_    │  language's gloss is non-empty and not
+│ translations.py            │  Latin chars in non-Latin script (basic
+│                            │  garbage filter).
+│                            │  Quarantine failures, retry up to 3× via
+│                            │  fix batch (same shape as verse pipeline).
+│                            │  Persist responses to
+│                            │  ThaqalaynWordSources/translation/
+│                            │  responses/{slug}.json
+└────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────┐
+│ 5. Merge into lemma pages  │  WordPageBuilder gains:
+│ (rebuild)                  │   - `translations: {en, ar, fa, ...}`
+│                            │     short glosses on the lemma JSON
+│                            │   - `definitions: {en, ar, fa, ...}`
+│                            │     longer paragraph (replaces or
+│                            │     augments existing English-only
+│                            │     `definition` field)
+│                            │  Rebuild surfaces + lemma indexes (lemmas
+│                            │  index gets `glosses: {en, ar, fa, ...}`
+│                            │  per-entry for word-card display).
+└────────────────────────────┘
+            │
+            ▼
+┌────────────────────────────┐
+│ 6. UI                      │  Revert Path C commits (`34ff19c` UI +
+│                            │  `d0ce4a9` generator) and replace with:
+│                            │    - `WordsService.getLemmaGlossMap(lang)`
+│                            │      returning Observable<Map<slug, gloss>>
+│                            │      for the active lang
+│                            │    - `cardTranslation(entry)` reads the
+│                            │      lang-specific map
+│                            │    - lemma page renders all 11 langs in
+│                            │      the translations selector
+└────────────────────────────┘
+```
+
+### Prompt sketch (Phase 1)
+
+```
+You are translating an Arabic lemma into 11 languages for an Islamic
+hadith study app. The lemma's Wiktextract English gloss + Lane's
+first-sentence context are provided. Return a strict JSON object.
+
+Lemma:       {{lemma_ar}}
+POS:         {{pos}}    (e.g. verb, noun, prep, conj)
+English:     {{en_gloss}}
+Lane's:      {{lane_snippet | first sentence | ""}}
+
+Return:
+{
+  "glosses": {
+    "en": "short noun/verb-phrase gloss, ≤ 80 chars",
+    "ar": "Arabic equivalent or short synonym (often same lemma or root family)",
+    "fa": "...",
+    "ur": "...",
+    "tr": "...",
+    "id": "...",
+    "bn": "...",
+    "es": "...",
+    "fr": "...",
+    "de": "...",
+    "ru": "...",
+    "zh": "..."
+  },
+  "definitions": {
+    "en": "1-2 sentence definition explaining nuance, classical usage, theological connotations if applicable",
+    ...same 11 langs...
+  }
+}
+
+For function words (prepositions, conjunctions, particles), keep glosses
+literal and short ("to/toward", "and", "indeed"). For verbs, give the
+infinitive ("to say"). For nouns, give the singular ("speech, saying").
+Do NOT include diacritics on Latin-script languages. Do NOT translate
+proper nouns (return the transliteration).
+```
+
+### Schema additions
+
+**`lemmas/{slug}.json`** gains:
+```json
+{
+  ...existing fields...
+  "translations": {
+    "en": "to say, speak",
+    "ar": "نطق، تكلم",
+    "fa": "گفتن",
+    "ur": "کہنا",
+    "tr": "söylemek",
+    "id": "berkata",
+    "bn": "বলা",
+    "es": "decir",
+    "fr": "dire",
+    "de": "sagen",
+    "ru": "сказать",
+    "zh": "说"
+  },
+  "definitions_multilang": {
+    "en": "Form I verb of the root ق-و-ل, the most common verb of speech in classical Arabic. Used for ordinary speech, authoritative declarations, and citation of Quranic verses or hadith narrations.",
+    "ar": "...",
+    ...
+  },
+  "translations_attribution": {
+    "model": "gpt-4.1-mini",
+    "generated_date": "2026-06-01",
+    "pipeline_version": "words.translation.v1"
+  }
+}
+```
+
+**`index/lemmas.json`** entry gains a compact per-language map (replaces the single `gloss` field added in Phase 16):
+```json
+{
+  "slug": "قَالَ",
+  "root": "ق.و.ل",
+  ...
+  "glosses": {
+    "en": "to say, speak",
+    "ar": "نطق",
+    "fa": "گفتن",
+    ...
+  },
+  "frequency": 8421,
+  ...
+}
+```
+
+**Index size estimate:** going from one `gloss` field (avg ~30 chars) to 11 glosses (avg ~25 chars each) takes the index from 2.8 MB to ~5-6 MB. Worth verifying after a small pilot batch — if the size becomes uncomfortable, split into per-language index files (`index/lemmas.{lang}.json`) so the UI fetches only the active language.
+
+### Sessions / execution plan
+
+| Step | Effort | Cost |
+|---|---|---|
+| Build extraction + prompt module + Pydantic schema | 0.5 session | $0 |
+| **Pilot batch: 100 lemmas across all POS classes**; eyeball output quality, tweak prompt | 0.25 session | ~$0.02 |
+| Pilot batch with gpt-5.4 (same 100 lemmas) for comparison | 0.25 session | ~$0.50 |
+| Full batch on 13,105 lemmas (gpt-4.1-mini) | 1 session wall time, ~3-24 h batch | ~$2.50 |
+| Quarantine retry passes | 0.25 session | ~$0.10 |
+| Merge into lemma pages + rebuild indexes | 0.25 session | $0 |
+| Revert Path C, wire UI to multilingual maps, lang-switcher integration test | 0.5 session | $0 |
+| **Total** | **~3 sessions** | **~$3-4** |
+
+### Validation checklist
+
+- [ ] Every lemma has non-empty glosses for all 11 langs
+- [ ] No Latin chars in Arabic/Persian/Urdu/Russian/Chinese/Bengali glosses (basic script check)
+- [ ] Gloss length ≤ 80 chars (truncation discipline matches Path C's UI assumption)
+- [ ] Spot-check 50 random lemmas + 20 high-frequency lemmas + 20 function-word lemmas manually
+- [ ] Spot-check إِلَى (the canonical homograph that broke Path C without POS-alignment) returns the correct "to/toward" preposition gloss, not the verb sense
+- [ ] Diff index size against pre-Path-B index (~2.8 MB) — should land in 5-6 MB range
+- [ ] Verify revert commits land cleanly: `git revert 34ff19c d0ce4a9` should produce no merge conflicts
+
+### What to do about surface pages
+
+Surfaces don't need their own LLM translation. The card on a surface page already lazy-loads the lemma's translations via `WordsService.getLemma`. For the verse-page word-by-word view, the translation shown on each card comes from `lemmaGlossMap` (post-Path-B: from the multilingual version of the same map).
+
+**Future work — paradigm-role-aware translation:** the card for `قَالَتْ` (3fs past) ideally reads "she said" rather than "to say". CAMeL Tools already gives us the role (`past_3fs`). We have a finite role taxonomy (~50 roles × 11 langs = ~550 strings). One-time human-curated or LLM-batch translation of that table, loaded into the UI as `assets/role-labels.{lang}.json`, would let the card combine `glosses.{lang} + role-label.{lang}` to produce "she said" / "you (m) said" / "I will say". This is Track D-ish — defer until users ask for it.
+
+### Open questions before kicking Path B off
+
+1. **gpt-4.1-mini vs gpt-5.4 quality on classical religious terminology.** Pilot will answer this. If gpt-4.1-mini's translations for words like تقوى, إيمان, تسبيح, ركوع are weak, run them through gpt-5.4 selectively (still cheap because we're talking 100-200 lemmas of the 13K).
+2. **Do we want a separate definitions paragraph per language, or just the gloss?** Definitions multiply output tokens by ~10×. Recommend gloss-only on the first pass to minimize cost, then add definitions as a follow-up pass once Path B is shipped and we know users want them.
+3. **Index per-language splitting threshold.** If the all-langs `index/lemmas.json` lands above 8 MB, split per language.
 
 
 

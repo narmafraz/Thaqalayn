@@ -334,6 +334,14 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return this.verse?.ai?.word_analysis || [];
   }
 
+  /** Memoized wordTokens — recomputed only when the verse input changes.
+   *  Without this, the getter returns a fresh array on every change
+   *  detection tick; *ngFor's identity diff then tears down and rebuilds
+   *  every word card on each click, which (a) is wasteful and (b) caused
+   *  a visible layout jump as DOM nodes were destroyed/recreated. */
+  private _wordTokensVerse: Verse | undefined;
+  private _wordTokensCache: WordAnalysisEntry[] = [];
+
   /**
    * Word entries for the word-by-word view. Falls back to whitespace-
    * tokenized chunk text when v3 `word_analysis` is absent. Each
@@ -341,6 +349,13 @@ export class VerseTextComponent implements OnInit, OnDestroy {
    * UI then lazy-loads the lemma on card click to populate them.
    */
   get wordTokens(): WordAnalysisEntry[] {
+    if (this._wordTokensVerse === this.verse) return this._wordTokensCache;
+    this._wordTokensVerse = this.verse;
+    this._wordTokensCache = this.computeWordTokens();
+    return this._wordTokensCache;
+  }
+
+  private computeWordTokens(): WordAnalysisEntry[] {
     if (this.hasWordAnalysis) return this.wordAnalysis;
     const chunks = this.verse?.ai?.chunks;
     if (!chunks?.length) return [];
@@ -365,6 +380,12 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     }
     return out;
   }
+
+  /** trackBy for *ngFor over word cards. Stable identity by index +
+   *  word text means Angular reuses the existing DOM node when the
+   *  array is recomputed (e.g. on verse change), instead of destroying
+   *  and rebuilding all cards. */
+  trackWordToken = (i: number, e: WordAnalysisEntry): string => i + ':' + e.word;
 
   /** URL-safe slug for a word token (NFC + percent-encode happens in service). */
   wordHref(word: string): string {
@@ -396,25 +417,37 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Resolve the popup's translation/POS from either the inlined v3
-   * `entry.translation` or the lazy-loaded LemmaPage's first sense. */
+  /** Resolve the popup's translation from any source already loaded:
+   *  inline v3 entry → lemmas-index gloss map (English) → fully-loaded
+   *  lemma page first sense. We check the cached sources first so the
+   *  popup hydrates instantly when the card already had a gloss to
+   *  show, instead of spinning while we re-fetch the lemma. */
   get popupTranslation(): string {
     if (!this.wordPopup) return '';
-    // Inline v3 translation first.
-    const t = this.wordPopup.entry.translation;
-    const inline = t?.[this.wordAnalysisLang];
+    const entry = this.wordPopup.entry;
+    const inline = entry.translation?.[this.wordAnalysisLang];
     if (inline) return inline;
-    // Fall back to lemma definition first-sense gloss (en only for now).
+    if (this.wordAnalysisLang === 'en') {
+      const lemmaSlug = this.cardLemmaSlug(entry);
+      const cached = lemmaSlug ? this.lemmaGlossMap.get(lemmaSlug) : '';
+      if (cached) return cached;
+    }
     if (this.popupLemma && this.wordAnalysisLang === 'en') {
       return this.popupLemma.definition?.senses?.[0]?.gloss || '';
     }
     return '';
   }
 
-  /** Popup POS — either inline (v3) or lemma.pos from lazy-load. */
+  /** Popup POS — inline v3 entry, eagerly-prefetched surface page, or
+   *  the lazy-loaded lemma (in that order). The first two are
+   *  typically already in memory by the time the user clicks. */
   get popupPos(): string {
     if (!this.wordPopup) return '';
-    return this.wordPopup.entry.pos || this.popupLemma?.pos || '';
+    const entry = this.wordPopup.entry;
+    if (entry.pos) return entry.pos;
+    const surf = this.surfaceCardData.get(entry.word);
+    if (surf?.morphology?.pos) return surf.morphology.pos;
+    return this.popupLemma?.pos || '';
   }
 
   get hasChunks(): boolean {

@@ -57,7 +57,7 @@
       </select>
     </div>
     <div class="word-cards">
-      <div *ngFor="let entry of wordTokens; let i = index"
+      <div *ngFor="let entry of wordTokens; let i = index; trackBy: trackWordToken"
            class="word-card"
            [class.active]="activeWordIndex === i"
            (click)="setActiveWord(i, $event); $event.stopPropagation()"
@@ -69,8 +69,9 @@
            [attr.aria-label]="cardPos(entry) ? (entry.word + ' - ' + getPosLabel(cardPos(entry))) : entry.word">
         <span class="word-arabic">{{ entry.word }}</span>
         <!-- Inline translation: v3 word_analysis when present, otherwise
-             the lemma's English Wiktextract gloss from the lemmas index. -->
-        <span class="word-translation" dir="ltr" *ngIf="cardTranslation(entry) as t">
+             the lemma's English Wiktextract gloss from the lemmas index.
+             title shows the full text when CSS ellipsis truncates it. -->
+        <span class="word-translation" dir="ltr" *ngIf="cardTranslation(entry) as t" [title]="t">
           {{ t }}
         </span>
         <!-- POS: from v3 entry or eagerly-loaded surface data. -->

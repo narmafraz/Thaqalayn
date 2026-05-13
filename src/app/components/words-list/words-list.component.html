@@ -1,0 +1,91 @@
+<div class="words-list-page">
+  <header class="page-header">
+    <h1>Browse Arabic Words</h1>
+    <p class="hint">
+      Every diacritized surface form, lemma, and root in the hadith corpus.
+      Sorted by descending corpus frequency.
+    </p>
+  </header>
+
+  <div class="controls">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab"
+              [class.active]="activeTab === 'lemmas'"
+              [attr.aria-selected]="activeTab === 'lemmas'"
+              (click)="setTab('lemmas')">
+        Lemmas <span class="count">{{ filteredLemmas.length | number }}</span>
+      </button>
+      <button type="button" role="tab"
+              [class.active]="activeTab === 'surfaces'"
+              [attr.aria-selected]="activeTab === 'surfaces'"
+              (click)="setTab('surfaces')">
+        Surfaces <span class="count">{{ filteredSurfaces.length | number }}</span>
+      </button>
+      <button type="button" role="tab"
+              [class.active]="activeTab === 'roots'"
+              [attr.aria-selected]="activeTab === 'roots'"
+              (click)="setTab('roots')">
+        Roots <span class="count">{{ filteredRoots.length | number }}</span>
+      </button>
+    </div>
+    <input type="text" class="filter-input"
+           placeholder="Filter (diacritic-insensitive)…"
+           [(ngModel)]="filter"
+           (ngModelChange)="onFilterChange()"
+           lang="ar" dir="rtl">
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loadingLemmas && activeTab === 'lemmas'" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Lemmas tab -->
+  <cdk-virtual-scroll-viewport
+      *ngIf="!loadingLemmas && activeTab === 'lemmas'"
+      itemSize="48" class="virtual-list">
+    <a *cdkVirtualFor="let l of filteredLemmas; trackBy: trackBySlug"
+       [routerLink]="['/words/lemmas', l.slug]"
+       class="list-row" lang="ar" dir="rtl">
+      <span class="row-arabic">{{ l.slug }}</span>
+      <span *ngIf="l.pos" class="row-pos">{{ l.pos }}</span>
+      <span class="row-meta">
+        <span *ngIf="l.frequency" class="row-freq">{{ l.frequency | number }}×</span>
+        <span *ngIf="l.has_lanes" class="row-flag" title="Lane's">L</span>
+        <span *ngIf="l.has_wiktextract" class="row-flag" title="Wiktionary">W</span>
+        <span *ngIf="l.has_qac" class="row-flag" title="Quranic Arabic Corpus">Q</span>
+      </span>
+    </a>
+  </cdk-virtual-scroll-viewport>
+
+  <!-- Surfaces tab -->
+  <cdk-virtual-scroll-viewport
+      *ngIf="!loadingSurfaces && activeTab === 'surfaces'"
+      itemSize="48" class="virtual-list">
+    <a *cdkVirtualFor="let s of filteredSurfaces; trackBy: trackBySlug"
+       [routerLink]="['/words', s.slug]"
+       class="list-row" lang="ar" dir="rtl">
+      <span class="row-arabic">{{ s.slug }}</span>
+      <span *ngIf="s.pos" class="row-pos">{{ s.pos }}</span>
+      <span class="row-meta">
+        <span class="row-freq">{{ s.count | number }}×</span>
+        <span *ngIf="s.lemma" class="row-lemma">→ {{ s.lemma }}</span>
+      </span>
+    </a>
+  </cdk-virtual-scroll-viewport>
+
+  <!-- Roots tab -->
+  <cdk-virtual-scroll-viewport
+      *ngIf="!loadingRoots && activeTab === 'roots'"
+      itemSize="48" class="virtual-list">
+    <a *cdkVirtualFor="let r of filteredRoots; trackBy: trackBySlug"
+       [routerLink]="['/words/roots', r.slug]"
+       class="list-row" lang="ar" dir="rtl">
+      <span class="row-arabic">{{ r.slug }}</span>
+      <span class="row-meta">
+        <span class="row-freq">{{ r.lemma_count }} lemmas</span>
+        <span class="row-freq">{{ r.total_frequency | number }}×</span>
+      </span>
+    </a>
+  </cdk-virtual-scroll-viewport>
+</div>

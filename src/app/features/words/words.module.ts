@@ -1,14 +1,15 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 import { SharedModule } from '../../shared/shared.module';
 import { WordSurfaceComponent } from '../../components/word-surface/word-surface.component';
 import { WordLemmaComponent } from '../../components/word-lemma/word-lemma.component';
 import { WordRootComponent } from '../../components/word-root/word-root.component';
+import { WordsListComponent } from '../../components/words-list/words-list.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'index', pathMatch: 'full' },
-  { path: 'index', component: WordSurfaceComponent }, // placeholder until browse page lands
+  { path: '', component: WordsListComponent },
   { path: 'lemmas/:slug', component: WordLemmaComponent },
   { path: 'roots/:slug', component: WordRootComponent },
   // Catch-all for /words/:surface — must be last so 'lemmas' and 'roots' match first.
@@ -20,10 +21,12 @@ const routes: Routes = [
     WordSurfaceComponent,
     WordLemmaComponent,
     WordRootComponent,
+    WordsListComponent,
   ],
   imports: [
     SharedModule,
     RouterModule.forChild(routes),
+    ScrollingModule,
   ],
 })
 export class WordsModule {}

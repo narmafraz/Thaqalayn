@@ -155,4 +155,30 @@ export class WordLemmaComponent implements OnInit, OnDestroy {
       ? `https://corpus.quran.com/qurandictionary.jsp?q=${encodeURIComponent(root)}`
       : '';
   }
+
+  /** A few example occurrence paths fetched lazily for the citation form. */
+  examplePaths: string[] = [];
+  exampleSourceForm: string | null = null;
+  exampleLoading = false;
+  /** Lazy load: when the user expands "Show examples", fetch the most-
+   * frequent paradigm form's surface page and pull a few hadith paths. */
+  loadExamples(): void {
+    if (!this.lemma) return;
+    if (this.exampleLoading || this.examplePaths.length) return;
+    // Pick the highest-count in_corpus form, falling back to the lemma slug itself.
+    const candidate = this.lemma.paradigm
+      .filter(p => p.in_corpus && p.count)
+      .sort((a, b) => (b.count || 0) - (a.count || 0))[0];
+    const form = candidate?.form || this.lemma.slug;
+    this.exampleSourceForm = form;
+    this.exampleLoading = true;
+    this.cdr.markForCheck();
+    this.words.getSurface(form).subscribe(s => {
+      this.exampleLoading = false;
+      if (s) {
+        this.examplePaths = s.occurrence_paths.slice(0, 5);
+      }
+      this.cdr.markForCheck();
+    });
+  }
 }

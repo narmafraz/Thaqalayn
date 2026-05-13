@@ -311,6 +311,16 @@ h3 {
   vertical-align: text-bottom;
 }
 
+// ---- Example occurrences ----
+.examples-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
 // ---- Cross-references ----
 .ref-list {
   list-style: none;

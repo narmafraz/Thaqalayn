@@ -154,6 +154,27 @@
       </div>
     </section>
 
+    <!-- ===== Example occurrences (lazy) ===== -->
+    <section class="examples" *ngIf="lemma.frequency_in_corpus">
+      <h2>Example occurrences in the corpus</h2>
+      <button *ngIf="!examplePaths.length && !exampleLoading"
+              type="button" mat-button (click)="loadExamples()">
+        Show examples from <span lang="ar" dir="rtl">{{ exampleSourceForm || lemma.slug }}</span>
+      </button>
+      <mat-spinner *ngIf="exampleLoading" diameter="20"></mat-spinner>
+      <ul *ngIf="examplePaths.length" class="examples-list">
+        <li *ngFor="let p of examplePaths">
+          <app-path-link [path]="p"></app-path-link>
+        </li>
+      </ul>
+      <p *ngIf="examplePaths.length" class="hint">
+        From the surface page for
+        <a [routerLink]="['/words', exampleSourceForm]" lang="ar" dir="rtl">
+          {{ exampleSourceForm }}
+        </a>. <a [routerLink]="['/words', exampleSourceForm]">See all occurrences →</a>
+      </p>
+    </section>
+
     <!-- ===== Cross-references ===== -->
     <section class="cross-refs">
       <h2>External references</h2>

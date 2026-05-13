@@ -1069,3 +1069,68 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 **Decision:** Option 2 — gitignore. The per-lemma JSON pages in `ThaqalaynWords/lemmas/` already contain the extracted senses/etymology/IPA in final form. The slim was a "convenience cache for re-runs", not load-bearing. If a future session needs to re-build, the rebuilder loads the full 221 MB cache (also gitignored, sits in `ThaqalaynDataGenerator/tmp/wiktextract_cache/`).
 
 ---
+
+## Spark / Qwen Optimisation (2026-05-13, autonomous run)
+
+### D055: All-Spark default vs Hybrid for the corpus rebuild — go all-Spark with mitigations
+
+**Context:** Phase 4 benchmark verdict has Spark viable. User asked: "fine tune the pipeline to work best with the qwen model for both phase 1 & 4 such that you are making no openai API calls".
+
+**Options considered:**
+1. **Hybrid** (gpt-5.4 P1 + qwen36 P4): preserves Phase 1 chunk granularity. Saves ~$270 vs all-OpenAI; ~$1,060 OpenAI cost remains.
+2. **All-Spark** (qwen36 P1 + qwen36 P4): zero OpenAI cost. Phase 1 chunk under-segmentation regression.
+3. **All-Spark with Phase 1 mitigations**: zero cost + try to recover Phase 1 chunk quality.
+
+**Decision:** Option 3. Go all-Spark per the explicit user request, but invest in chunk-quality mitigations first. If mitigations don't close the gap, hybrid is the documented escape hatch.
+
+**Rationale:**
+- User's explicit request.
+- Saved cost on 48K remainder: ~$1,330. Electricity ~$30 only.
+- Phase 1 chunk regression has known mitigations to try (few-shot, schema descriptions) before declaring it a blocker.
+- Corpus is resumable; if quality degrades mid-run, switch back to hybrid for the rest.
+
+### D056: Decision log venue — append here, not a separate file
+
+**Decision:** New "Spark Optimisation" section in this file rather than a new `SPARK_DECISION_LOG.md`. Readers expect architectural decisions here; Spark decisions affect production behaviour.
+
+### D057: Online research signal — informational only, must validate
+
+**Context:** Web research surfaced claimed best practices: prefix caching saves ~7× TTFT on shared system prompts; few-shot examples improve enum compliance; vLLM version affects `enable_thinking=False` + structured output compatibility. User noted: "don't take whatever you learn online as gospel, you need to validate it with your experiments".
+
+**Decision:** Treat online claims as hypotheses. Each claim that materially affects config must be A/B-tested against the existing 30-verse benchmark.
+
+**Rationale:**
+- Existing benchmark already surfaced Qwen `}` loops that no online source warned about — domain-specific failure modes matter more than general claims.
+- A/B testing is cheap (Spark electricity, minutes per round).
+- Avoids cargo-cult engineering.
+
+### D058: Phase 1 chunk-quality mitigations — try cheapest first
+
+**Context:** Phase 1 Qwen output under-segments chunks in 12/29 verses (merges body+quran_quote+closing into single body). Need to close the gap vs gpt-5.4 baseline.
+
+**Options considered:**
+1. Few-shot examples appended to the user message (2-3 representative segmentations).
+2. JSON-schema `description` fields inside `chunks.items.properties` to guide decode.
+3. Two-pass: identify chunk boundaries first, then emit chunks.
+4. Use existing gpt-5.4 P1 outputs as oracle few-shot (we have ~9.8K of them).
+
+**Decision:** Try in order 1 → 2 → 4 → 3. Stop when chunk-count parity (Qwen vs baseline) hits ≥80% on the 30-verse sample.
+
+**Rationale:**
+- (1) is the cheapest test: a few extra prompt tokens.
+- (2) is the next-cheapest and orthogonal to (1).
+- (4) leverages existing corpus knowledge as oracle — strongest mitigation but more code.
+- (3) is the heavyweight fallback.
+
+### D059: Phase 4 per-call `}`-loop fix — clamp max_tokens, keep retry
+
+**Context:** Per-language Phase 4 calls (Round 4) occasionally emit valid JSON followed by `}` loops until `max_tokens=2048` clips. Current mitigation is per-call retry.
+
+**Options considered:**
+1. Lower `max_tokens` per chunk-lang call from 2048 → ~400. Truncated `}` loops are cheaper.
+2. Add `stop=["}\n", "} "]` to force stop after closing brace.
+3. Retry on parse failure (current — keep).
+
+**Decision:** Combine (1) + (3). Skip (2) initially — stop sequences are model-specific and may misfire.
+
+---

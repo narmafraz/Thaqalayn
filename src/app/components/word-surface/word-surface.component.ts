@@ -119,6 +119,16 @@ export class WordSurfaceComponent implements OnInit, OnDestroy {
     return code;
   }
 
+  /**
+   * Convert CAMeL root notation (`ق.#.ل`) to the URL-safe slug
+   * (`ق-_-ل`) used by root pages. Mirrors the Python `root_to_slug` in
+   * `app/words/builders.py`. Returns null for empty/null input.
+   */
+  rootSlug(root: string | null | undefined): string | null {
+    if (!root) return null;
+    return root.replace(/\./g, '-').replace(/#/g, '_');
+  }
+
   /** Slot name → human label. */
   slotLabel(slot: string): string {
     return ({

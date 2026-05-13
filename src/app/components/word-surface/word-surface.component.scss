@@ -59,6 +59,13 @@ h2 {
   &:hover { text-decoration: underline; }
 }
 
+.root-link {
+  color: var(--mat-sys-primary, #5e2bdb);
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
 .pos-badge {
   display: inline-block;
   font-size: 0.75rem;

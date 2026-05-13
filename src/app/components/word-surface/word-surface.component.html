@@ -29,7 +29,11 @@
         <ng-container *ngIf="m.root">
           <dt>Root</dt>
           <dd>
-            <span lang="ar" dir="rtl"><code>{{ m.root }}</code></span>
+            <a *ngIf="rootSlug(m.root)"
+               [routerLink]="['/words/roots', rootSlug(m.root)]"
+               lang="ar" dir="rtl" class="root-link">
+              <code>{{ m.root }}</code>
+            </a>
             <span class="hint">(<code>#</code> = weak/hollow radical)</span>
           </dd>
         </ng-container>

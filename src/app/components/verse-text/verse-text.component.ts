@@ -101,7 +101,15 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   }
 
   applyViewMode(mode: ViewMode): void {
+    const wasShown = this.showWordAnalysis;
     this.showWordAnalysis = mode === 'word-by-word';
+    // When WBW becomes active via the saved preference (not a manual
+    // toggle), kick off the same prefetch the toggle button does so
+    // cards populate without requiring the user to flip it twice.
+    // shareReplay cache makes this idempotent across re-renders.
+    if (this.showWordAnalysis && !wasShown && !this.hasWordAnalysis) {
+      this.prefetchSurfaceData();
+    }
   }
 
   toggleDiacritics(): void {

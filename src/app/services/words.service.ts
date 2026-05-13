@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, shareReplay } from 'rxjs/operators';
+import { catchError, map, shareReplay } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import {
   LemmaPage, LemmasIndex,
@@ -96,6 +96,26 @@ export class WordsService {
       `${this.base}index/lemmas.json`,
     ).pipe(catchError(() => of(null)), shareReplay(1));
     return this.lemmasIndex$;
+  }
+
+  /** Lookup table from lemma slug → first English gloss, built once
+   *  from the lemmas index. Used for inline word-by-word translation. */
+  private lemmaGlossMap$?: Observable<Map<string, string>>;
+  getLemmaGlossMap(): Observable<Map<string, string>> {
+    if (this.lemmaGlossMap$) return this.lemmaGlossMap$;
+    this.lemmaGlossMap$ = this.getLemmasIndex().pipe(
+      map(idx => {
+        const m = new Map<string, string>();
+        if (idx?.lemmas) {
+          for (const l of idx.lemmas) {
+            if (l.gloss) m.set(l.slug, l.gloss);
+          }
+        }
+        return m;
+      }),
+      shareReplay(1),
+    );
+    return this.lemmaGlossMap$;
   }
 
   getRootsIndex(): Observable<RootsIndex | null> {

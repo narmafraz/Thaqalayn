@@ -226,6 +226,10 @@ export interface LemmaIndexEntry {
   root: string | null;
   root_slug: string | null;
   pos: string | null;
+  /** First English Wiktextract gloss aligned with the lemma's POS,
+   *  truncated to 80 chars. Empty when Wiktionary has no POS-aligned
+   *  sense (typical for some function words). */
+  gloss: string;
   frequency: number;
   paradigm_size: number;
   in_corpus_forms: number;

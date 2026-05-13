@@ -68,10 +68,10 @@
            [attr.aria-expanded]="activeWordIndex === i"
            [attr.aria-label]="cardPos(entry) ? (entry.word + ' - ' + getPosLabel(cardPos(entry))) : entry.word">
         <span class="word-arabic">{{ entry.word }}</span>
-        <!-- Inline translation: from v3 word_analysis if present, else
-             from the lazy-loaded lemma data (only after click). -->
-        <span class="word-translation" dir="ltr" *ngIf="entry.translation && entry.translation[wordAnalysisLang]">
-          {{ entry.translation[wordAnalysisLang] }}
+        <!-- Inline translation: v3 word_analysis when present, otherwise
+             the lemma's English Wiktextract gloss from the lemmas index. -->
+        <span class="word-translation" dir="ltr" *ngIf="cardTranslation(entry) as t">
+          {{ t }}
         </span>
         <!-- POS: from v3 entry or eagerly-loaded surface data. -->
         <span class="word-pos" *ngIf="cardPos(entry)" [style.color]="getPosColor(cardPos(entry))">{{ getPosLabel(cardPos(entry)) }}</span>

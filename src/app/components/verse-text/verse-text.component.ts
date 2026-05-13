@@ -47,6 +47,9 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   /** Set of surface slugs we're currently fetching. */
   private surfaceCardLoading = new Set<string>();
 
+  /** Lemma slug → English gloss, populated once from the lemmas index. */
+  lemmaGlossMap = new Map<string, string>();
+
   @Input() verse: Verse;
   @Input() isQuran = false;
   @Input() verseNumber: number;
@@ -82,6 +85,12 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     this.aiPrefs.preferences$.pipe(takeUntil(this.destroy$)).subscribe(prefs => {
       this.showDiacritics = prefs.showDiacritizedByDefault;
       this.wordAnalysisLang = prefs.wordByWordDefaultLang;
+      this.cdr.markForCheck();
+    });
+    // Load the lemma → gloss lookup once. WordsService caches it
+    // session-wide; multiple verse-text instances share the same map.
+    this.words.getLemmaGlossMap().pipe(takeUntil(this.destroy$)).subscribe(m => {
+      this.lemmaGlossMap = m;
       this.cdr.markForCheck();
     });
   }
@@ -153,6 +162,18 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   cardLemmaSlug(entry: WordAnalysisEntry): string | null {
     const data = this.surfaceCardData.get(entry.word);
     return data?.morphology?.lemma_slug || null;
+  }
+
+  /** Read-only helper: English gloss for a card. Prefers the inline v3
+   *  entry's translation for the active lang; falls back to the lemma
+   *  gloss map (English only — Path B will fill other langs later). */
+  cardTranslation(entry: WordAnalysisEntry): string {
+    const inline = entry.translation?.[this.wordAnalysisLang];
+    if (inline) return inline;
+    if (this.wordAnalysisLang !== 'en') return '';
+    const lemmaSlug = this.cardLemmaSlug(entry);
+    if (!lemmaSlug) return '';
+    return this.lemmaGlossMap.get(lemmaSlug) || '';
   }
 
   toggleChainDiagram(): void {

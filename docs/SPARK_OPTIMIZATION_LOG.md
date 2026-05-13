@@ -298,19 +298,60 @@ Wired Spark into the production pipeline. Changes:
 
 **5-verse batch** (`quran` first 5 verses, workers=4): 1.4 min, **5/5 pass**, $0. 8,217 output tokens (down from 11,263 in the no-retry initial test → retry logic recovers wasted-token `}` loops). Per-verse mean ~17 s including Phase 1 + per-language Phase 4.
 
-**Production usage**:
+**Production usage** (current recommended — Phase 3 ON by default since 2026-05-13 Spark P3 benchmark; see Rounds H/I below):
 ```bash
 AI_CONTENT_SUBDIR=corpus PYTHONPATH="$PWD:$PWD/app" SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
-  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend spark \
-  --phase1-model qwen36-fast --phase4-model qwen36-fast \
+  python -m app.pipeline_cli.pipeline --phased --backend spark \
   --book al-tawhid --workers 8
 ```
+When `--backend spark`, all three phase models default to `qwen36-fast`. Drop in `--skip-scholarly` to disable Phase 3 (no longer the recommendation).
 
 Override the endpoint with `SPARK_BASE_URL=http://192.168.0.66:8000/v1` (the default). To revert to OpenAI Phase 1 + Spark Phase 4: `--phase1-model gpt-5.4 --phase4-model qwen36-fast`.
 
 ### What's left to address (chunked into deferred items)
 
 - **Phase 1 chunk under-segmentation**: Qwen tends to merge body+quran_quote+closing into one body chunk. Affects narrator highlighting + Quran-quote chunk types. Fix: add 2-3 few-shot examples to the Phase 1 prompt showing baseline-style chunk granularity. Untested.
+
+## Round H — Phase 3 (scholarly enrichment) on Spark (2026-05-13)
+
+**Question**: Phase 3 has been `--skip-scholarly` since v3 because the original plan needed Claude ($8,700) for scholarly depth. Can Spark/Qwen do useful enrichment?
+
+**Setup**: 10 al-tawhid verses (mix of book opening, short isnad+matn, theological hadith). Each gets the existing Phase 1 EN summary + a Spark-routed `enrich_scholarly()` call returning a strict JSON `{enriched_summary, additional_quran_refs}`.
+
+**Results** (`benchmark/phase3_spark/pairs.md`):
+
+Phase 3 consistently adds across all 10 verses:
+1. **Source attribution** — names al-Saduq as compiler, identifies the work, often names the Imam.
+2. **Sectarian framing** — "Shia emphasis on...", "Shia theological discourse on..." — Phase 1 stays neutral.
+3. **Theological vocabulary** — *Ma'rifah*, *Shafa'ah*, *Aqidah*, *ikhlas*, *Al-Ahad*, *thaman* — woven inline with meanings.
+4. **Cross-concept linking** — eschatology, sacred geography of Mecca, Shia-distinct rituals (Fitrah noted as distinct Shia practice).
+5. **Additional Quran refs** — every verse got 1-2 thematically defensible new refs (112:4, 39:65, 9:103, etc.).
+
+**Sample delta** (al-tawhid:2:1:5 — Tawhid + Paradise for sinners):
+- P1: "establishes that monotheism is the primary condition for entering Paradise. It teaches that even if a person committed sins... their ultimate destination is Paradise."
+- P3: "...supports the doctrine of *intercession* (Shafa'ah) and the belief that while major sins incur punishment, they do not result in eternal exclusion... ensuring that Shirk remains the only unforgivable sin..."
+
+Phase 1 paraphrases; Phase 3 names the doctrine and distinguishes the special case.
+
+**One hallucination caught** (10% on this sample): al-tawhid:2:1:11 → P3 said *"this hadith from al-Kulayni's *al-Tawhid*"*. Wrong — al-Kulayni wrote *al-Kafi*; *al-Tawhid* is by al-Saduq. Factual error of the compiler-attribution class.
+
+**Verdict**: enable Phase 3 on Spark. The depth gain is real and consistent. Hallucination class identified is amenable to a cheap post-hoc guard (cross-check enriched_summary against the book's known compiler from `book_registry.py` — flagged in deferred items).
+
+**Cost / wall time impact**: $0 on Spark, ~3s extra per verse. 48K verses → ~40h additional Spark time. New total wall-time projection: ~17-20 days for all-Spark including Phase 3.
+
+## Round I — make Phase 3 the production default (2026-05-13)
+
+**Change**: dropped `--skip-scholarly` from the recommended Spark invocation. With `--backend spark`, all three phase models now default to `qwen36-fast` (Phase 3 included), so the minimal command is:
+
+```bash
+python -m app.pipeline_cli.pipeline --phased --backend spark --book X --workers 8
+```
+
+Users can still opt out with `--skip-scholarly` or override `--phase3-model`. Code changes:
+- `PipelineConfig.phase3_model` field added
+- `--phase3-model` CLI flag added (default: `sonnet` to preserve the claude path; auto-overrides to `qwen36-fast` under `--backend spark`)
+- `scholarly_phase._spark_scholarly_schema()` added — strict JSON-schema with `enriched_summary` + regex-validated `additional_quran_refs`
+- `enrich_scholarly()` now accepts `backend="spark"` (alias for `openai`), auto-attaches the schema when `is_spark_model(model)` is True. Default-config path keeps the existing free-form parser.
 - **Native-speaker review for ur/bn**: I can't reliably judge these languages. Before committing to Spark for production runs, get a one-page native check.
 - **Spark uptime concern**: 14+ days of dedicated Spark runtime is a real operational consideration (concurrent ComfyUI/Goose/Hermes use blocked, network/container hiccups across 2 weeks). Mitigation: corpus is resumable (`is_complete` skips already-processed verses), so interruption isn't catastrophic.
 - **Auto-merge into ThaqalaynData**: Existing `build_lean_ai_content()` merger should work as-is since Qwen output is the same shape as OpenAI output. Untested.
@@ -336,12 +377,14 @@ Override the endpoint with `SPARK_BASE_URL=http://192.168.0.66:8000/v1` (the def
 ### How to use
 
 ```bash
-# Most aggressive cost savings (~$1,330 saved on 48K verses, ~17 days Spark wall time)
+# All-Spark with Phase 3 scholarly enrichment ON (recommended; ~$1,330 saved on
+# 48K verses, ~14-17 days Spark wall time). All three phase models default to
+# qwen36-fast under --backend spark.
 PYTHONPATH="$PWD:$PWD/app" SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
-  python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend spark \
-  --phase1-model qwen36-fast --phase4-model qwen36-fast --book al-tawhid --workers 8
+  python -m app.pipeline_cli.pipeline --phased --backend spark \
+  --book al-tawhid --workers 8
 
-# Recommended hybrid (~$270 saved, ~3 days, preserves Phase 1 chunk granularity)
+# Hybrid (Phase 1 OpenAI, Phase 4 Spark, Phase 3 skipped)
 PYTHONPATH="$PWD:$PWD/app" SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
   python -m app.pipeline_cli.pipeline --phased --skip-scholarly --backend spark \
   --phase1-model gpt-5.4 --phase4-model qwen36-fast --book al-tawhid --workers 8

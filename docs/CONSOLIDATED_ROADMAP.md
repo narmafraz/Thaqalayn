@@ -167,6 +167,27 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 - Interactive network graph (PPL-19) — PLANNED
 - Side-by-side narrator comparison (PPL-13) — PLANNED
 
+### 3.5 Narrator Registry Enrichment (Spark-enabled, 2026-05-13)
+
+Originally planned in `PIPELINE_OPTIMIZATION_PLAN.md` Step 4 ("Phase 0 narrator bio batch", ~$750 Claude) and deferred indefinitely due to cost. With Spark/Qwen the marginal cost is $0 — feasible now.
+
+The `canonical_narrators.json` registry has 4,544 entries today with only `canonical_name_ar`, `canonical_name_en`, `role`, `variants_ar`, `disambiguation_context`. The fields below are **all missing**. Spark batch would fill them once and the result lands in every verse via the existing `NarratorRegistry` lookup.
+
+| Field | Description | Status |
+|------|-------------|--------|
+| Biographical paragraph | 2-3 sentences: who they are, era, school, teachers/students, reliability notes | **PLANNED — Spark batch** |
+| Death date (Hijri) | Year of death where known | **PLANNED — Spark batch** |
+| Epithets / kunya / nisba | Full traditional honorifics | **PLANNED — Spark batch** |
+| Reliability classification | Sunni/Shia rijal assessments (thiqa, weak, etc.) | **PLANNED — Spark batch** (requires reference corpus) |
+| Multi-language names — `name_{ur,tr,fa,id,bn,es,fr,de,ru,zh}` | Transliteration in each UI language (Urdu uses Arabic script natively; others get target-script renderings) | **PLANNED — Spark batch** |
+| Bio paragraph translations | Same 10-language coverage as `name_*` | **PLANNED — Spark batch** |
+
+**Estimated effort**: 1 batch run on Spark = ~4,544 verses × 11 languages × ~2-3 calls each = ~150K calls. At Spark's ~50-200 tok/s aggregate this is ~1-3 days continuous. Zero $ cost. Result is a single enriched `canonical_narrators.json`; UI consumes via existing narrator hover cards + narrator profile pages.
+
+**Open question** (decide at run time): do biographies need source citations (rijal works like Najashi, Tusi's Fihrist) or are Qwen's untrained-on-Shia-rijal answers good enough for v1? Recommend a 50-narrator pilot before committing.
+
+**Hallucination risk**: similar to Phase 3 compiler-attribution case — Qwen could invent death dates or misclassify reliability. Mitigations: cross-check biographical fact-claims against existing reference data; flag low-confidence entries via a `confidence: low/medium/high` field per narrator.
+
 ---
 
 ## Priority 4: Frontend — Search & Discovery Improvements

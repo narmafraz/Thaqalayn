@@ -17,6 +17,10 @@ const routes: Routes = [
     loadChildren: () => import('../features/people/people.module').then(m => m.PeopleModule)
   },
   {
+    path: 'words',
+    loadChildren: () => import('../features/words/words.module').then(m => m.WordsModule)
+  },
+  {
     path: '',
     loadChildren: () => import('../features/static-pages/static-pages.module').then(m => m.StaticPagesModule)
   },

@@ -1,0 +1,81 @@
+.word-root-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.loading-state,
+.not-found-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.root-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant, #ddd);
+}
+
+.root-title {
+  font-size: 3rem;
+  margin: 0 0 0.5rem;
+  font-family: var(--arabic-font, 'Amiri', serif);
+}
+
+.root-camel,
+.root-stats {
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface-variant, #555);
+  margin: 0.25rem 0;
+}
+
+.lemma-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem;
+}
+
+.lemma-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--mat-sys-surface-variant, #f5f5f5);
+  transition: background 120ms ease;
+
+  &:hover,
+  &:focus {
+    background: var(--mat-sys-secondary-container, #e0d4f7);
+  }
+}
+
+.lemma-arabic {
+  flex: 1;
+  font-size: 1.3rem;
+  font-family: var(--arabic-font, 'Amiri', serif);
+}
+
+.lemma-pos {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  background: var(--mat-sys-tertiary-container, #d4e8f7);
+  color: var(--mat-sys-on-tertiary-container, #003a5e);
+}
+
+.lemma-freq {
+  font-size: 0.8rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: var(--mat-sys-on-surface-variant, #666);
+  margin: 0 0 1rem;
+}

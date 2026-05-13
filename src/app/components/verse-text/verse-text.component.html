@@ -13,7 +13,7 @@
             matTooltip="{{ 'settings.ai.showDiacritizedText' | translate }}">
       <mat-icon>{{ showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
     </button>
-    <button *ngIf="hasWordAnalysis" class="ai-toggle-btn" (click)="toggleWordAnalysis()"
+    <button *ngIf="hasWordByWord" class="ai-toggle-btn" (click)="toggleWordAnalysis()"
             [class.active]="showWordAnalysis"
             [attr.aria-label]="showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
             matTooltip="{{ 'settings.ai.showWordAnalysis' | translate }}">
@@ -40,7 +40,7 @@
   <!-- ===== ARABIC TEXT SECTION ===== -->
 
   <!-- Word-by-word analysis (replaces Arabic text when active) -->
-  <div *ngIf="showWordAnalysis && hasWordAnalysis" class="word-analysis-grid" dir="rtl" lang="ar">
+  <div *ngIf="showWordAnalysis && hasWordByWord" class="word-analysis-grid" dir="rtl" lang="ar">
     <div class="word-analysis-lang-select">
       <select [(ngModel)]="wordAnalysisLang" [attr.aria-label]="'book.wordTranslationLanguage' | translate" class="word-lang-select">
         <option value="en">English</option>
@@ -57,7 +57,7 @@
       </select>
     </div>
     <div class="word-cards">
-      <div *ngFor="let entry of wordAnalysis; let i = index"
+      <div *ngFor="let entry of wordTokens; let i = index"
            class="word-card"
            [class.active]="activeWordIndex === i"
            (click)="setActiveWord(i, $event)"
@@ -66,10 +66,12 @@
            (keydown.enter)="setActiveWord(i, $event)"
            (keydown.space)="setActiveWord(i, $event)"
            [attr.aria-expanded]="activeWordIndex === i"
-           [attr.aria-label]="entry.word + ' - ' + getPosLabel(entry.pos)">
+           [attr.aria-label]="entry.pos ? (entry.word + ' - ' + getPosLabel(entry.pos)) : entry.word">
         <span class="word-arabic">{{ entry.word }}</span>
-        <span class="word-translation" dir="ltr">{{ entry.translation[wordAnalysisLang] }}</span>
-        <span class="word-pos" [style.color]="getPosColor(entry.pos)">{{ getPosLabel(entry.pos) }}</span>
+        <span class="word-translation" dir="ltr" *ngIf="entry.translation && entry.translation[wordAnalysisLang]">
+          {{ entry.translation[wordAnalysisLang] }}
+        </span>
+        <span class="word-pos" *ngIf="entry.pos" [style.color]="getPosColor(entry.pos)">{{ getPosLabel(entry.pos) }}</span>
       </div>
     </div>
     <!-- Word detail popup -->
@@ -79,15 +81,22 @@
          role="dialog"
          [attr.aria-label]="'book.wordDetails' | translate">
       <div class="word-popup-arabic" lang="ar" dir="rtl">{{ wordPopup.entry.word }}</div>
-      <div class="word-popup-pos">
-        <span class="word-popup-pos-badge" [style.background-color]="getPosColor(wordPopup.entry.pos)">
-          {{ getPosLabel(wordPopup.entry.pos) }}
+      <div class="word-popup-pos" *ngIf="popupPos">
+        <span class="word-popup-pos-badge" [style.background-color]="getPosColor(popupPos)">
+          {{ getPosLabel(popupPos) }}
         </span>
       </div>
-      <div class="word-popup-translation" *ngIf="wordPopup.entry.translation[wordAnalysisLang]">
-        <span class="word-popup-lang-label">{{ getWordLangLabel(wordAnalysisLang) }}</span>
-        <span class="word-popup-trans-text">{{ wordPopup.entry.translation[wordAnalysisLang] }}</span>
+      <div class="word-popup-loading" *ngIf="popupLemmaLoading && !popupTranslation">
+        <mat-spinner diameter="16"></mat-spinner>
       </div>
+      <div class="word-popup-translation" *ngIf="popupTranslation">
+        <span class="word-popup-lang-label">{{ getWordLangLabel(wordAnalysisLang) }}</span>
+        <span class="word-popup-trans-text">{{ popupTranslation }}</span>
+      </div>
+      <a class="word-popup-link" *ngIf="wordPopup"
+         [routerLink]="['/words', wordHref(wordPopup.entry.word)]">
+        Full word page →
+      </a>
       <button class="word-popup-close" (click)="closeWordPopup()" [attr.aria-label]="'common.close' | translate" tabindex="0">&times;</button>
     </div>
   </div>

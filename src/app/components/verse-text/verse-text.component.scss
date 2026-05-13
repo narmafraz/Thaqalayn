@@ -358,6 +358,24 @@
       color: var(--text-primary, #333);
     }
   }
+
+  .word-popup-loading {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0;
+  }
+
+  .word-popup-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--mat-sys-primary, #5e2bdb);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 }
 
 :host-context(body.dark-theme) .word-popup {

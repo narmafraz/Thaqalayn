@@ -3,7 +3,10 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AiLanguage, AiTranslationEntry, Chunk, ContentType, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { NarratorMetadata, Verse } from '@app/models';
 import { SpecialText } from '@app/models/book';
+import { LemmaPage } from '@app/models/word';
 import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
+import { WordsService } from '@app/services/words.service';
+import { slug as wordSlug } from '@app/services/word-normalize';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { PeopleState } from '@store/people/people.state';
@@ -26,8 +29,13 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   private aiPrefs = inject(AiPreferencesService);
   private sanitizer = inject(DomSanitizer);
   private cdr = inject(ChangeDetectorRef);
+  private words = inject(WordsService);
   private destroy$ = new Subject<void>();
   private localOverride = false;
+
+  /** Lemma data fetched lazily on word-card click, keyed by surface slug. */
+  popupLemma: LemmaPage | null = null;
+  popupLemmaLoading = false;
 
   @Input() verse: Verse;
   @Input() isQuran = false;
@@ -116,12 +124,17 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     if (this.activeWordIndex === index) {
       this.activeWordIndex = null;
       this.wordPopup = null;
+      this.popupLemma = null;
+      this.popupLemmaLoading = false;
       return;
     }
     this.activeWordIndex = index;
     if (index !== null && event) {
-      const entry = this.wordAnalysis[index];
+      const entry = this.wordTokens[index];
       if (entry) {
+        // Lazy-load the lemma in parallel so the popup hydrates after
+        // a network round-trip. Cached via WordsService.shareReplay.
+        this.loadPopupLemma(entry.word);
         const target = event.currentTarget as HTMLElement;
         const containerRect = target.closest('.word-analysis-grid')?.getBoundingClientRect();
         const cardRect = target.getBoundingClientRect();
@@ -157,6 +170,8 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   closeWordPopup(): void {
     this.activeWordIndex = null;
     this.wordPopup = null;
+    this.popupLemma = null;
+    this.popupLemmaLoading = false;
   }
 
   @HostListener('document:keydown.escape')
@@ -224,8 +239,99 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return !!this.verse?.ai?.word_analysis?.length;
   }
 
+  /** True when word-by-word view can be shown — either v3 `word_analysis`
+   * is present, or v4 chunks have inline Arabic text we can tokenize. */
+  get hasWordByWord(): boolean {
+    if (this.hasWordAnalysis) return true;
+    const chunks = this.verse?.ai?.chunks;
+    return !!chunks?.some(c => !!c.arabic_text);
+  }
+
   get wordAnalysis(): WordAnalysisEntry[] {
     return this.verse?.ai?.word_analysis || [];
+  }
+
+  /**
+   * Word entries for the word-by-word view. Falls back to whitespace-
+   * tokenized chunk text when v3 `word_analysis` is absent. Each
+   * fallback token has empty `translation` + placeholder `pos` — the
+   * UI then lazy-loads the lemma on card click to populate them.
+   */
+  get wordTokens(): WordAnalysisEntry[] {
+    if (this.hasWordAnalysis) return this.wordAnalysis;
+    const chunks = this.verse?.ai?.chunks;
+    if (!chunks?.length) return [];
+    const out: WordAnalysisEntry[] = [];
+    for (const c of chunks) {
+      const text = (c.arabic_text || '').trim();
+      if (!text) continue;
+      // Split on whitespace; strip leading/trailing Arabic punctuation
+      // (، . ؟ ؛ ! : ()).
+      for (const raw of text.split(/\s+/)) {
+        const token = raw.replace(/^[،.؟؛!:()«»\-]+|[،.؟؛!:()«»\-]+$/g, '');
+        if (!token) continue;
+        // Cast through `unknown` because the v3 schema requires the
+        // full translation/pos shape we don't have yet — UI guards
+        // with *ngIf on entry.pos and entry.translation[lang].
+        out.push({
+          word: token,
+          pos: '' as any,
+          translation: {} as any,
+        } as unknown as WordAnalysisEntry);
+      }
+    }
+    return out;
+  }
+
+  /** URL-safe slug for a word token (NFC + percent-encode happens in service). */
+  wordHref(word: string): string {
+    return wordSlug(word);
+  }
+
+  /**
+   * Lazy-load the lemma data for a clicked word and merge it into the
+   * popup so POS and translation light up after the network round-trip.
+   * Uses WordsService which has shareReplay caching — fetches each
+   * lemma at most once per session.
+   */
+  private loadPopupLemma(surface: string): void {
+    this.popupLemma = null;
+    this.popupLemmaLoading = true;
+    this.cdr.markForCheck();
+    this.words.getSurface(surface).subscribe(surfacePage => {
+      if (!surfacePage?.morphology?.lemma_slug) {
+        this.popupLemmaLoading = false;
+        this.cdr.markForCheck();
+        return;
+      }
+      const lemmaSlug = surfacePage.morphology.lemma_slug;
+      this.words.getLemma(lemmaSlug).subscribe(lemma => {
+        this.popupLemma = lemma;
+        this.popupLemmaLoading = false;
+        this.cdr.markForCheck();
+      });
+    });
+  }
+
+  /** Resolve the popup's translation/POS from either the inlined v3
+   * `entry.translation` or the lazy-loaded LemmaPage's first sense. */
+  get popupTranslation(): string {
+    if (!this.wordPopup) return '';
+    // Inline v3 translation first.
+    const t = this.wordPopup.entry.translation;
+    const inline = t?.[this.wordAnalysisLang];
+    if (inline) return inline;
+    // Fall back to lemma definition first-sense gloss (en only for now).
+    if (this.popupLemma && this.wordAnalysisLang === 'en') {
+      return this.popupLemma.definition?.senses?.[0]?.gloss || '';
+    }
+    return '';
+  }
+
+  /** Popup POS — either inline (v3) or lemma.pos from lazy-load. */
+  get popupPos(): string {
+    if (!this.wordPopup) return '';
+    return this.wordPopup.entry.pos || this.popupLemma?.pos || '';
   }
 
   get hasChunks(): boolean {

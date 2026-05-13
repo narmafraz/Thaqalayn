@@ -1,0 +1,76 @@
+<div class="word-surface-page">
+  <div *ngIf="loading" class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <div *ngIf="notFound" class="not-found-state">
+    <p>No surface page found for <code>{{ slug }}</code>.</p>
+    <a routerLink="/words">← Browse words</a>
+  </div>
+
+  <ng-container *ngIf="surface && !loading">
+    <header class="surface-header">
+      <h1 class="surface-title" lang="ar" dir="rtl">{{ surface.surface }}</h1>
+      <p class="surface-stats">
+        Appears <strong>{{ surface.occurrence_count | number }}</strong> times across
+        <strong>{{ surface.occurrence_paths.length | number }}</strong> hadiths.
+      </p>
+    </header>
+
+    <section class="morphology" *ngIf="surface.morphology as m">
+      <h2>Morphology</h2>
+      <dl class="morphology-grid">
+        <dt>Lemma</dt>
+        <dd>
+          <a [routerLink]="['/words/lemmas', m.lemma_slug]" lang="ar" dir="rtl" class="lemma-link">
+            {{ m.lemma_slug }}
+          </a>
+        </dd>
+        <ng-container *ngIf="m.root">
+          <dt>Root</dt>
+          <dd>
+            <span lang="ar" dir="rtl"><code>{{ m.root }}</code></span>
+            <span class="hint">(<code>#</code> = weak/hollow radical)</span>
+          </dd>
+        </ng-container>
+        <ng-container *ngIf="m.pos">
+          <dt>Part of speech</dt>
+          <dd>
+            <span class="pos-badge">{{ m.pos }}</span>
+            <span class="hint">{{ posName(m.pos) }}<ng-container *ngIf="m.pos_camel && m.pos_camel !== posName(m.pos)"> · CAMeL: {{ m.pos_camel }}</ng-container></span>
+          </dd>
+        </ng-container>
+        <ng-container *ngIf="clitic_entries(m.clitics).length">
+          <dt>Affixes</dt>
+          <dd>
+            <ul class="clitic-list">
+              <li *ngFor="let c of clitic_entries(m.clitics)">
+                <code>{{ c.slot }}</code> = <code>{{ c.code }}</code>
+                <span class="hint">{{ cliticLabel(c.slot, c.code) }} · {{ slotLabel(c.slot) }}</span>
+              </li>
+            </ul>
+          </dd>
+        </ng-container>
+      </dl>
+    </section>
+
+    <section class="morphology missing" *ngIf="!surface.morphology">
+      <p>No morphological analysis available for this surface (typically a
+        proper noun, transliterated text, or unknown token).</p>
+    </section>
+
+    <section class="occurrences">
+      <h2>Occurrences in the corpus</h2>
+      <ul class="path-list">
+        <li *ngFor="let p of visiblePaths">
+          <app-path-link [path]="p"></app-path-link>
+        </li>
+      </ul>
+      <button *ngIf="surface.occurrence_paths.length > pathsVisible"
+              type="button" mat-button class="show-more"
+              (click)="showMorePaths()">
+        Show more ({{ surface.occurrence_paths.length - pathsVisible | number }} remaining)
+      </button>
+    </section>
+  </ng-container>
+</div>

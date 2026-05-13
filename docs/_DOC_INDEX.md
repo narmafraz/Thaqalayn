@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-05-10
+> **Last updated:** 2026-05-12
 
 ## Status Legend
 
@@ -115,3 +115,9 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **ACTIVE** (Session 1 complete + deployed) | Per-word Arabic dictionary. **Session 1 done 2026-05-11**: 102K surface pages + 13K lemma pages + 2,769 root pages live at <https://thaqalaynwords.netlify.app/>. 76% of lemmas have Wiktextract-merged definitions/etymology/IPA already. Deterministic build (CAMeL Tools + 4 source indexes — QAC, Wiktextract, Lane's, Mufradat) with full validation. Next: UI integration (Track A), Lane's body parsing (Track B), then optional LLM augmentation for translations + corpus-context definitions (Track C, $680-$2,600). |
+
+### 2026-05-12
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [PHASE4_OPENWEIGHT_BENCHMARK.md](PHASE4_OPENWEIGHT_BENCHMARK.md) | **COMPLETE** | First Phase 4-specific quality benchmark. 30 verses × 3 models (gpt-4.1-mini, gpt-5.4-mini, qwen36-fast). Verdict: Qwen 3.6-35B on DGX Spark **not ready** for production (88.6% parse rate, ~62 s/verse, factual errors). **Side finding**: gpt-5.4-mini provides no measurable Phase 4 quality lift over gpt-4.1-mini at 5× the output cost — recommend flipping the `--phase4-model` default. |

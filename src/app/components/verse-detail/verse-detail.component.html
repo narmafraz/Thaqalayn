@@ -18,7 +18,7 @@
     <mat-card appearance="outlined" class="hadith-card">
       <mat-card-content>
         <!-- AI feature toggles -->
-        <div class="verse-detail-toggles" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasNarratorChain">
+        <div class="verse-detail-toggles" *ngIf="vt.hasAiText || vt.hasWordByWord || vt.hasNarratorChain">
           <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
                   [class.active]="vt.showChainDiagram"
                   [attr.aria-label]="vt.showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
@@ -31,7 +31,7 @@
                   matTooltip="{{ 'settings.ai.showDiacritizedText' | translate }}">
             <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
           </button>
-          <button *ngIf="vt.hasWordAnalysis" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
+          <button *ngIf="vt.hasWordByWord" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
                   [class.active]="vt.showWordAnalysis"
                   [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
                   matTooltip="{{ 'settings.ai.showWordAnalysis' | translate }}">

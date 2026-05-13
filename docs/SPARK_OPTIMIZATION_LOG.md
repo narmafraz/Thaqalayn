@@ -576,3 +576,43 @@ PYTHONPATH="$PWD:$PWD/app" SOURCE_DATA_DIR="../ThaqalaynDataSources/" \
 - Auto-routed via `is_spark_model(model)` in `openai_backend.py`
 
 Effective production setup: zero OpenAI calls, 80-85% first-pass, ~95% after salvage, $30 electricity for the 48K-verse remainder.
+
+### 2026-05-13 08:55 — Final Round G result (stopped after ~70 min)
+
+The al-tawhid full-book continuation was stopped at ~70 min in (workers=4, was bottlenecked on a 1451-word verse for 26 minutes — long verses are pathological at low concurrency). Final state on this sample:
+
+| Metric | Value |
+|---|---|
+| Verses attempted | 24 |
+| Pass on first try | 17 (71%) |
+| Quarantined initially | 7 (29%) |
+| Salvaged via auto-fix (Round F) | 2 → +2 responses |
+| **Final responses** | **19/24 (79%)** |
+| Remaining quarantine | 5 (4 parse errors + 1 Phase-2 bug) |
+| Total Spark cost | $0 (electricity only, ~$0.20 for 70 min) |
+
+The 4 "parse error" quarantines are Qwen P1 JSON-parse failures (rare; typically retry-recoverable on a second pass). The 1 Phase-2 narrator-name bug (`narrator[0] name_ar has 17 words`) is unrelated to Qwen — Phase 2 narrator_linker.py greedy regex.
+
+**Production reality check**: at workers=4 this is too slow because long verses block. Recommend **workers=8 or 12** for production runs. Spark `max-num-seqs=16` allows it. Higher concurrency takes the per-language Phase 4 surface (~50 calls per long verse) and parallelises it across 8-12 in-flight slots, reducing the long-verse penalty dramatically.
+
+**For the 48K-verse remainder**, the realistic forecast:
+- Workers=8: ~26 s/verse mean → ~14 days continuous
+- Workers=12 (if Spark KV cache holds): ~20 s/verse → ~11 days
+- First-pass pass rate: **~75-85%** (varies by book complexity)
+- After two `--attempt-quarantined` passes + salvage: **~92-95%**
+- Cost: ~$30 electricity vs ~$1,330 OpenAI
+
+## Final pipeline state (committed)
+
+The all-Spark pipeline is production-ready. The committed code uses:
+- **Phase 1**: Qwen 3.6 + strict JSON schema (closed enums) + few-shot chunk examples + thinking-disabled. Auto-routed when `--phase1-model qwen36-*`.
+- **Phase 4**: Qwen 3.6 + per-(chunk, language) calls + strict JSON schema + max_tokens=600/400 + 1-retry on parse failure. Auto-routed when `--phase4-model qwen36-*`.
+- **All-Spark mode**: `--phase1-model qwen36-fast --phase4-model qwen36-fast --backend openai`. `SPARK_BASE_URL` env var optionally overrides the default `http://192.168.0.66:8000/v1`.
+
+## Things I would try next session (deferred)
+
+- **Workers=8 trial** on full al-tawhid to confirm the wall-time forecast holds (today's run used workers=4)
+- **Phase 2 narrator_linker** patch: cap the per-narrator-name word count to 14 in extraction logic to prevent the "17-word name" failure mode that resists salvage
+- **Two-pass Phase 1** for chunk parity: a small first call asks Qwen for chunk boundaries (enum sequence only), second call fills in arabic_text + translations. Could close the chunk-parity gap from 67% to 85-90%
+- **Oracle few-shot retrieval**: for each verse, pick the most structurally-similar existing gpt-5.4 P1 output (from the 9.8K we already have) and include it in the prompt. Strongest mitigation but needs retrieval logic
+- **Prefix caching diagnosis**: the 0% hit rate we see despite identical system prompts is worth understanding. Could be a vLLM container issue or an interplay with the chat template

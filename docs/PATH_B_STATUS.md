@@ -10,12 +10,16 @@ in progress on Spark Qwen 3.6-35B at $0.
 
 | Background task | Status | ETA |
 |---|---|---|
-| Lemma full pass (13K lemmas) | **running** | ~3.7 h total, ~3.5 h remaining as of 02:20 |
-| Corpus context extraction (102K surfaces) | **running** | ~10-20 min |
-| Surface prompt extraction (full corpus) | **pending** — blocked on contexts | ~5 min after contexts done |
-| Surface full pass (~102K surfaces) | **pending** — blocked on lemma pass + surface prompts | ~9-11 h |
-| Merge translations into pages | **pending** — last step | ~2 min |
-| Rebuild word indexes | **pending** — emits the 11-lang `glosses` map | ~10 s |
+| Lemma full pass (13K lemmas) | **running** | ~2.5 h (was ~3.7h; restarted with per-item persistence fix at 02:40, currently at ~1.4 items/s) |
+| Corpus context extraction (102K surfaces) | **done** | surface_contexts.json = 33.5 MB |
+| Surface prompt extraction (full corpus) | **pending** — chain script will run after lemma | ~5 min |
+| Surface full pass (~102K surfaces) | **pending** — chain script will run | ~9-11 h |
+| Merge translations into pages | **pending** — chain script | ~2 min |
+| Rebuild word indexes | **pending** — chain script | ~10 s |
+
+**Chain script**: `scripts/path_b_continue_after_lemmas.ps1` is running detached (PID logged in `path_b_continue.log`). It polls for lemma_responses to reach 13000 files and then chains the rest of the pipeline automatically. So unattended completion *should* happen — just check `path_b_continue.log` when you return.
+
+**Critical bug fixed at 02:38**: the runner was persisting all results AFTER `asyncio.gather` returned (so a 13K-item run that died mid-way lost everything). Now persists per-item via the progress callback. Resume on re-launch works correctly. Lemma pass restart cost ~25 min of compute.
 
 ## Resumability
 

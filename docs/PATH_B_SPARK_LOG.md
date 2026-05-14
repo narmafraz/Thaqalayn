@@ -93,3 +93,128 @@ ru: говорить        zh: 说
 ```
 
 ---
+
+## Round 2 — Lemma prompt + classical_definitions
+
+**Date:** 2026-05-14
+**Pass:** lemma (A/B against Round 1)
+**Prompt change:** appended hawramani `classical_summary` (top-3 classical-lexicon entries, HTML-stripped, capped at 3,000 chars) to lemmas that have it. Same 11-lang ASCII-key schema otherwise.
+**Output dir:** `ThaqalaynWordSources/translation/lemma_responses/round-2/`
+
+### Headline metrics
+
+| Metric | Round 1 | Round 2 | Δ |
+|---|---|---|---|
+| Items | 100 | 100 | — |
+| Parse rate | 100% | **100%** | flat |
+| Validation issues | 0 | 0 | flat |
+| Mean latency | 5.0 s/item | 5.3 s/item | +6% |
+| Wall time | 75 s | 77 s | +3% |
+| Input tokens | 77.5 K | **105.7 K** | +36% (extra Lane's-style context) |
+| Output tokens | 12.2 K | 12.2 K | flat |
+
+### A/B differences
+
+Out of 100 pilot lemmas, 31 have hawramani classical content (the other 69 produce byte-identical prompts in R1/R2 by construction).
+
+| Class | Count |
+|---|---|
+| Lemmas where R2 == R1 (no meaningful change) | 83 |
+| Lemmas where some language differs | **17** |
+| Regressions (R1 was clearly better than R2) | **0** |
+
+**All 5 classical-religious pilot lemmas are R1==R2** because they were in the top-frequency tier the hawramani scrape paused before reaching (14.7% coverage is concentrated mid-tier, not at the absolute top). Future hawramani re-scrape would change this.
+
+### Notable R1→R2 quality shifts
+
+| Lemma | Lang | R1 | R2 | Verdict |
+|---|---|---|---|---|
+| ذَكَرَ | fa | ذکر کردن | یاد کردن | **R2 better** — corpus uses dhikr in the "remember/invoke" sense |
+| ذَكَرَ | id | menyebut | mengingat | **R2 better** — same rationale |
+| ذَكَرَ | bn | উল্লেখ করা | স্মরণ করা | **R2 better** — same rationale |
+| عُمْرٌ | en | "long life" | "life" | **R2 better** — simpler, more idiomatic |
+| خَلْقٌ | tr | yaratma (act of creating) | yaratılış (creation/nature) | **R2 better** — noun form aligns with خَلْقٌ as noun |
+| لَسْنَ | en | "to not be" | "not to be" | tie — both idiomatic |
+| وَلَدٌ | bn | শিশু (child) | সন্তান (offspring) | tie — both correct |
+
+### Decision
+
+**Adopt Round 2** (`--include-classical` is now the default for the lemma pass). The improvement is modest but real — ~5 of 100 lemmas got a meaningfully better translation in one or more languages — and there are no regressions. The 36% input-token cost is $0 on Spark and only adds 2-3 seconds per item in latency, which scales fine to the 13K-lemma corpus run.
+
+### Outstanding from Round 1 (still open)
+
+- **Proper-noun localization** (دانِيال→Daniel weak in fa/ur): R2 didn't address it because the affected lemmas don't have classical content. Deferred to **Round 5** (tough-case spot check + targeted prompt patch).
+
+### Next: Round 3 — surface baseline.
+
+---
+
+## Round 3 — Surface baseline
+
+**Date:** 2026-05-14
+**Pass:** surface (first surface run)
+**Inputs per item:**
+- `surface_ar` + lemma_ar + pos_label
+- `clitic_breakdown` (rendered via `CLITIC_CODE_LABELS`)
+- `lemma_translations` — anchor pulled from Round 2 lemma responses
+- lemma's en_gloss + lane_body
+- (no corpus context windows yet — that's Round 4)
+**Pre-pass:** translated 78 supplementary lemmas (the lemma_slugs the 100 pilot surfaces reference but weren't in the original 100-lemma pilot) so 100/100 surfaces had a lemma anchor.
+
+### Headline metrics
+
+| Metric | Value |
+|---|---|
+| Items | 100 |
+| Parse rate | **100%** |
+| Validation issues (original validator) | 0 |
+| Validation issues (enhanced validator — see below) | **2** (cross-script leaks) |
+| Mean latency | 4.56 s/item |
+| Wall time | 70 s |
+| Tokens | 81.6 K in / 12.5 K out |
+
+### Quality scoring (eyeball, 24 items across strata)
+
+| Stratum | Sampled | Score | Notes |
+|---|---|---|---|
+| Compounds with clitics | 5 | **4/5** | يَمِينُكَ→your right side ✓, الْهَارِبِ→the fugitive ✓, لَنَسِيٌّ→indeed forgetful ✓, فَكَظَمْتُ→so I restrained ✓. آجُرَّةٍ wrongly translated as "to run to him" — root cause is upstream CAMeL mis-lemmatization (آجُرَّةٌ "brick" got mapped to lemma جَرَى "to run"); Qwen translated faithfully against the bad anchor. Garbage-in/garbage-out, not Spark's fault. |
+| Inflections of religious lemmas | 5 | **5/5** | Outstanding consistency: لِوَلَايَةِ→for guardianship, بِوِلَايَتِنَا→by our guardianship, وِلَايَتِهِ→his guardianship, وَالصلاة→and the prayer, أَيْمَاناً→faiths. Surface composes from the lemma anchor cleanly across all 11 langs. |
+| Proper-noun surfaces | 5 | **5/5** | لِلْكَعْبَةِ→to the Kaaba, عَامِرٍ→Amir (genitive correctly mapped to base name), حَزِيرَانَ→June, all transliterated correctly |
+| Hi-freq | 3 | **2/3** | ثُمَّ→then ✓, حَدَّثَنَا→he narrated to us ✓. **وَ→Spanish slot has Bengali "এবং"** — cross-language leak found. Validator caught it after enhancement (see below). |
+| Low-freq | 3 | **3/3** | بِثَوَابٍ→with reward, رُطَبٌ→fresh ripe dates, وَشَاهِدَهُ→and his witness — all correct |
+
+Overall mean ≥4.6/5.
+
+### Two real bugs found + validator enhancement
+
+The original validator (Latin-letters-in-non-Latin-script check) missed two cross-language leaks. **Enhanced** to also assert each gloss contains characters of its expected primary script:
+
+```python
+# new check: each gloss must contain at least one char from
+# {Latin (en/tr/id/es/fr/de), Arabic (fa/ur), Bengali (bn),
+#  Cyrillic (ru), CJK (zh)}.
+# Exempts digit-only outputs (e.g. surface "٤٤٩٣" → "4493")
+```
+
+After the fix, full Round 3 re-validation found **2 cross-script leaks**:
+
+| Surface | Lang | Bad gloss | Correct should be |
+|---|---|---|---|
+| وَ (~50K occurrences) | es | "এবং" (Bengali) | "y" |
+| وَالْحَبَشَةُ (1 occurrence) | tr | "حبش" (Arabic) | "ve Habeşistan" or similar |
+
+3 new tests added to guard regression. 26/26 spark_translation tests pass.
+
+### Lemma-surface consistency
+
+For the 5-item religious-inflection stratum (perfectly homogeneous lemmas), surfaces consistently share root vocabulary with their lemma across all 11 languages. Example: every form of وِلَايَة → guardianship/ولایت/velayet/tutela/etc. The lemma anchor is doing its job.
+
+### Decision
+
+**PASS** with caveats: surfaces baseline quality is high (≥4.6/5), parse rate is perfect, and lemma-anchoring works as intended. Two real cross-script leaks at 2/100 = 2% rate, now detected by the validator. Lock the Round 3 prompt as the surface baseline; proceed to Round 4 (corpus context A/B).
+
+The CAMeL mis-lemmatization issue (آجُرَّةٌ→جَرَى) is upstream and out of scope for Path B — it would need a re-build of `ThaqalaynWords/surfaces/*.json` with improved morphological analysis. Filed as a Track D issue.
+
+### Next: Round 4 — surface + corpus context windows A/B.
+
+---

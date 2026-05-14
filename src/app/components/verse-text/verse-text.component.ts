@@ -330,6 +330,15 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return !!chunks?.some(c => !!c.arabic_text);
   }
 
+  /** True when WBW is both *requested* (toggle / saved preference) AND
+   *  the verse has the data needed to render it. Use this for the
+   *  mutual-exclusion guard between WBW grid and standard Arabic — if
+   *  WBW is requested but unavailable, standard Arabic still has to
+   *  render, otherwise the verse is completely blank. */
+  get showWordByWordActive(): boolean {
+    return this.showWordAnalysis && this.hasWordByWord;
+  }
+
   get wordAnalysis(): WordAnalysisEntry[] {
     return this.verse?.ai?.word_analysis || [];
   }

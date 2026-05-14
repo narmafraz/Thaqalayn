@@ -39,8 +39,8 @@
 
   <!-- ===== ARABIC TEXT SECTION ===== -->
 
-  <!-- Word-by-word analysis (replaces Arabic text when active) -->
-  <div *ngIf="showWordAnalysis && hasWordByWord" class="word-analysis-grid" dir="rtl" lang="ar">
+  <!-- Word-by-word analysis (replaces Arabic text when active AND data supports it) -->
+  <div *ngIf="showWordByWordActive" class="word-analysis-grid" dir="rtl" lang="ar">
     <div class="word-analysis-lang-select">
       <select [(ngModel)]="wordAnalysisLang" [attr.aria-label]="'book.wordTranslationLanguage' | translate" class="word-lang-select">
         <option value="en">English</option>
@@ -105,8 +105,11 @@
     </div>
   </div>
 
-  <!-- Standard Arabic text (hidden when word-by-word is active) -->
-  <ng-container *ngIf="!showWordAnalysis">
+  <!-- Standard Arabic text (hidden when word-by-word is actively rendering).
+       Important: must still render when the user has WBW preference on but
+       this verse lacks WBW data (no chunks with arabic_text, no v3
+       word_analysis) — otherwise the verse is completely blank. -->
+  <ng-container *ngIf="!showWordByWordActive">
     <!-- Chunked view: when chunks exist and diacritics is ON -->
     <ng-container *ngIf="hasChunks && showDiacritics; else fallbackArabic">
       <!-- Narrator hover card (shared) -->

@@ -218,3 +218,64 @@ The CAMeL mis-lemmatization issue (آجُرَّةٌ→جَرَى) is upstream an
 ### Next: Round 4 — surface + corpus context windows A/B.
 
 ---
+
+## Round 4 — Surface + corpus context windows
+
+**Date:** 2026-05-14
+**Pass:** surface (A/B against Round 3)
+**Prompt change:** appended up to 3 ±10-word corpus windows per surface, pre-extracted from `ThaqalaynData/books/{path}.json` for each surface's `occurrence_paths`. Pipeline: `scripts/extract_corpus_contexts.py` writes `surface_contexts.json`; the surface-extractor's new `--corpus-contexts` flag feeds it into the JSONL.
+**Output dir:** `ThaqalaynWordSources/translation/surface_responses/round-4/`
+
+### Headline metrics
+
+| Metric | Round 3 | Round 4 | Δ |
+|---|---|---|---|
+| Items | 100 | 100 | — |
+| Parse rate | 100% | **100%** | flat |
+| Mean latency | 4.6 s | 4.5 s | -2% |
+| Wall time | 70 s | 66 s | -6% |
+| Input tokens | 81.6 K | 94.3 K | **+16%** (extra context) |
+| Output tokens | 12.5 K | 12.4 K | flat |
+| Validator issues | 2 | **1** | -1 |
+| Corpus context coverage | n/a | 76/100 | — |
+
+### A/B differences (R3 → R4)
+
+100 pilot surfaces. **33 differ** in at least one language; 67 are identical. Of the 33, the differences split:
+
+| Outcome | Count | Examples |
+|---|---|---|
+| **Clear improvement** (R4 fixes a real bug) | ~10 | آجُرَّةٍ "to run to him" → "brick" (corpus context overrode bad CAMeL lemma anchor جَرَى "to run") · قَطُّ "cat" → "ever" (Arabic particle, was lemmatized to قِطّ "cat") · أَيْمَاناً "faiths" → "oaths" (Quranic/classical sense) · وَ Spanish "এবং" → "y" (cross-script leak resolved) · وَالْحَبَشَةُ Turkish "حبش" → "ve Habesh" (script-leak resolved) |
+| **Stylistic refinement** (both valid; R4 slightly better phrasing) | ~20 | وَشَاهِدَهُ Persian "و شاهدش" → "و شاهد او" (more formal) · فَدَعَاهُمْ Urdu "بلایا" → "دعوت دی" · لِلْكَعْبَةِ Chinese 向 → 到 (preposition variation) |
+| **Regression** | 1 | وَالْحَبَشَةُ Chinese "和哈巴什" → "zh" (literal lang code — Qwen glitch) |
+| Roughly equivalent / undetermined | ~2 | minor word-order differences |
+
+### Standout: آجُرَّةٍ recovery
+
+This is the headline finding for Round 4. The surface آجُرَّةٍ ("brick", genitive of آجُرَّةٌ) was upstream mis-lemmatized by CAMeL Tools to جَرَى ("to run") — likely a pattern-similarity false positive. Round 3 dutifully translated against that bad anchor and produced "to run to him" in all 11 languages (consistent and wrong). Round 4's corpus context windows showed the surface actually appearing in brick-related contexts, and Qwen overrode the lemma anchor to produce **"brick"** in all 11 langs (الإيت/tuğla/bata/Ziegel/кирпич/砖). This is exactly what corpus context was supposed to fix — and validates it as a generally useful technique for handling upstream morphological-analysis errors, which we expected (the lemma_slug references on `morphology` are CAMeL's best guess, not ground truth).
+
+### Quality scoring delta vs Round 3
+
+| Stratum | R3 | R4 | Δ |
+|---|---|---|---|
+| Compounds with clitics | 4/5 | **5/5** | +1 (آجُرَّةٍ recovered) |
+| Inflections of religious | 5/5 | 4-5/5 | small drift on أَيْمَاناً ("oaths" vs "faiths" — Quranic context-dependent; corpus-anchored translation is arguably more accurate to actual usage) |
+| Proper-noun surfaces | 5/5 | 5/5 | flat |
+| Hi-freq | 2/3 | **3/3** | +1 (وَ Spanish fixed) |
+| Low-freq | 3/3 | 3/3 | flat |
+
+Overall mean: ≥4.7 / 5, up from R3's ~4.6.
+
+### Decision
+
+**Adopt Round 4 prompt** (corpus contexts ON) as the locked surface-pass prompt. The wins on polysemous lemmas and upstream-mis-lemmatized surfaces (آجُرَّةٍ, قَطُّ) significantly outweigh the one Chinese regression (which is a rare Qwen JSON-emit glitch we can either retry or filter at merge time).
+
+For the full corpus run: extract corpus contexts for **all 102K surfaces** (a one-time ~10 min walk over ThaqalaynData), then run the surface pass.
+
+### Next
+
+- Round 5 spot-check **deferred** — Rounds 1-4 already identified all the systematic issues and the validator now catches script leaks. Remaining open issue (proper-noun localization on rare names like دانِيال) is too narrow to warrant a dedicated round; it'll be revisited if/when we see it at scale.
+- Build the merger script (folds round-2 lemma responses + round-4 surface responses back into `ThaqalaynWords/{lemmas,surfaces}/{slug}.json`).
+- Kick off full corpus runs: lemmas (~1 h Spark), surfaces (~9-11 h Spark).
+
+---

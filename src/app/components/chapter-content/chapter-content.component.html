@@ -134,7 +134,7 @@
                             [matTooltip]="'book.toggleDiacritics' | translate">
                       <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
                     </button>
-                    <button *ngIf="vt.hasWordAnalysis" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
+                    <button *ngIf="vt.hasWordByWord" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
                             [class.active]="vt.showWordAnalysis"
                             [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
                             [matTooltip]="'book.wordByWordAnalysis' | translate">
@@ -314,7 +314,7 @@
                       [matTooltip]="'book.toggleDiacritics' | translate">
                 <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
               </button>
-              <button *ngIf="vt.hasWordAnalysis" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
+              <button *ngIf="vt.hasWordByWord" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
                       [class.active]="vt.showWordAnalysis"
                       [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
                       [matTooltip]="'book.wordByWordAnalysis' | translate">

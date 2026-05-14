@@ -1,8 +1,8 @@
 # ThaqalaynWords — Per-Word Pages Project Plan
 
-**Status:** **Sessions 1 + 2 complete.** Per-word data API live at <https://thaqalaynwords.netlify.app/>. Full Angular UI shipped (`/words` browse, surface/lemma/root pages, in-verse word-by-word view on every hadith with lazy-loaded morphology + clickable popups). Free-data enrichment partly done (Lane's body parsing complete; hawramani multi-lexicon aggregator covers top ~15% of lemmas; rest blocked on rate-limiting). Temporary English-only gloss-on-index ("Path C") rolled out 2026-05-13 so every word card shows a translation; it is explicitly throwaway and reverts when Path B (LLM translations) lands. **Outstanding:** Path B (10-language LLM translation of lemmas), the gloss tooltip-truncation issue (deferred), and the small Track D polish items.
+**Status:** **Sessions 1 + 2 complete.** Per-word data API live at <https://thaqalaynwords.netlify.app/>. Full Angular UI shipped (`/words` browse, surface/lemma/root pages, in-verse word-by-word view on every hadith with lazy-loaded morphology + clickable popups). Free-data enrichment partly done (Lane's body parsing complete; hawramani multi-lexicon aggregator covers top ~15% of lemmas; rest blocked on rate-limiting). Temporary English-only gloss-on-index ("Path C") rolled out 2026-05-13 so every word card shows a translation; it is explicitly throwaway and reverts when Path B (LLM translations) lands. **Outstanding:** Path B (11-language LLM translation of lemmas + surfaces on Spark Qwen 3.6-35B, ~10-12 h Spark wall time, $0), the gloss tooltip-truncation issue (deferred), and the small Track D polish items.
 **Created:** 2026-05-10
-**Last updated:** 2026-05-13 (Track A complete + Path C temporary glosses + UI polish round)
+**Last updated:** 2026-05-14 (Path B replanned for Spark — lemmas + surfaces, 11 langs, experiment-rounds structure)
 **Owner:** Sadegh Shahrbaf
 
 ## Vision
@@ -883,153 +883,155 @@ Tracks A (UI), B1 (Lane's), and B2-partial (hawramani) are **done** (see Impleme
 
 ---
 
-## Path B — LLM translation of lemmas (the next major spend)
+## Path B — Spark translation of all words (lemmas + surfaces)
 
-**Goal:** every lemma gets a high-quality short gloss + sense-paragraph in all 11 supported app languages (`en, ar, fa, ur, tr, id, bn, es, fr, de, ru, zh`), so every word card in `verse-text` and every lemma page shows the correct translation in whatever `wordAnalysisLang` the user selected. The English gloss comes from Wiktextract already; the other 10 languages are what we're paying the LLM to produce.
+**Status (2026-05-14):** plan locked. Originally scoped as a $3 OpenAI gpt-4.1-mini Batch run translating lemmas only; replanned to run on **DGX Spark / Qwen 3.6-35B at $0** and **extend coverage to all 102K surface forms** as well, since Spark compute is otherwise idle and the Phase 4 benchmark (`PHASE4_OPENWEIGHT_BENCHMARK.md`) validated Qwen36's translation quality. The earlier OpenAI flavour of this plan is preserved at the bottom for historical reference.
+
+**Goal:** every lemma (13,105) and every surface form (102,003) gets a short ≤80-char gloss in 11 languages, so every word card in `verse-text`, every lemma page, and every surface page shows the correct translation in whatever `wordAnalysisLang` the user selected — without a UI-side composition step.
+
+**Terminology note** (the gloss/translation overlap is easy to get wrong):
+
+| Term | Meaning |
+|---|---|
+| **gloss** | A single short ≤80-char string in one language. The thing rendered on a word card. |
+| **translations** | The per-language map of glosses: `{en, fa, ur, tr, id, bn, es, fr, de, ru, zh}`. |
+| **`translations` field on a lemma page** | Already in the schema, currently `null`. Path B populates it. |
+| **`translations` field on a surface page** | **Does not exist yet.** Path B adds it. |
+| **`index/lemmas.json` `gloss` field** | Path C temporary, English-only. Reverted when Path B ships. |
 
 **Why "Path B" not "C1":** the user calls it Path B in conversation (Path A = WBW UI, Path B = LLM translations, Path C = temporary English glosses on the index). C1 is the same scope under the original roadmap naming.
 
 ### Scope
 
-- **13,105 lemmas** to translate (the count after the dedup fix in Phase 10)
-- Per lemma we send the LLM: lemma Arabic + Wiktextract English gloss + POS + optional Lane's first-sentence context
-- Per lemma we get back: an object `{en, ar, fa, ur, tr, id, bn, es, fr, de, ru, zh}` of short noun-phrase / verb-phrase glosses (≤ 80 chars each) plus an optional longer `definition` paragraph in each language
-- Surfaces inherit their lemma's translations (we do NOT pay to translate each of the 102K surface forms — that's combinatorially worse and most surfaces are inflections of the same lemma)
-- For verbs we DO want per-paradigm-role label translation eventually (so card for `قَالَتْ` reads "she said" not "to say") — but that's mechanical (we have the role: `past_3fs`, we just need the per-language role-label table). Treat this as a one-time fixed-asset translation table loaded by the UI, not an LLM call per form.
+- **13,105 lemmas** + **102,003 surface forms** = ~115K items to translate
+- **11 target languages**: `en, fa, ur, tr, id, bn, es, fr, de, ru, zh`. Arabic (`ar`) is dropped — asking an Arabic LLM to paraphrase Arabic risks echoing the lemma, and the lemma slug *is* the canonical Arabic form.
+- **Output is glosses only**: short ≤80-char string per language. No `definitions` paragraph in v1 — deferred to a follow-up pass if users ask for it. (Multiplies output tokens ~10×, low UI-side payoff.)
+- **Backend**: Spark Qwen 3.6-35B (`qwen36-fast`), $0 compute, talks to vLLM via the existing `openai_backend.call_openai` path (auto-routes on `is_spark_model("qwen36-fast")` per the Phase 4 production integration).
+- **Strict `json_schema` with named ASCII property names**: language keys are 2-char ISO codes, so the vLLM Arabic-property-name corruption bug doesn't apply. No positional-`values`-array workaround needed.
 
-### Cost
+### Cost + wall time
 
-Using **gpt-4.1-mini** via Batch API (50% off list, matches the Phase 4 production model):
-- Input per lemma ≈ 150 tokens (system prompt cached + lemma data + few-shot)
-- Output per lemma ≈ 200 tokens (11 langs × ~15 tokens each, JSON overhead)
-- Pricing 2026: `$0.40/1M input` / `$1.60/1M output` × 0.5 batch
-- Per-lemma: `(150 × 0.20 + 200 × 0.80) / 1M = $0.000190` ≈ **2 hundredths of a cent**
-- **13,105 lemmas total: ~$2.50**, plus a few dollars overhead for retries
+- **$0** Spark compute (Qwen 3.6-35B served locally, otherwise-idle hardware)
+- Wall-time projections (concurrency 8 workers, ~2-3s per batched-all-langs call):
 
-That's the cheap-and-good band. We could pay more for gpt-5.4 ($1.25/$10 per 1M, ~30× cost: $75) if quality on rarer lemmas suffers — recommend running gpt-4.1-mini first, spot-checking the worst-quality lemmas (likely classical religious terminology + foreign loanwords), and re-running only those on gpt-5.4 if needed.
+| Pass | Items | Per-call latency | Wall time |
+|---|---|---|---|
+| Lemma | 13,105 | ~2 s (input ~250 tok, output ~250 tok) | ~55 min |
+| Surface — baseline (no corpus context) | 102,003 | ~2.5 s (input ~300 tok, output ~250 tok) | ~9 h |
+| Surface — with corpus context windows (3 × ±10 words) | 102,003 | ~3 s (input ~500 tok, output ~250 tok) | ~11 h |
+| Context-window extraction (one-time, local) | 102,003 | ~0.5 ms | ~1 min |
+| Experiment rounds (~5 rounds × 100 items × ~2 variants each) | ~1,000 | ~2.5 s | ~5 min/round |
+
+End-to-end is ~10-12 h Spark wall time. Can run overnight.
 
 ### Pipeline architecture
 
-Mirrors the verse pipeline's batch flow (`app/pipeline_cli/openai_batch.py`). New module: `app/words/translation.py`.
+New module: `ThaqalaynDataGenerator/app/words/spark_translation.py`. Mirrors `app/pipeline_cli/translation_phase.py` (per-language calls on Spark) but for word-level inputs. No batch-API state-machine plumbing — local async, concurrency-8.
 
 ```
-┌────────────────────────────┐
-│ 1. Extract                 │  Walk ThaqalaynWords/lemmas/*.json
-│ scripts/extract_lemma_     │  → emit (slug, lemma_ar, pos, en_gloss,
-│ translation_prompts.py     │     lane_snippet) tuples for every lemma
-│                            │  → write to
-│                            │  ThaqalaynWordSources/translation/
-│                            │  prompts.jsonl
-└────────────────────────────┘
-            │
-            ▼
-┌────────────────────────────┐
-│ 2. Submit batch            │  OpenAI Batch API: 13K requests, 1 file.
-│ scripts/submit_lemma_      │  System prompt asks for strict JSON object
-│ translations_batch.py      │  {lemma_ar: ..., glosses: {en, ar, fa, ...},
-│                            │   definitions: {en, ar, fa, ...}}.
-│                            │  State persisted to
-│                            │  WordSources/translation/batch_state.json
-└────────────────────────────┘
-            │
-            ▼
-┌────────────────────────────┐
-│ 3. Poll until completed    │  ~3-24 h depending on OpenAI queue
-│ scripts/poll_lemma_        │  Resumable across reboots (state file holds
-│ translations_batch.py      │  batch ID).
-└────────────────────────────┘
-            │
-            ▼
-┌────────────────────────────┐
-│ 4. Download + validate     │  Parse responses, validate JSON, check each
-│ scripts/download_lemma_    │  language's gloss is non-empty and not
-│ translations.py            │  Latin chars in non-Latin script (basic
-│                            │  garbage filter).
-│                            │  Quarantine failures, retry up to 3× via
-│                            │  fix batch (same shape as verse pipeline).
-│                            │  Persist responses to
-│                            │  ThaqalaynWordSources/translation/
-│                            │  responses/{slug}.json
-└────────────────────────────┘
-            │
-            ▼
-┌────────────────────────────┐
-│ 5. Merge into lemma pages  │  WordPageBuilder gains:
-│ (rebuild)                  │   - `translations: {en, ar, fa, ...}`
-│                            │     short glosses on the lemma JSON
-│                            │   - `definitions: {en, ar, fa, ...}`
-│                            │     longer paragraph (replaces or
-│                            │     augments existing English-only
-│                            │     `definition` field)
-│                            │  Rebuild surfaces + lemma indexes (lemmas
-│                            │  index gets `glosses: {en, ar, fa, ...}`
-│                            │  per-entry for word-card display).
-└────────────────────────────┘
-            │
-            ▼
-┌────────────────────────────┐
-│ 6. UI                      │  Revert Path C commits (`34ff19c` UI +
-│                            │  `d0ce4a9` generator) and replace with:
-│                            │    - `WordsService.getLemmaGlossMap(lang)`
-│                            │      returning Observable<Map<slug, gloss>>
-│                            │      for the active lang
-│                            │    - `cardTranslation(entry)` reads the
-│                            │      lang-specific map
-│                            │    - lemma page renders all 11 langs in
-│                            │      the translations selector
-└────────────────────────────┘
+                Lemma pass (Phase A)                       Surface pass (Phase B)
+                ────────────────────                       ──────────────────────
+   ThaqalaynWords/lemmas/*.json                ThaqalaynWords/surfaces/*.json
+                │                                          │
+                ▼                                          ▼
+   scripts/extract_lemma_translation_prompts.py
+                │                                          │
+                ▼                                          ▼
+   spark_translation.run_lemma_batch          spark_translation.run_surface_batch
+   (concurrency 8, ~55 min)                   (concurrency 8, ~9-11 h)
+                │                                          │
+                ▼                                          ▼
+   ThaqalaynWordSources/translation/          ThaqalaynWordSources/translation/
+     lemma_responses/{slug}.json                surface_responses/{slug}.json
+   (raw Spark output, sacred, never stripped — same pattern as ai-content/corpus/responses/)
+                │                                          │
+                └──────────────┬───────────────────────────┘
+                               ▼
+                  WordPageBuilder rebuild
+                  - lemmas/{slug}.json: `translations: null` → populated 11-lang map
+                  - surfaces/{slug}.json: new `translations: {…}` field
+                  - index/lemmas.json: `gloss` (English-only) → `glosses` (11-lang map)
+                  - index/surfaces.json: unchanged (intentional — surface PAGES carry translations,
+                                                    surface INDEX does not, to avoid bloating browse list)
+                               │
+                               ▼
+                  UI revert + rewire
+                  - git revert d0ce4a9 (Path C generator gloss)
+                  - git revert 34ff19c (Path C UI map)
+                  - WordsService.getLemmaGlossMap(lang) returning Observable<Map<slug,gloss>>
+                  - verse-text reads surface.translations.{lang} when available,
+                    falls back to lemma.translations.{lang}
 ```
 
-### Prompt sketch (Phase 1)
+### Prompt design
 
+**Inputs collected per item** (constructed by the extractors, persisted to JSONL so iteration is fast):
+
+| Field | Lemma pass | Surface pass |
+|---|---|---|
+| `slug` | the lemma slug (NFC Arabic) | the surface slug |
+| `pos`, `pos_camel` | from `lemmas/{slug}.json` | from `surfaces/{slug}.json.morphology` |
+| `en_gloss` | first POS-aligned Wiktextract sense (the Path C field) | from the lemma |
+| `lane_body` | full `lanes_definition.entries[*].body` rendered as readable text (italic_en + text segments concatenated, page-break and arabic segments inlined) — **no truncation** since Spark is free | from the lemma |
+| `clitic_breakdown` | n/a | `morphology.clitics` codes translated to labels via `CLITIC_CODE_LABELS`: `{prc2:"wa_part", prc1:"bi_prep"}` → "proclitics: wa- 'and', bi- 'with'" |
+| `lemma_translations` | n/a (this is what we're producing) | the lemma's 11-lang map from Phase A — anchors surface output to compose from the lemma's vocabulary in each language |
+| `corpus_contexts` | n/a | (optional, rounds 4+) 3× ±10-word windows extracted from `surface.occurrence_paths` |
+
+**CLITIC_CODE_LABELS** (the table that turns CAMeL clitic codes into prompt-readable English labels):
+
+```python
+CLITIC_CODE_LABELS = {
+    # proclitics
+    "wa_part":   ("wa-", "and"),
+    "fa_part":   ("fa-", "so/then"),
+    "bi_prep":   ("bi-", "with/by"),
+    "li_prep":   ("li-", "to/for"),
+    "ka_prep":   ("ka-", "like/as"),
+    "sa_fut":    ("sa-", "future-marker"),
+    "Al_det":    ("al-", "the"),
+    # enclitics (pronominal suffixes)
+    "3ms_pron":  ("-hu", "him/his/it"),
+    "3fs_pron":  ("-hā", "her"),
+    "2ms_pron":  ("-ka", "your (m sg)"),
+    # … full list lives in app/words/clitic_labels.py
+}
 ```
-You are translating an Arabic lemma into 11 languages for an Islamic
-hadith study app. The lemma's Wiktextract English gloss + Lane's
-first-sentence context are provided. Return a strict JSON object.
 
-Lemma:       {{lemma_ar}}
-POS:         {{pos}}    (e.g. verb, noun, prep, conj)
-English:     {{en_gloss}}
-Lane's:      {{lane_snippet | first sentence | ""}}
+**Output schema** (named ASCII keys, strict json_schema):
 
-Return:
+```json
 {
   "glosses": {
-    "en": "short noun/verb-phrase gloss, ≤ 80 chars",
-    "ar": "Arabic equivalent or short synonym (often same lemma or root family)",
-    "fa": "...",
-    "ur": "...",
-    "tr": "...",
-    "id": "...",
-    "bn": "...",
-    "es": "...",
-    "fr": "...",
-    "de": "...",
-    "ru": "...",
-    "zh": "..."
-  },
-  "definitions": {
-    "en": "1-2 sentence definition explaining nuance, classical usage, theological connotations if applicable",
-    ...same 11 langs...
+    "en": "to say, speak",
+    "fa": "گفتن",
+    "ur": "کہنا",
+    "tr": "söylemek",
+    "id": "berkata",
+    "bn": "বলা",
+    "es": "decir",
+    "fr": "dire",
+    "de": "sagen",
+    "ru": "сказать",
+    "zh": "说"
   }
 }
-
-For function words (prepositions, conjunctions, particles), keep glosses
-literal and short ("to/toward", "and", "indeed"). For verbs, give the
-infinitive ("to say"). For nouns, give the singular ("speech, saying").
-Do NOT include diacritics on Latin-script languages. Do NOT translate
-proper nouns (return the transliteration).
 ```
+
+`max_output_tokens` cap: 300 (≈ 11 langs × ~20 tokens incl. JSON overhead, with slack). Apply the same `}`-loop mitigation we shipped for Phase 4 — when Spark's output exceeds the cap, retry once with bumped cap, then quarantine.
+
+**System prompt** (full content lives in `app/words/spark_translation_prompts.py`, summary):
+- Style guide: ≤80 chars/gloss, no diacritics on Latin scripts, infinitive for verbs, singular for nouns, no proper-noun translation (transliterate).
+- For function words: keep glosses literal and short ("to/toward", "and", "indeed").
+- For surfaces: glosses MUST compose from the provided `lemma_translations` so all forms of one lemma share root vocabulary across the 11 languages.
 
 ### Schema additions
 
-**`lemmas/{slug}.json`** gains:
+**`lemmas/{slug}.json`** — populate the existing `translations` field (currently `null`):
 ```json
 {
   ...existing fields...
   "translations": {
     "en": "to say, speak",
-    "ar": "نطق، تكلم",
     "fa": "گفتن",
     "ur": "کہنا",
     "tr": "söylemek",
@@ -1041,20 +1043,29 @@ proper nouns (return the transliteration).
     "ru": "сказать",
     "zh": "说"
   },
-  "definitions_multilang": {
-    "en": "Form I verb of the root ق-و-ل, the most common verb of speech in classical Arabic. Used for ordinary speech, authoritative declarations, and citation of Quranic verses or hadith narrations.",
-    "ar": "...",
-    ...
-  },
   "translations_attribution": {
-    "model": "gpt-4.1-mini",
-    "generated_date": "2026-06-01",
-    "pipeline_version": "words.translation.v1"
+    "model": "qwen36-35b-heretic",
+    "generated_date": "2026-05-…",
+    "pipeline_version": "words.translation.v1.spark"
   }
 }
 ```
 
-**`index/lemmas.json`** entry gains a compact per-language map (replaces the single `gloss` field added in Phase 16):
+**`surfaces/{slug}.json`** — new `translations` field (was absent):
+```json
+{
+  ...existing fields...
+  "translations": {
+    "en": "and by the covenant",
+    "fa": "و با پیمان",
+    "ur": "اور عہد کے ذریعے",
+    ...
+  },
+  "translations_attribution": { ...same shape as lemma... }
+}
+```
+
+**`index/lemmas.json`** entry — `gloss` (Path C, English-only) replaced with `glosses` (11-lang map):
 ```json
 {
   "slug": "قَالَ",
@@ -1062,51 +1073,115 @@ proper nouns (return the transliteration).
   ...
   "glosses": {
     "en": "to say, speak",
-    "ar": "نطق",
     "fa": "گفتن",
     ...
   },
-  "frequency": 8421,
-  ...
+  "frequency": 8421
 }
 ```
 
-**Index size estimate:** going from one `gloss` field (avg ~30 chars) to 11 glosses (avg ~25 chars each) takes the index from 2.8 MB to ~5-6 MB. Worth verifying after a small pilot batch — if the size becomes uncomfortable, split into per-language index files (`index/lemmas.{lang}.json`) so the UI fetches only the active language.
+**Index size estimate:** going from one `gloss` (~30 chars) to 11 glosses (~25 chars each) takes the index from 2.8 MB to ~5-6 MB. Verify after pilot. If >8 MB at full scale, split into per-language index files (`index/lemmas.{lang}.json`) so the UI fetches only the active language. Trivial refactor, defer until measured.
 
-### Sessions / execution plan
+**`index/surfaces.json`** — **unchanged on purpose.** Surface translations live on the surface JSON itself; index stays compact (browse-list use case).
 
-| Step | Effort | Cost |
+### Experiment rounds
+
+The user has asked for iterative experimentation. Each round is a 100-item pilot evaluated against a scoring rubric before moving to the next. Mirrors the Spark Phase 4 optimization log (Rounds A-J) structure. All rounds run on a fixed pilot set so changes are attributable.
+
+**Pilot set composition (100 lemmas + 100 surfaces, locked once at start of Round 1):**
+
+| Stratum | Lemmas | Surfaces | Why |
+|---|---|---|---|
+| High-frequency content words | 30 | 30 | Most-used vocabulary, must be flawless |
+| Mid-frequency content words | 30 | 30 | The bulk; quality must hold |
+| Low-frequency / rare | 20 | 20 | Coverage stress test |
+| Function words (prep/conj/particle) | 10 | 10 | Homographs like إِلَى |
+| Classical religious terminology | 5 | 5 | تقوى, تسبيح, إيمان, ركوع, زكاة — Qwen's likely weak spot |
+| Proper nouns / loanwords | 5 | 5 | Should transliterate, not translate |
+
+**Scoring rubric per round** (eyeball + automated):
+
+| Metric | How measured |
+|---|---|
+| Gloss quality (5-point scale) | Manual review of ~20 random items per round across 4-5 languages |
+| Script sanity | Automated: no Latin chars in `fa/ur/bn/zh/ru` glosses |
+| Length compliance | Automated: ≤80 chars per gloss |
+| Homograph correctness | Automated check on the إِلَى canonical case + 5 others |
+| Lemma-surface consistency | Automated: surface translations contain at least one substring from lemma translations (per language) |
+| Parse rate | Automated: % of items returning valid JSON matching the schema |
+
+**Round 1 — Baseline lemma prompt.**
+- Input: lemma + pos + en_gloss + full Lane's body
+- 100 lemmas, no surfaces yet
+- Goal: validate that Qwen36 produces clean 11-lang glosses with strict schema. Confirm parse rate ≥99% (the Phase 4 benchmark floor).
+- Decision: pass if mean gloss-quality ≥3.5/5 AND parse rate ≥99%. Otherwise iterate on prompt before scaling.
+
+**Round 2 — Lemma prompt refinement.**
+- A/B Round-1 prompt vs (a) shorter Lane's body (first paragraph only), (b) explicit few-shot exemplars in the system prompt for verb/noun/function-word.
+- 100 lemmas × 3 variants = 300 calls (~10 min Spark).
+- Goal: find the best lemma prompt. Lock it.
+
+**Round 3 — Surface baseline.**
+- Inputs: surface + clitic decomposition (CLITIC_CODE_LABELS-translated) + lemma's translations from Round 2 + lemma's Lane's body.
+- 100 surfaces. NO corpus context yet.
+- Goal: confirm surfaces compose from lemma vocabulary correctly. Measure consistency metric.
+- Decision gate: pass if consistency ≥80% across the 11 langs.
+
+**Round 4 — Surface with corpus context windows.**
+- Inputs: same as Round 3 + 3 narration windows of `surface ± 10 words` (extracted from `surface.occurrence_paths`).
+- 100 surfaces, A/B against Round 3 outputs.
+- Goal: does corpus context improve disambiguation of polysemous surfaces (`وَلَّى`, `لَيَقُولُنَّ`, etc.)?
+- Decision rule: if Variant B fixes ≥10% of cases without regressing others, adopt context windows for the full surface run. Otherwise stick with Round 3 prompt (cheaper).
+
+**Round 5 — Spot-check on tough cases.**
+- Run only the "Classical religious terminology" + "Proper nouns" + "Homographs" strata through the locked Round 4 prompt.
+- Manual review of 100% of these outputs (~30 items).
+- Goal: identify which strata fail and need targeted prompt patches.
+- Decision: if classical religious terms score <3.5/5, add a curated few-shot block to the prompt with تقوى, تسبيح, etc. as exemplars and re-run.
+
+**Full-corpus run.** Locked prompt from Round 5. Run lemma pass (1 h), then surface pass (9-11 h depending on Round 4 outcome).
+
+Each round's prompt + outputs + scores + decision get appended to a new doc `Thaqalayn/docs/PATH_B_SPARK_LOG.md` (similar to SPARK_OPTIMIZATION_LOG.md). DECISION_LOG entries (D060+) capture the per-round go/no-go calls.
+
+### Execution plan
+
+| Step | Effort | Time |
 |---|---|---|
-| Build extraction + prompt module + Pydantic schema | 0.5 session | $0 |
-| **Pilot batch: 100 lemmas across all POS classes**; eyeball output quality, tweak prompt | 0.25 session | ~$0.02 |
-| Pilot batch with gpt-5.4 (same 100 lemmas) for comparison | 0.25 session | ~$0.50 |
-| Full batch on 13,105 lemmas (gpt-4.1-mini) | 1 session wall time, ~3-24 h batch | ~$2.50 |
-| Quarantine retry passes | 0.25 session | ~$0.10 |
-| Merge into lemma pages + rebuild indexes | 0.25 session | $0 |
-| Revert Path C, wire UI to multilingual maps, lang-switcher integration test | 0.5 session | $0 |
-| **Total** | **~3 sessions** | **~$3-4** |
+| Build `spark_translation.py` + extractors + validators + unit tests | 1 session | ~6 h |
+| Lock pilot set (100 lemmas + 100 surfaces, write to `pilot_set.json`) | included | ~30 min |
+| Round 1 (lemma baseline) — pilot + review + decision | 0.5 session | ~3 h |
+| Round 2 (lemma refinement) — pilot + review + decision | 0.5 session | ~3 h |
+| Round 3 (surface baseline) — pilot + review + decision | 0.5 session | ~3 h |
+| Round 4 (surface + corpus context A/B) — pilot + review + decision | 0.5 session | ~3 h |
+| Round 5 (tough-case spot check) — pilot + review + targeted patch | 0.5 session | ~3 h |
+| **Full-corpus run**: lemma pass (~1 h) + surface pass (~9-11 h) | autonomous overnight | ~12 h Spark |
+| Merge into pages + rebuild indexes + validate | 0.5 session | ~2 h |
+| Revert Path C + wire UI to multilingual `getLemmaGlossMap(lang)` + integration test | 0.5 session | ~3 h |
+| **Total** | **~5 sessions** | **~$0** |
 
 ### Validation checklist
 
 - [ ] Every lemma has non-empty glosses for all 11 langs
-- [ ] No Latin chars in Arabic/Persian/Urdu/Russian/Chinese/Bengali glosses (basic script check)
-- [ ] Gloss length ≤ 80 chars (truncation discipline matches Path C's UI assumption)
-- [ ] Spot-check 50 random lemmas + 20 high-frequency lemmas + 20 function-word lemmas manually
-- [ ] Spot-check إِلَى (the canonical homograph that broke Path C without POS-alignment) returns the correct "to/toward" preposition gloss, not the verb sense
-- [ ] Diff index size against pre-Path-B index (~2.8 MB) — should land in 5-6 MB range
-- [ ] Verify revert commits land cleanly: `git revert 34ff19c d0ce4a9` should produce no merge conflicts
+- [ ] Every surface has non-empty glosses for all 11 langs
+- [ ] No Latin chars in `fa/ur/bn/zh/ru` glosses (automated regex check)
+- [ ] All glosses ≤80 chars
+- [ ] إِلَى canonical homograph returns "to/toward" (preposition), not the verb sense
+- [ ] Surface translations compose from lemma translations in each language (substring overlap or root-form match per lang)
+- [ ] Spot-check 50 random lemmas + 50 random surfaces + 20 high-freq + 20 function-words + 20 classical religious terms manually
+- [ ] Compound surfaces like `وَبِالْعَهْدِ` read coherently in each language (not stitched fragments)
+- [ ] `index/lemmas.json` size lands in the projected 5-6 MB range
+- [ ] Path C revert (`git revert 34ff19c d0ce4a9`) lands without conflicts
 
-### What to do about surface pages
+### What's deferred
 
-Surfaces don't need their own LLM translation. The card on a surface page already lazy-loads the lemma's translations via `WordsService.getLemma`. For the verse-page word-by-word view, the translation shown on each card comes from `lemmaGlossMap` (post-Path-B: from the multilingual version of the same map).
+- **Per-language `definitions` paragraph.** Multiplies output tokens by ~10× and rarely shown in the UI. Round 6+ if/when users ask.
+- **`ar` paraphrase.** Dropped because the lemma slug IS Arabic; same-language paraphrasing risk-of-echo + minimal UI value. Revisit only if a user request for "what does this word literally mean in Arabic synonyms" emerges.
+- **Per-paradigm-role label translation.** The card for `قَالَتْ` (3fs past) ideally reads "she said" rather than "to say". With Path B surfaces translated end-to-end, this is moot — the surface translation IS "she said". The role-label table is no longer needed.
+- **Spark vs gpt-5.4 quality comparison.** If a future user complaint reveals systematic quality issues, run those specific lemmas through gpt-5.4 selectively (still cheap because 100-200 lemmas of the 13K).
 
-**Future work — paradigm-role-aware translation:** the card for `قَالَتْ` (3fs past) ideally reads "she said" rather than "to say". CAMeL Tools already gives us the role (`past_3fs`). We have a finite role taxonomy (~50 roles × 11 langs = ~550 strings). One-time human-curated or LLM-batch translation of that table, loaded into the UI as `assets/role-labels.{lang}.json`, would let the card combine `glosses.{lang} + role-label.{lang}` to produce "she said" / "you (m) said" / "I will say". This is Track D-ish — defer until users ask for it.
+### Original OpenAI plan (historical, superseded by Spark)
 
-### Open questions before kicking Path B off
-
-1. **gpt-4.1-mini vs gpt-5.4 quality on classical religious terminology.** Pilot will answer this. If gpt-4.1-mini's translations for words like تقوى, إيمان, تسبيح, ركوع are weak, run them through gpt-5.4 selectively (still cheap because we're talking 100-200 lemmas of the 13K).
-2. **Do we want a separate definitions paragraph per language, or just the gloss?** Definitions multiply output tokens by ~10×. Recommend gloss-only on the first pass to minimize cost, then add definitions as a follow-up pass once Path B is shipped and we know users want them.
-3. **Index per-language splitting threshold.** If the all-langs `index/lemmas.json` lands above 8 MB, split per language.
+This section's original plan called for OpenAI gpt-4.1-mini Batch API at ~$3 for lemmas only. Replaced because (a) Spark Qwen36 is $0, (b) the Phase 4 benchmark validated Qwen36's translation quality at production parity, (c) Spark is otherwise idle, (d) free compute removes the cost argument for skipping surfaces.
 
 
 

@@ -1,10 +1,37 @@
 # Reading Controls Redesign
 
-**Status:** ACTIVE — plan agreed, one open question pending, implementation not yet started.
+**Status:** COMPLETE — all 7 implementation steps shipped 2026-05-16.
 **Created:** 2026-05-16
 **Owner:** narmafraz
 
 Unifies AI view toggles + reading preferences into a single, discoverable, responsive surface across chapter-list and verse-detail pages.
+
+## Implementation summary (2026-05-16)
+
+| Step | Commit | What landed |
+|---|---|---|
+| 1. Service plumbing | `2a7e0a5` | `AiPreferencesService` extended with `showChainDiagram`, `showWordByWord`, `sidesheetOpenOnDesktop`; legacy `viewMode` migration; `showIsnadSeparation` dropped. `VerseTextComponent` toggles routed through the service. |
+| 2. Reading sheet | `f45f3ef` | New `ReadingSheetService` + `ReadingSheetComponent`. Slide-out panel hosted at app shell, RTL-aware, Esc / backdrop close. Inline `ai-settings-panel` retired. |
+| 3. Top app bar | `2c09587` | `#header` made `position: sticky` (required flipping `#site` overflow to `clip` — the old `auto / hidden` combo silently broke sticky). View icon trigger added to desktop + mobile header. Mobile hamburger's duplicated AI checkboxes replaced with a single "open sheet" button. |
+| 4. Reading toolbar | `bf3582d` | New `ReadingToolbarComponent`. Sticky below the header, hide-on-scroll-down per DR1 (60px always-visible top band, 10px dead zone), 3 view-toggle buttons synced through `AiPreferencesService`. Route-scoped to `/books/*`. |
+| 5. Remove redundant surfaces | `f633d18` | Dropped the per-verse `ai-toggles-footer` block (chapter-content), the chapter-toolbar WBW button, and the `verse-detail-toggles` row. `currentViewMode` / `onViewModeChange` / `checkAiContent` / `hasAnyAiContent` cleaned out of `chapter-content.component.ts`. |
+| 6. Simplify gate + revert patches | `1b2f275` | `hasWordByWord` reduced to `!!verse.text?.length`. `computeWordTokens` gained a `verse.text` fallback so WBW renders for every hadith. `showWordByWordActive` removed. Effectively reverts `78dba5d` and `7cb7f6e`. |
+| 7. A11y + RTL | `5611b1a` | Focus trap + restoration on the sheet (open captures `document.activeElement`, close restores; Tab / Shift+Tab cycle within the panel). RTL browser-verified — panel anchors at the leading edge under `dir=rtl`. |
+
+**Tests:** 649/649 Karma pass (up from 622 at start). Browser-verified end-to-end at desktop 1280–1516px and mobile 400px; RTL (`dir=rtl`) verified.
+
+## Variance from original plan
+
+- **Responsive primitive (`<600px` bottom sheet, `600–1240px` modal side sheet, `≥1240px` standard side sheet)** — shipped as a single custom slide-out panel that works at all sizes. The bottom-sheet split + non-modal desktop variant were not needed for the milestone and remain available as a future refinement. `sidesheetOpenOnDesktop` preference is provisioned in the service for when that lands.
+- **Mobile hamburger menu** — was meant to lose its AI checkboxes "when step 3 restructures the mobile path." Done in step 3 as planned; replaced with a single button that closes the menu and opens the sheet.
+- **Nav arrows + translation-selection in `<app-settings>` strip** — still in the strip, not relocated. Plan called this out as an open follow-up; staying open.
+
+## Open follow-ups
+
+- Responsive primitive: bottom sheet under 600px, non-modal side sheet at ≥1240px, with the `sidesheetOpenOnDesktop` pref governing the persistent-open case.
+- Relocate the `<app-settings>` strip's translation-selection + nav arrows (or accept current placement).
+- Future settings (font size, theme, line-height) — the side sheet content template is designed to absorb these without restructuring.
+- Z-index audit — sticky header (100), sticky toolbar (90), reading-sheet backdrop (1250), reading-sheet panel (1300), mobile-menu overlay (1100), mobile-menu panel (1200). Worth reconsolidating into a single SCSS map once another modal lands.
 
 ---
 

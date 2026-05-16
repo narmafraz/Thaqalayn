@@ -17,31 +17,6 @@
     <!-- Main hadith card -->
     <mat-card appearance="outlined" class="hadith-card">
       <mat-card-content>
-        <!-- AI feature toggles -->
-        <div class="verse-detail-toggles" *ngIf="vt.hasAiText || vt.hasWordByWord || vt.hasNarratorChain">
-          <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
-                  [class.active]="vt.showChainDiagram"
-                  [attr.aria-label]="vt.showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
-                  [matTooltip]="'narrator.chainDiagram' | translate">
-            <mat-icon>{{ vt.showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
-          </button>
-          <button *ngIf="vt.hasAiText" class="ai-toggle-btn" (click)="vt.toggleDiacritics()"
-                  [class.active]="vt.showDiacritics"
-                  [attr.aria-label]="vt.showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
-                  matTooltip="{{ 'settings.ai.showDiacritizedText' | translate }}">
-            <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
-          </button>
-          <button *ngIf="vt.hasWordByWord" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
-                  [class.active]="vt.showWordAnalysis"
-                  [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
-                  matTooltip="{{ 'settings.ai.showWordAnalysis' | translate }}">
-            <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
-          </button>
-          <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && book.data.verse.ai?.diacritics_status">
-            {{ book.data.verse.ai.diacritics_status }}
-          </span>
-        </div>
-
         <!-- Verse text -->
         <app-verse-text #vt [verse]="book.data.verse"
                         [isQuran]="isQuranBook(book.index)"

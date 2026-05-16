@@ -12,7 +12,7 @@ import { BooksService } from '@app/services/books.service';
 import { VerseLoaderService } from '@app/services/verse-loader.service';
 import { ShareCardService } from '@app/services/share-card.service';
 import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
-import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
+import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { RelatedChaptersService, RelatedChapter } from '@app/services/related-chapters.service';
 import { SeoService } from '@app/services/seo.service';
 import { Store } from '@ngxs/store';
@@ -68,9 +68,6 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   // Current UI language for reference display
   currentLang = 'en';
-
-  // View mode state
-  hasAnyAiContent = false;
 
   // Book author metadata
   author: BookAuthor | undefined;
@@ -175,12 +172,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
         } else {
           this.setupIntersectionObserver();
         }
-        // For shell format, derive AI content from verse_translations
-        this.hasAnyAiContent = book.data.verse_translations?.some(id => id.endsWith('.ai')) || false;
       } else {
         this.verseRefs = [];
         this.destroyObserver();
-        this.checkAiContent(book);
       }
 
       // Load bookmark and annotation states for all verses
@@ -342,20 +336,6 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       });
     }
   };
-
-  get currentViewMode(): ViewMode {
-    return this.aiPrefs.viewMode;
-  }
-
-  onViewModeChange(mode: ViewMode): void {
-    this.aiPrefs.setViewMode(mode);
-  }
-
-  private checkAiContent(book: ChapterContent): void {
-    this.hasAnyAiContent = book?.data?.verses?.some(
-      v => !!(v.ai?.chunks?.length || v.ai?.word_analysis?.length)
-    ) || false;
-  }
 
   getInBookReference(crumbs: Crumb[], verse: Verse): string {
     let result = '';

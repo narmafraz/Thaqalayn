@@ -1,8 +1,8 @@
 <ng-container *ngIf="(book$ | async) as book">
   <app-settings></app-settings>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author"></app-book-titles>
-  <div class="chapter-toolbar" *ngIf="getVerseCount(book) >= 10 || hasAnyAiContent">
-    <div class="jump-to-verse-inline" *ngIf="getVerseCount(book) >= 10">
+  <div class="chapter-toolbar" *ngIf="getVerseCount(book) >= 10">
+    <div class="jump-to-verse-inline">
       <mat-form-field appearance="outline" class="jump-input">
         <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
         <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
@@ -25,13 +25,6 @@
         </mat-select>
       </mat-form-field>
     </div>
-    <button class="word-by-word-toggle" *ngIf="hasAnyAiContent"
-            (click)="onViewModeChange(currentViewMode === 'word-by-word' ? 'plain' : 'word-by-word')"
-            [class.active]="currentViewMode === 'word-by-word'"
-            [matTooltip]="'book.viewWordByWord' | translate">
-      <mat-icon>grid_on</mat-icon>
-      <span class="toggle-label">{{ 'book.wordByWord' | translate }}</span>
-    </button>
   </div>
   <!-- Shell format: lazy-load verses via verse_refs -->
   <ng-container *ngIf="isShellFormat">
@@ -121,29 +114,6 @@
                   <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
                 </button>
                 <div class="secondary-metadata" *ngIf="isMetadataExpanded(verse.local_index)">
-                  <div class="ai-toggles-footer" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasNarratorChain">
-                    <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
-                            [class.active]="vt.showChainDiagram"
-                            [attr.aria-label]="vt.showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
-                            [matTooltip]="'narrator.chainDiagram' | translate">
-                      <mat-icon>{{ vt.showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
-                    </button>
-                    <button *ngIf="vt.hasAiText" class="ai-toggle-btn" (click)="vt.toggleDiacritics()"
-                            [class.active]="vt.showDiacritics"
-                            [attr.aria-label]="vt.showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
-                            [matTooltip]="'book.toggleDiacritics' | translate">
-                      <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
-                    </button>
-                    <button *ngIf="vt.hasWordByWord" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
-                            [class.active]="vt.showWordAnalysis"
-                            [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
-                            [matTooltip]="'book.wordByWordAnalysis' | translate">
-                      <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
-                    </button>
-                    <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && verse.ai?.diacritics_status">
-                      {{ verse.ai.diacritics_status }}
-                    </span>
-                  </div>
                   <div>{{ 'book.reference' | translate }}</div>
                   <div>{{getBookName(crumbs)}} {{verse.index}}</div>
                   <div>{{ 'book.inBookReference' | translate }}</div>
@@ -300,30 +270,6 @@
           </button>
           <!-- Collapsible secondary metadata -->
           <div class="secondary-metadata" *ngIf="isMetadataExpanded(verse.local_index)">
-            <!-- AI feature toggles (per-verse) -->
-            <div class="ai-toggles-footer" *ngIf="vt.hasAiText || vt.hasWordAnalysis || vt.hasNarratorChain">
-              <button *ngIf="vt.hasNarratorChain" class="ai-toggle-btn" (click)="vt.toggleChainDiagram()"
-                      [class.active]="vt.showChainDiagram"
-                      [attr.aria-label]="vt.showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
-                      [matTooltip]="'narrator.chainDiagram' | translate">
-                <mat-icon>{{ vt.showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
-              </button>
-              <button *ngIf="vt.hasAiText" class="ai-toggle-btn" (click)="vt.toggleDiacritics()"
-                      [class.active]="vt.showDiacritics"
-                      [attr.aria-label]="vt.showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
-                      [matTooltip]="'book.toggleDiacritics' | translate">
-                <mat-icon>{{ vt.showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
-              </button>
-              <button *ngIf="vt.hasWordByWord" class="ai-toggle-btn" (click)="vt.toggleWordAnalysis()"
-                      [class.active]="vt.showWordAnalysis"
-                      [attr.aria-label]="vt.showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
-                      [matTooltip]="'book.wordByWordAnalysis' | translate">
-                <mat-icon>{{ vt.showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
-              </button>
-              <span class="ai-diacritics-badge" *ngIf="vt.showDiacritics && verse.ai?.diacritics_status">
-                {{ verse.ai.diacritics_status }}
-              </span>
-            </div>
             <div>{{ 'book.reference' | translate }}</div>
             <div>{{getBookName(crumbs)}} {{verse.index}}</div>
             <div>{{ 'book.inBookReference' | translate }}</div>

@@ -4,7 +4,7 @@ import { AiLanguage, AiTranslationEntry, Chunk, ContentType, KeyPhrase, WordAnal
 import { NarratorMetadata, Verse } from '@app/models';
 import { SpecialText } from '@app/models/book';
 import { LemmaPage, SurfacePage } from '@app/models/word';
-import { AiPreferencesService, ViewMode } from '@app/services/ai-preferences.service';
+import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { WordsService } from '@app/services/words.service';
 import { slug as wordSlug } from '@app/services/word-normalize';
 import { Store } from '@ngxs/store';
@@ -31,7 +31,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private words = inject(WordsService);
   private destroy$ = new Subject<void>();
-  private localOverride = false;
 
   /** Lemma data fetched lazily on word-card click, keyed by surface slug. */
   popupLemma: LemmaPage | null = null;
@@ -65,8 +64,8 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   private elementRef = inject(ElementRef);
 
   showDiacritics = this.aiPrefs.get('showDiacritizedByDefault');
-  showWordAnalysis = false;
-  showChainDiagram = false;
+  showWordAnalysis = this.aiPrefs.get('showWordByWord');
+  showChainDiagram = this.aiPrefs.get('showChainDiagram');
   private _previousDiacritics = this.showDiacritics;
   wordAnalysisLang: AiLanguage = this.aiPrefs.get('wordByWordDefaultLang');
   activeWordIndex: number | null = null;
@@ -76,15 +75,18 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   wordPopup: { entry: WordAnalysisEntry; x: number; y: number } | null = null;
 
   ngOnInit(): void {
-    this.aiPrefs.viewMode$.pipe(takeUntil(this.destroy$)).subscribe(mode => {
-      if (!this.localOverride) {
-        this.applyViewMode(mode);
-        this.cdr.markForCheck();
-      }
-    });
     this.aiPrefs.preferences$.pipe(takeUntil(this.destroy$)).subscribe(prefs => {
+      const wasWBW = this.showWordAnalysis;
       this.showDiacritics = prefs.showDiacritizedByDefault;
+      this.showWordAnalysis = prefs.showWordByWord;
+      this.showChainDiagram = prefs.showChainDiagram;
       this.wordAnalysisLang = prefs.wordByWordDefaultLang;
+      // When WBW transitions off→on (toolbar/sheet flip or other surface)
+      // and this verse has no v3 word_analysis, kick the prefetch so cards
+      // populate without an extra click. shareReplay makes it idempotent.
+      if (this.showWordAnalysis && !wasWBW && !this.hasWordAnalysis) {
+        this.prefetchSurfaceData();
+      }
       this.cdr.markForCheck();
     });
     // Load the lemma → gloss lookup once. WordsService caches it
@@ -100,38 +102,20 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  applyViewMode(mode: ViewMode): void {
-    const wasShown = this.showWordAnalysis;
-    this.showWordAnalysis = mode === 'word-by-word';
-    // When WBW becomes active via the saved preference (not a manual
-    // toggle), kick off the same prefetch the toggle button does so
-    // cards populate without requiring the user to flip it twice.
-    // shareReplay cache makes this idempotent across re-renders.
-    if (this.showWordAnalysis && !wasShown && !this.hasWordAnalysis) {
-      this.prefetchSurfaceData();
-    }
-  }
-
   toggleDiacritics(): void {
-    this.showDiacritics = !this.showDiacritics;
-    this.cdr.markForCheck();
+    this.aiPrefs.set('showDiacritizedByDefault', !this.showDiacritics);
   }
 
   toggleWordAnalysis(): void {
-    this.localOverride = true;
-    this.showWordAnalysis = !this.showWordAnalysis;
-    if (this.showWordAnalysis) {
+    const next = !this.showWordAnalysis;
+    if (next) {
       this._previousDiacritics = this.showDiacritics;
-      this.showDiacritics = false;
-      // Pre-fetch surface data for each token when we lack v3 word_analysis
-      // so POS lights up on each card without requiring a click.
-      if (!this.hasWordAnalysis) {
-        this.prefetchSurfaceData();
-      }
+      this.aiPrefs.set('showDiacritizedByDefault', false);
+      this.aiPrefs.set('showWordByWord', true);
     } else {
-      this.showDiacritics = this._previousDiacritics;
+      this.aiPrefs.set('showDiacritizedByDefault', this._previousDiacritics);
+      this.aiPrefs.set('showWordByWord', false);
     }
-    this.cdr.markForCheck();
   }
 
   /**
@@ -185,8 +169,7 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   }
 
   toggleChainDiagram(): void {
-    this.showChainDiagram = !this.showChainDiagram;
-    this.cdr.markForCheck();
+    this.aiPrefs.set('showChainDiagram', !this.showChainDiagram);
   }
 
   /** Get narrator-kind parts from the narrator chain for the chain diagram */

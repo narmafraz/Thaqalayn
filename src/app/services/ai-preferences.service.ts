@@ -1,18 +1,21 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AiLanguage } from '@app/models/ai-content';
 
 export type ViewMode = 'plain' | 'word-by-word' | 'paragraph' | 'combined';
-// Note: 'paragraph' and 'combined' are legacy values that may exist in localStorage.
-// They are treated as 'plain' by applyViewMode() since paragraph view was removed.
+// 'paragraph' and 'combined' are legacy values that may exist in localStorage.
+// Treated as 'plain' on read; new writes only use 'plain' or 'word-by-word'.
 
 export interface AiPreferences {
   showDiacritizedByDefault: boolean;
   showContentTypeBadges: boolean;
   showTopicTags: boolean;
-  showIsnadSeparation: boolean;
   showAiTranslationDisclaimer: boolean;
+  showChainDiagram: boolean;
+  showWordByWord: boolean;
+  sidesheetOpenOnDesktop: boolean;
   wordByWordDefaultLang: AiLanguage;
+  /** @deprecated mirror of showWordByWord; kept one release for legacy migration. */
   viewMode: ViewMode;
 }
 
@@ -22,8 +25,10 @@ const DEFAULTS: AiPreferences = {
   showDiacritizedByDefault: true,
   showContentTypeBadges: true,
   showTopicTags: true,
-  showIsnadSeparation: true,
   showAiTranslationDisclaimer: true,
+  showChainDiagram: false,
+  showWordByWord: false,
+  sidesheetOpenOnDesktop: false,
   wordByWordDefaultLang: 'en',
   viewMode: 'plain',
 };
@@ -33,13 +38,12 @@ export class AiPreferencesService {
   private prefs: AiPreferences;
   private viewModeSubject: BehaviorSubject<ViewMode>;
   private prefsSubject: BehaviorSubject<AiPreferences>;
-  viewMode$ = new BehaviorSubject<ViewMode>('paragraph').asObservable();
-  /** Emits current preferences on subscribe and whenever any preference changes. */
-  preferences$;
+  viewMode$: Observable<ViewMode>;
+  preferences$: Observable<AiPreferences>;
 
   constructor() {
     this.prefs = this.load();
-    this.viewModeSubject = new BehaviorSubject<ViewMode>(this.prefs.viewMode || 'paragraph');
+    this.viewModeSubject = new BehaviorSubject<ViewMode>(this.prefs.viewMode);
     this.viewMode$ = this.viewModeSubject.asObservable();
     this.prefsSubject = new BehaviorSubject<AiPreferences>({ ...this.prefs });
     this.preferences$ = this.prefsSubject.asObservable();
@@ -55,18 +59,28 @@ export class AiPreferencesService {
 
   set<K extends keyof AiPreferences>(key: K, value: AiPreferences[K]): void {
     this.prefs[key] = value;
+    // Keep showWordByWord and the deprecated viewMode in sync so legacy
+    // viewMode$ subscribers (chapter-content WBW button) keep working until
+    // those callsites are migrated.
+    if (key === 'showWordByWord') {
+      const mode: ViewMode = value ? 'word-by-word' : 'plain';
+      this.prefs.viewMode = mode;
+      this.viewModeSubject.next(mode);
+    } else if (key === 'viewMode') {
+      this.prefs.showWordByWord = value === 'word-by-word';
+      this.viewModeSubject.next(value as ViewMode);
+    }
     this.save();
     this.prefsSubject.next({ ...this.prefs });
   }
 
   get viewMode(): ViewMode {
-    return this.prefs.viewMode || 'paragraph';
+    return this.prefs.viewMode;
   }
 
+  /** @deprecated use set('showWordByWord', boolean). Retained for legacy callers. */
   setViewMode(mode: ViewMode): void {
-    this.prefs.viewMode = mode;
-    this.save();
-    this.viewModeSubject.next(mode);
+    this.set('viewMode', mode);
   }
 
   reset(): void {
@@ -80,7 +94,20 @@ export class AiPreferencesService {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return { ...DEFAULTS, ...JSON.parse(stored) };
+        const parsed = JSON.parse(stored);
+        const merged: AiPreferences = { ...DEFAULTS, ...parsed };
+        // Migration: pre-showWordByWord prefs only had viewMode. Reflect
+        // a stored 'word-by-word' viewMode into the new boolean so the
+        // subscribed UI agrees with what the user saved before the upgrade.
+        if (parsed.showWordByWord === undefined && parsed.viewMode === 'word-by-word') {
+          merged.showWordByWord = true;
+        }
+        // Keep the two in sync on read so a partially-migrated state can't
+        // produce conflicting values downstream.
+        merged.viewMode = merged.showWordByWord ? 'word-by-word' : 'plain';
+        // Strip the deprecated showIsnadSeparation if present (unused since dfdab29).
+        delete (merged as Partial<AiPreferences> & { showIsnadSeparation?: unknown }).showIsnadSeparation;
+        return merged;
       }
     } catch {
       // Invalid stored data, use defaults

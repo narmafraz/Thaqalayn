@@ -131,6 +131,7 @@ describe('VerseTextComponent', () => {
 
   it('should toggle diacritics display', () => {
     component.verse = { ...mockVerse, ai: mockAi };
+    fixture.detectChanges(); // run ngOnInit so the prefs subscription is live
     expect(component.showDiacritics).toBe(true); // default is now true
     component.toggleDiacritics();
     expect(component.showDiacritics).toBe(false);
@@ -140,6 +141,7 @@ describe('VerseTextComponent', () => {
 
   it('should toggle word analysis display', () => {
     component.verse = { ...mockVerse, ai: mockAi };
+    fixture.detectChanges(); // run ngOnInit so the prefs subscription is live
     expect(component.showWordAnalysis).toBe(false);
     component.toggleWordAnalysis();
     expect(component.showWordAnalysis).toBe(true);
@@ -388,25 +390,32 @@ describe('VerseTextComponent', () => {
     expect(html).toContain('&quot;');
   });
 
-  // View mode tests
-  it('should set showWordAnalysis for word-by-word mode', () => {
+  // View mode tests — driven through AiPreferencesService now that view
+  // state is global rather than per-component-local.
+  it('should set showWordAnalysis when showWordByWord preference flips on', () => {
+    const prefs = TestBed.inject(AiPreferencesService);
     component.verse = { ...mockVerse, ai: mockAi };
-    component.applyViewMode('word-by-word');
+    fixture.detectChanges();
+    prefs.set('showWordByWord', true);
     expect(component.showWordAnalysis).toBe(true);
   });
 
-  it('should clear showWordAnalysis for plain mode', () => {
+  it('should clear showWordAnalysis when showWordByWord preference flips off', () => {
+    const prefs = TestBed.inject(AiPreferencesService);
     component.verse = { ...mockVerse, ai: mockAi };
-    component.applyViewMode('word-by-word');
-    component.applyViewMode('plain');
+    fixture.detectChanges();
+    prefs.set('showWordByWord', true);
+    prefs.set('showWordByWord', false);
     expect(component.showWordAnalysis).toBe(false);
   });
 
-  it('should treat legacy combined/paragraph modes as plain', () => {
+  it('should treat legacy combined/paragraph viewMode values as plain', () => {
+    const prefs = TestBed.inject(AiPreferencesService);
     component.verse = { ...mockVerse, ai: mockAi };
-    component.applyViewMode('combined');
+    fixture.detectChanges();
+    prefs.set('viewMode', 'combined');
     expect(component.showWordAnalysis).toBe(false);
-    component.applyViewMode('paragraph');
+    prefs.set('viewMode', 'paragraph');
     expect(component.showWordAnalysis).toBe(false);
   });
 

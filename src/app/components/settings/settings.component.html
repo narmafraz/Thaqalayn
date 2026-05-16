@@ -4,8 +4,9 @@
 
   <button class="ai-settings-btn" (click)="toggleAiSettings()"
           [attr.aria-label]="'settings.ai.title' | translate"
-          [matTooltip]="'settings.ai.title' | translate">
-    <mat-icon>{{ showAiSettings ? 'tune' : 'auto_awesome' }}</mat-icon>
+          [matTooltip]="'settings.ai.title' | translate"
+          [class.active]="open$ | async">
+    <mat-icon>{{ (open$ | async) ? 'tune' : 'auto_awesome' }}</mat-icon>
   </button>
 
   <div class="nav-buttons" *ngIf="(nav$ | async) as nav">
@@ -24,50 +25,5 @@
   </div>
 </div>
 
-<div class="ai-settings-panel" *ngIf="showAiSettings">
-  <div class="ai-settings-header">
-    <mat-icon>auto_awesome</mat-icon>
-    <span>{{ 'settings.ai.title' | translate }}</span>
-    <button class="ai-settings-close" (click)="showAiSettings = false"
-            [attr.aria-label]="'settings.close' | translate"
-            [matTooltip]="'settings.close' | translate">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-  <label class="ai-pref" for="ai-pref-diacritized">
-    <input type="checkbox" id="ai-pref-diacritized" [checked]="aiPrefs.get('showDiacritizedByDefault')"
-           (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">
-    <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
-  </label>
-  <label class="ai-pref" for="ai-pref-badges">
-    <input type="checkbox" id="ai-pref-badges" [checked]="aiPrefs.get('showContentTypeBadges')"
-           (change)="onPrefChange('showContentTypeBadges', $any($event.target).checked)">
-    <span>{{ 'settings.ai.showBadges' | translate }}</span>
-  </label>
-  <label class="ai-pref" for="ai-pref-topics">
-    <input type="checkbox" id="ai-pref-topics" [checked]="aiPrefs.get('showTopicTags')"
-           (change)="onPrefChange('showTopicTags', $any($event.target).checked)">
-    <span>{{ 'settings.ai.showTopics' | translate }}</span>
-  </label>
-  <label class="ai-pref" for="ai-pref-disclaimer">
-    <input type="checkbox" id="ai-pref-disclaimer" [checked]="aiPrefs.get('showAiTranslationDisclaimer')"
-           (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
-    <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
-  </label>
-  <label class="ai-pref">
-    <span>{{ 'settings.ai.wordByWordLang' | translate }}</span>
-    <select [ngModel]="wordLang" (ngModelChange)="onPrefChange('wordByWordDefaultLang', $event)" class="ai-lang-select">
-      <option value="en">English</option>
-      <option value="ur">اردو</option>
-      <option value="tr">Türkçe</option>
-      <option value="fa">فارسی</option>
-      <option value="id">Indonesia</option>
-      <option value="bn">বাংলা</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-      <option value="de">Deutsch</option>
-      <option value="ru">Русский</option>
-      <option value="zh">中文</option>
-    </select>
-  </label>
-</div>
+<!-- AI preferences now live in the global Reading Sheet hosted at the app
+     shell. The ai-settings-btn above opens it via ReadingSheetService. -->

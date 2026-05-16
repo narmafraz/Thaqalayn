@@ -1,0 +1,119 @@
+// Global Reading Sheet — slide-out panel hosted at the app shell.
+// LTR: slides in from the right; RTL: from the left. Layered above
+// the mobile-menu-panel (z-index 1200/1100) so a hypothetical
+// concurrent open never sits behind it.
+
+.reading-sheet-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1250;
+  animation: rs-backdrop-fade-in 0.2s ease-out;
+}
+
+@keyframes rs-backdrop-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.reading-sheet-panel {
+  position: fixed;
+  top: 0;
+  right: -360px;
+  width: 360px;
+  max-width: 90vw;
+  height: 100%;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #333);
+  z-index: 1300;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+
+  &.open {
+    right: 0;
+  }
+}
+
+:host-context([dir="rtl"]) .reading-sheet-panel {
+  right: auto;
+  left: -360px;
+  transition: left 0.3s ease;
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
+
+  &.open {
+    left: 0;
+  }
+}
+
+.reading-sheet-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+
+  mat-icon {
+    color: var(--accent-color, #673ab7);
+    flex-shrink: 0;
+  }
+
+  .reading-sheet-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .reading-sheet-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--text-secondary, #666);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: var(--text-primary, #333);
+    }
+  }
+}
+
+.reading-sheet-body {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .ai-pref {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .ai-lang-select {
+      margin-inline-start: auto;
+      padding: 4px 8px;
+      border: 1px solid var(--border-color, #ccc);
+      border-radius: 4px;
+      background: var(--bg-primary, #fff);
+      color: var(--text-primary, #333);
+      font-size: 14px;
+    }
+  }
+}

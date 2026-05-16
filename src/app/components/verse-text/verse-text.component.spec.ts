@@ -87,6 +87,9 @@ describe('VerseTextComponent', () => {
   };
 
   beforeEach(async () => {
+    // Reset AiPreferences localStorage so prior specs can't leak state
+    // into VerseText's TestBed-injected singleton.
+    localStorage.removeItem('thaqalayn_ai_preferences');
     await TestBed.configureTestingModule({
       declarations: [VerseTextComponent, TranslatePipe],
       imports: [

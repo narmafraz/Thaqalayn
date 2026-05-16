@@ -455,3 +455,31 @@ kbd {
     display: none;
   }
 }
+
+/* ===================== Reading Sheet Trigger ===================== */
+// Always-visible View icon in the top app bar. Opens the global
+// Reading Sheet (AI prefs + view toggles).
+.reading-sheet-trigger {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-inline-start: 4px;
+  border-radius: 50%;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover, &.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+  }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

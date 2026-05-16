@@ -20,8 +20,12 @@
   background-color: var(--bg-primary);
   background-position: center top;
 	width: 100%;
-	overflow: auto;
-  overflow-x: hidden;
+  // `overflow-x: clip` prevents horizontal overflow without creating
+  // a scroll container — leaves the document as the scroller so
+  // `position: sticky` on #header sticks to the viewport, not to
+  // #site's own scroll context. (`overflow: hidden` would also clip
+  // but registers as a scroll container, which broke sticky.)
+  overflow-x: clip;
   min-height: 100%;
   flex-flow: column;
   transition: background-color 0.3s ease;
@@ -35,6 +39,14 @@
   background-image: url(/assets/banner_small.png);
   height: 100px;
 	width: 100%;
+  // Step 3 of READING_CONTROLS_REDESIGN: keep the View trigger (and
+  // search/font/theme controls) reachable at any scroll position.
+  // z-index sits above page content (0) and below the mobile menu /
+  // reading-sheet overlays (1100-1300) so those primitives still
+  // overlay the bar when open.
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 :host-context(body.dark-theme) #header {
@@ -249,6 +261,40 @@
     color: var(--text-primary, #333);
     padding: 8px;
   }
+}
+
+// Entry point from the mobile hamburger menu into the global
+// Reading Sheet (replaces the duplicated AI-pref checkboxes that
+// previously lived in this section).
+.mobile-open-reading-sheet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  color: var(--text-primary, #333);
+  text-align: start;
+
+  span {
+    flex: 1;
+    font-size: 14px;
+  }
+
+  mat-icon.chevron {
+    color: var(--text-secondary, #666);
+  }
+
+  &:hover {
+    background: var(--bg-secondary, #f5f5f5);
+  }
+}
+
+:host-context([dir="rtl"]) .mobile-open-reading-sheet .chevron {
+  transform: scaleX(-1);
 }
 
 .mobile-font-controls {

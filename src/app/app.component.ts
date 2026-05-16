@@ -5,6 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { Book, Crumb, getChapter, Narrator } from '@app/models';
 import { BreadcrumbItem, I18nService, SeoService, ThemeService, KeyboardShortcutService, WebVitalsService } from '@app/services';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
+import { ReadingSheetService } from '@app/services/reading-sheet.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { LoadNarrator } from '@store/people/people.actions';
@@ -45,6 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
   helpVisible$: Observable<boolean>;
   isEmbed$: Observable<boolean>;
   activeSection$: Observable<string>;
+  readingSheetOpen$: Observable<boolean>;
   showBackToTop = false;
   headerCompact = false;
   mobileMenuOpen = false;
@@ -74,10 +76,12 @@ export class AppComponent implements OnInit, OnDestroy {
     private webVitals: WebVitalsService,
     private cdr: ChangeDetectorRef,
     public aiPrefs: AiPreferencesService,
+    public readingSheet: ReadingSheetService,
     @Inject(PLATFORM_ID) platformId: object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
     this.currentLang$ = this.i18n.currentLang$;
+    this.readingSheetOpen$ = this.readingSheet.open$;
     this.theme$ = this.themeService.theme$;
     this.fontSize$ = this.themeService.fontSize$;
     this.helpVisible$ = this.keyboard.helpVisible$;
@@ -140,6 +144,17 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleHelp(): void {
     this.keyboard.toggleHelp();
+  }
+
+  /** Opens the global Reading Sheet (AI prefs + view toggles). */
+  toggleReadingSheet(): void {
+    this.readingSheet.toggle();
+  }
+
+  /** Mobile-menu entry point: close the hamburger then open the sheet. */
+  openReadingSheetFromMobileMenu(): void {
+    this.mobileMenuOpen = false;
+    this.readingSheet.open();
   }
 
   dismissHelp(): void {

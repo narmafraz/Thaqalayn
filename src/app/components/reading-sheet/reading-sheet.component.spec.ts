@@ -73,4 +73,66 @@ describe('ReadingSheetComponent', () => {
     component.onLangChange('ur');
     expect(prefs.get('wordByWordDefaultLang')).toBe('ur');
   });
+
+  describe('focus management', () => {
+    it('restores focus to the trigger element when the sheet closes', () => {
+      // Stand in for an external trigger button (e.g. the header View icon).
+      const trigger = document.createElement('button');
+      document.body.appendChild(trigger);
+      trigger.focus();
+      expect(document.activeElement).toBe(trigger);
+
+      sheet.open();
+      // Open should remember the trigger as the focus to restore.
+      sheet.close();
+      expect(document.activeElement).toBe(trigger);
+
+      document.body.removeChild(trigger);
+    });
+
+    it('Tab from the last focusable cycles to the first', () => {
+      sheet.open();
+      fixture.detectChanges();
+      const host = fixture.nativeElement as HTMLElement;
+      const focusables = Array.from(
+        host.querySelectorAll<HTMLElement>(
+          '.reading-sheet-panel button, .reading-sheet-panel input, .reading-sheet-panel select'
+        )
+      ).filter(el => el.offsetParent !== null);
+      expect(focusables.length).toBeGreaterThan(1);
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      last.focus();
+      expect(document.activeElement).toBe(last);
+
+      const event = new KeyboardEvent('keydown', { key: 'Tab', cancelable: true });
+      component.onTab(event);
+      expect(document.activeElement).toBe(first);
+    });
+
+    it('Shift+Tab from the first focusable cycles to the last', () => {
+      sheet.open();
+      fixture.detectChanges();
+      const host = fixture.nativeElement as HTMLElement;
+      const focusables = Array.from(
+        host.querySelectorAll<HTMLElement>(
+          '.reading-sheet-panel button, .reading-sheet-panel input, .reading-sheet-panel select'
+        )
+      ).filter(el => el.offsetParent !== null);
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      first.focus();
+
+      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, cancelable: true });
+      component.onTab(event);
+      expect(document.activeElement).toBe(last);
+    });
+
+    it('Tab handler is a no-op when the sheet is closed', () => {
+      const event = new KeyboardEvent('keydown', { key: 'Tab', cancelable: true });
+      component.onTab(event);
+      // Nothing to assert beyond "does not throw / does not prevent default".
+      expect(event.defaultPrevented).toBe(false);
+    });
+  });
 });

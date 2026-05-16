@@ -1134,3 +1134,30 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 **Decision:** Combine (1) + (3). Skip (2) initially — stop sequences are model-specific and may misfire.
 
 ---
+
+### D060: Reading Controls UX — split surfaces, top-bar trigger, responsive sheet (2026-05-16)
+
+**Context:** AI view toggles (narrator chain, diacritics/chunks, word-by-word) were inconsistent across surfaces — buried in a collapsed per-verse footer on chapter pages (0 visible buttons across 36 cards in production), visible at top of card on verse-detail. Initial plan was a single FAB-triggered MatSidenav drawer holding everything. UX research (Quran.com redesign post-mortem, NN/g hidden-nav study, M3 2025 guidance, Kindle / Apple Books / YouVersion conventions) found three problems with that plan: FAB is for primary actions not settings, hidden controls cut discoverability ~50%, and "one drawer for everything" conflates high-frequency view toggles with low-frequency preferences.
+
+**Options considered:**
+1. **Single FAB → MatSidenav with everything inside** (original plan).
+2. **Per-verse toggles, made visible-by-default on chapter cards** — mirrors verse-detail; no global surface.
+3. **Split surfaces: sticky reading toolbar (3 view toggles, hide-on-scroll-down) + responsive side/bottom sheet for prefs, triggered from top-bar `View` icon.**
+
+**Decision:** Option 3.
+
+**Rationale:**
+- Matches the Kindle / Apple Books / YouVersion convention (labeled top-bar icon, never a FAB) — these are the conventions users already know.
+- Splits by change-frequency exactly as Quran.com's redesign concluded after their flat-drawer approach failed.
+- M3 side sheet is the documented primitive for "viewing options for the screen you're already on" — exact match. Navigation drawer is being deprecated in M3 Expressive (May 2025).
+- Reclaims ~40px of vertical reading area via the hide-on-scroll-down toolbar — matters on mobile, free on desktop.
+- Lets us simplify the now-stale `hasWordByWord` gate (word data lives in central ThaqalaynWords, not per-narration) and revert today's two patch commits (`78dba5d`, `7cb7f6e`).
+
+**Trade-offs:**
+- Three new components (reading toolbar, responsive sheet, fixed top app bar restructure) instead of one drawer.
+- Two control surfaces (toolbar + sheet) to keep visually consistent.
+- Hide-on-scroll behaviour adds scroll-listener complexity and a small dead-zone heuristic to avoid flicker.
+
+**Full plan:** [READING_CONTROLS_REDESIGN.md](READING_CONTROLS_REDESIGN.md). Sub-decisions captured there: DR1 hide-on-scroll behaviour (Option B), DR2 fixed top app bar, DR3 desktop side sheet closed-by-default.
+
+---

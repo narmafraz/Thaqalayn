@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-05-12
+> **Last updated:** 2026-05-16
 
 ## Status Legend
 
@@ -121,3 +121,9 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [PHASE4_OPENWEIGHT_BENCHMARK.md](PHASE4_OPENWEIGHT_BENCHMARK.md) | **COMPLETE** | First Phase 4-specific quality benchmark. 30 verses × 3 models (gpt-4.1-mini, gpt-5.4-mini, qwen36-fast). Verdict: Qwen 3.6-35B on DGX Spark **not ready** for production (88.6% parse rate, ~62 s/verse, factual errors). **Side finding**: gpt-5.4-mini provides no measurable Phase 4 quality lift over gpt-4.1-mini at 5× the output cost — recommend flipping the `--phase4-model` default. |
+
+### 2026-05-16
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [READING_CONTROLS_REDESIGN.md](READING_CONTROLS_REDESIGN.md) | **ACTIVE** | Unifies AI view toggles (chain / diacritics / WBW) + reading preferences into one discoverable, responsive surface. Sticky reading toolbar (hide-on-scroll-down) for the 3 high-frequency toggles; responsive side sheet (≥600px) or bottom sheet (<600px) for prefs; top-bar `View` icon trigger; no FAB. Replaces buried per-verse footer toggles on chapter pages and the duplicate toggle row on verse-detail. Simplifies `hasWordByWord` gate now that word data is centralised in ThaqalaynWords. See [DECISION_LOG.md D060](DECISION_LOG.md). |

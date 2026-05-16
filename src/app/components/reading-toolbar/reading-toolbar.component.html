@@ -1,0 +1,25 @@
+<div class="reading-toolbar" [class.hidden]="hidden"
+     role="toolbar"
+     [attr.aria-label]="'book.viewToggles' | translate">
+  <button class="reading-toolbar-btn" (click)="toggleChainDiagram()"
+          [class.active]="showChainDiagram"
+          [attr.aria-pressed]="showChainDiagram"
+          [attr.aria-label]="(showChainDiagram ? 'settings.ai.hideChainDiagram' : 'settings.ai.showChainDiagram') | translate"
+          [matTooltip]="'narrator.chainDiagram' | translate">
+    <mat-icon>{{ showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
+  </button>
+  <button class="reading-toolbar-btn" (click)="toggleDiacritics()"
+          [class.active]="showDiacritics"
+          [attr.aria-pressed]="showDiacritics"
+          [attr.aria-label]="(showDiacritics ? 'settings.ai.showOriginalText' : 'settings.ai.showDiacritizedText') | translate"
+          [matTooltip]="'book.toggleDiacritics' | translate">
+    <mat-icon>{{ showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
+  </button>
+  <button class="reading-toolbar-btn" (click)="toggleWordAnalysis()"
+          [class.active]="showWordAnalysis"
+          [attr.aria-pressed]="showWordAnalysis"
+          [attr.aria-label]="(showWordAnalysis ? 'settings.ai.hideWordAnalysis' : 'settings.ai.showWordAnalysis') | translate"
+          [matTooltip]="'book.wordByWordAnalysis' | translate">
+    <mat-icon>{{ showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
+  </button>
+</div>

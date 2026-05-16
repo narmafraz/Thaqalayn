@@ -1,0 +1,82 @@
+// Sticky reading toolbar — pinned just below the top app bar.
+// Per DR1, hides on scroll-down and reveals on scroll-up.
+// Height-offset matches #header on both desktop (100px) and the
+// mobile compact header (60px) so the toolbar sits flush below it.
+
+.reading-toolbar {
+  position: sticky;
+  top: 100px;
+  // Below header (z-index 100), above page content (0). Stays under
+  // the reading-sheet backdrop (1250) and mobile menu (1100/1200)
+  // when those are open.
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--bg-primary, #fff);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  // Slide up out of view when `hidden`. Stays in the sticky slot
+  // (so content doesn't shift) but the visible region is removed.
+  transition: transform 0.2s ease;
+
+  &.hidden {
+    transform: translateY(-150%);
+  }
+}
+
+:host-context(body.dark-theme) .reading-toolbar {
+  background: var(--bg-primary, #242424);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 768px) {
+  .reading-toolbar {
+    // Header is 100px by default but flips to 60px when scrolled
+    // (.header-compact). We anchor to 60 so the toolbar sits flush
+    // below the compact header; when the page is at top the
+    // toolbar is in the TOP_AREA_PX always-visible band anyway
+    // (handled by the hide-on-scroll dead zone in the component).
+    top: 60px;
+    padding: 4px 8px;
+    gap: 6px;
+  }
+}
+
+.reading-toolbar-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary, #666);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: var(--bg-secondary, #f5f5f5);
+    color: var(--text-primary, #333);
+  }
+
+  &.active {
+    background: var(--accent-soft, rgba(103, 58, 183, 0.12));
+    color: var(--accent-color, #673ab7);
+    border-color: var(--accent-color, #673ab7);
+  }
+}
+
+:host-context(body.dark-theme) .reading-toolbar-btn {
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+  }
+}

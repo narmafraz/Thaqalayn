@@ -129,6 +129,8 @@
       </div>
     </aside>
   </ng-container>
+  <!-- Sticky reading toolbar (chain / diacritics / WBW) — book routes only -->
+  <app-reading-toolbar *ngIf="(activeSection$ | async) === 'books'"></app-reading-toolbar>
   <main id="main-content" class="main">
     <router-outlet></router-outlet>
   </main>

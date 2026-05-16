@@ -231,6 +231,86 @@ python -m app.pipeline_cli.pipeline word-dict extract \
 python -m app.pipeline_cli.build_caches
 ```
 
+### 3i. Words Project — Path B Spark Translation
+
+Separate from the hadith content pipeline. Translates every lemma + surface form in `ThaqalaynWords/` into 11 languages using DGX Spark / Qwen 3.6-35B at $0. See `WORDS_PROJECT_PLAN.md` (plan), `PATH_B_SPARK_LOG.md` (round-by-round results), `PATH_B_STATUS.md` (runbook).
+
+All stages are idempotent — per-slug response files in `ThaqalaynWordSources/translation/{lemma,surface}_responses/{slug}.json` act as resume checkpoints. Re-running the chain after a crash/sleep skips completed slugs.
+
+**Full end-to-end** (~12 h Spark, $0):
+```bash
+# Easiest path — chains every stage. Off by default; switch enables it.
+cd ThaqalaynDataGenerator
+./regen_words.ps1 -IncludeTranslations
+```
+
+**Or run stages individually**:
+```bash
+# 1. Extract lemma prompts (walks ../ThaqalaynWords/lemmas/)
+python scripts/extract_lemma_translation_prompts.py
+
+# 2. Spark lemma pass (~1-3 h, 13K lemmas)
+python -u scripts/run_path_b_translations.py --pass lemma --workers 12 --include-classical
+
+# 3. Extract ±10-word corpus context windows from ../ThaqalaynData/
+python scripts/extract_corpus_contexts.py
+
+# 4. Extract surface prompts (joins lemma anchors + contexts)
+python scripts/extract_surface_translation_prompts.py \
+    --corpus-contexts ../ThaqalaynWordSources/translation/surface_contexts.json
+
+# 5. Spark surface pass (~6-9 h at 12 workers, 102K surfaces)
+python -u scripts/run_path_b_translations.py --pass surface --workers 12
+
+# 6. Merge translations into ThaqalaynWords/{lemmas,surfaces}/*.json
+python scripts/merge_translations_into_pages.py --pass both
+
+# 7. Rebuild indexes (lemmas index gains 11-lang `glosses` map)
+python scripts/build_word_indexes.py
+```
+
+**Pilot rounds** (100 lemmas + 100 surfaces stratified, for prompt iteration):
+```bash
+# Build the locked pilot set (random.seed=20260514, idempotent)
+python scripts/build_path_b_pilot_set.py
+
+# Round N pilot — outputs to {lemma,surface}_responses/round-N/ instead of top-level
+python -u scripts/run_path_b_translations.py --pass lemma \
+    --pilot-set ../ThaqalaynWordSources/translation/pilot_set.json \
+    --round 1 --workers 8 --include-classical
+```
+
+**Resume / restart**:
+```bash
+# After machine sleep / crash, just re-run. Resume skips already-translated slugs:
+python -u scripts/run_path_b_translations.py --pass lemma --workers 12 --include-classical
+python -u scripts/run_path_b_translations.py --pass surface --workers 12
+
+# Force-redo all (bypass resume):
+python -u scripts/run_path_b_translations.py --pass lemma --workers 12 --include-classical --force
+```
+
+**Chain script for unattended completion** (waits for lemma → triggers everything else):
+```bash
+# Launch detached so it survives terminal close. Already inside regen_words.ps1
+# -IncludeTranslations, but can be run on its own:
+powershell -NoProfile -File scripts/path_b_continue_after_lemmas.ps1
+```
+
+**Validation / quality check on translated outputs**:
+```bash
+# Validator sweep across all lemma responses — counts script-leak issues etc.
+python -c "
+import sys; sys.stdout.reconfigure(encoding='utf-8')
+import json, glob
+from app.words.spark_translation import validate_translations
+dir_ = '../ThaqalaynWordSources/translation/lemma_responses'
+files = [f for f in glob.glob(dir_+'/*.json') if '/round-' not in f]
+clean = sum(1 for f in files if not validate_translations(json.load(open(f, encoding='utf-8')).get('parsed', {})))
+print(f'{clean}/{len(files)} clean ({100*clean/len(files):.1f}%)')
+"
+```
+
 ---
 
 ## 4. Pipeline Monitoring & Analysis

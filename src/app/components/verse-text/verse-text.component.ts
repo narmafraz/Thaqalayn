@@ -305,21 +305,13 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return !!this.verse?.ai?.word_analysis?.length;
   }
 
-  /** True when word-by-word view can be shown — either v3 `word_analysis`
-   * is present, or v4 chunks have inline Arabic text we can tokenize. */
+  /** True when word-by-word view can be shown. With word-data now sourced
+   *  per-word from the central ThaqalaynWords repo (not per-verse AI
+   *  content), any hadith with Arabic text can render WBW — the
+   *  tokenizer falls back to splitting `verse.text` and WordsService
+   *  lazy-loads each surface from ThaqalaynWords. */
   get hasWordByWord(): boolean {
-    if (this.hasWordAnalysis) return true;
-    const chunks = this.verse?.ai?.chunks;
-    return !!chunks?.some(c => !!c.arabic_text);
-  }
-
-  /** True when WBW is both *requested* (toggle / saved preference) AND
-   *  the verse has the data needed to render it. Use this for the
-   *  mutual-exclusion guard between WBW grid and standard Arabic — if
-   *  WBW is requested but unavailable, standard Arabic still has to
-   *  render, otherwise the verse is completely blank. */
-  get showWordByWordActive(): boolean {
-    return this.showWordAnalysis && this.hasWordByWord;
+    return !!this.verse?.text?.length;
   }
 
   get wordAnalysis(): WordAnalysisEntry[] {
@@ -349,12 +341,24 @@ export class VerseTextComponent implements OnInit, OnDestroy {
 
   private computeWordTokens(): WordAnalysisEntry[] {
     if (this.hasWordAnalysis) return this.wordAnalysis;
+    // Source order: v4 chunks with arabic_text -> raw verse.text fallback.
+    // Both paths produce empty WordAnalysisEntry stubs; surface data
+    // (pos, lemma, translation) lazy-loads from ThaqalaynWords per click
+    // / on toolbar activation (prefetchSurfaceData).
     const chunks = this.verse?.ai?.chunks;
-    if (!chunks?.length) return [];
+    const sources: string[] = [];
+    if (chunks?.length) {
+      for (const c of chunks) {
+        const t = (c.arabic_text || '').trim();
+        if (t) sources.push(t);
+      }
+    }
+    if (!sources.length && this.verse?.text?.length) {
+      sources.push(...this.verse.text.map(t => (t || '').trim()).filter(Boolean));
+    }
+    if (!sources.length) return [];
     const out: WordAnalysisEntry[] = [];
-    for (const c of chunks) {
-      const text = (c.arabic_text || '').trim();
-      if (!text) continue;
+    for (const text of sources) {
       // Split on whitespace; strip leading/trailing Arabic punctuation
       // (، . ؟ ؛ ! : ()).
       for (const raw of text.split(/\s+/)) {

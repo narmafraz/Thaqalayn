@@ -79,6 +79,17 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   private observer: IntersectionObserver | null = null;
   private observedElements = new Set<Element>();
 
+  // Read-state tracking (RE-01)
+  readPaths = new Set<string>();
+  private readObserver: IntersectionObserver | null = null;
+  private readObservedElements = new Set<Element>();
+  private readDwellTimers = new Map<Element, ReturnType<typeof setTimeout>>();
+  /** Verse must stay ≥50% visible for this long before being auto-marked read. */
+  private static readonly READ_DWELL_MS = 3000;
+  /** Pending auto-marks are flushed in batches to avoid Dexie churn on fast scroll. */
+  private pendingReadFlush: ReturnType<typeof setTimeout> | null = null;
+  private pendingReadPaths = new Set<string>();
+
   private destroyRef = inject(DestroyRef);
   private platformId = inject(PLATFORM_ID);
 
@@ -171,15 +182,21 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
           this.prefetchVersesForSsr(book);
         } else {
           this.setupIntersectionObserver();
+          this.setupReadObserver();
         }
       } else {
         this.verseRefs = [];
         this.destroyObserver();
+        // Legacy inline-verse format: still track reads for visible cards.
+        if (!isPlatformServer(this.platformId) && !isLikelyCrawler()) {
+          this.setupReadObserver();
+        }
       }
 
-      // Load bookmark and annotation states for all verses
+      // Load bookmark, annotation, and read states for all verses
       this.loadBookmarkStates(book);
       this.loadAnnotationStates(book);
+      this.loadReadStates(book);
 
       // Load related chapters from other books
       this.relatedChaptersService.getRelatedChapters('/books/' + book.index)
@@ -199,6 +216,8 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
     this.destroyObserver();
+    this.destroyReadObserver();
+    this.flushPendingReadsNow();
     const host = this.el.nativeElement;
     host.removeEventListener('touchstart', this.onTouchStart);
     host.removeEventListener('touchend', this.onTouchEnd);
@@ -272,6 +291,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
                 if (verse) {
                   this.loadedVerses.set(path, verse);
                   this.cdr.markForCheck();
+                  // The card replaces the skeleton — re-scan so the new
+                  // [data-path] element gets the read observer attached.
+                  setTimeout(() => this.observeReadTargets(), 0);
                 }
               });
             }
@@ -568,6 +590,142 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       this.bookmarkedPaths.add(bm.path);
     }
     this.cdr.markForCheck();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Read-state tracking (RE-01)
+  // ---------------------------------------------------------------------------
+
+  private async loadReadStates(book: ChapterContent): Promise<void> {
+    const bookId = book.index.split(':')[0];
+    const reads = await this.bookmarkService.getReadVersesForBook(bookId);
+    this.readPaths.clear();
+    for (const r of reads) this.readPaths.add(r.path);
+    this.cdr.markForCheck();
+  }
+
+  isVerseRead(bookIndex: string, verse: Verse): boolean {
+    return this.readPaths.has(this.getVersePath(bookIndex, verse));
+  }
+
+  async toggleVerseRead(bookIndex: string, verse: Verse): Promise<void> {
+    const path = this.getVersePath(bookIndex, verse);
+    if (this.readPaths.has(path)) {
+      await this.bookmarkService.unmarkRead(path);
+      this.readPaths.delete(path);
+    } else {
+      await this.bookmarkService.markRead(path, 'manual');
+      this.readPaths.add(path);
+    }
+    this.cdr.markForCheck();
+  }
+
+  /** Mark every verse in the chapter up to and including `verse` as read. */
+  async markReadUpTo(bookIndex: string, verse: Verse): Promise<void> {
+    const cutoff = verse.local_index;
+    const paths: string[] = [];
+    if (this.isShellFormat) {
+      for (const ref of this.verseRefs) {
+        if (ref.part_type === 'Heading') continue;
+        if (!ref.path) continue;
+        if (ref.local_index <= cutoff) paths.push(ref.path);
+      }
+    }
+    if (paths.length === 0) return;
+    await this.bookmarkService.markReadBulk(paths, 'manual');
+    for (const p of paths) this.readPaths.add(p);
+    this.cdr.markForCheck();
+  }
+
+  private setupReadObserver(): void {
+    this.destroyReadObserver();
+    if (typeof IntersectionObserver === 'undefined') return;
+
+    this.readObserver = new IntersectionObserver(
+      entries => {
+        for (const entry of entries) {
+          const target = entry.target;
+          const path = (target as HTMLElement).getAttribute('data-path');
+          if (!path) continue;
+
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            // Already marked? Stop watching to free observer slots.
+            if (this.readPaths.has(path)) {
+              this.readObserver?.unobserve(target);
+              this.readObservedElements.delete(target);
+              continue;
+            }
+            if (this.readDwellTimers.has(target)) continue;
+            const timer = setTimeout(() => {
+              this.readDwellTimers.delete(target);
+              this.queueAutoMark(path);
+              this.readObserver?.unobserve(target);
+              this.readObservedElements.delete(target);
+            }, ChapterContentComponent.READ_DWELL_MS);
+            this.readDwellTimers.set(target, timer);
+          } else {
+            // Left view (or below the 0.5 threshold) — cancel dwell timer
+            const t = this.readDwellTimers.get(target);
+            if (t !== undefined) {
+              clearTimeout(t);
+              this.readDwellTimers.delete(target);
+            }
+          }
+        }
+      },
+      { threshold: [0.5] }
+    );
+
+    setTimeout(() => this.observeReadTargets(), 0);
+  }
+
+  /** Observe every `[data-path]` element. Safe to call multiple times — already-observed nodes are skipped. */
+  observeReadTargets(): void {
+    if (!this.readObserver) return;
+    const els = this.el.nativeElement.querySelectorAll('[data-path]') as NodeListOf<HTMLElement>;
+    els.forEach((el: HTMLElement) => {
+      const path = el.getAttribute('data-path');
+      if (!path) return;
+      // Skip already-marked verses — no need to watch them.
+      if (this.readPaths.has(path)) return;
+      if (this.readObservedElements.has(el)) return;
+      this.readObserver!.observe(el);
+      this.readObservedElements.add(el);
+    });
+  }
+
+  private destroyReadObserver(): void {
+    if (this.readObserver) {
+      this.readObserver.disconnect();
+      this.readObserver = null;
+    }
+    this.readObservedElements.clear();
+    for (const t of this.readDwellTimers.values()) clearTimeout(t);
+    this.readDwellTimers.clear();
+  }
+
+  /**
+   * Buffer auto-marks and flush in batches via `markReadBulk`. Keeps Dexie
+   * writes from thrashing when the user scrolls slowly through many verses.
+   */
+  private queueAutoMark(path: string): void {
+    this.pendingReadPaths.add(path);
+    if (this.pendingReadFlush !== null) return;
+    this.pendingReadFlush = setTimeout(() => this.flushPendingReadsNow(), 1000);
+  }
+
+  private flushPendingReadsNow(): void {
+    if (this.pendingReadFlush !== null) {
+      clearTimeout(this.pendingReadFlush);
+      this.pendingReadFlush = null;
+    }
+    if (this.pendingReadPaths.size === 0) return;
+    const paths = Array.from(this.pendingReadPaths);
+    this.pendingReadPaths.clear();
+    this.bookmarkService.markReadBulk(paths, 'auto').then(() => {
+      for (const p of paths) this.readPaths.add(p);
+      this.cdr.markForCheck();
+    });
   }
 
   // Inline comparative view

@@ -27,6 +27,8 @@ export class VerseActionsComponent {
   @Input() isBookmarked = false;
   @Input() hasNote = false;
   @Input() isGeneratingImage = false;
+  /** Whether the user has marked this verse as read. */
+  @Input() isRead = false;
 
   // --- Chapter mode inputs ---
   /** Set to show the "view details" link (open_in_new) */
@@ -56,6 +58,10 @@ export class VerseActionsComponent {
   @Output() audioToggle = new EventEmitter<void>();
   @Output() tafsirToggle = new EventEmitter<void>();
   @Output() linkShare = new EventEmitter<void>();
+  /** Manual mark/unmark of the verse as read. */
+  @Output() readToggle = new EventEmitter<void>();
+  /** "Mark all verses up to and including this one as read." */
+  @Output() markUpTo = new EventEmitter<void>();
 
   // Internal copy feedback state
   textCopied = false;

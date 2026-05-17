@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { BookmarkService, Bookmark, ReadingProgress, Annotation } from './bookmark.service';
+import { BookmarkService, Bookmark, ReadingProgress, Annotation, ReadVerse, GoalConfig } from './bookmark.service';
 import { firstValueFrom, skip, take } from 'rxjs';
 
 describe('BookmarkService', () => {
@@ -739,6 +739,302 @@ describe('BookmarkService', () => {
       const currentValue = await firstValueFrom(service.annotations$);
       expect(currentValue.length).toBe(1);
       expect(currentValue[0].text).toBe('Updated');
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Read-verse tracking (Wave A / RE-01)
+  // ---------------------------------------------------------------------------
+  describe('markRead', () => {
+    it('records the verse with the inferred bookId and given source', async () => {
+      await service.markRead('/books/al-kafi:1:1:1:1', 'manual');
+      const verses = await service.getReadVerses();
+      expect(verses.length).toBe(1);
+      expect(verses[0].path).toBe('/books/al-kafi:1:1:1:1');
+      expect(verses[0].bookId).toBe('al-kafi');
+      expect(verses[0].source).toBe('manual');
+      expect(verses[0].readAt).toBeInstanceOf(Date);
+    });
+
+    it('defaults source to "auto"', async () => {
+      await service.markRead('/books/quran:1:1');
+      const verses = await service.getReadVerses();
+      expect(verses[0].source).toBe('auto');
+    });
+
+    it('is idempotent — second mark keeps the original readAt and does not duplicate', async () => {
+      await service.markRead('/books/quran:1:1', 'auto');
+      const first = (await service.getReadVerses())[0];
+      await new Promise(r => setTimeout(r, 15));
+      await service.markRead('/books/quran:1:1', 'manual');
+      const all = await service.getReadVerses();
+      expect(all.length).toBe(1);
+      expect(all[0].readAt.getTime()).toBe(first.readAt.getTime());
+      // source should remain the original 'auto' (first-mark wins)
+      expect(all[0].source).toBe('auto');
+    });
+
+    it('ignores paths with no inferrable bookId', async () => {
+      await service.markRead('');
+      const verses = await service.getReadVerses();
+      expect(verses.length).toBe(0);
+    });
+  });
+
+  describe('markReadBulk', () => {
+    it('marks every fresh path and returns the count of new rows', async () => {
+      const n = await service.markReadBulk([
+        '/books/quran:1:1',
+        '/books/quran:1:2',
+        '/books/quran:1:3',
+      ]);
+      expect(n).toBe(3);
+      expect((await service.getReadVerses()).length).toBe(3);
+    });
+
+    it('skips already-marked paths', async () => {
+      await service.markRead('/books/quran:1:1');
+      const n = await service.markReadBulk([
+        '/books/quran:1:1',
+        '/books/quran:1:2',
+        '/books/quran:1:3',
+      ]);
+      expect(n).toBe(2);
+      expect((await service.getReadVerses()).length).toBe(3);
+    });
+
+    it('returns 0 on empty input', async () => {
+      expect(await service.markReadBulk([])).toBe(0);
+    });
+
+    it('preserves the source argument on bulk adds', async () => {
+      await service.markReadBulk(['/books/quran:1:1', '/books/quran:1:2'], 'manual');
+      const verses = await service.getReadVerses();
+      expect(verses.every(v => v.source === 'manual')).toBeTrue();
+    });
+  });
+
+  describe('unmarkRead', () => {
+    it('removes the mark for a given path', async () => {
+      await service.markRead('/books/quran:1:1');
+      await service.unmarkRead('/books/quran:1:1');
+      expect(await service.isRead('/books/quran:1:1')).toBeFalse();
+    });
+
+    it('is a no-op for paths that were never marked', async () => {
+      await service.unmarkRead('/books/quran:99:99');
+      expect((await service.getReadVerses()).length).toBe(0);
+    });
+  });
+
+  describe('isRead / getReadVersesForBook', () => {
+    it('isRead returns true after marking', async () => {
+      await service.markRead('/books/al-kafi:1:1:1:1');
+      expect(await service.isRead('/books/al-kafi:1:1:1:1')).toBeTrue();
+    });
+
+    it('isRead returns false for unmarked paths', async () => {
+      expect(await service.isRead('/books/al-kafi:9:9:9:9')).toBeFalse();
+    });
+
+    it('getReadVersesForBook returns only verses from that book', async () => {
+      await service.markRead('/books/quran:1:1');
+      await service.markRead('/books/quran:1:2');
+      await service.markRead('/books/al-kafi:1:1:1:1');
+
+      const quran = await service.getReadVersesForBook('quran');
+      const kafi = await service.getReadVersesForBook('al-kafi');
+
+      expect(quran.length).toBe(2);
+      expect(kafi.length).toBe(1);
+      expect(quran.every(v => v.bookId === 'quran')).toBeTrue();
+    });
+  });
+
+  describe('readVerses$ observable', () => {
+    it('emits after markRead', async () => {
+      await service.markRead('/books/quran:1:1');
+      const current = await firstValueFrom(service.readVerses$);
+      expect(current.length).toBe(1);
+    });
+
+    it('emits after unmarkRead', async () => {
+      await service.markRead('/books/quran:1:1');
+      await service.unmarkRead('/books/quran:1:1');
+      const current = await firstValueFrom(service.readVerses$);
+      expect(current.length).toBe(0);
+    });
+
+    it('emits empty after clearReadVerses', async () => {
+      await service.markReadBulk(['/books/quran:1:1', '/books/quran:1:2']);
+      await service.clearReadVerses();
+      const current = await firstValueFrom(service.readVerses$);
+      expect(current).toEqual([]);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Goal config (RE-09)
+  // ---------------------------------------------------------------------------
+  describe('goalConfig', () => {
+    it('getGoalConfig returns null when never set', async () => {
+      expect(await service.getGoalConfig()).toBeNull();
+    });
+
+    it('setGoalConfig stores the target', async () => {
+      await service.setGoalConfig(10);
+      const cfg = await service.getGoalConfig();
+      expect(cfg).not.toBeNull();
+      expect(cfg!.dailyVerseTarget).toBe(10);
+      expect(cfg!.id).toBe(0);
+    });
+
+    it('setGoalConfig preserves createdAt on subsequent updates', async () => {
+      await service.setGoalConfig(5);
+      const first = await service.getGoalConfig();
+      await new Promise(r => setTimeout(r, 15));
+      await service.setGoalConfig(15);
+      const second = await service.getGoalConfig();
+
+      expect(second!.dailyVerseTarget).toBe(15);
+      expect(second!.createdAt.getTime()).toBe(first!.createdAt.getTime());
+      expect(second!.updatedAt.getTime()).toBeGreaterThanOrEqual(first!.updatedAt.getTime());
+    });
+
+    it('setGoalConfig(0) is a valid disable signal', async () => {
+      await service.setGoalConfig(0);
+      const cfg = await service.getGoalConfig();
+      expect(cfg!.dailyVerseTarget).toBe(0);
+    });
+
+    it('clearGoalConfig removes the singleton', async () => {
+      await service.setGoalConfig(10);
+      await service.clearGoalConfig();
+      expect(await service.getGoalConfig()).toBeNull();
+    });
+
+    it('goalConfig$ observable emits the latest config', async () => {
+      await service.setGoalConfig(20);
+      const cfg = await firstValueFrom(service.goalConfig$);
+      expect(cfg!.dailyVerseTarget).toBe(20);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Export / import covers new tables
+  // ---------------------------------------------------------------------------
+  describe('export/import — read verses and goal config (v2 format)', () => {
+    it('export includes readVerses and goalConfig under format version 2', async () => {
+      await service.markRead('/books/quran:1:1', 'manual');
+      await service.markRead('/books/al-kafi:1:1:1:1');
+      await service.setGoalConfig(7);
+
+      const json = await service.exportBookmarks();
+      const data = JSON.parse(json);
+
+      expect(data.version).toBe(2);
+      expect(data.readVerses.length).toBe(2);
+      expect(data.goalConfig.dailyVerseTarget).toBe(7);
+      expect(typeof data.exportedAt).toBe('string');
+    });
+
+    it('round-trips read marks across a clear+import cycle', async () => {
+      await service.markRead('/books/quran:1:1');
+      await service.markRead('/books/quran:1:2');
+      await service.markRead('/books/al-kafi:1:1:1:1', 'manual');
+      const exported = await service.exportBookmarks();
+
+      await service.clearAll();
+      expect(await service.getReadVerses()).toEqual([]);
+
+      const imported = await service.importBookmarks(exported);
+      // 3 readVerses count toward the imported total
+      expect(imported).toBe(3);
+
+      const restored = await service.getReadVerses();
+      expect(restored.length).toBe(3);
+      const kafiVerse = restored.find(r => r.path === '/books/al-kafi:1:1:1:1');
+      expect(kafiVerse!.source).toBe('manual');
+    });
+
+    it('importing read marks already in the DB skips duplicates', async () => {
+      await service.markRead('/books/quran:1:1');
+      const exported = await service.exportBookmarks();
+
+      // Don't clear — re-import the same data
+      const imported = await service.importBookmarks(exported);
+      expect(imported).toBe(0);
+      expect((await service.getReadVerses()).length).toBe(1);
+    });
+
+    it('imports goalConfig via upsert (not counted in imported total)', async () => {
+      const importData = {
+        version: 2,
+        bookmarks: [],
+        readingProgress: [],
+        annotations: [],
+        readVerses: [],
+        goalConfig: {
+          id: 0,
+          dailyVerseTarget: 12,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      };
+      const imported = await service.importBookmarks(JSON.stringify(importData));
+      expect(imported).toBe(0);
+
+      const cfg = await service.getGoalConfig();
+      expect(cfg!.dailyVerseTarget).toBe(12);
+    });
+
+    it('imports a legacy v1 payload (no version field, no readVerses) cleanly', async () => {
+      const legacy = {
+        bookmarks: [{ path: '/books/quran:1', title: 'Fatiha', bookId: 'quran', createdAt: new Date().toISOString() }],
+        readingProgress: [],
+        annotations: [],
+      };
+      const imported = await service.importBookmarks(JSON.stringify(legacy));
+      expect(imported).toBe(1);
+      expect((await service.getBookmarks()).length).toBe(1);
+      expect((await service.getReadVerses()).length).toBe(0);
+    });
+
+    it('full round-trip preserves everything (bookmarks + progress + annotations + readVerses + goal)', async () => {
+      await service.addBookmark('/books/quran:1', 'Al-Fatiha', 'الفاتحة');
+      await service.updateReadingProgress('/books/al-kafi:1:1:1', 'Kafi Ch1');
+      await service.saveAnnotation('/books/quran:2:255', 'Throne verse');
+      await service.markRead('/books/quran:1:1', 'manual');
+      await service.markRead('/books/quran:1:2');
+      await service.setGoalConfig(10);
+
+      const exported = await service.exportBookmarks();
+      await service.clearAll();
+
+      const imported = await service.importBookmarks(exported);
+      // 1 bookmark + 1 annotation + 2 readVerses = 4 (readingProgress + goalConfig upsert and aren't counted)
+      expect(imported).toBe(4);
+
+      expect((await service.getBookmarks()).length).toBe(1);
+      expect((await service.getReadingProgress()).length).toBe(1);
+      expect((await service.getAnnotations()).length).toBe(1);
+      expect((await service.getReadVerses()).length).toBe(2);
+      expect((await service.getGoalConfig())!.dailyVerseTarget).toBe(10);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // clearAll covers new tables
+  // ---------------------------------------------------------------------------
+  describe('clearAll — read verses and goal config', () => {
+    it('clearAll wipes readVerses and goalConfig too', async () => {
+      await service.markRead('/books/quran:1:1');
+      await service.setGoalConfig(10);
+
+      await service.clearAll();
+
+      expect((await service.getReadVerses()).length).toBe(0);
+      expect(await service.getGoalConfig()).toBeNull();
     });
   });
 

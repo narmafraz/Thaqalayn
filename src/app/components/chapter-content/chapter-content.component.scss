@@ -1003,3 +1003,48 @@ mat-mdc-card {
     flex: 1 1 100%;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Read-state styling (RE-05). Subtle muting of cards the user has already
+// read. Driven by the .verse-read class set on each verse card. Easy to
+// override via the reading-toolbar "Show read" toggle (RE-05 wiring).
+// ---------------------------------------------------------------------------
+:host:not(.show-read-marks-off) {
+  mat-card.verse-read {
+    opacity: 0.78;
+    transition: opacity 0.15s ease-in-out;
+
+    &:hover {
+      opacity: 1;
+    }
+
+    // A small check in the top-right corner of the card.
+    position: relative;
+
+    &::after {
+      content: '✓';
+      position: absolute;
+      top: 6px;
+      inset-inline-end: 8px;
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      line-height: 1;
+      color: var(--accent-color, #66bb6a);
+      pointer-events: none;
+    }
+  }
+}
+
+// When the toolbar toggle hides read styling, the .verse-read class still
+// exists for state, but opacity / check icon are reset.
+:host.show-read-marks-off mat-card.verse-read {
+  opacity: 1;
+
+  &::after {
+    display: none;
+  }
+}

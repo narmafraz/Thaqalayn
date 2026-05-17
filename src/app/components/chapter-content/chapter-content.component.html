@@ -32,7 +32,7 @@
       <app-book-titles *ngIf="ref.part_type === 'Heading'" [verse]="ref.inline" [headingLevel]="2"></app-book-titles>
       <ng-container *ngIf="ref.part_type === 'Hadith' || ref.part_type === 'Verse'">
         <ng-container *ngIf="loadedVerses.get(ref.path!) as verse; else skeleton">
-          <mat-card appearance="outlined">
+          <mat-card appearance="outlined" [attr.data-path]="ref.path" [class.verse-read]="readPaths.has(ref.path || '')">
             <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ ref.local_index }}</span>
             <mat-card-title>
               <div class="titles">
@@ -86,6 +86,7 @@
                     [preferredTranslation]="(translation$ | async)"
                     [isBookmarked]="isVerseBookmarked(book.index, verse)"
                     [hasNote]="hasNote(book.index, verse)"
+                    [isRead]="isVerseRead(book.index, verse)"
                     [isGeneratingImage]="generatingImageIndex === verse.local_index"
                     [detailPath]="book.index + ':' + verse.local_index"
                     [anchorFragment]="'h' + verse.local_index"
@@ -96,7 +97,9 @@
                     (noteToggle)="toggleNoteEditor(book.index, verse)"
                     (imageShare)="shareAsImage(book, verse, crumbs)"
                     (audioToggle)="toggleAudio(book.index, verse.local_index)"
-                    (tafsirToggle)="toggleTafsir(book.index, verse.local_index)">
+                    (tafsirToggle)="toggleTafsir(book.index, verse.local_index)"
+                    (readToggle)="toggleVerseRead(book.index, verse)"
+                    (markUpTo)="markReadUpTo(book.index, verse)">
                   </app-verse-actions>
                 </div>
                 <div class="grading-inline" *ngIf="verse.gradings?.length">
@@ -185,7 +188,9 @@
   <ng-container *ngIf="!isShellFormat">
   <ng-container *ngFor="let verse of book.data.verses">
     <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse" [headingLevel]="2"></app-book-titles>
-    <mat-card appearance="outlined" *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'">
+    <mat-card appearance="outlined" *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'"
+              [attr.data-path]="getVersePath(book.index, verse)"
+              [class.verse-read]="readPaths.has(getVersePath(book.index, verse))">
       <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ verse.local_index }}</span>
       <mat-card-title>
         <div class="titles">

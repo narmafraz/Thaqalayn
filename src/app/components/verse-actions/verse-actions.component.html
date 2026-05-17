@@ -19,6 +19,16 @@
   <mat-icon>{{ isBookmarked ? 'bookmark' : 'bookmark_border' }}</mat-icon>
 </button>
 
+<!-- Read toggle (Wave A / RE-01) -->
+<button class="action-icon-btn read-icon-btn"
+        [class.is-read]="isRead"
+        (click)="readToggle.emit()"
+        (contextmenu)="$event.preventDefault(); markUpTo.emit()"
+        [attr.aria-label]="isRead ? ('reading.unmarkRead' | translate) : ('reading.markRead' | translate)"
+        [matTooltip]="(isRead ? 'reading.unmarkRead' : 'reading.markRead') | translate">
+  <mat-icon>{{ isRead ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+</button>
+
 <!-- Copy anchor link (chapter mode) -->
 <a *ngIf="anchorFragment"
    class="action-icon-btn"

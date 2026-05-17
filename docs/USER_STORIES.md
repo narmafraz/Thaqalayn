@@ -121,6 +121,23 @@ Status legend: **[DONE]** = implemented & working, **[PARTIAL]** = partially imp
 | BMK-07 | As a user, I can clear reading progress for a book | [DONE] |
 | BMK-08 | As a user, I can add personal notes/annotations to verses | [PARTIAL] |
 | BMK-09 | As a user, I can sync bookmarks/notes across devices via Firebase (Google or anonymous sign-in) | [PARTIAL] |
+| BMK-10 | As a user, individual verses I read are automatically marked (≥50% visible for ≥3s) | [DONE] |
+| BMK-11 | As a user, I can manually toggle a verse's read state via the verse-actions bar | [DONE] |
+| BMK-12 | As a user, I can right-click the read button to mark all verses up to here | [DONE] |
+| BMK-13 | As a user, I see per-book progress bars on the homepage and chapter-list pages | [DONE] |
+| BMK-14 | As a user, I see per-chapter completion rings in chapter lists | [DONE] |
+| BMK-15 | As a user, I can filter a chapter list to hide fully-read chapters | [DONE] |
+| BMK-16 | As a user, read verses are visually muted with a checkmark | [DONE] |
+| BMK-17 | As a user, I see my reading history grouped by day on the bookmarks page | [DONE] |
+| BMK-18 | As a user, I see a streak counter (current + longest) for consecutive reading days | [DONE] |
+| BMK-19 | As a user, my streak survives one missed day (forgiving freeze) | [DONE] |
+| BMK-20 | As a user, when my streak is alive but I haven't read today, the chip warns me | [DONE] |
+| BMK-21 | As a user, I can set a daily verse-count goal with quick-pick presets | [DONE] |
+| BMK-22 | As a user, I can disable my goal at any time | [DONE] |
+| BMK-23 | As a user, I see a goal-progress ring on the homepage tracking today's reading | [DONE] |
+| BMK-24 | As a user, I get a celebratory toast when I finish a book or cross 100/1000/10000 cumulative verses | [DONE] |
+| BMK-25 | As a user, the homepage shows a sticky "Verse of the Day" (Quran), same for everyone on the same date | [DONE] |
+| BMK-26 | As a user, my export bundle includes read-verses, goal config, and all the above for cross-device migration | [DONE] |
 
 ## 9. Sharing & Embedding
 

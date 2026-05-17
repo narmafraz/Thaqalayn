@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-05-16
+> **Last updated:** 2026-05-17
 
 ## Status Legend
 
@@ -127,3 +127,9 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [READING_CONTROLS_REDESIGN.md](READING_CONTROLS_REDESIGN.md) | **COMPLETE** (shipped 2026-05-16, 7 commits `2a7e0a5..5611b1a`) | Unifies AI view toggles (chain / diacritics / WBW) + reading preferences into one discoverable surface. Sticky reading toolbar (hide-on-scroll-down) for the 3 toggles; slide-out side sheet for prefs; top-bar `View` icon trigger; no FAB. Replaced buried per-verse footer toggles + duplicate verse-detail toggle row. `hasWordByWord` simplified to text-presence now that word data is centralised in ThaqalaynWords. Reverts patch commits `78dba5d` + `7cb7f6e`. 649/649 Karma. See [DECISION_LOG.md D060](DECISION_LOG.md). Open: responsive-primitive split (bottom-sheet at <600px), z-index audit. |
+
+### 2026-05-17
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [READING_ENGAGEMENT_PROPOSAL.md](READING_ENGAGEMENT_PROPOSAL.md) | **WAVES A–D COMPLETE** (2026-05-17, 5 commits in this session + 2 in the generator/data repos) | 15-item proposal extending `lastPath`-only progress into verse-level coverage tracking + habit features. **Shipped:** per-verse auto+manual marking via dedicated IntersectionObserver, Dexie v3 schema (`readVerses` + `goalConfig`) + extended JSON export/import, `VerseCountsService` + `ReadingStatsService` deriving book progress / daily tallies / streak / goal, per-book progress bars on homepage cards, per-chapter SVG rings in chapter-list with unread-only filter, `.verse-read` styling, /bookmarks reading-history section + streak chip + goal editor, deterministic "verse of the day", milestone toasts on book completion + cumulative thresholds. **Deferred:** RE-10 plans (Wave E), RE-12 push (Wave F), RE-14/15 (Wave G). 75 new Karma tests (649 → 724) + 10 new pytest tests (verse_counts module). All 1979 pytest + 724 Karma pass. See [DECISION_LOG.md D061](DECISION_LOG.md). |

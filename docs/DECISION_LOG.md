@@ -1161,3 +1161,35 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 **Full plan:** [READING_CONTROLS_REDESIGN.md](READING_CONTROLS_REDESIGN.md). Sub-decisions captured there: DR1 hide-on-scroll behaviour (Option B), DR2 fixed top app bar, DR3 desktop side sheet closed-by-default.
 
 ---
+
+### D061: Reading-progress architecture — single Dexie DB, derived stats service, IntersectionObserver auto-detect (2026-05-17)
+
+**Context:** The proposal in `READING_ENGAGEMENT_PROPOSAL.md` Wave A introduces per-verse read tracking, daily-goal config, milestone events, streaks, and history — all client-only. Multiple architectural choices needed up front so later waves don't fight the foundation.
+
+**Sub-decisions:**
+
+1. **Storage: one Dexie database, not two.** The existing `thaqalayn-bookmarks` DB grew to v3 with `readVerses` + `goalConfig` tables. A second DB would have simplified migrations of unrelated data but complicated the user-facing JSON export/import (the single-button "save your progress" workflow the user asked for). Going single-DB keeps export atomic and clearAll() trivial.
+
+2. **Auto-detect: separate IntersectionObserver, not piggybacking the lazy loader.** `chapter-content` already has an observer with `rootMargin: 200px` to lazy-load verse-detail JSONs. Reusing it for read-state would have meant marking-as-read before the user actually saw the verse. Instead a second observer with `threshold: 0.5` + 3-second dwell timer runs in parallel, ignoring already-marked paths. Batched flush via `markReadBulk` every 1 s keeps Dexie writes bounded under fast scroll.
+
+3. **Idempotent `markRead`: first-read wins.** Marking the same path twice keeps the original `readAt` — re-visits don't reset history-page chronology or streak math. Manual escape hatch is `unmarkRead`.
+
+4. **Derived stats live in `ReadingStatsService`, not state.** No new NGXS state. The service projects `readVerses$ + verse-counts$` into UI shapes (per-book progress map, daily tallies, streak, goal fraction, milestone deltas). Cheaper, simpler, and the manifest fetch is the only HTTP call.
+
+5. **Streak forgiveness model: one freeze per walk, applies anywhere.** Originally the freeze only triggered after the first read day. Tests demonstrated that missing today should not zero-out a multi-day streak — instead, the freeze can cover today, yesterday, or any single gap in the walk. Two consecutive missing days break it. `includesToday` boolean separates "streak alive, in danger" from "streak alive, already read today" for the in-danger UI state.
+
+6. **Verse counts at build time, not runtime.** `ThaqalaynDataGenerator/app/verse_counts.py` walks chapter shells once during `add_data` and emits `ThaqalaynData/index/verse-counts.json` (~250 KB, 8.6K chapter keys, 58K total verses). Frontend fetches it once via `VerseCountsService` with `shareReplay(1)`. Computing on the client from 67K JSON files would be wasteful; computing on first use only would block UI.
+
+7. **Quran semantics: ayah coverage.** Counted units are `part_type ∈ {Hadith, Verse}`; `Heading` entries (~43 across the corpus) are skipped. Quran totals to 6,236 ayat which matches the canonical count. Confirmed with the user (2026-05-17).
+
+8. **Milestone toasts: custom component, not MatSnackBar.** The project doesn't import `@angular/material/snack-bar` anywhere. Adding it for this single feature would have pulled new module dependencies into shared.module. A 60-line bespoke toaster with ARIA live region, dismiss + click-through link, and tailored styling per milestone kind ships smaller and matches existing project conventions.
+
+9. **Daily verse: FNV-1a 32-bit hash of local `YYYY-MM-DD`.** Cheap, dependency-free, deterministic per calendar day in the user's local time (matters because reading happens in local context, not UTC). Quran-only — hadith stays random because there's no obvious "hadith of the day" framing across 22+ collections, and shuffle satisfies that surface.
+
+10. **Gamification posture: visible, opt-out, no comparison.** Per user direction (2026-05-17), no leaderboards (impossible without a server anyway), streak chip visible by default on /bookmarks and on homepage when streak > 0, milestone toasts on by default, daily goal off by default with a "Set goal" entry point. No public profiles. Streak in-danger uses warning colour, never push.
+
+**Full plan + status:** [READING_ENGAGEMENT_PROPOSAL.md](READING_ENGAGEMENT_PROPOSAL.md).
+
+**Out of scope this session (per the user's "to the end of Wave D" instruction):** RE-10 reading plans (Wave E — needs curated plan JSON authorship), RE-12 PWA push notifications (Wave F — copy review pending), RE-14/15 spaced-repetition and cross-book recommendations (Wave G).
+
+---

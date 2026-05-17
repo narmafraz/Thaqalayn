@@ -99,5 +99,35 @@ describe('ReadingToolbarComponent', () => {
       emitScroll(205); // tiny scroll, should not change state
       expect(component.hidden).toBe(before);
     });
+
+    // Regression for the smooth-scroll bug: real browsers fire scroll
+    // events with ~5px deltas during wheel/trackpad scrolling. If we
+    // re-baseline lastScrollY on every event, the dead zone is
+    // permanently active and hide-on-scroll never triggers.
+    it('accumulates small downward ticks until the dead zone is crossed', () => {
+      // First establish a baseline at y=100 with hidden=false: scroll
+      // down (decisive), then back up (decisive). Now lastScrollY=100,
+      // hidden=false.
+      emitScroll(300);
+      emitScroll(100);
+      expect(component.hidden).toBe(false);
+      emitScroll(105); // delta 5 — within dead zone
+      expect(component.hidden).toBe(false);
+      emitScroll(110); // cumulative delta 10 — still within dead zone (<=)
+      expect(component.hidden).toBe(false);
+      emitScroll(115); // cumulative delta 15 — exceeds dead zone, should hide
+      expect(component.hidden).toBe(true);
+    });
+
+    it('accumulates small upward ticks to reveal the toolbar', () => {
+      emitScroll(300); // decisive — hides, lastScrollY=300
+      expect(component.hidden).toBe(true);
+      emitScroll(295); // -5 within dead zone
+      expect(component.hidden).toBe(true);
+      emitScroll(290); // cumulative -10 still within dead zone
+      expect(component.hidden).toBe(true);
+      emitScroll(285); // cumulative -15 exceeds dead zone, should reveal
+      expect(component.hidden).toBe(false);
+    });
   });
 });

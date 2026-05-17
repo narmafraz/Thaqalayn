@@ -457,29 +457,56 @@ kbd {
 }
 
 /* ===================== Reading Sheet Trigger ===================== */
-// Always-visible View icon in the top app bar. Opens the global
-// Reading Sheet (AI prefs + view toggles).
+// Always-visible View pill in the top app bar. Opens the global
+// Reading Sheet (AI prefs + view toggles). Labeled (not icon-only)
+// so it's discoverable as a distinct affordance among the other
+// chrome icons — Kindle "Aa" / YouVersion convention.
 .reading-sheet-trigger {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
   cursor: pointer;
-  padding: 4px;
-  display: flex;
+  padding: 4px 12px 4px 8px;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  margin-inline-start: 4px;
-  border-radius: 50%;
-  transition: background 0.2s, color 0.2s;
+  gap: 6px;
+  margin-inline-start: 8px;
+  border-radius: 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
 
-  &:hover, &.active {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  &.active {
+    background: #fff;
+    color: var(--accent-color, #673ab7);
+    border-color: #fff;
   }
 
   mat-icon {
     font-size: 18px;
     width: 18px;
     height: 18px;
+  }
+
+  .reading-sheet-trigger-label {
+    line-height: 1;
+  }
+}
+
+// Hide the label below a narrow breakpoint so the pill stays compact
+// alongside the other chrome controls when space is tight (still
+// labeled at desktop sizes ≥ 900px).
+@media (max-width: 900px) {
+  .reading-sheet-trigger {
+    padding: 4px 8px;
+    .reading-sheet-trigger-label {
+      display: none;
+    }
   }
 }

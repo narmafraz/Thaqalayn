@@ -163,16 +163,16 @@ export class AppComponent implements OnInit, OnDestroy {
 
   scrollToTop(): void {
     if (!this.isBrowser) return;
-    const siteEl = document.getElementById('site');
-    if (siteEl) {
-      siteEl.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    // Document is the scroll container now (#site is overflow-x: clip;
+    // overflow-y: visible since the step-3 header-sticky fix). Use
+    // window.scrollTo so this works whether scroll lives on
+    // documentElement, body, or scrollingElement.
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   private onSiteScroll = (): void => {
-    const siteEl = document.getElementById('site');
-    if (!siteEl) return;
-    const scrollTop = siteEl.scrollTop;
+    if (!this.isBrowser) return;
+    const scrollTop = window.scrollY;
     const shouldShow = scrollTop > window.innerHeight * 2;
     const shouldCompact = scrollTop > 50;
     let changed = false;
@@ -207,11 +207,10 @@ export class AppComponent implements OnInit, OnDestroy {
         })
       );
 
-      // Listen for scroll events on #site for back-to-top button
-      const siteEl = document.getElementById('site');
-      if (siteEl) {
-        siteEl.addEventListener('scroll', this.onSiteScroll, { passive: true });
-      }
+      // Listen on window scroll (document is the scroll container after
+      // the step-3 sticky-header fix). Drives the header-compact class
+      // and the back-to-top FAB visibility.
+      window.addEventListener('scroll', this.onSiteScroll, { passive: true });
 
       // Handle legacy hash-based URLs (redirect #/books/quran:1 to /books/quran:1)
       if (window.location.hash.startsWith('#/')) {
@@ -414,10 +413,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
     if (this.isBrowser) {
-      const siteEl = document.getElementById('site');
-      if (siteEl) {
-        siteEl.removeEventListener('scroll', this.onSiteScroll);
-      }
+      window.removeEventListener('scroll', this.onSiteScroll);
     }
   }
 }

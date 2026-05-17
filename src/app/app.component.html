@@ -30,6 +30,7 @@
                     [attr.aria-label]="'settings.ai.title' | translate"
                     [matTooltip]="'settings.ai.title' | translate">
               <mat-icon>{{ (readingSheetOpen$ | async) ? 'tune' : 'auto_awesome' }}</mat-icon>
+              <span class="reading-sheet-trigger-label">{{ 'nav.view' | translate }}</span>
             </button>
 
             <mat-select

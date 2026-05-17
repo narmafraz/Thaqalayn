@@ -55,12 +55,24 @@ export class ReadingToolbarComponent implements OnInit, OnDestroy {
   @HostListener('window:scroll')
   onScroll(): void {
     const y = window.scrollY;
-    let next = this.hidden;
+    // Always-visible top band: any scroll position inside it forces
+    // the toolbar back to visible, and the next decisive scroll
+    // baselines from here.
     if (y < this.TOP_AREA_PX) {
-      next = false;
-    } else if (Math.abs(y - this.lastScrollY) > this.DEAD_ZONE_PX) {
-      next = y > this.lastScrollY;
+      this.lastScrollY = y;
+      if (this.hidden) {
+        this.hidden = false;
+        this.cdr.markForCheck();
+      }
+      return;
     }
+    const delta = y - this.lastScrollY;
+    // Within dead zone: keep lastScrollY untouched so micro-tick
+    // deltas (e.g. smooth-scroll wheel events firing every ~5px)
+    // accumulate. Updating lastScrollY here was the bug that made
+    // hide-on-scroll silently never trigger during normal browsing.
+    if (Math.abs(delta) <= this.DEAD_ZONE_PX) return;
+    const next = delta > 0;
     this.lastScrollY = y;
     if (next !== this.hidden) {
       this.hidden = next;

@@ -98,11 +98,12 @@
 
 .header-mobile-controls {
   display: none;
+  // Push the icons against the trailing edge of the header so they
+  // sit opposite the logo/title rather than crowding into it.
   margin-inline-start: auto;
-  flex: 1;
-  min-width: 0;
   gap: 4px;
   align-items: center;
+  justify-content: flex-end;
 
   button {
     color: #fff;
@@ -127,7 +128,10 @@
 }
 
 .mobile-search-panel {
-  background: var(--crumb-bg, #512da8);
+  // Light panel rather than the banner purple — typed text was
+  // hard to read against the purple-on-purple of the previous
+  // styling. Matches the rest of the app's content surface.
+  background: var(--bg-primary, #fff);
   padding: 12px 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }

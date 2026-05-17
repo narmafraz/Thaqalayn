@@ -1,5 +1,7 @@
 <div class="settings">
-  <mat-icon>settings</mat-icon>
+  <!-- Decorative gear icon removed — the canonical Settings trigger lives
+       in the top app bar; having an inert gear next to the translation
+       dropdown was confusing now that we have a real one. -->
   <app-translation-selection></app-translation-selection>
 
   <div class="nav-buttons" *ngIf="(nav$ | async) as nav">

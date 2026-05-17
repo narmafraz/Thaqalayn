@@ -73,9 +73,28 @@
       </div>
     </section>
 
+    <!-- Translation (current chapter) -->
+    <section class="reading-sheet-section">
+      <h3 class="reading-sheet-section-title">{{ 'translation.selectTranslation' | translate }}</h3>
+      <!-- Mirrors the per-chapter translation dropdown in the page so
+           users can switch translation without scrolling back to the
+           top. Dropdown is data-driven; empty on non-book routes. -->
+      <app-translation-selection></app-translation-selection>
+    </section>
+
     <!-- AI Features -->
     <section class="reading-sheet-section" *ngIf="preferences$ | async as prefs">
       <h3 class="reading-sheet-section-title">{{ 'settings.ai.title' | translate }}</h3>
+      <label class="reading-sheet-pref" for="rs-pref-chain">
+        <input type="checkbox" id="rs-pref-chain" [checked]="prefs.showChainDiagram"
+               (change)="onPrefChange('showChainDiagram', $any($event.target).checked)">
+        <span>{{ 'narrator.chainDiagram' | translate }}</span>
+      </label>
+      <label class="reading-sheet-pref" for="rs-pref-wbw">
+        <input type="checkbox" id="rs-pref-wbw" [checked]="prefs.showWordByWord"
+               (change)="onPrefChange('showWordByWord', $any($event.target).checked)">
+        <span>{{ 'book.wordByWordAnalysis' | translate }}</span>
+      </label>
       <label class="reading-sheet-pref" for="rs-pref-diacritized">
         <input type="checkbox" id="rs-pref-diacritized" [checked]="prefs.showDiacritizedByDefault"
                (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">

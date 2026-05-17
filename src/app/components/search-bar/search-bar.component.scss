@@ -54,13 +54,34 @@ input {
   width: 100%;
 
   .search-input-container {
+    // Light panel context (was banner-purple) — pair a slightly
+    // tinted background with dark text so what the user types is
+    // actually readable.
+    background: var(--bg-secondary, #f0f0f4);
+    border: 1px solid var(--border-color, #d0d0d0);
     height: 40px;
     padding: 0 8px;
+
+    &:focus-within {
+      background: var(--bg-primary, #fff);
+      border-color: var(--accent-color, #673ab7);
+    }
+  }
+
+  .search-icon,
+  .clear-btn mat-icon,
+  .search-tips-btn mat-icon {
+    color: var(--text-secondary, #555);
   }
 
   input {
     width: 100%;
     font-size: 16px; // 16px prevents iOS zoom
+    color: var(--text-primary, #222);
+
+    &::placeholder {
+      color: var(--text-muted, #888);
+    }
   }
 
   .search-tips-btn {

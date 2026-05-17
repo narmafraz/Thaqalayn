@@ -1,21 +1,26 @@
 import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AiLanguage } from '@app/models/ai-content';
 import { AiPreferences, AiPreferencesService } from '@app/services/ai-preferences.service';
 import { ReadingSheetService } from '@app/services/reading-sheet.service';
+import { I18nService, ThemeService } from '@app/services';
+import { ThemeMode } from '@app/services/theme.service';
 
 /**
- * Global Reading Sheet — slide-out panel hosted at the app shell.
- * Currently surfaces AI preferences (was the inline ai-settings-panel
- * inside SettingsComponent). Step 4 of READING_CONTROLS_REDESIGN will
- * add the 3 view-toggles (chain / diacritics / WBW) here too; for now
- * those still live on per-verse footers.
+ * Global Settings sheet — slide-out panel hosted at the app shell.
+ * Single canonical surface for all reading-app settings:
+ *   - Display (theme, font size)
+ *   - Language (UI language, word-by-word default language)
+ *   - AI Features (diacritics-by-default, badges, topic tags, disclaimer)
+ *   - Navigate (top-level routes; on mobile this also replaces the old
+ *     hamburger menu, so the trigger is the *only* nav-and-settings
+ *     affordance off the header).
  *
- * Trigger: SettingsComponent's `ai-settings-btn` calls
- * `ReadingSheetService.toggle()`. The sheet is single-instance,
- * survives route changes (hosted in `app.component.html`), and closes
- * on Esc or backdrop click.
+ * Trigger: the labeled "Settings" pill in `app.component.html`
+ * (desktop and mobile) calls `ReadingSheetService.toggle()`.
+ * Single-instance, survives route changes, closes on Esc / backdrop.
  */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,9 +32,41 @@ import { ReadingSheetService } from '@app/services/reading-sheet.service';
 export class ReadingSheetComponent implements OnInit, OnDestroy {
   readonly sheet = inject(ReadingSheetService);
   readonly aiPrefs = inject(AiPreferencesService);
+  private readonly themeService = inject(ThemeService);
+  private readonly i18n = inject(I18nService);
+  private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
+
   readonly open$: Observable<boolean> = this.sheet.open$;
   readonly preferences$: Observable<AiPreferences> = this.aiPrefs.preferences$;
+  readonly theme$: Observable<ThemeMode> = this.themeService.theme$;
+  readonly fontSize$: Observable<number> = this.themeService.fontSize$;
+  readonly currentLang$: Observable<string> = this.i18n.currentLang$;
+
+  readonly uiLanguages = [
+    { code: 'en', name: 'English' },
+    { code: 'ar', name: 'العربية' },
+    { code: 'fa', name: 'فارسی' },
+    { code: 'fr', name: 'Français' },
+    { code: 'ur', name: 'اردو' },
+    { code: 'tr', name: 'Türkçe' },
+    { code: 'id', name: 'Bahasa Indonesia' },
+    { code: 'bn', name: 'বাংলা' },
+    { code: 'es', name: 'Español' },
+    { code: 'de', name: 'Deutsch' },
+    { code: 'ru', name: 'Русский' },
+    { code: 'zh', name: '中文' },
+  ];
+
+  readonly navLinks = [
+    { route: '/books', icon: 'menu_book', labelKey: 'nav.books' },
+    { route: '/topics', icon: 'category', labelKey: 'nav.topics' },
+    { route: '/people/narrators', icon: 'people', labelKey: 'nav.narrators' },
+    { route: '/bookmarks', icon: 'bookmark', labelKey: 'nav.bookmarks' },
+    { route: '/about', icon: 'info', labelKey: 'nav.about' },
+    { route: '/download', icon: 'download', labelKey: 'nav.download' },
+    { route: '/support', icon: 'volunteer_activism', labelKey: 'nav.support' },
+  ];
 
   /** Element that had focus before the sheet opened, restored on close. */
   private previouslyFocused: HTMLElement | null = null;
@@ -40,8 +77,6 @@ export class ReadingSheetComponent implements OnInit, OnDestroy {
       if (isOpen) {
         this.previouslyFocused = (document.activeElement as HTMLElement) ?? null;
         // Defer to after the panel is in the DOM and CSS class applied.
-        // setTimeout works for tests + real browsers; using rAF in SSR
-        // contexts isn't safe so timeout is the portable choice.
         setTimeout(() => this.focusFirst(), 0);
       } else if (this.previouslyFocused) {
         const target = this.previouslyFocused;
@@ -60,13 +95,41 @@ export class ReadingSheetComponent implements OnInit, OnDestroy {
     this.sheet.close();
   }
 
+  // --- Display ---
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+  increaseFontSize(): void {
+    this.themeService.increaseFontSize();
+  }
+  decreaseFontSize(): void {
+    this.themeService.decreaseFontSize();
+  }
+  resetFontSize(): void {
+    this.themeService.resetFontSize();
+  }
+
+  // --- Language ---
+  onUiLanguageChange(lang: string): void {
+    this.i18n.setLanguage(lang);
+    this.router.navigate([], {
+      queryParams: { lang },
+      queryParamsHandling: 'merge',
+    });
+  }
+  onWordByWordLangChange(value: AiLanguage): void {
+    this.aiPrefs.set('wordByWordDefaultLang', value);
+  }
+
+  // --- AI prefs ---
   onPrefChange<K extends keyof AiPreferences>(key: K, value: AiPreferences[K]): void {
     this.aiPrefs.set(key, value);
   }
 
-  /** Type-narrowed wrapper so the template can pass strings without `any`. */
-  onLangChange(value: AiLanguage): void {
-    this.aiPrefs.set('wordByWordDefaultLang', value);
+  // --- Navigate (closes the sheet on click) ---
+  navigateTo(route: string): void {
+    this.close();
+    this.router.navigateByUrl(route);
   }
 
   @HostListener('document:keydown.escape')

@@ -27,10 +27,10 @@
 
             <button class="reading-sheet-trigger" (click)="toggleReadingSheet(); $event.stopPropagation()"
                     [class.active]="readingSheetOpen$ | async"
-                    [attr.aria-label]="'settings.ai.title' | translate"
-                    [matTooltip]="'settings.ai.title' | translate">
-              <mat-icon>{{ (readingSheetOpen$ | async) ? 'tune' : 'auto_awesome' }}</mat-icon>
-              <span class="reading-sheet-trigger-label">{{ 'nav.view' | translate }}</span>
+                    [attr.aria-label]="'settings.title' | translate"
+                    [matTooltip]="'settings.title' | translate">
+              <mat-icon>settings</mat-icon>
+              <span class="reading-sheet-trigger-label">{{ 'settings.title' | translate }}</span>
             </button>
 
             <mat-select
@@ -43,19 +43,17 @@
             </mat-select>
           </div>
 
-          <!-- Mobile: search icon + reading sheet + hamburger -->
+          <!-- Mobile: search icon + single Settings trigger (hamburger
+               retired — its nav links and settings now live inside
+               the consolidated Reading Sheet) -->
           <div class="header-mobile-controls">
             <button class="mobile-search-btn" (click)="toggleMobileSearch(); $event.stopPropagation()"
                     [attr.aria-label]="'search.search' | translate">
               <mat-icon>{{ mobileSearchOpen ? 'close' : 'search' }}</mat-icon>
             </button>
             <button class="mobile-reading-sheet-btn" (click)="toggleReadingSheet(); $event.stopPropagation()"
-                    [attr.aria-label]="'settings.ai.title' | translate">
-              <mat-icon>{{ (readingSheetOpen$ | async) ? 'tune' : 'auto_awesome' }}</mat-icon>
-            </button>
-            <button class="mobile-menu-btn" (click)="toggleMobileMenu(); $event.stopPropagation()"
-                    [attr.aria-label]="'nav.menu' | translate">
-              <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
+                    [attr.aria-label]="'settings.title' | translate">
+              <mat-icon>settings</mat-icon>
             </button>
           </div>
         </div>
@@ -70,65 +68,8 @@
       </div>
     </div>
 
-    <!-- Mobile hamburger menu overlay -->
-    <div class="mobile-menu-overlay" *ngIf="mobileMenuOpen" (click)="mobileMenuOpen = false"></div>
-    <aside class="mobile-menu-panel" [class.open]="mobileMenuOpen">
-      <div class="mobile-menu-header">
-        <span>{{ 'app.title' | translate }}</span>
-        <button (click)="mobileMenuOpen = false" [attr.aria-label]="'app.closeMenu' | translate">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-      <nav class="mobile-menu-nav">
-        <a routerLink="/books" (click)="mobileMenuOpen = false" queryParamsHandling="preserve">
-          <mat-icon>menu_book</mat-icon> {{ 'nav.books' | translate }}
-        </a>
-        <a routerLink="/about" (click)="mobileMenuOpen = false">
-          <mat-icon>info</mat-icon> {{ 'nav.about' | translate }}
-        </a>
-        <a routerLink="/download" (click)="mobileMenuOpen = false">
-          <mat-icon>download</mat-icon> {{ 'nav.download' | translate }}
-        </a>
-        <a routerLink="/support" (click)="mobileMenuOpen = false">
-          <mat-icon>volunteer_activism</mat-icon> {{ 'nav.support' | translate }}
-        </a>
-      </nav>
-      <div class="mobile-menu-settings">
-        <h4>{{ 'settings.title' | translate }}</h4>
-        <div class="mobile-setting-row">
-          <span>{{ 'settings.toggleDarkMode' | translate }}</span>
-          <button (click)="toggleTheme()" [attr.aria-label]="'settings.toggleDarkMode' | translate">
-            <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
-          </button>
-        </div>
-        <div class="mobile-setting-row" *ngIf="fontSize$ | async as fontSize">
-          <span>{{ 'settings.fontSize' | translate }}</span>
-          <div class="mobile-font-controls">
-            <button (click)="decreaseFontSize()" [disabled]="fontSize <= 75">A-</button>
-            <button (click)="resetFontSize()">A</button>
-            <button (click)="increaseFontSize()" [disabled]="fontSize >= 150">A+</button>
-          </div>
-        </div>
-        <div class="mobile-setting-row">
-          <span>{{ 'language.picker' | translate }}</span>
-          <mat-select
-            class="mobile-lang-picker"
-            [value]="currentLang$ | async"
-            (selectionChange)="onLanguageChange($event.value)"
-            [attr.aria-label]="'language.picker' | translate">
-            <mat-option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</mat-option>
-          </mat-select>
-        </div>
-      </div>
-      <div class="mobile-menu-settings">
-        <button class="mobile-open-reading-sheet" (click)="openReadingSheetFromMobileMenu()"
-                [attr.aria-label]="'settings.ai.title' | translate">
-          <mat-icon>auto_awesome</mat-icon>
-          <span>{{ 'settings.ai.title' | translate }}</span>
-          <mat-icon class="chevron">chevron_right</mat-icon>
-        </button>
-      </div>
-    </aside>
+    <!-- Mobile hamburger retired in favour of the single Settings
+         trigger above; the Reading Sheet hosts all nav + settings. -->
   </ng-container>
   <!-- Sticky reading toolbar (chain / diacritics / WBW) — book routes only -->
   <app-reading-toolbar *ngIf="(activeSection$ | async) === 'books'"></app-reading-toolbar>

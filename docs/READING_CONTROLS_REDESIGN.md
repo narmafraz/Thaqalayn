@@ -30,8 +30,26 @@ Unifies AI view toggles + reading preferences into a single, discoverable, respo
 
 - Responsive primitive: bottom sheet under 600px, non-modal side sheet at ≥1240px, with the `sidesheetOpenOnDesktop` pref governing the persistent-open case.
 - Relocate the `<app-settings>` strip's translation-selection + nav arrows (or accept current placement).
-- Future settings (font size, theme, line-height) — the side sheet content template is designed to absorb these without restructuring.
-- Z-index audit — sticky header (100), sticky toolbar (90), reading-sheet backdrop (1250), reading-sheet panel (1300), mobile-menu overlay (1100), mobile-menu panel (1200). Worth reconsolidating into a single SCSS map once another modal lands.
+- Line-height / reading width / reciter — the sheet's section template is designed to absorb these without restructuring.
+- Z-index audit — sticky header (100), sticky toolbar (90), reading-sheet backdrop (1250), reading-sheet panel (1300). Mobile-menu z-indices retired in the consolidation. Worth reconsolidating into a single SCSS map once another modal lands.
+
+## Post-ship consolidation (2026-05-17)
+
+After the user reviewed the as-built UX, two issues surfaced and one direction-of-travel correction:
+
+1. **View trigger discoverability** (`e525dcc`) — the 18×18 sparkles icon was indistinguishable from the other chrome icons. Replaced with a labeled "View" pill. Pill survives this consolidation but is rethemed as **"Settings"** with a gear icon.
+2. **Toolbar didn't hide on real scrolling** (`e525dcc`) — `onScroll` re-baselined `lastScrollY` on every event, so smooth-scroll wheel deltas (~5px) never accumulated past the 10px dead zone. Fix: only update the baseline on decisive scrolls. Two regression specs added.
+3. **Sheet scope consolidation** (`<this commit>`) — user direction: drop the AI-only framing, make this the single canonical surface for *all* settings + navigation. Sections:
+   - **Display**: theme toggle, font size controls
+   - **Language**: UI language picker, word-by-word language
+   - **AI Features**: existing 4 prefs (renamed section header from "AI Feature Settings" to "AI Features")
+   - **Navigate**: top-level routes (Books, Topics, Narrators, Bookmarks, About, Download, Support)
+
+   Trigger renamed "View" → "Settings", icon `auto_awesome` → `settings` (gear). Mobile hamburger menu retired entirely — the single Settings trigger on mobile now opens the consolidated sheet (containing the nav links that were in the hamburger). Mobile-menu HTML, TS state (`mobileMenuOpen`, `toggleMobileMenu`, `openReadingSheetFromMobileMenu`), and 170+ lines of CSS removed.
+
+   Desktop header keeps its quick-access controls (search, font, theme, shortcuts, lang picker) as redundant fast paths — the user explicitly accepted desktop having "some icons on the header for more frequent actions." Canonical home is the sheet.
+
+   Acceptance verified: 4 sections render with correct titles; 7 nav links; nav click closes sheet and routes correctly; mobile @ 400px has no hamburger / no menu panel, gear opens sheet; 656/656 Karma pass.
 
 ---
 

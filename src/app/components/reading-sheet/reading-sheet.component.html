@@ -1,55 +1,114 @@
 <div class="reading-sheet-backdrop" *ngIf="open$ | async" (click)="close()" aria-hidden="true"></div>
 <aside class="reading-sheet-panel" [class.open]="open$ | async"
        role="dialog" aria-modal="true"
-       [attr.aria-label]="'settings.ai.title' | translate"
+       [attr.aria-label]="'settings.title' | translate"
        [attr.aria-hidden]="!(open$ | async)">
   <header class="reading-sheet-header">
-    <mat-icon>auto_awesome</mat-icon>
-    <span class="reading-sheet-title">{{ 'settings.ai.title' | translate }}</span>
+    <mat-icon>settings</mat-icon>
+    <span class="reading-sheet-title">{{ 'settings.title' | translate }}</span>
     <button class="reading-sheet-close" (click)="close()"
             [attr.aria-label]="'settings.close' | translate"
             [matTooltip]="'settings.close' | translate">
       <mat-icon>close</mat-icon>
     </button>
   </header>
-  <div class="reading-sheet-body" *ngIf="preferences$ | async as prefs">
-    <label class="ai-pref" for="rs-pref-diacritized">
-      <input type="checkbox" id="rs-pref-diacritized" [checked]="prefs.showDiacritizedByDefault"
-             (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">
-      <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
-    </label>
-    <label class="ai-pref" for="rs-pref-badges">
-      <input type="checkbox" id="rs-pref-badges" [checked]="prefs.showContentTypeBadges"
-             (change)="onPrefChange('showContentTypeBadges', $any($event.target).checked)">
-      <span>{{ 'settings.ai.showBadges' | translate }}</span>
-    </label>
-    <label class="ai-pref" for="rs-pref-topics">
-      <input type="checkbox" id="rs-pref-topics" [checked]="prefs.showTopicTags"
-             (change)="onPrefChange('showTopicTags', $any($event.target).checked)">
-      <span>{{ 'settings.ai.showTopics' | translate }}</span>
-    </label>
-    <label class="ai-pref" for="rs-pref-disclaimer">
-      <input type="checkbox" id="rs-pref-disclaimer" [checked]="prefs.showAiTranslationDisclaimer"
-             (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
-      <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
-    </label>
-    <label class="ai-pref">
-      <span>{{ 'settings.ai.wordByWordLang' | translate }}</span>
-      <select [ngModel]="prefs.wordByWordDefaultLang"
-              (ngModelChange)="onLangChange($event)" class="ai-lang-select"
-              [attr.aria-label]="'settings.ai.wordByWordLang' | translate">
-        <option value="en">English</option>
-        <option value="ur">اردو</option>
-        <option value="tr">Türkçe</option>
-        <option value="fa">فارسی</option>
-        <option value="id">Indonesia</option>
-        <option value="bn">বাংলা</option>
-        <option value="es">Español</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="ru">Русский</option>
-        <option value="zh">中文</option>
-      </select>
-    </label>
+  <div class="reading-sheet-body">
+    <!-- Display -->
+    <section class="reading-sheet-section">
+      <h3 class="reading-sheet-section-title">{{ 'settings.display' | translate }}</h3>
+      <div class="reading-sheet-row">
+        <span class="reading-sheet-row-label">{{ 'settings.toggleDarkMode' | translate }}</span>
+        <button class="reading-sheet-icon-btn" (click)="toggleTheme()"
+                [attr.aria-label]="'settings.toggleDarkMode' | translate"
+                [matTooltip]="'settings.toggleDarkMode' | translate">
+          <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        </button>
+      </div>
+      <div class="reading-sheet-row" *ngIf="fontSize$ | async as fontSize">
+        <span class="reading-sheet-row-label">{{ 'settings.fontSize' | translate }}</span>
+        <div class="reading-sheet-font-controls">
+          <button (click)="decreaseFontSize()" [disabled]="fontSize <= 75"
+                  [attr.aria-label]="'settings.decreaseFont' | translate"
+                  [matTooltip]="'settings.decreaseFont' | translate">A-</button>
+          <button (click)="resetFontSize()"
+                  [attr.aria-label]="'settings.resetFont' | translate"
+                  [matTooltip]="'settings.resetFont' | translate">A</button>
+          <button (click)="increaseFontSize()" [disabled]="fontSize >= 150"
+                  [attr.aria-label]="'settings.increaseFont' | translate"
+                  [matTooltip]="'settings.increaseFont' | translate">A+</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Language -->
+    <section class="reading-sheet-section">
+      <h3 class="reading-sheet-section-title">{{ 'settings.language' | translate }}</h3>
+      <div class="reading-sheet-row">
+        <span class="reading-sheet-row-label">{{ 'language.picker' | translate }}</span>
+        <select class="reading-sheet-select"
+                [value]="currentLang$ | async"
+                (change)="onUiLanguageChange($any($event.target).value)"
+                [attr.aria-label]="'language.picker' | translate">
+          <option *ngFor="let lang of uiLanguages" [value]="lang.code">{{ lang.name }}</option>
+        </select>
+      </div>
+      <div class="reading-sheet-row" *ngIf="preferences$ | async as prefs">
+        <span class="reading-sheet-row-label">{{ 'settings.ai.wordByWordLang' | translate }}</span>
+        <select class="reading-sheet-select"
+                [ngModel]="prefs.wordByWordDefaultLang"
+                (ngModelChange)="onWordByWordLangChange($event)"
+                [attr.aria-label]="'settings.ai.wordByWordLang' | translate">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="tr">Türkçe</option>
+          <option value="fa">فارسی</option>
+          <option value="id">Indonesia</option>
+          <option value="bn">বাংলা</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="ru">Русский</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- AI Features -->
+    <section class="reading-sheet-section" *ngIf="preferences$ | async as prefs">
+      <h3 class="reading-sheet-section-title">{{ 'settings.ai.title' | translate }}</h3>
+      <label class="reading-sheet-pref" for="rs-pref-diacritized">
+        <input type="checkbox" id="rs-pref-diacritized" [checked]="prefs.showDiacritizedByDefault"
+               (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">
+        <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
+      </label>
+      <label class="reading-sheet-pref" for="rs-pref-badges">
+        <input type="checkbox" id="rs-pref-badges" [checked]="prefs.showContentTypeBadges"
+               (change)="onPrefChange('showContentTypeBadges', $any($event.target).checked)">
+        <span>{{ 'settings.ai.showBadges' | translate }}</span>
+      </label>
+      <label class="reading-sheet-pref" for="rs-pref-topics">
+        <input type="checkbox" id="rs-pref-topics" [checked]="prefs.showTopicTags"
+               (change)="onPrefChange('showTopicTags', $any($event.target).checked)">
+        <span>{{ 'settings.ai.showTopics' | translate }}</span>
+      </label>
+      <label class="reading-sheet-pref" for="rs-pref-disclaimer">
+        <input type="checkbox" id="rs-pref-disclaimer" [checked]="prefs.showAiTranslationDisclaimer"
+               (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
+        <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
+      </label>
+    </section>
+
+    <!-- Navigate -->
+    <section class="reading-sheet-section">
+      <h3 class="reading-sheet-section-title">{{ 'nav.navigate' | translate }}</h3>
+      <a *ngFor="let link of navLinks"
+         class="reading-sheet-nav-link"
+         [routerLink]="link.route"
+         (click)="close()"
+         queryParamsHandling="preserve">
+        <mat-icon>{{ link.icon }}</mat-icon>
+        <span>{{ link.labelKey | translate }}</span>
+      </a>
+    </section>
   </div>
 </aside>

@@ -49,7 +49,6 @@ export class AppComponent implements OnInit, OnDestroy {
   readingSheetOpen$: Observable<boolean>;
   showBackToTop = false;
   headerCompact = false;
-  mobileMenuOpen = false;
   mobileSearchOpen = false;
 
   private static readonly STATIC_TITLES: Record<string, { i18nKey: string; fallback: string; noindex?: boolean }> = {
@@ -118,12 +117,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   toggleMobileSearch(): void {
     this.mobileSearchOpen = !this.mobileSearchOpen;
-    if (this.mobileSearchOpen) this.mobileMenuOpen = false;
-  }
-
-  toggleMobileMenu(): void {
-    this.mobileMenuOpen = !this.mobileMenuOpen;
-    if (this.mobileMenuOpen) this.mobileSearchOpen = false;
   }
 
   toggleTheme(): void {
@@ -146,15 +139,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.keyboard.toggleHelp();
   }
 
-  /** Opens the global Reading Sheet (AI prefs + view toggles). */
+  /** Opens the global Reading Sheet (all settings + navigation). */
   toggleReadingSheet(): void {
     this.readingSheet.toggle();
-  }
-
-  /** Mobile-menu entry point: close the hamburger then open the sheet. */
-  openReadingSheetFromMobileMenu(): void {
-    this.mobileMenuOpen = false;
-    this.readingSheet.open();
   }
 
   dismissHelp(): void {

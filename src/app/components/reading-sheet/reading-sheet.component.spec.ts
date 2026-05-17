@@ -3,10 +3,12 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 
 import { ReadingSheetComponent } from './reading-sheet.component';
 import { ReadingSheetService } from '@app/services/reading-sheet.service';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
+import { ThemeService } from '@app/services/theme.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 describe('ReadingSheetComponent', () => {
@@ -14,12 +16,13 @@ describe('ReadingSheetComponent', () => {
   let fixture: ComponentFixture<ReadingSheetComponent>;
   let sheet: ReadingSheetService;
   let prefs: AiPreferencesService;
+  let theme: ThemeService;
 
   beforeEach(async () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       declarations: [ReadingSheetComponent, TranslatePipe],
-      imports: [FormsModule, MatTooltipModule, HttpClientTestingModule],
+      imports: [FormsModule, MatTooltipModule, HttpClientTestingModule, RouterTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
@@ -27,6 +30,7 @@ describe('ReadingSheetComponent', () => {
     component = fixture.componentInstance;
     sheet = TestBed.inject(ReadingSheetService);
     prefs = TestBed.inject(AiPreferencesService);
+    theme = TestBed.inject(ThemeService);
     fixture.detectChanges();
   });
 
@@ -69,9 +73,54 @@ describe('ReadingSheetComponent', () => {
     expect(prefs.get('showContentTypeBadges')).toBe(false);
   });
 
-  it('onLangChange writes wordByWordDefaultLang', () => {
-    component.onLangChange('ur');
+  it('onWordByWordLangChange writes wordByWordDefaultLang', () => {
+    component.onWordByWordLangChange('ur');
     expect(prefs.get('wordByWordDefaultLang')).toBe('ur');
+  });
+
+  describe('display section', () => {
+    it('toggleTheme delegates to ThemeService', () => {
+      const before = theme.currentTheme;
+      component.toggleTheme();
+      expect(theme.currentTheme).not.toBe(before);
+    });
+
+    it('font controls delegate to ThemeService', () => {
+      const initial = theme.currentFontSize;
+      component.increaseFontSize();
+      expect(theme.currentFontSize).toBeGreaterThan(initial);
+      const grown = theme.currentFontSize;
+      component.decreaseFontSize();
+      expect(theme.currentFontSize).toBeLessThan(grown);
+      component.resetFontSize();
+      expect(theme.currentFontSize).toBe(100);
+    });
+  });
+
+  describe('language section', () => {
+    it('onUiLanguageChange sets i18n language', () => {
+      component.onUiLanguageChange('fa');
+      // I18nService persists to localStorage; verify via the sheet's
+      // currentLang$ which mirrors i18n.currentLang$.
+      component.currentLang$.subscribe(l => {
+        expect(l).toBe('fa');
+      }).unsubscribe();
+    });
+  });
+
+  describe('navigate section', () => {
+    it('exposes the top-level route list', () => {
+      expect(component.navLinks.some(l => l.route === '/books')).toBe(true);
+      expect(component.navLinks.some(l => l.route === '/about')).toBe(true);
+      expect(component.navLinks.some(l => l.route === '/people/narrators')).toBe(true);
+    });
+
+    it('renders one router-link per entry', () => {
+      sheet.open();
+      fixture.detectChanges();
+      const links = fixture.nativeElement.querySelectorAll('.reading-sheet-nav-link');
+      expect(links.length).toBe(component.navLinks.length);
+    });
   });
 
   describe('focus management', () => {
@@ -96,7 +145,7 @@ describe('ReadingSheetComponent', () => {
       const host = fixture.nativeElement as HTMLElement;
       const focusables = Array.from(
         host.querySelectorAll<HTMLElement>(
-          '.reading-sheet-panel button, .reading-sheet-panel input, .reading-sheet-panel select'
+          '.reading-sheet-panel button, .reading-sheet-panel input, .reading-sheet-panel select, .reading-sheet-panel a[href]'
         )
       ).filter(el => el.offsetParent !== null);
       expect(focusables.length).toBeGreaterThan(1);
@@ -116,7 +165,7 @@ describe('ReadingSheetComponent', () => {
       const host = fixture.nativeElement as HTMLElement;
       const focusables = Array.from(
         host.querySelectorAll<HTMLElement>(
-          '.reading-sheet-panel button, .reading-sheet-panel input, .reading-sheet-panel select'
+          '.reading-sheet-panel button, .reading-sheet-panel input, .reading-sheet-panel select, .reading-sheet-panel a[href]'
         )
       ).filter(el => el.offsetParent !== null);
       const first = focusables[0];

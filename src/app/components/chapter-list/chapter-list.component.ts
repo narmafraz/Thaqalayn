@@ -1,12 +1,23 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatSort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { Chapter, ChapterList } from '@app/models';
 import { BookAuthor, getBookAuthor } from '@app/data/book-authors';
-import { combineLatest, Observable, of } from 'rxjs';
+import { combineLatest, Observable, Subscription, of } from 'rxjs';
 import { catchError, distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
 import { ChapterListDataSource } from './chapter-list-data-source';
+import { BookmarkService } from '@app/services/bookmark.service';
+import { ReadingStatsService } from '@app/services/reading-stats.service';
+import { VerseCountsService } from '@app/services/verse-counts.service';
+
+/** Per-row progress fragment: { read, total, fraction, percent }. Null = unknown. */
+export interface ChapterListRowProgress {
+  read: number;
+  total: number;
+  fraction: number;
+  percent: number;
+}
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -15,7 +26,7 @@ import { ChapterListDataSource } from './chapter-list-data-source';
     styleUrls: ['./chapter-list.component.scss'],
     standalone: false
 })
-export class ChapterListComponent implements OnInit, AfterViewInit {
+export class ChapterListComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() book$: Observable<ChapterList>;
 
   readonly SMALL_SCREEN_ALIAS = 'xs';
@@ -28,10 +39,20 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
   displayedColumns$: Observable<string[]>;
   mqAlias$: Observable<string>;
   author$: Observable<BookAuthor | undefined>;
+  bookProgress: ChapterListRowProgress | null = null;
+  /** Per-row (chapter index → progress fragment). Empty for paths with no manifest entry. */
+  chapterProgressMap: Map<string, ChapterListRowProgress> = new Map();
+  /** When true, the user has filtered the table to only show chapters with unread content. */
+  unreadOnly = false;
+  private currentBookIndex: string | null = null;
+  private subs: Subscription[] = [];
 
   constructor(
     private breakpointObserver: BreakpointObserver,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private bookmarkService: BookmarkService,
+    private readingStats: ReadingStatsService,
+    private verseCounts: VerseCountsService,
   ) {
     this.mqAlias$ = this.breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -46,6 +67,9 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    // Kick off the manifest fetch (no-op if already cached).
+    this.verseCounts.get().subscribe();
+
     // Derive author from the book index (root slug)
     this.author$ = this.book$.pipe(
       filter((book): book is ChapterList => !!book),
@@ -56,7 +80,66 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
       startWith(undefined)
     );
 
-    // Enhanced error handling for book$ observable
+    // RE-04 / RE-07: per-book strip + per-row rings. Both depend on the
+    // current book index, the verse-counts manifest, and the live readVerses
+    // stream.
+    this.subs.push(
+      combineLatest([
+        this.book$.pipe(filter((b): b is ChapterList => !!b)),
+        this.verseCounts.get(),
+        this.bookmarkService.readVerses$,
+      ]).subscribe(([book, , readVerses]) => {
+        this.currentBookIndex = book.index;
+        const prefix = book.index === 'books' ? '' : book.index;
+        if (!prefix) {
+          this.bookProgress = null;
+          this.chapterProgressMap = new Map();
+          this.changeDetectorRef.markForCheck();
+          return;
+        }
+
+        const chapterReadCounts = this.readingStats.buildChapterReadCounts(readVerses);
+
+        // Whole-book / sub-tree progress
+        const total = this.verseCounts.totalForPrefix(prefix);
+        let bookRead = 0;
+        for (const idx of this.verseCounts.chapterIndexesForPrefix(prefix)) {
+          bookRead += chapterReadCounts.get(idx) || 0;
+        }
+        if (bookRead > total) bookRead = total;
+        this.bookProgress = total > 0 ? this.toProgress(bookRead, total) : null;
+
+        // Per-row rings — keyed by chapter `path` (which matches the `path`
+        // field on Chapter rows, e.g. `/books/al-kafi:1:1:1`)
+        const map = new Map<string, ChapterListRowProgress>();
+        for (const ch of book.data.chapters) {
+          const path = (ch as Chapter).path;
+          if (!path) continue;
+          const chapterIdx = path.replace(/^\/books\//, '');
+          const chTotal = this.verseCounts.forChapter(chapterIdx);
+          if (chTotal === 0) {
+            // Could be a section/volume that aggregates child chapters
+            const subTotal = this.verseCounts.totalForPrefix(chapterIdx);
+            if (subTotal === 0) continue;
+            let subRead = 0;
+            for (const childIdx of this.verseCounts.chapterIndexesForPrefix(chapterIdx)) {
+              subRead += chapterReadCounts.get(childIdx) || 0;
+            }
+            if (subRead > subTotal) subRead = subTotal;
+            map.set(path, this.toProgress(subRead, subTotal));
+          } else {
+            const chRead = Math.min(chapterReadCounts.get(chapterIdx) || 0, chTotal);
+            map.set(path, this.toProgress(chRead, chTotal));
+          }
+        }
+        this.chapterProgressMap = map;
+        this.changeDetectorRef.markForCheck();
+      })
+    );
+
+    // Enhanced error handling for book$ observable. We include `readVerses$`
+    // in the combine so the "progress" column shows up the moment we know
+    // there are read marks to render.
     this.displayedColumns$ = combineLatest([
       this.mqAlias$.pipe(startWith(this.SMALL_SCREEN_ALIAS)),
       this.book$.pipe(
@@ -66,7 +149,8 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
         }),
         filter(book => book !== undefined && book.data?.chapters?.length > 0),
         startWith(null)
-      )
+      ),
+      this.bookmarkService.readVerses$.pipe(startWith([])),
     ]).pipe(
       map(([mqAlias, book]) => this.selectApplicableColumns(mqAlias, book))
     );
@@ -82,6 +166,37 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
     );
 
     this.dataSource = new ChapterListDataSource(bookChapters$);
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach(s => s.unsubscribe());
+  }
+
+  /** Look up the per-row progress fragment for a chapter row. */
+  progressForRow(row: Chapter): ChapterListRowProgress | null {
+    return row.path ? this.chapterProgressMap.get(row.path) ?? null : null;
+  }
+
+  /** True when the unread-only filter chip is active and this row has no unread content. */
+  isRowHiddenByFilter(row: Chapter): boolean {
+    if (!this.unreadOnly) return false;
+    const p = this.progressForRow(row);
+    return !!(p && p.read >= p.total);
+  }
+
+  toggleUnreadOnly(): void {
+    this.unreadOnly = !this.unreadOnly;
+    this.changeDetectorRef.markForCheck();
+  }
+
+  private toProgress(read: number, total: number): ChapterListRowProgress {
+    const fraction = total > 0 ? Math.min(1, read / total) : 0;
+    return {
+      read,
+      total,
+      fraction,
+      percent: Math.round(fraction * 1000) / 10,
+    };
   }
 
   ngAfterViewInit() {
@@ -140,6 +255,10 @@ export class ChapterListComponent implements OnInit, AfterViewInit {
     }
     if (book.data.chapters.some(chapter => chapter.verse_count)) {
       columns.push('verse_count');
+    }
+    // RE-07: per-row progress ring appears whenever any chapter has manifest data.
+    if (this.chapterProgressMap.size > 0) {
+      columns.push('progress');
     }
     return columns;
   }

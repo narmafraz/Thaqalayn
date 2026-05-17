@@ -1,5 +1,28 @@
 <ng-container *ngIf="(book$ | async) as book">
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author$ | async"></app-book-titles>
+
+  <!-- RE-04: Per-book / sub-tree progress strip -->
+  <div *ngIf="bookProgress && bookProgress.total > 0" class="book-progress-strip"
+       [attr.aria-label]="bookProgress.percent + '% — ' + bookProgress.read + ' / ' + bookProgress.total"
+       [matTooltip]="bookProgress.read + ' / ' + bookProgress.total">
+    <div class="book-progress-text">
+      <span class="book-progress-percent">{{ bookProgress.percent }}%</span>
+      <span class="book-progress-count">{{ bookProgress.read }} / {{ bookProgress.total }}</span>
+    </div>
+    <div class="book-progress-bar">
+      <div class="book-progress-fill" [style.width.%]="bookProgress.fraction * 100"></div>
+    </div>
+  </div>
+
+  <!-- RE-07: Unread-only filter chip -->
+  <div *ngIf="chapterProgressMap.size > 0" class="chapter-list-toolbar">
+    <button class="filter-chip" [class.active]="unreadOnly" (click)="toggleUnreadOnly()"
+            [attr.aria-pressed]="unreadOnly">
+      <mat-icon>{{ unreadOnly ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+      <span>{{ (unreadOnly ? 'reading.hideReadMarks' : 'reading.showReadMarks') | translate }}</span>
+    </button>
+  </div>
+
 <div class="content">
   <div class="mat-elevation-z8">
     <table *ngIf="(displayedColumns$ | async) as displayedColumns" mat-table class="full-width-table" matSort aria-label="Elements">
@@ -11,7 +34,38 @@
             <!-- <div>{{row.part_type}} {{row.local_index}}</div> -->
             <div class="arabic" lang="ar" [innerHTML]="row.titles.ar"></div>
             <div [innerHTML]="row.titles.en"></div>
+            <ng-container *ngIf="progressForRow(row) as p">
+              <div *ngIf="p.total > 0" class="row-progress-mobile" dir="ltr">
+                <span class="row-progress-text">{{ p.read }} / {{ p.total }}</span>
+                <div class="row-progress-bar">
+                  <div class="row-progress-fill" [style.width.%]="p.fraction * 100"></div>
+                </div>
+              </div>
+            </ng-container>
           </div>
+        </td>
+      </ng-container>
+
+      <!-- RE-07: Per-row progress ring -->
+      <ng-container matColumnDef="progress">
+        <th mat-header-cell *matHeaderCellDef class="center-header">{{ 'reading.progress' | translate }}</th>
+        <td mat-cell *matCellDef="let row" class="center">
+          <ng-container *ngIf="progressForRow(row) as p; else noProgressData">
+            <div *ngIf="p.total > 0" class="row-progress-ring"
+                 [class.row-progress-complete]="p.read >= p.total"
+                 [class.row-progress-empty]="p.read === 0"
+                 [attr.aria-label]="p.percent + '% — ' + p.read + ' / ' + p.total"
+                 [matTooltip]="p.read + ' / ' + p.total">
+              <svg viewBox="0 0 36 36" class="row-progress-svg" aria-hidden="true">
+                <path class="row-progress-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <path class="row-progress-arc"
+                      [attr.stroke-dasharray]="(p.fraction * 100) + ', 100'"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                <text x="18" y="20.5" class="row-progress-svg-text" text-anchor="middle">{{ p.percent | number:'1.0-0' }}</text>
+              </svg>
+            </div>
+          </ng-container>
+          <ng-template #noProgressData></ng-template>
         </td>
       </ng-container>
 
@@ -67,7 +121,9 @@
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns" [ngStyle]="(mqAlias$ | async) === SMALL_SCREEN_ALIAS ? {'display': 'none'} : {}"></tr>
-      <tr mat-row [routerLink]="row.path" queryParamsHandling="preserve" *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row [routerLink]="row.path" queryParamsHandling="preserve"
+          [class.row-hidden]="isRowHiddenByFilter(row)"
+          *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
   </div>

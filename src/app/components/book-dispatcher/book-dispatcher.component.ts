@@ -3,6 +3,8 @@ import { Book } from '@app/models';
 import { BOOK_AUTHORS } from '@app/data/book-authors';
 import { BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
 import { RandomVerse, RandomVerseService } from '@app/services/random-verse.service';
+import { ReadingStatsService, BookProgress } from '@app/services/reading-stats.service';
+import { VerseCountsService } from '@app/services/verse-counts.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { RetryLoadBookPart } from '@store/books/books.actions';
@@ -115,6 +117,7 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
 
   exploreCards: ExploreCard[] = [];
   readingProgress: ReadingProgress[] = [];
+  bookProgressMap: Map<string, BookProgress> = new Map();
   private subscriptions: Subscription[] = [];
 
   private static readonly BOOK_NAMES: Record<string, string> = {
@@ -127,6 +130,8 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     private store: Store,
     private randomVerseService: RandomVerseService,
     private bookmarkService: BookmarkService,
+    private readingStats: ReadingStatsService,
+    private verseCounts: VerseCountsService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -134,9 +139,18 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     this.randomQuran$ = this.randomVerseService.getRandomQuranVerse();
     this.randomHadith$ = this.randomVerseService.getRandomHadith();
 
+    // Kick off the verse-counts manifest fetch so per-book progress bars can render.
+    this.verseCounts.get().subscribe();
+
     this.subscriptions.push(
       this.bookmarkService.readingProgress$.subscribe(rp => {
         this.readingProgress = rp.slice(0, 3);
+        this.cdr.markForCheck();
+      })
+    );
+    this.subscriptions.push(
+      this.readingStats.bookProgressMap$.subscribe(map => {
+        this.bookProgressMap = map;
         this.cdr.markForCheck();
       })
     );
@@ -212,6 +226,11 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
 
   clearProgress(bookId: string): void {
     this.bookmarkService.clearReadingProgress(bookId);
+  }
+
+  /** Per-book progress for the given slug, or `null` if unknown. Used by the homepage card template. */
+  bookProgress(slug: string): BookProgress | null {
+    return this.bookProgressMap.get(slug) ?? null;
   }
 
   shuffleQuran(event: Event): void {

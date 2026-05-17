@@ -341,3 +341,135 @@
     background: linear-gradient(90deg, #81c784 0%, #66bb6a 100%);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Homepage streak chip + goal ring (RE-08 / RE-09)
+// ---------------------------------------------------------------------------
+.homepage-stats-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.homepage-streak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, rgba(255, 152, 0, 0.12), rgba(255, 152, 0, 0.04));
+  border: 1px solid rgba(255, 152, 0, 0.25);
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--text-primary, #333);
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  &.streak-in-danger {
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.12), rgba(244, 67, 54, 0.04));
+    border-color: rgba(244, 67, 54, 0.3);
+  }
+
+  .streak-flame {
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  .streak-count {
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .streak-text {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+.homepage-goal-ring {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 4px 4px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--text-primary, #333);
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
+
+  &.goal-met .goal-ring-arc {
+    stroke: #2e7d32;
+  }
+
+  .goal-ring-svg {
+    width: 44px;
+    height: 44px;
+    transform: rotate(-90deg);
+  }
+
+  .goal-ring-track {
+    fill: none;
+    stroke: var(--border-color, rgba(0, 0, 0, 0.08));
+    stroke-width: 3;
+  }
+
+  .goal-ring-arc {
+    fill: none;
+    stroke: #43a047;
+    stroke-width: 3;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.4s ease-out;
+  }
+
+  .goal-ring-text {
+    transform: rotate(90deg);
+    transform-origin: 18px 18px;
+    font-size: 8.5px;
+    font-weight: 700;
+    fill: var(--text-primary, #333);
+  }
+
+  .goal-ring-label {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+// RE-11: tag the Quran card as "Verse of the Day"
+.verse-of-the-day-tag {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.random-verse-book-label {
+  color: var(--text-secondary, #888);
+  font-size: 0.85rem;
+}
+
+:host-context(body.dark-theme) {
+  .homepage-goal-ring {
+    background: rgba(255, 255, 255, 0.06);
+
+    .goal-ring-text {
+      fill: #e0e0e0;
+    }
+  }
+
+  .homepage-streak-chip {
+    color: #e0e0e0;
+  }
+}

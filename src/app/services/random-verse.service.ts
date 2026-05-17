@@ -43,6 +43,46 @@ export class RandomVerseService {
     );
   }
 
+  /**
+   * Deterministic "Verse of the Day" — the same surah:ayah for every visitor
+   * for a given calendar day (local time). Used by the homepage when the user
+   * lands; the existing `getRandomQuranVerse()` is still available behind the
+   * shuffle button (RE-11).
+   */
+  getTodayQuranVerse(): Observable<RandomVerse | null> {
+    const seed = this.dailySeed();
+    // Pick surah first via seeded modulus, then a verse within it.
+    const surah = (seed % 114) + 1;
+    const verseCount = QURAN_VERSE_COUNTS[surah - 1];
+    // Mix the seed again so different surahs cycle through different ayat
+    const ayahSeed = (seed * 2654435761) >>> 0;
+    const verse = (ayahSeed % verseCount) + 1;
+    const verseDetailPath = `quran:${surah}:${verse}`;
+
+    return this.booksService.getPart(verseDetailPath).pipe(
+      map((book: Book) => this.extractFromVerseDetail(book, 'quran', `${surah}:${verse}`)),
+      catchError(() => of(null)),
+    );
+  }
+
+  /**
+   * 32-bit unsigned hash of today's YYYY-MM-DD local date. Stable across
+   * subscribers within the same calendar day. Visible for testing.
+   */
+  dailySeed(now: Date = new Date()): number {
+    const y = now.getFullYear();
+    const m = now.getMonth() + 1;
+    const d = now.getDate();
+    const key = `${y}-${m}-${d}`;
+    // FNV-1a 32-bit
+    let h = 0x811c9dc5;
+    for (let i = 0; i < key.length; i++) {
+      h ^= key.charCodeAt(i);
+      h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+    }
+    return h;
+  }
+
   getRandomHadith(): Observable<RandomVerse | null> {
     // Wait for the index to be loaded before picking a random chapter
     return this.store.select(IndexState.getBookForLanguage).pipe(

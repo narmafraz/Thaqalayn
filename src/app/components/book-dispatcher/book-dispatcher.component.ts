@@ -3,7 +3,7 @@ import { Book } from '@app/models';
 import { BOOK_AUTHORS } from '@app/data/book-authors';
 import { BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
 import { RandomVerse, RandomVerseService } from '@app/services/random-verse.service';
-import { ReadingStatsService, BookProgress } from '@app/services/reading-stats.service';
+import { ReadingStatsService, BookProgress, StreakInfo } from '@app/services/reading-stats.service';
 import { VerseCountsService } from '@app/services/verse-counts.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -118,6 +118,10 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   exploreCards: ExploreCard[] = [];
   readingProgress: ReadingProgress[] = [];
   bookProgressMap: Map<string, BookProgress> = new Map();
+  streak: StreakInfo = { current: 0, longest: 0, includesToday: false };
+  goalTarget = 0;
+  goalToday = 0;
+  goalFraction = 0;
   private subscriptions: Subscription[] = [];
 
   private static readonly BOOK_NAMES: Record<string, string> = {
@@ -136,7 +140,9 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.randomQuran$ = this.randomVerseService.getRandomQuranVerse();
+    // RE-11: sticky "Verse of the Day" for Quran. Shuffle button below still
+    // produces a fresh random verse on demand.
+    this.randomQuran$ = this.randomVerseService.getTodayQuranVerse();
     this.randomHadith$ = this.randomVerseService.getRandomHadith();
 
     // Kick off the verse-counts manifest fetch so per-book progress bars can render.
@@ -151,6 +157,20 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.readingStats.bookProgressMap$.subscribe(map => {
         this.bookProgressMap = map;
+        this.cdr.markForCheck();
+      })
+    );
+    this.subscriptions.push(
+      this.readingStats.streak$.subscribe(s => {
+        this.streak = s;
+        this.cdr.markForCheck();
+      })
+    );
+    this.subscriptions.push(
+      this.readingStats.goalProgress$.subscribe(g => {
+        this.goalTarget = g.target;
+        this.goalToday = g.today;
+        this.goalFraction = g.fraction;
         this.cdr.markForCheck();
       })
     );

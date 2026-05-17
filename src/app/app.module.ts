@@ -40,6 +40,7 @@ import { SearchBarComponent } from './components/search-bar/search-bar.component
 import { EmbedVerseComponent } from './components/embed-verse/embed-verse.component';
 import { DiffViewerComponent } from './components/diff-viewer/diff-viewer.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { MilestoneToasterComponent } from './components/milestone-toaster/milestone-toaster.component';
 import { ErrorInterceptor } from './services/error.interceptor';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -62,6 +63,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     EmbedVerseComponent,
     DiffViewerComponent,
     NotFoundComponent,
+    MilestoneToasterComponent,
   ],
   bootstrap: [AppComponent],
   imports: [

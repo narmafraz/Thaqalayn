@@ -1,6 +1,69 @@
 <div class="content mat-elevation-z8">
   <h1>{{ 'bookmark.title' | translate }}</h1>
 
+  <!-- Streak + Reading-history summary chip strip -->
+  <section *ngIf="totalVersesRead > 0 || streak.current > 0 || goalTarget > 0" class="reading-stats-strip"
+           [attr.aria-label]="'reading.progress' | translate">
+    <div class="stat-chip streak-chip" [class.streak-in-danger]="streak.current > 0 && !streak.includesToday">
+      <span class="stat-chip-icon" aria-hidden="true">🔥</span>
+      <span class="stat-chip-value">{{ streak.current }}</span>
+      <span class="stat-chip-label">{{ 'reading.streak' | translate }}</span>
+      <span *ngIf="streak.longest > streak.current" class="stat-chip-secondary">
+        {{ 'reading.longestStreak' | translate }}: {{ streak.longest }}
+      </span>
+    </div>
+    <div class="stat-chip total-chip">
+      <span class="stat-chip-icon" aria-hidden="true">📖</span>
+      <span class="stat-chip-value">{{ totalVersesRead }}</span>
+      <span class="stat-chip-label">{{ 'reading.versesReadTotal' | translate }}</span>
+    </div>
+    <!-- Goal progress (RE-09) -->
+    <div *ngIf="goalTarget > 0" class="stat-chip goal-chip" [class.goal-met]="goalFraction >= 1">
+      <span class="stat-chip-icon" aria-hidden="true">🎯</span>
+      <span class="stat-chip-value">{{ goalToday }} / {{ goalTarget }}</span>
+      <span class="stat-chip-label">{{ 'reading.goalLabel' | translate }}</span>
+      <div class="goal-mini-bar" aria-hidden="true">
+        <div class="goal-mini-fill" [style.width.%]="goalFraction * 100"></div>
+      </div>
+    </div>
+    <div *ngIf="streak.current > 0 && !streak.includesToday" class="streak-danger-msg">
+      {{ 'reading.streakInDanger' | translate }}
+    </div>
+  </section>
+
+  <!-- Goal config (RE-09) -->
+  <section class="goal-section">
+    <h2>{{ 'reading.goal' | translate }}</h2>
+    <ng-container *ngIf="!goalEditing">
+      <p *ngIf="goalTarget === 0" class="goal-empty">{{ 'reading.setGoalDescription' | translate }}</p>
+      <p *ngIf="goalTarget > 0" class="goal-current">
+        <strong>{{ goalTarget }}</strong> {{ 'reading.dailyVerseTarget' | translate | lowercase }}
+      </p>
+      <div class="goal-actions">
+        <button mat-stroked-button (click)="openGoalEditor()">
+          <mat-icon>edit</mat-icon> {{ goalTarget > 0 ? ('annotation.edit' | translate) : ('reading.setGoal' | translate) }}
+        </button>
+        <button *ngIf="goalTarget > 0" mat-button (click)="disableGoal()">
+          <mat-icon>do_not_disturb</mat-icon> {{ 'reading.disableGoal' | translate }}
+        </button>
+      </div>
+    </ng-container>
+    <div *ngIf="goalEditing" class="goal-editor">
+      <label class="goal-label">
+        <span>{{ 'reading.dailyVerseTarget' | translate }}</span>
+        <input type="number" min="1" max="500" [(ngModel)]="goalDraft" class="goal-input" aria-label="Daily verse target">
+      </label>
+      <div class="goal-presets">
+        <button class="goal-preset" *ngFor="let n of [3, 5, 10, 20, 50]" (click)="goalDraft = n"
+                [class.active]="goalDraft === n">{{ n }}</button>
+      </div>
+      <div class="goal-actions">
+        <button mat-raised-button color="primary" (click)="saveGoal()">{{ 'reading.saveGoal' | translate }}</button>
+        <button mat-button (click)="cancelGoalEdit()">{{ 'annotation.cancel' | translate }}</button>
+      </div>
+    </div>
+  </section>
+
   <!-- Continue Reading section -->
   <section *ngIf="readingProgress.length > 0" class="continue-section">
     <h2>{{ 'bookmark.continueReading' | translate }}</h2>
@@ -22,6 +85,24 @@
         </button>
       </div>
     </div>
+  </section>
+
+  <!-- Reading history (RE-06) -->
+  <section *ngIf="dailyTallies.length > 0" class="reading-history-section">
+    <h2>{{ 'reading.history' | translate }}</h2>
+    <ol class="reading-history-list">
+      <li *ngFor="let day of dailyTallies.slice(0, 30)" class="reading-history-day">
+        <div class="history-day-header">
+          <span class="history-day-label">{{ formatDayLabel(day.date) }}</span>
+          <span class="history-day-count">{{ day.versesRead }}</span>
+        </div>
+        <div class="history-day-books">
+          <span *ngFor="let bookId of day.bookIds" class="history-book-chip">
+            {{ formatBookId(bookId) }}
+          </span>
+        </div>
+      </li>
+    </ol>
   </section>
 
   <!-- Bookmarks section -->

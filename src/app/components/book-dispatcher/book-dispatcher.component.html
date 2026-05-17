@@ -14,13 +14,40 @@
   <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
     <ng-container *ngSwitchCase="'chapter_list'">
       <ng-container *ngIf="book.index === 'books'">
+        <!-- RE-08 / RE-09: streak chip + daily goal ring (visible only after the user has read something) -->
+        <div *ngIf="streak.current > 0 || goalTarget > 0" class="homepage-stats-row">
+          <a routerLink="/bookmarks" queryParamsHandling="preserve" class="homepage-streak-chip"
+             *ngIf="streak.current > 0"
+             [class.streak-in-danger]="!streak.includesToday"
+             [attr.aria-label]="'reading.streak' | translate">
+            <span class="streak-flame" aria-hidden="true">🔥</span>
+            <span class="streak-count">{{ streak.current }}</span>
+            <span class="streak-text">{{ 'reading.streak' | translate }}</span>
+          </a>
+          <a routerLink="/bookmarks" queryParamsHandling="preserve" class="homepage-goal-ring"
+             *ngIf="goalTarget > 0"
+             [class.goal-met]="goalFraction >= 1"
+             [attr.aria-label]="goalToday + ' / ' + goalTarget">
+            <svg viewBox="0 0 36 36" class="goal-ring-svg" aria-hidden="true">
+              <path class="goal-ring-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <path class="goal-ring-arc" [attr.stroke-dasharray]="(goalFraction * 100) + ', 100'"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+              <text x="18" y="20" class="goal-ring-text" text-anchor="middle">{{ goalToday }}/{{ goalTarget }}</text>
+            </svg>
+            <span class="goal-ring-label">{{ 'reading.goal' | translate }}</span>
+          </a>
+        </div>
+
         <!-- Random Quran + Hadith cards -->
         <div class="random-verse-row">
           <div *ngIf="(randomQuran$ | async) as qv" class="random-verse-card mat-elevation-z2">
             <div class="random-verse-label">
               <mat-icon>menu_book</mat-icon>
-              <span>{{ qv.bookLabel }}</span>
-              <button class="random-verse-shuffle" (click)="shuffleQuran($event)" [attr.aria-label]="'book.shuffleQuran' | translate">
+              <span class="verse-of-the-day-tag">{{ 'reading.verseOfTheDay' | translate }}</span>
+              <span class="random-verse-book-label">· {{ qv.bookLabel }}</span>
+              <button class="random-verse-shuffle" (click)="shuffleQuran($event)"
+                      [attr.aria-label]="'reading.shuffleAgain' | translate"
+                      [matTooltip]="'reading.shuffleAgain' | translate">
                 <mat-icon>refresh</mat-icon>
               </button>
             </div>

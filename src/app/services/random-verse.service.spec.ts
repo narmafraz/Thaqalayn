@@ -453,4 +453,45 @@ describe('RandomVerseService', () => {
       });
     });
   });
+
+  // RE-11: deterministic daily seed
+  describe('dailySeed / getTodayQuranVerse', () => {
+    it('returns the same seed for the same calendar day', () => {
+      const a = service.dailySeed(new Date('2026-05-17T09:00:00'));
+      const b = service.dailySeed(new Date('2026-05-17T23:59:00'));
+      expect(a).toBe(b);
+    });
+
+    it('returns a different seed on a different day', () => {
+      const a = service.dailySeed(new Date('2026-05-17T09:00:00'));
+      const b = service.dailySeed(new Date('2026-05-18T09:00:00'));
+      expect(a).not.toBe(b);
+    });
+
+    it('produces a 32-bit unsigned integer', () => {
+      const s = service.dailySeed(new Date('2026-05-17'));
+      expect(s).toBeGreaterThanOrEqual(0);
+      expect(s).toBeLessThan(0xFFFFFFFF + 1);
+      expect(Number.isInteger(s)).toBeTrue();
+    });
+
+    it('getTodayQuranVerse fetches a verse — surah and ayah deterministic for the day', (done) => {
+      booksServiceSpy.getPart.and.returnValue(of(mockQuranVerseDetail));
+
+      service.getTodayQuranVerse().subscribe(verse => {
+        expect(verse).toBeTruthy();
+        expect(booksServiceSpy.getPart).toHaveBeenCalled();
+        const path = booksServiceSpy.getPart.calls.mostRecent().args[0];
+        // Path is `quran:S:A`. The surah and ayah are deterministic, so
+        // repeated calls within the same day should hit the same path.
+        booksServiceSpy.getPart.calls.reset();
+        booksServiceSpy.getPart.and.returnValue(of(mockQuranVerseDetail));
+        service.getTodayQuranVerse().subscribe(() => {
+          const path2 = booksServiceSpy.getPart.calls.mostRecent().args[0];
+          expect(path2).toBe(path);
+          done();
+        });
+      });
+    });
+  });
 });

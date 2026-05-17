@@ -120,6 +120,9 @@
 <!-- Global Reading Sheet — slide-out panel for AI prefs + (step 4) view toggles -->
 <app-reading-sheet></app-reading-sheet>
 
+<!-- Milestone toaster (RE-13) — fixed bottom-right; subscribes to ReadingStatsService on mount -->
+<app-milestone-toaster></app-milestone-toaster>
+
 <!-- Keyboard shortcuts help overlay -->
 <div class="keyboard-help-overlay" *ngIf="helpVisible$ | async" (click)="dismissHelp()">
   <div class="keyboard-help-panel" (click)="$event.stopPropagation()">

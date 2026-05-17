@@ -238,3 +238,283 @@ section {
     color: #bdbdbd;
   }
 }
+
+// ---------------------------------------------------------------------------
+// Reading stats strip (RE-06 / RE-08)
+// ---------------------------------------------------------------------------
+.reading-stats-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0 24px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(102, 187, 106, 0.08), rgba(67, 160, 71, 0.04));
+  border-radius: 12px;
+  border: 1px solid rgba(102, 187, 106, 0.15);
+}
+
+.stat-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 16px;
+  background: var(--card-bg, #fff);
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-width: 110px;
+
+  .stat-chip-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+  }
+
+  .stat-chip-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text-primary, #333);
+  }
+
+  .stat-chip-label {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .stat-chip-secondary {
+    font-size: 0.7rem;
+    color: var(--text-secondary, #888);
+    margin-top: 2px;
+  }
+
+  &.streak-chip.streak-in-danger {
+    background: rgba(255, 167, 38, 0.08);
+    border: 1px solid rgba(255, 167, 38, 0.3);
+
+    .stat-chip-value {
+      color: #ef6c00;
+    }
+  }
+}
+
+.streak-danger-msg {
+  flex-basis: 100%;
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: #ef6c00;
+  font-style: italic;
+}
+
+:host-context(body.dark-theme) {
+  .reading-stats-strip {
+    background: linear-gradient(135deg, rgba(102, 187, 106, 0.12), rgba(67, 160, 71, 0.06));
+    border-color: rgba(102, 187, 106, 0.2);
+  }
+
+  .stat-chip {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .stat-chip-value {
+    color: #e0e0e0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reading history list (RE-06)
+// ---------------------------------------------------------------------------
+.reading-history-section {
+  margin-block: 24px;
+
+  h2 {
+    font-size: 1.15rem;
+    margin-bottom: 12px;
+  }
+}
+
+.reading-history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.reading-history-day {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  background: var(--card-bg, #fff);
+  border-radius: 8px;
+  border-inline-start: 3px solid #43a047;
+
+  .history-day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .history-day-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary, #333);
+  }
+
+  .history-day-count {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #43a047;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .history-day-books {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .history-book-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(102, 187, 106, 0.1);
+    color: #2e7d32;
+    font-size: 0.75rem;
+    border-radius: 10px;
+    letter-spacing: 0.02em;
+  }
+}
+
+:host-context(body.dark-theme) .reading-history-day {
+  background: rgba(255, 255, 255, 0.04);
+
+  .history-day-label {
+    color: #e0e0e0;
+  }
+
+  .history-day-count {
+    color: #81c784;
+  }
+
+  .history-book-chip {
+    background: rgba(102, 187, 106, 0.18);
+    color: #a5d6a7;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Goal chip (RE-09) — sits in the stats strip
+// ---------------------------------------------------------------------------
+.goal-chip {
+  position: relative;
+  padding-bottom: 12px;
+  min-width: 130px;
+
+  &.goal-met {
+    background: linear-gradient(135deg, rgba(67, 160, 71, 0.18), transparent 70%);
+
+    .stat-chip-value {
+      color: #2e7d32;
+    }
+  }
+
+  .goal-mini-bar {
+    position: absolute;
+    inset-inline: 12px;
+    bottom: 6px;
+    height: 4px;
+    background: var(--border-color, rgba(0, 0, 0, 0.08));
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .goal-mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #66bb6a, #43a047);
+    transition: width 0.4s ease-out;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Goal config section (RE-09)
+// ---------------------------------------------------------------------------
+.goal-section {
+  margin-block: 24px;
+  padding: 16px;
+  background: var(--card-bg, #fff);
+  border-radius: 8px;
+
+  h2 {
+    font-size: 1.05rem;
+    margin: 0 0 8px;
+  }
+
+  .goal-empty {
+    color: var(--text-secondary, #666);
+    font-size: 0.9rem;
+    margin: 0 0 12px;
+  }
+
+  .goal-current {
+    margin: 0 0 12px;
+  }
+
+  .goal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .goal-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .goal-label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.9rem;
+    color: var(--text-secondary, #666);
+
+    .goal-input {
+      padding: 8px 10px;
+      border: 1px solid var(--border-color, #ccc);
+      border-radius: 6px;
+      font-size: 1rem;
+      max-width: 140px;
+    }
+  }
+
+  .goal-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .goal-preset {
+    background: transparent;
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 16px;
+    padding: 4px 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s ease;
+
+    &.active {
+      background: #43a047;
+      border-color: #43a047;
+      color: white;
+    }
+
+    &:hover:not(.active) {
+      border-color: #43a047;
+    }
+  }
+}
+
+:host-context(body.dark-theme) .goal-section {
+  background: rgba(255, 255, 255, 0.04);
+}

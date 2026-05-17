@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Annotation, Bookmark, BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
+import { DailyReadingTally, ReadingStatsService, StreakInfo } from '@app/services/reading-stats.service';
 import { SyncService, SyncStatus, SyncUser } from '@app/services/sync.service';
+import { I18nService } from '@app/services/i18n.service';
 import { Observable, Subscription } from 'rxjs';
 
 @Component({
@@ -15,6 +17,17 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   bookmarks: Bookmark[] = [];
   readingProgress: ReadingProgress[] = [];
   annotations: Annotation[] = [];
+  /** Daily reading history, newest-first. Capped at 30 days in the template. */
+  dailyTallies: DailyReadingTally[] = [];
+  streak: StreakInfo = { current: 0, longest: 0, includesToday: false };
+  totalVersesRead = 0;
+
+  // RE-09 daily-goal state
+  goalTarget = 0;
+  goalToday = 0;
+  goalFraction = 0;
+  goalEditing = false;
+  goalDraft = 5;
   private subs: Subscription[] = [];
 
   // Sync
@@ -25,7 +38,9 @@ export class BookmarksComponent implements OnInit, OnDestroy {
 
   constructor(
     private bookmarkService: BookmarkService,
+    private readingStats: ReadingStatsService,
     private syncService: SyncService,
+    private i18n: I18nService,
     private cdr: ChangeDetectorRef,
   ) {
     this.syncConfigured = this.syncService.isConfigured;
@@ -53,6 +68,56 @@ export class BookmarksComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       })
     );
+
+    // RE-06 + RE-08 wiring (history grouped by day + streak counter)
+    this.subs.push(
+      this.readingStats.dailyTallies$.subscribe(d => {
+        this.dailyTallies = d;
+        this.totalVersesRead = d.reduce((sum, t) => sum + t.versesRead, 0);
+        this.cdr.markForCheck();
+      })
+    );
+    this.subs.push(
+      this.readingStats.streak$.subscribe(s => {
+        this.streak = s;
+        this.cdr.markForCheck();
+      })
+    );
+    this.subs.push(
+      this.readingStats.goalProgress$.subscribe(g => {
+        this.goalTarget = g.target;
+        this.goalToday = g.today;
+        this.goalFraction = g.fraction;
+        if (!this.goalEditing) {
+          this.goalDraft = g.target > 0 ? g.target : 5;
+        }
+        this.cdr.markForCheck();
+      })
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // RE-09 daily-goal handlers
+  // ---------------------------------------------------------------------------
+
+  openGoalEditor(): void {
+    this.goalEditing = true;
+    this.goalDraft = this.goalTarget > 0 ? this.goalTarget : 5;
+  }
+
+  cancelGoalEdit(): void {
+    this.goalEditing = false;
+  }
+
+  async saveGoal(): Promise<void> {
+    const n = Math.max(0, Math.min(500, Math.floor(this.goalDraft || 0)));
+    await this.bookmarkService.setGoalConfig(n);
+    this.goalEditing = false;
+  }
+
+  async disableGoal(): Promise<void> {
+    await this.bookmarkService.setGoalConfig(0);
+    this.goalEditing = false;
   }
 
   ngOnDestroy(): void {
@@ -90,8 +155,45 @@ export class BookmarksComponent implements OnInit, OnDestroy {
     const names: Record<string, string> = {
       'quran': 'Quran',
       'al-kafi': 'Al-Kafi',
+      'tahdhib-al-ahkam': 'Tahdhib al-Ahkam',
+      'al-istibsar': 'Al-Istibsar',
+      'man-la-yahduruhu-al-faqih': 'Man La Yahduruhu al-Faqih',
+      'nahj-al-balagha': 'Nahj al-Balagha',
+      'al-sahifa-al-sajjadiyya': 'Al-Sahifa al-Sajjadiyya',
+      'al-amali-saduq': 'Al-Amali (Saduq)',
+      'al-amali-mufid': 'Al-Amali (Mufid)',
+      'al-khisal': 'Al-Khisal',
+      'al-tawhid': 'Al-Tawhid',
+      'kamal-al-din': 'Kamal al-Din',
+      'maani-al-akhbar': "Ma'ani al-Akhbar",
+      'uyun-akhbar-al-rida': 'Uyun Akhbar al-Rida',
+      'kamil-al-ziyarat': 'Kamil al-Ziyarat',
+      'risalat-al-huquq': 'Risalat al-Huquq',
+      'kitab-al-zuhd': 'Kitab al-Zuhd',
+      'kitab-al-mumin': "Kitab al-Mu'min",
+      'kitab-al-ghayba-numani': "Kitab al-Ghayba (Nu'mani)",
+      'kitab-al-ghayba-tusi': 'Kitab al-Ghayba (Tusi)',
+      'fadail-al-shia': "Fada'il al-Shi'a",
+      'sifat-al-shia': "Sifat al-Shi'a",
+      'kitab-al-duafa': "Kitab al-Du'afa",
+      'mujam-al-ahadith-al-mutabara': "Mu'jam al-Ahadith",
+      'kitab-al-irshad': 'Kitab al-Irshad',
+      'kitab-sulaym-ibn-qays': 'Kitab Sulaym ibn Qays',
+      'thawab-al-amal': "Thawab al-A'mal",
     };
-    return names[bookId] || bookId;
+    return names[bookId] || bookId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  /** Human-friendly day label: Today / Yesterday / formatted date. */
+  formatDayLabel(dayKey: string): string {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(dayKey);
+    target.setHours(0, 0, 0, 0);
+    const diff = (today.getTime() - target.getTime()) / 86_400_000;
+    if (diff === 0) return this.i18n.get('reading.todayLabel');
+    if (diff === 1) return this.i18n.get('reading.yesterdayLabel');
+    return target.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
   }
 
   async exportBookmarks(): Promise<void> {

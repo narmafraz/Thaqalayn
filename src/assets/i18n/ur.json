@@ -277,7 +277,10 @@
     "muteReadVerses": "پڑھی ہوئی آیات مدھم کریں",
     "muteReadVersesHint": "پڑھی ہوئی آیات ✓ کے ساتھ مدھم نظر آتی ہیں؛ بند ہونے پر تمام آیات یکساں دکھتی ہیں۔",
     "countNounAyah": "آیات",
-    "countNounHadith": "احادیث"
+    "countNounHadith": "احادیث",
+    "resetProgress": "اس سیکشن کی پیش رفت ری سیٹ کریں",
+    "resetAll": "تمام پڑھنے کی پیش رفت ری سیٹ کریں",
+    "resetAllConfirm": "تمام کتابوں میں {{count}} نشانات ہٹا دیں؟"
   },
   "audio": {
     "play": "چلائیں",

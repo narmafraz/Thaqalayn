@@ -289,7 +289,10 @@
     "muteReadVerses": "تخفيت الآيات التي قرأتها",
     "muteReadVersesHint": "الآيات المقروءة تظهر باهتة مع علامة ✓؛ عند الإيقاف تظهر كل الآيات بنفس الشكل.",
     "countNounAyah": "آية",
-    "countNounHadith": "حديث"
+    "countNounHadith": "حديث",
+    "resetProgress": "إعادة تعيين تقدم هذا القسم",
+    "resetAll": "إعادة تعيين كل تقدم القراءة",
+    "resetAllConfirm": "إزالة جميع علامات القراءة الـ {{count}} في كل الكتب؟"
   },
   "audio": {
     "play": "تشغيل",

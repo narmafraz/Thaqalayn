@@ -307,7 +307,10 @@
     "muteReadVerses": "Fade out verses I've read",
     "muteReadVersesHint": "Read verses appear faded with a ✓; off makes every verse look the same.",
     "countNounAyah": "ayahs",
-    "countNounHadith": "hadiths"
+    "countNounHadith": "hadiths",
+    "resetProgress": "Reset progress for this section",
+    "resetAll": "Reset all reading progress",
+    "resetAllConfirm": "Remove all {{count}} read marks across every book?"
   },
   "audio": {
     "play": "Play",

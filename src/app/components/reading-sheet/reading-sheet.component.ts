@@ -4,6 +4,7 @@ import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AiLanguage } from '@app/models/ai-content';
 import { AiPreferences, AiPreferencesService } from '@app/services/ai-preferences.service';
+import { BookmarkService } from '@app/services/bookmark.service';
 import { ReadingSheetService } from '@app/services/reading-sheet.service';
 import { I18nService, ThemeService } from '@app/services';
 import { ThemeMode } from '@app/services/theme.service';
@@ -35,6 +36,7 @@ export class ReadingSheetComponent implements OnInit, OnDestroy {
   private readonly themeService = inject(ThemeService);
   private readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
+  private readonly bookmarks = inject(BookmarkService);
   private readonly host = inject(ElementRef<HTMLElement>);
 
   readonly open$: Observable<boolean> = this.sheet.open$;
@@ -124,6 +126,21 @@ export class ReadingSheetComponent implements OnInit, OnDestroy {
   // --- AI prefs ---
   onPrefChange<K extends keyof AiPreferences>(key: K, value: AiPreferences[K]): void {
     this.aiPrefs.set(key, value);
+  }
+
+  /** Wipe ALL read marks across every book. RE-17. */
+  async resetAllProgress(): Promise<void> {
+    const all = await this.bookmarks.getReadVerses();
+    if (all.length === 0) return;
+    const msg = this.i18n.get('reading.resetAllConfirm');
+    const fallback = `Remove all ${all.length} read marks across all books?`;
+    const ok = window.confirm(
+      msg === 'reading.resetAllConfirm'
+        ? fallback
+        : msg.replace(/\{\{\s*count\s*\}\}/g, String(all.length)),
+    );
+    if (!ok) return;
+    await this.bookmarks.clearReadVerses();
   }
 
   // --- Navigate (closes the sheet on click) ---

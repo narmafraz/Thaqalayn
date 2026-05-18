@@ -375,6 +375,43 @@ export class BookmarkService {
     await this.refreshReadVerses();
   }
 
+  /**
+   * Remove read marks whose path lies under `pathPrefix` (which can be a
+   * whole book, a volume, a section, or a leaf chapter). Returns the count
+   * deleted. `pathPrefix` is the index form — e.g. `al-kafi`, `al-kafi:1`,
+   * `al-kafi:1:1:1`. The leading `/books/` is added automatically; the
+   * caller passes the index, not the URL path.
+   */
+  async resetReadProgressForPrefix(pathPrefix: string): Promise<number> {
+    if (!pathPrefix) return 0;
+    const slug = pathPrefix.split(':')[0];
+    const prefixPath = '/books/' + pathPrefix;
+    const needle = prefixPath + ':';
+    // Fetch all reads in the book and filter — cheaper than a full scan
+    // because Dexie has an index on `bookId`.
+    const all = await this.db.readVerses.where('bookId').equals(slug).toArray();
+    const toDelete = all.filter(r => r.path === prefixPath || r.path.startsWith(needle));
+    if (toDelete.length === 0) return 0;
+    const ids = toDelete.map(r => r.id!).filter(id => id !== undefined);
+    await this.db.readVerses.bulkDelete(ids);
+    await this.refreshReadVerses();
+    return toDelete.length;
+  }
+
+  /**
+   * Preview helper — how many read marks live under `pathPrefix`. Used by
+   * the confirmation dialog so we can say "Remove N marks from <label>?"
+   * without first running the destructive op.
+   */
+  async countReadProgressForPrefix(pathPrefix: string): Promise<number> {
+    if (!pathPrefix) return 0;
+    const slug = pathPrefix.split(':')[0];
+    const prefixPath = '/books/' + pathPrefix;
+    const needle = prefixPath + ':';
+    const all = await this.db.readVerses.where('bookId').equals(slug).toArray();
+    return all.filter(r => r.path === prefixPath || r.path.startsWith(needle)).length;
+  }
+
   // ---------------------------------------------------------------------------
   // Goal config (Wave D / RE-09)
   // ---------------------------------------------------------------------------

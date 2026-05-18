@@ -277,7 +277,10 @@
     "muteReadVerses": "Redupkan ayat yang sudah dibaca",
     "muteReadVersesHint": "Ayat yang sudah dibaca tampak redup dengan ✓; jika nonaktif, semua ayat tampak sama.",
     "countNounAyah": "ayat",
-    "countNounHadith": "hadis"
+    "countNounHadith": "hadis",
+    "resetProgress": "Setel ulang kemajuan bagian ini",
+    "resetAll": "Setel ulang seluruh kemajuan membaca",
+    "resetAllConfirm": "Hapus semua {{count}} tanda baca di semua kitab?"
   },
   "audio": {
     "play": "Putar",

@@ -1,17 +1,24 @@
 <ng-container *ngIf="(book$ | async) as book">
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author$ | async"></app-book-titles>
 
-  <!-- RE-04: Per-book / sub-tree progress strip -->
-  <div *ngIf="bookProgress && bookProgress.total > 0" class="book-progress-strip"
-       [attr.aria-label]="bookProgress.percent + '% — ' + bookProgress.read + ' / ' + bookProgress.total"
-       [matTooltip]="bookProgress.read + ' / ' + bookProgress.total">
-    <div class="book-progress-text">
-      <span class="book-progress-percent">{{ bookProgress.percent }}%</span>
-      <span class="book-progress-count">{{ bookProgress.read }} / {{ bookProgress.total }}</span>
+  <!-- RE-04: Per-book / sub-tree progress strip + RE-17 reset action -->
+  <div *ngIf="bookProgress && bookProgress.total > 0" class="book-progress-strip">
+    <div class="book-progress-body"
+         [attr.aria-label]="bookProgress.percent + '% — ' + bookProgress.read + ' / ' + bookProgress.total"
+         [matTooltip]="bookProgress.read + ' / ' + bookProgress.total">
+      <div class="book-progress-text">
+        <span class="book-progress-percent">{{ bookProgress.percent }}%</span>
+        <span class="book-progress-count">{{ bookProgress.read }} / {{ bookProgress.total }}</span>
+      </div>
+      <div class="book-progress-bar">
+        <div class="book-progress-fill" [style.width.%]="bookProgress.fraction * 100"></div>
+      </div>
     </div>
-    <div class="book-progress-bar">
-      <div class="book-progress-fill" [style.width.%]="bookProgress.fraction * 100"></div>
-    </div>
+    <button *ngIf="bookProgress.read > 0" class="book-progress-reset" (click)="resetProgress()"
+            [attr.aria-label]="'reading.resetProgress' | translate"
+            [matTooltip]="'reading.resetProgress' | translate">
+      <mat-icon>restart_alt</mat-icon>
+    </button>
   </div>
 
   <!-- RE-07: Hide fully-read chapters filter chip (per-page, intentionally

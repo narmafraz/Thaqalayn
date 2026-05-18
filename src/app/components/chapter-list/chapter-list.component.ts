@@ -189,6 +189,21 @@ export class ChapterListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.changeDetectorRef.markForCheck();
   }
 
+  /** Wipe all read marks under the current chapter-list page (book / volume / section).
+   *  Asks for confirmation first, showing the affected count. */
+  async resetProgress(): Promise<void> {
+    if (!this.currentBookIndex) return;
+    const prefix = this.currentBookIndex;
+    const count = await this.bookmarkService.countReadProgressForPrefix(prefix);
+    if (count === 0) return;
+    // Simple confirm() for v1 — Material dialog can replace this later.
+    const ok = window.confirm(
+      `Remove ${count} read mark${count === 1 ? '' : 's'} under this section?`
+    );
+    if (!ok) return;
+    await this.bookmarkService.resetReadProgressForPrefix(prefix);
+  }
+
   private toProgress(read: number, total: number): ChapterListRowProgress {
     const fraction = total > 0 ? Math.min(1, read / total) : 0;
     return {

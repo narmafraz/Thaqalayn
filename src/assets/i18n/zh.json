@@ -277,7 +277,10 @@
     "muteReadVerses": "弱化已读经文",
     "muteReadVersesHint": "已读经文显示为淡色并带 ✓；关闭时所有经文外观相同。",
     "countNounAyah": "节",
-    "countNounHadith": "条"
+    "countNounHadith": "条",
+    "resetProgress": "重置本部分进度",
+    "resetAll": "重置所有阅读进度",
+    "resetAllConfirm": "移除所有书籍中的 {{count}} 条已读标记？"
   },
   "audio": {
     "play": "播放",

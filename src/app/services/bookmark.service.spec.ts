@@ -874,6 +874,109 @@ describe('BookmarkService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // Reset progress at any prefix (RE-17)
+  // ---------------------------------------------------------------------------
+  describe('resetReadProgressForPrefix', () => {
+    async function seedRange(book: string, start: number, end: number): Promise<void> {
+      const paths: string[] = [];
+      for (let i = start; i <= end; i++) {
+        paths.push(`/books/${book}:${i}`);
+      }
+      await service.markReadBulk(paths);
+    }
+
+    it('deletes all read marks under a whole-book prefix', async () => {
+      await service.markRead('/books/quran:1:1');
+      await service.markRead('/books/quran:1:2');
+      await service.markRead('/books/al-kafi:1:1:1:1');
+
+      const removed = await service.resetReadProgressForPrefix('quran');
+
+      expect(removed).toBe(2);
+      expect((await service.getReadVerses()).length).toBe(1);
+      const remaining = await service.getReadVerses();
+      expect(remaining[0].path).toBe('/books/al-kafi:1:1:1:1');
+    });
+
+    it('deletes only paths under a volume prefix', async () => {
+      await service.markRead('/books/al-kafi:1:1:1:1');
+      await service.markRead('/books/al-kafi:1:1:1:2');
+      await service.markRead('/books/al-kafi:2:1:1:1');
+
+      const removed = await service.resetReadProgressForPrefix('al-kafi:1');
+
+      expect(removed).toBe(2);
+      const remaining = await service.getReadVerses();
+      expect(remaining.length).toBe(1);
+      expect(remaining[0].path).toBe('/books/al-kafi:2:1:1:1');
+    });
+
+    it('deletes only paths under a chapter prefix', async () => {
+      await service.markRead('/books/al-kafi:1:1:1:1');
+      await service.markRead('/books/al-kafi:1:1:1:2');
+      await service.markRead('/books/al-kafi:1:1:2:1');
+
+      const removed = await service.resetReadProgressForPrefix('al-kafi:1:1:1');
+
+      expect(removed).toBe(2);
+      const remaining = await service.getReadVerses();
+      expect(remaining.length).toBe(1);
+      expect(remaining[0].path).toBe('/books/al-kafi:1:1:2:1');
+    });
+
+    it('does not delete sibling prefix that starts with the same letters', async () => {
+      // /books/al-kafi:1:1 vs /books/al-kafi:1:11 — the latter must NOT match the former's prefix
+      await service.markRead('/books/al-kafi:1:1:1:1');
+      await service.markRead('/books/al-kafi:1:11:1:1');
+
+      const removed = await service.resetReadProgressForPrefix('al-kafi:1:1');
+
+      expect(removed).toBe(1);
+      const remaining = await service.getReadVerses();
+      expect(remaining[0].path).toBe('/books/al-kafi:1:11:1:1');
+    });
+
+    it('returns 0 for an empty prefix string', async () => {
+      await service.markRead('/books/quran:1:1');
+      const removed = await service.resetReadProgressForPrefix('');
+      expect(removed).toBe(0);
+      expect((await service.getReadVerses()).length).toBe(1);
+    });
+
+    it('returns 0 when no reads match the prefix', async () => {
+      await service.markRead('/books/quran:1:1');
+      const removed = await service.resetReadProgressForPrefix('nahj-al-balagha');
+      expect(removed).toBe(0);
+      expect((await service.getReadVerses()).length).toBe(1);
+    });
+
+    it('emits via readVerses$ after deletion', async () => {
+      await service.markRead('/books/quran:1:1');
+      await service.markRead('/books/quran:1:2');
+      await service.resetReadProgressForPrefix('quran');
+      const current = await firstValueFrom(service.readVerses$);
+      expect(current).toEqual([]);
+    });
+  });
+
+  describe('countReadProgressForPrefix', () => {
+    it('returns the number of marks under a prefix without modifying state', async () => {
+      await service.markRead('/books/al-kafi:1:1:1:1');
+      await service.markRead('/books/al-kafi:1:1:1:2');
+      await service.markRead('/books/al-kafi:2:1:1:1');
+
+      const count = await service.countReadProgressForPrefix('al-kafi:1');
+      expect(count).toBe(2);
+      // state unchanged
+      expect((await service.getReadVerses()).length).toBe(3);
+    });
+
+    it('returns 0 for unmatched prefix', async () => {
+      expect(await service.countReadProgressForPrefix('nahj-al-balagha')).toBe(0);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Goal config (RE-09)
   // ---------------------------------------------------------------------------
   describe('goalConfig', () => {

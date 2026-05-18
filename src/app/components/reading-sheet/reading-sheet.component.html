@@ -117,7 +117,7 @@
       </label>
     </section>
 
-    <!-- Reading progress (RE-05 / RE-09) -->
+    <!-- Reading progress (RE-05 / RE-09 / RE-17) -->
     <section class="reading-sheet-section" *ngIf="preferences$ | async as prefs">
       <h3 class="reading-sheet-section-title">{{ 'reading.progress' | translate }}</h3>
       <label class="reading-sheet-pref reading-sheet-pref-with-hint" for="rs-pref-mute-read">
@@ -128,6 +128,10 @@
           <span class="reading-sheet-pref-hint">{{ 'reading.muteReadVersesHint' | translate }}</span>
         </span>
       </label>
+      <button class="reading-sheet-danger" (click)="resetAllProgress()">
+        <mat-icon>restart_alt</mat-icon>
+        <span>{{ 'reading.resetAll' | translate }}</span>
+      </button>
     </section>
 
     <!-- Navigate -->

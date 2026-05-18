@@ -277,7 +277,10 @@
     "muteReadVerses": "Okuduğum ayetleri sönükleştir",
     "muteReadVersesHint": "Okunan ayetler ✓ ile soluk görünür; kapatıldığında tüm ayetler aynı görünür.",
     "countNounAyah": "ayet",
-    "countNounHadith": "hadis"
+    "countNounHadith": "hadis",
+    "resetProgress": "Bu bölümün ilerlemesini sıfırla",
+    "resetAll": "Tüm okuma ilerlemesini sıfırla",
+    "resetAllConfirm": "Tüm kitaplardaki {{count}} okuma işareti silinsin mi?"
   },
   "audio": {
     "play": "Oynat",

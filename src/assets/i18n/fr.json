@@ -277,7 +277,10 @@
     "muteReadVerses": "Atténuer les versets déjà lus",
     "muteReadVersesHint": "Les versets lus apparaissent atténués avec une ✓ ; désactivé, tous les versets ont le même aspect.",
     "countNounAyah": "ayahs",
-    "countNounHadith": "hadiths"
+    "countNounHadith": "hadiths",
+    "resetProgress": "Réinitialiser la progression de cette section",
+    "resetAll": "Réinitialiser toute la progression de lecture",
+    "resetAllConfirm": "Supprimer les {{count}} marques de lecture dans tous les livres ?"
   },
   "audio": {
     "play": "Lecture",

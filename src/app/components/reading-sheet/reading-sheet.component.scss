@@ -208,6 +208,31 @@
   line-height: 1.35;
 }
 
+.reading-sheet-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  border-radius: 16px;
+  font-size: 13px;
+  color: #d32f2f;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: rgba(244, 67, 54, 0.08);
+  }
+}
+
 .reading-sheet-nav-link {
   display: flex;
   align-items: center;

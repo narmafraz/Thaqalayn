@@ -277,7 +277,10 @@
     "muteReadVerses": "পড়া আয়াত নিষ্প্রভ করুন",
     "muteReadVersesHint": "পড়া আয়াত ✓ চিহ্ন সহ নিষ্প্রভ দেখায়; বন্ধ থাকলে সব আয়াত একরকম দেখায়।",
     "countNounAyah": "আয়াত",
-    "countNounHadith": "হাদিস"
+    "countNounHadith": "হাদিস",
+    "resetProgress": "এই বিভাগের অগ্রগতি রিসেট করুন",
+    "resetAll": "সমস্ত পড়ার অগ্রগতি রিসেট করুন",
+    "resetAllConfirm": "সব বই থেকে {{count}}টি পড়া চিহ্ন সরাবেন?"
   },
   "audio": {
     "play": "চালান",

@@ -277,7 +277,10 @@
     "muteReadVerses": "Atenuar los versículos ya leídos",
     "muteReadVersesHint": "Los versículos leídos aparecen atenuados con un ✓; desactivado, todos los versículos se ven igual.",
     "countNounAyah": "ayat",
-    "countNounHadith": "hadices"
+    "countNounHadith": "hadices",
+    "resetProgress": "Reiniciar el progreso de esta sección",
+    "resetAll": "Reiniciar todo el progreso de lectura",
+    "resetAllConfirm": "¿Eliminar las {{count}} marcas de lectura en todos los libros?"
   },
   "audio": {
     "play": "Reproducir",

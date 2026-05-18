@@ -16,7 +16,7 @@ All four pilot rounds and the full-corpus runs completed on Spark Qwen 3.6-35B a
 Final-state commits:
 - `ThaqalaynDataGenerator @ 86d3349` — build_word_indexes emits `glosses` map
 - `ThaqalaynWords @ b6bc78697a` — 113,661 page updates + new index
-- `ThaqalaynWordSources @ 62616ef56` — full Path B archive (~115K files, ~430 MB)
+- `ThaqalaynWordSources @ dbfa3a52a` — slim Path B archive (~115K response files, ~55 MB; lemma_prompts.jsonl / surface_prompts.jsonl / surface_contexts.json gitignored as regenerable)
 
 **What's left:**
 - Push the three repos (waited for owner approval per AFK rule)

@@ -138,6 +138,20 @@ Status legend: **[DONE]** = implemented & working, **[PARTIAL]** = partially imp
 | BMK-24 | As a user, I get a celebratory toast when I finish a book or cross 100/1000/10000 cumulative verses | [DONE] |
 | BMK-25 | As a user, the homepage shows a sticky "Verse of the Day" (Quran), same for everyone on the same date | [DONE] |
 | BMK-26 | As a user, my export bundle includes read-verses, goal config, and all the above for cross-device migration | [DONE] |
+| BMK-27 | As a user, on the homepage I see a "Books you've started" panel listing every book where I have at least one read mark, sorted by most recent (RE-18) | [DONE] |
+| BMK-28 | As a user, on the homepage I see a "Worth revisiting" panel suggesting older bookmarks (≥3 days since I last touched them), oldest-first (RE-14) | [DONE] |
+| BMK-29 | As a user, in the related-chapters list at the bottom of a chapter, chapters I've already read are faded with a green ✓; unread ones float to the top (RE-15) | [DONE] |
+| BMK-30 | As a user, I can reset progress at any level — chapter, volume, whole book, or all books — with a confirmation dialog that shows the count first (RE-17) | [DONE] |
+| BMK-31 | As a user, my read-mark muting (the fade + ✓ on cards I've read) is a persisted global preference I can toggle in the reading-sheet (RE-05 split) | [DONE] |
+| BMK-32 | As a user, when my streak is at risk (alive but not read today) I see a slim banner at the top of the app with a one-tap CTA. Same banner appears for missed daily goals after noon. Dismissible per-day. (RE-12) | [DONE] |
+| BMK-33 | As a user, I can opt out of the daily reminder banner from the reading-sheet | [DONE] |
+| BMK-34 | As a user, I can earn achievement badges across milestone / streak / book-completion / breadth / habit categories. Earned badges have holographic foil styling with hover tilt; locked badges show as desaturated silhouettes (RE-16) | [DONE] |
+| BMK-35 | As a user, when I earn a new badge I see a celebratory toast that pauses on hover and stays up for 20 seconds | [DONE] |
+| BMK-36 | As a user, the badge shelf groups badges by category (milestone / streak / book / breadth / habit) with each category sorted from easiest to hardest | [DONE] |
+| BMK-37 | As a user, I can enrol in structured reading plans (Quran-in-30-days, Quran-in-365-days, Nahj al-Balagha, the Four Books, etc.). One enrollment at a time per plan id; restart resets the day counter (RE-10) | [DONE] |
+| BMK-38 | As a user, on the homepage I see a "Day X / Y" ribbon for each plan I'm enrolled in, with today's verse count + a deep-link to the first verse of today's slot | [DONE] |
+| BMK-39 | As a user, my plan-day shows as complete once I've marked every verse in today's slot. Tomorrow's ribbon shows the next day's targets. | [DONE] |
+| BMK-40 | As a user, milestone toasts (book complete / cumulative threshold / badge earned) pause-on-hover so I can read them; they auto-dismiss after 12-20 seconds otherwise | [DONE] |
 
 ## 9. Sharing & Embedding
 

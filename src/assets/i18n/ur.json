@@ -545,6 +545,54 @@
     "nightOwl": {
       "label": "Night owl",
       "desc": "Five reads logged between 10 PM and 2 AM."
+    },
+    "fajrReader": {
+      "label": "Fajr reader",
+      "desc": "Ten reads logged between 4 AM and 6 AM."
+    },
+    "consistentWeek": {
+      "label": "A full week",
+      "desc": "Read on every day of one calendar week — Monday through Sunday."
+    },
+    "streakFortnight": {
+      "label": "Fortnight",
+      "desc": "A 14-day reading streak."
+    },
+    "streakHundred": {
+      "label": "Century streak",
+      "desc": "A 100-day reading streak — a rare achievement."
+    },
+    "dailyFifty": {
+      "label": "Half-century",
+      "desc": "Read 50 verses in a single day."
+    },
+    "dailyHundred": {
+      "label": "Marathon day",
+      "desc": "Read 100 verses in a single day."
+    },
+    "twentyFiveThousand": {
+      "label": "Twenty-five thousand",
+      "desc": "25,000 verses read in total."
+    },
+    "fiftyThousand": {
+      "label": "Fifty thousand",
+      "desc": "50,000 verses read in total — almost the entire corpus."
+    },
+    "varietyDay": {
+      "label": "Sampler",
+      "desc": "Read in three different books in one day."
+    },
+    "kafiVol1": {
+      "label": "Usul al-Kafi",
+      "desc": "Read at least Volume 1 of Al-Kafi."
+    },
+    "alSaduqMaster": {
+      "label": "Saduq scholar",
+      "desc": "Finish three of al-Saduq's books."
+    },
+    "fourBooks": {
+      "label": "The four pillars",
+      "desc": "Finish all four of Al-Kafi, al-Faqih, Tahdhib al-Ahkam, and al-Istibsar."
     }
   }
 }

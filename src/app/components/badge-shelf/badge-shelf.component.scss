@@ -1,3 +1,8 @@
+// Holographic badge tiles inspired by simeydotme/hover-tilt + Pokémon
+// holofoil cards. CSS-only effect driven by the HoloTiltDirective's CSS
+// custom properties (--pointer-x, --pointer-y, --rotate-x, --rotate-y,
+// --pointer-from-center).
+
 .badge-shelf {
   margin-block: 24px;
 }
@@ -21,7 +26,7 @@
 }
 
 .badge-group {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 
   .badge-group-title {
     font-size: 0.82rem;
@@ -29,77 +34,245 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--text-secondary, #888);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
   }
 }
 
 .badge-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
+  // Slightly bigger tiles to give the holo treatment room to breathe.
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+  // Perspective on the parent makes the tilt feel 3D — children opt in via
+  // transform-style: preserve-3d.
+  perspective: 800px;
 }
 
-.badge-tile {
+// ---------------------------------------------------------------------------
+// Card shell
+// ---------------------------------------------------------------------------
+
+.badge-card {
+  // CSS-var defaults so locked + first paint look right before the directive
+  // sets values.
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  --rotate-x: 0deg;
+  --rotate-y: 0deg;
+  --pointer-from-center: 0;
+
+  // Per-category holographic tint. Earned tiles override these to vivid hues;
+  // locked tiles use a desaturated grey foil so they still feel like cards.
+  --holo-c1: #555;
+  --holo-c2: #aaa;
+  --holo-c3: #888;
+
   position: relative;
+  aspect-ratio: 5 / 7;
+  perspective: 800px;
+  cursor: default;
+
+  // Subtle shadow base that grows on hover for a "lifting off the page" feel.
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.12));
+  transition: filter 0.3s ease;
+
+  &.badge-earned {
+    cursor: pointer;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.2));
+  }
+}
+
+.badge-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rotate-x)) rotateY(var(--rotate-y));
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.05), transparent 25%, transparent 75%, rgba(0, 0, 0, 0.06)),
+    conic-gradient(from 200deg at 50% 50%,
+      var(--holo-c1), var(--holo-c2), var(--holo-c3), var(--holo-c1));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  // Locked tiles get a flat grey treatment via the variables; this saturation
+  // override pushes them further into "monochrome" territory.
+  filter: saturate(0.2) brightness(0.85);
+}
+
+// Per-category holo tints — only applied when earned. Locked tiles keep the
+// neutral grey treatment so they read as "still to be unlocked."
+.badge-earned {
+  &.badge-cat-milestone .badge-card-inner {
+    --holo-c1: #ffd54f;
+    --holo-c2: #ff8a65;
+    --holo-c3: #ffeb3b;
+  }
+  &.badge-cat-streak .badge-card-inner {
+    --holo-c1: #ff7043;
+    --holo-c2: #f44336;
+    --holo-c3: #ff9800;
+  }
+  &.badge-cat-book .badge-card-inner {
+    --holo-c1: #66bb6a;
+    --holo-c2: #26a69a;
+    --holo-c3: #43a047;
+  }
+  &.badge-cat-breadth .badge-card-inner {
+    --holo-c1: #42a5f5;
+    --holo-c2: #5c6bc0;
+    --holo-c3: #29b6f6;
+  }
+  &.badge-cat-habit .badge-card-inner {
+    --holo-c1: #ab47bc;
+    --holo-c2: #7e57c2;
+    --holo-c3: #ec407a;
+  }
+}
+
+.badge-earned .badge-card-inner {
+  filter: saturate(1.05);
+}
+
+// ---------------------------------------------------------------------------
+// The two overlay layers — shine (pointer-following spotlight) + glare
+// (rainbow holofoil that intensifies near the pointer)
+// ---------------------------------------------------------------------------
+
+.badge-card-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--pointer-x) var(--pointer-y),
+    rgba(255, 255, 255, 0.55),
+    rgba(255, 255, 255, 0) 45%
+  );
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.badge-card-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  // Repeating-linear-gradient gives the rainbow-foil striping; conic-gradient
+  // would also work but stripes feel more "Pokémon card."
+  background:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 0, 80, 0.18) 0%,
+      rgba(255, 200, 0, 0.18) 12%,
+      rgba(40, 200, 120, 0.18) 24%,
+      rgba(60, 130, 255, 0.18) 36%,
+      rgba(180, 80, 220, 0.18) 48%,
+      rgba(255, 0, 80, 0.18) 60%
+    ),
+    radial-gradient(
+      circle at var(--pointer-x) var(--pointer-y),
+      rgba(255, 255, 255, 0.35),
+      transparent 40%
+    );
+  mix-blend-mode: color-dodge;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+// Locked tiles: the holo overlays stay off; only the muted conic shows.
+.badge-card.badge-earned:hover {
+  .badge-card-shine { opacity: 0.65; }
+  .badge-card-glare { opacity: 0.55; }
+}
+
+// Pointer-from-center boosts the foil — caps subtly during fast moves
+.badge-card.badge-earned .badge-card-glare {
+  // Use the pointer distance so the centre is dimmer and the corners glow.
+  opacity: calc(var(--pointer-from-center) * 0.55);
+}
+
+// ---------------------------------------------------------------------------
+// Content (icon + label)
+// ---------------------------------------------------------------------------
+
+.badge-card-content {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 14px 8px 10px;
-  background: var(--card-bg, #fff);
-  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
-  border-radius: 12px;
+  justify-content: center;
+  height: 100%;
+  padding: 14px 10px;
+  gap: 8px;
+  // Slight Z-translate gives the content a floating-above-foil feel under tilt
+  transform: translateZ(20px);
+}
+
+.badge-icon {
+  font-size: 2.6rem;
+  line-height: 1;
+  // Drop shadow inherits the holo gradient slightly via filter
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.badge-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
   text-align: center;
-  transition: all 0.2s ease;
+  line-height: 1.2;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
+  // Reserve two lines for layout consistency across earned + locked
+  min-height: 2.4em;
+  display: flex;
+  align-items: center;
+}
 
-  // Locked state — desaturated + faded
-  opacity: 0.42;
-  filter: grayscale(80%);
+// Locked variant — keep label readable against the muted card
+.badge-card:not(.badge-earned) .badge-label {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
 
-  .badge-icon {
-    font-size: 2rem;
-    line-height: 1;
+.badge-locked {
+  position: absolute;
+  top: 8px;
+  inset-inline-end: 10px;
+  z-index: 2;
+  font-size: 0.95rem;
+  opacity: 0.65;
+}
+
+// ---------------------------------------------------------------------------
+// Dark theme — soften the locked-tile background; the earned holos already
+// pop on dark.
+// ---------------------------------------------------------------------------
+
+:host-context(body.dark-theme) {
+  .badge-card-inner {
+    border-color: rgba(255, 255, 255, 0.08);
   }
-
-  .badge-label {
-    font-size: 0.78rem;
-    color: var(--text-secondary, #666);
-    line-height: 1.2;
-    min-height: 2.4em; // 2 lines reserved so earned/unearned cards align
-    display: flex;
-    align-items: center;
+  .badge-card:not(.badge-earned) .badge-card-inner {
+    filter: saturate(0.15) brightness(0.55);
   }
-
-  .badge-locked {
-    position: absolute;
-    top: 6px;
-    inset-inline-end: 8px;
-    font-size: 0.9rem;
-    opacity: 0.6;
+  .badge-card:not(.badge-earned) .badge-label {
+    color: rgba(255, 255, 255, 0.7);
   }
-
-  &.badge-earned {
-    opacity: 1;
-    filter: none;
-    border-color: rgba(255, 193, 7, 0.6);
-    background: linear-gradient(135deg, rgba(255, 193, 7, 0.06), transparent 70%);
-
-    .badge-label {
-      color: var(--text-primary, #333);
-      font-weight: 600;
-    }
+  .badge-earned .badge-label {
+    color: rgba(0, 0, 0, 0.9);
   }
 }
 
-:host-context(body.dark-theme) .badge-tile {
-  background: rgba(255, 255, 255, 0.04);
-
-  &.badge-earned {
-    background: linear-gradient(135deg, rgba(255, 193, 7, 0.12), transparent 70%);
-    border-color: rgba(255, 193, 7, 0.5);
-
-    .badge-label {
-      color: #e0e0e0;
-    }
+// Reduced motion: kill the tilt + soft-light overlays, keep the static foil
+// so the visual style remains but there's no movement.
+@media (prefers-reduced-motion: reduce) {
+  .badge-card-inner {
+    transform: none !important;
+    transition: none;
+  }
+  .badge-card-shine, .badge-card-glare {
+    transition: none;
   }
 }

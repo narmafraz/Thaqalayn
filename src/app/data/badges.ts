@@ -50,6 +50,56 @@ function distinctBooksRead(ctx: BadgeContext): number {
   return n;
 }
 
+/** Helper: max verses read in a single calendar day. */
+function maxVersesInOneDay(ctx: BadgeContext): number {
+  let m = 0;
+  for (const d of ctx.dailyTallies) {
+    if (d.versesRead > m) m = d.versesRead;
+  }
+  return m;
+}
+
+/** Helper: number of distinct books read in a single calendar day. */
+function maxBookBreadthInOneDay(ctx: BadgeContext): number {
+  let m = 0;
+  for (const d of ctx.dailyTallies) {
+    if (d.bookIds.length > m) m = d.bookIds.length;
+  }
+  return m;
+}
+
+/** Helper: has the user read on N reads inside the [startHour, endHour) window (wraparound supported). */
+function readsInHourRange(ctx: BadgeContext, startHour: number, endHour: number, n: number): boolean {
+  let count = 0;
+  const wrap = endHour <= startHour; // e.g. 22 → 2 wraps over midnight
+  for (const r of ctx.readVerses) {
+    const h = (r.readAt instanceof Date ? r.readAt : new Date(r.readAt)).getHours();
+    const inRange = wrap ? (h >= startHour || h < endHour) : (h >= startHour && h < endHour);
+    if (inRange) count++;
+    if (count >= n) return true;
+  }
+  return false;
+}
+
+/** Helper: read on every day of a given calendar-week ISO offset (Monday-start). */
+function readEveryDayOfAnyWeek(ctx: BadgeContext): boolean {
+  if (ctx.dailyTallies.length < 7) return false;
+  const dateSet = new Set(ctx.dailyTallies.map(t => t.date));
+  // For each day that's a Monday in the tally set, check 7 consecutive.
+  for (const t of ctx.dailyTallies) {
+    const start = new Date(t.date);
+    if (start.getDay() !== 1) continue; // 1 = Monday in JS
+    let allPresent = true;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start.getTime() + i * 86_400_000);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (!dateSet.has(key)) { allPresent = false; break; }
+    }
+    if (allPresent) return true;
+  }
+  return false;
+}
+
 /** Helper: how many distinct day-parts (morning / afternoon / evening) have ≥1 read. */
 function distinctDayParts(ctx: BadgeContext): number {
   const seen = new Set<string>();
@@ -223,16 +273,7 @@ export const BADGE_CATALOGUE: Badge[] = [
     labelKey: 'badges.earlyBird.label',
     descKey: 'badges.earlyBird.desc',
     category: 'habit',
-    predicate: ctx => {
-      // 5 reads logged between 04:00 and 07:00 local time
-      let n = 0;
-      for (const r of ctx.readVerses) {
-        const h = (r.readAt instanceof Date ? r.readAt : new Date(r.readAt)).getHours();
-        if (h >= 4 && h < 7) n++;
-        if (n >= 5) return true;
-      }
-      return false;
-    },
+    predicate: ctx => readsInHourRange(ctx, 4, 7, 5),
   },
   {
     id: 'night-owl',
@@ -240,15 +281,138 @@ export const BADGE_CATALOGUE: Badge[] = [
     labelKey: 'badges.nightOwl.label',
     descKey: 'badges.nightOwl.desc',
     category: 'habit',
+    predicate: ctx => readsInHourRange(ctx, 22, 2, 5),
+  },
+  {
+    id: 'fajr-reader',
+    icon: '🕌',
+    labelKey: 'badges.fajrReader.label',
+    descKey: 'badges.fajrReader.desc',
+    category: 'habit',
+    predicate: ctx => readsInHourRange(ctx, 4, 6, 10),
+  },
+  {
+    id: 'consistent-week',
+    icon: '📅',
+    labelKey: 'badges.consistentWeek.label',
+    descKey: 'badges.consistentWeek.desc',
+    category: 'habit',
+    predicate: ctx => readEveryDayOfAnyWeek(ctx),
+  },
+
+  // Larger streak tiers
+  {
+    id: 'streak-fortnight',
+    icon: '🔥',
+    labelKey: 'badges.streakFortnight.label',
+    descKey: 'badges.streakFortnight.desc',
+    category: 'streak',
+    predicate: ctx => ctx.streak.longest >= 14,
+  },
+  {
+    id: 'streak-hundred',
+    icon: '💎',
+    labelKey: 'badges.streakHundred.label',
+    descKey: 'badges.streakHundred.desc',
+    category: 'streak',
+    predicate: ctx => ctx.streak.longest >= 100,
+  },
+
+  // Daily-volume badges (push for bigger sessions)
+  {
+    id: 'daily-fifty',
+    icon: '⚡',
+    labelKey: 'badges.dailyFifty.label',
+    descKey: 'badges.dailyFifty.desc',
+    category: 'milestone',
+    predicate: ctx => maxVersesInOneDay(ctx) >= 50,
+  },
+  {
+    id: 'daily-hundred',
+    icon: '🚀',
+    labelKey: 'badges.dailyHundred.label',
+    descKey: 'badges.dailyHundred.desc',
+    category: 'milestone',
+    predicate: ctx => maxVersesInOneDay(ctx) >= 100,
+  },
+  {
+    id: 'twenty-five-thousand',
+    icon: '👑',
+    labelKey: 'badges.twentyFiveThousand.label',
+    descKey: 'badges.twentyFiveThousand.desc',
+    category: 'milestone',
+    predicate: ctx => ctx.totalVersesRead >= 25000,
+  },
+  {
+    id: 'fifty-thousand',
+    icon: '✨',
+    labelKey: 'badges.fiftyThousand.label',
+    descKey: 'badges.fiftyThousand.desc',
+    category: 'milestone',
+    predicate: ctx => ctx.totalVersesRead >= 50000,
+  },
+
+  // Variety in a single day
+  {
+    id: 'variety-day',
+    icon: '🎨',
+    labelKey: 'badges.varietyDay.label',
+    descKey: 'badges.varietyDay.desc',
+    category: 'breadth',
+    predicate: ctx => maxBookBreadthInOneDay(ctx) >= 3,
+  },
+
+  // Specific book completions — adds character + variety
+  {
+    id: 'kafi-vol1',
+    icon: '🧠',
+    labelKey: 'badges.kafiVol1.label',
+    descKey: 'badges.kafiVol1.desc',
+    category: 'book',
     predicate: ctx => {
-      // 5 reads logged between 22:00 and 02:00 local
-      let n = 0;
-      for (const r of ctx.readVerses) {
-        const h = (r.readAt instanceof Date ? r.readAt : new Date(r.readAt)).getHours();
-        if (h >= 22 || h < 2) n++;
-        if (n >= 5) return true;
+      // "al-kafi" book progress — check just vol 1 isn't tracked separately,
+      // so we approximate by checking the bookProgressMap. Better fidelity
+      // would require a per-prefix store; defer.
+      // For now: gate on >= 9% of al-kafi (vol 1 is ~1463/15397 ≈ 9.5%).
+      const bp = ctx.bookProgressMap.get('al-kafi');
+      return !!bp && bp.fraction >= 0.094;
+    },
+  },
+  {
+    id: 'al-saduq-master',
+    icon: '📜',
+    labelKey: 'badges.alSaduqMaster.label',
+    descKey: 'badges.alSaduqMaster.desc',
+    category: 'book',
+    predicate: ctx => {
+      // Finish any 3 of al-Saduq's books
+      const saduqSlugs = [
+        'al-amali-saduq', 'al-khisal', 'al-tawhid', 'kamal-al-din',
+        'maani-al-akhbar', 'man-la-yahduruhu-al-faqih', 'thawab-al-amal',
+        'uyun-akhbar-al-rida', 'fadail-al-shia', 'sifat-al-shia',
+      ];
+      let finished = 0;
+      for (const slug of saduqSlugs) {
+        const bp = ctx.bookProgressMap.get(slug);
+        if (bp && bp.total > 0 && bp.versesRead >= bp.total) finished++;
+        if (finished >= 3) return true;
       }
       return false;
+    },
+  },
+  {
+    id: 'four-books',
+    icon: '🏛️',
+    labelKey: 'badges.fourBooks.label',
+    descKey: 'badges.fourBooks.desc',
+    category: 'book',
+    predicate: ctx => {
+      const four = ['al-kafi', 'man-la-yahduruhu-al-faqih', 'tahdhib-al-ahkam', 'al-istibsar'];
+      for (const slug of four) {
+        const bp = ctx.bookProgressMap.get(slug);
+        if (!bp || bp.total === 0 || bp.versesRead < bp.total) return false;
+      }
+      return true;
     },
   },
 ];

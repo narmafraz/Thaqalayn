@@ -9,6 +9,7 @@ import { SupportComponent } from '../../components/support/support.component';
 import { DownloadComponent } from '../../components/download/download.component';
 import { BookmarksComponent } from '../../components/bookmarks/bookmarks.component';
 import { BadgeShelfComponent } from '../../components/badge-shelf/badge-shelf.component';
+import { HoloTiltDirective } from '../../components/badge-shelf/holo-tilt.directive';
 import { SearchResultsComponent } from '../../components/search-results/search-results.component';
 import { TopicsComponent } from '../../components/topics/topics.component';
 import { PhraseListComponent } from '../../components/phrase-list/phrase-list.component';
@@ -32,6 +33,7 @@ const routes: Routes = [
     DownloadComponent,
     BookmarksComponent,
     BadgeShelfComponent,
+    HoloTiltDirective,
     SearchResultsComponent,
     TopicsComponent,
     PhraseListComponent,

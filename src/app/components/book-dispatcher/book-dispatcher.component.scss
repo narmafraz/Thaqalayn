@@ -231,6 +231,87 @@
 }
 
 // ---------------------------------------------------------------------------
+// RE-14: revisit-suggestions panel
+// ---------------------------------------------------------------------------
+.revisit-panel {
+  margin: 24px auto;
+  max-width: 1000px;
+  padding: 0 16px;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    margin: 0 0 4px;
+  }
+
+  .revisit-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+    margin: 0 0 12px;
+  }
+
+  .revisit-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .revisit-item {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, rgba(0, 0, 0, 0.06));
+    border-radius: 8px;
+    border-inline-start: 3px solid #5e35b1; // contrasts with the green "started-books" panel
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+
+    &:hover {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      transform: translateX(2px);
+    }
+  }
+
+  .revisit-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: var(--text-primary, #333);
+
+    > mat-icon {
+      color: #5e35b1;
+      flex-shrink: 0;
+    }
+  }
+
+  .revisit-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .revisit-title {
+    font-size: 0.92rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .revisit-since {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #888);
+  }
+}
+
+:host-context(body.dark-theme) .revisit-item {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+// ---------------------------------------------------------------------------
 // RE-18: "Books you've started" panel
 // ---------------------------------------------------------------------------
 .started-books-panel {

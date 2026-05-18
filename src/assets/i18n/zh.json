@@ -282,7 +282,11 @@
     "resetAll": "重置所有阅读进度",
     "resetAllConfirm": "移除所有书籍中的 {{count}} 条已读标记？",
     "startedBooks": "你已开始阅读的书籍",
-    "badgeEarnedTitle": "获得徽章 — {{label}}"
+    "badgeEarnedTitle": "获得徽章 — {{label}}",
+    "revisitTitle": "值得重读",
+    "revisitSubtitle": "你不久前保存的书签 — 轻松回顾。",
+    "daysAgo": "天前",
+    "alreadyRead": "已读"
   },
   "audio": {
     "play": "播放",

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, combineLatest, map, of, switchMap, take } from 'rxjs';
 
-import { BookmarkService, ReadVerse } from './bookmark.service';
+import { Bookmark, BookmarkService, ReadVerse } from './bookmark.service';
 import { VerseCountsService } from './verse-counts.service';
 
 /** Per-book progress summary, ready for binding. */
@@ -23,6 +23,15 @@ export interface DailyReadingTally {
   date: string;
   versesRead: number;
   bookIds: string[];
+}
+
+/** RE-14: a bookmark suggested for revisit, with its "last seen" timestamp. */
+export interface RevisitCandidate {
+  bookmark: Bookmark;
+  /** max(createdAt, lastReadAtForSamePath). */
+  lastSeen: Date;
+  /** Days since lastSeen — used by the UI to surface the "X days ago" hint. */
+  daysSinceLastSeen: number;
 }
 
 /** Result of a streak computation. */
@@ -93,6 +102,79 @@ export class ReadingStatsService {
   async readPathSetForBook(bookId: string): Promise<Set<string>> {
     const rv = await this.bookmarks.getReadVersesForBook(bookId);
     return new Set(rv.map(r => r.path));
+  }
+
+  /**
+   * RE-15: take a list of chapter paths and annotate each with the user's
+   * read fraction so the caller can sort / fade / filter accordingly.
+   * Used by chapter-content to highlight related chapters the user hasn't
+   * explored yet. `isRead = true` means ≥ 90 % of the chapter is marked —
+   * a small slack so a chapter doesn't count as "unread" if the user is one
+   * heading away from completion.
+   */
+  async annotateChapterReadFractions<T extends { path: string }>(
+    items: T[],
+  ): Promise<Array<T & { fraction: number; isRead: boolean }>> {
+    const readVerses = await this.bookmarks.getReadVerses();
+    const chapterReadCounts = this.buildChapterReadCounts(readVerses);
+    return items.map(item => {
+      const chapterIdx = item.path.replace(/^\/books\//, '');
+      let total = this.counts.forChapter(chapterIdx);
+      let read = chapterReadCounts.get(chapterIdx) || 0;
+      if (total === 0) {
+        // Sub-tree (volume / book) — sum descendants
+        total = this.counts.totalForPrefix(chapterIdx);
+        read = 0;
+        for (const childIdx of this.counts.chapterIndexesForPrefix(chapterIdx)) {
+          read += chapterReadCounts.get(childIdx) || 0;
+        }
+      }
+      const fraction = total > 0 ? Math.min(1, read / total) : 0;
+      return { ...item, fraction, isRead: total > 0 && fraction >= 0.9 };
+    });
+  }
+
+  /**
+   * RE-14: revisit suggestions. Returns up to `limit` bookmarks sorted by
+   * "least recently seen" — surfaced on the homepage as a gentle nudge to
+   * re-read older saves. Items where the user has explicitly marked the
+   * verse read recently are pushed to the back.
+   *
+   * The min-age filter excludes very fresh bookmarks (within 3 days) so the
+   * panel feels like a callback to past intent rather than a list of stuff
+   * the user just added.
+   */
+  async revisitCandidates(limit = 5, minAgeDays = 3): Promise<RevisitCandidate[]> {
+    const bookmarks = await this.bookmarks.getBookmarks();
+    if (bookmarks.length === 0) return [];
+
+    const reads = await this.bookmarks.getReadVerses();
+    const readAtByPath = new Map<string, Date>();
+    for (const r of reads) {
+      const t = r.readAt instanceof Date ? r.readAt : new Date(r.readAt);
+      const existing = readAtByPath.get(r.path);
+      if (!existing || t > existing) readAtByPath.set(r.path, t);
+    }
+
+    const now = Date.now();
+    const dayMs = 86_400_000;
+    const minAgeMs = minAgeDays * dayMs;
+
+    const candidates = bookmarks
+      .map<RevisitCandidate>(bm => {
+        const created = bm.createdAt instanceof Date ? bm.createdAt : new Date(bm.createdAt);
+        const readAt = readAtByPath.get(bm.path);
+        const lastSeen = readAt && readAt > created ? readAt : created;
+        return {
+          bookmark: bm,
+          lastSeen,
+          daysSinceLastSeen: Math.floor((now - lastSeen.getTime()) / dayMs),
+        };
+      })
+      .filter(c => now - c.lastSeen.getTime() >= minAgeMs)
+      .sort((a, b) => a.lastSeen.getTime() - b.lastSeen.getTime());
+
+    return candidates.slice(0, limit);
   }
 
   /** One-shot read of the bookProgressMap (used by route resolvers and homepage explore cards). */

@@ -282,7 +282,11 @@
     "resetAll": "تمام پڑھنے کی پیش رفت ری سیٹ کریں",
     "resetAllConfirm": "تمام کتابوں میں {{count}} نشانات ہٹا دیں؟",
     "startedBooks": "کتابیں جو آپ نے شروع کیں",
-    "badgeEarnedTitle": "بیج حاصل کیا — {{label}}"
+    "badgeEarnedTitle": "بیج حاصل کیا — {{label}}",
+    "revisitTitle": "دوبارہ دیکھنے کے لائق",
+    "revisitSubtitle": "وہ بک مارک جو آپ نے کچھ عرصہ پہلے محفوظ کیے — آسان واپسی۔",
+    "daysAgo": "دن پہلے",
+    "alreadyRead": "پہلے سے پڑھا ہوا"
   },
   "audio": {
     "play": "چلائیں",

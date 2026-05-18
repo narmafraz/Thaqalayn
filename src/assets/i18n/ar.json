@@ -294,7 +294,11 @@
     "resetAll": "إعادة تعيين كل تقدم القراءة",
     "resetAllConfirm": "إزالة جميع علامات القراءة الـ {{count}} في كل الكتب؟",
     "startedBooks": "كتب بدأت قراءتها",
-    "badgeEarnedTitle": "حصلت على وسام — {{label}}"
+    "badgeEarnedTitle": "حصلت على وسام — {{label}}",
+    "revisitTitle": "يستحق العودة إليه",
+    "revisitSubtitle": "إشارات حفظتها منذ فترة — عودات سهلة.",
+    "daysAgo": "يوماً مضى",
+    "alreadyRead": "قُرئَ مسبقاً"
   },
   "audio": {
     "play": "تشغيل",

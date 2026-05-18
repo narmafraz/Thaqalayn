@@ -282,7 +282,11 @@
     "resetAll": "بازنشانی کل پیشرفت مطالعه",
     "resetAllConfirm": "همه {{count}} نشانه‌ی خواندن در کل کتاب‌ها حذف شود؟",
     "startedBooks": "کتاب‌هایی که شروع کرده‌اید",
-    "badgeEarnedTitle": "نشان کسب شد — {{label}}"
+    "badgeEarnedTitle": "نشان کسب شد — {{label}}",
+    "revisitTitle": "ارزش بازخوانی دارد",
+    "revisitSubtitle": "نشانه‌هایی که مدتی پیش ذخیره کردید — بازگشتی آسان.",
+    "daysAgo": "روز پیش",
+    "alreadyRead": "قبلاً خوانده‌اید"
   },
   "audio": {
     "play": "پخش",

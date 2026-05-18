@@ -282,7 +282,11 @@
     "resetAll": "Setel ulang seluruh kemajuan membaca",
     "resetAllConfirm": "Hapus semua {{count}} tanda baca di semua kitab?",
     "startedBooks": "Kitab yang telah Anda mulai",
-    "badgeEarnedTitle": "Lencana diperoleh — {{label}}"
+    "badgeEarnedTitle": "Lencana diperoleh — {{label}}",
+    "revisitTitle": "Layak dikunjungi ulang",
+    "revisitSubtitle": "Bookmark yang Anda simpan beberapa waktu lalu — kembali yang mudah.",
+    "daysAgo": "hari lalu",
+    "alreadyRead": "Sudah dibaca"
   },
   "audio": {
     "play": "Putar",

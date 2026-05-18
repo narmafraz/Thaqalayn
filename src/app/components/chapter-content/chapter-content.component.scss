@@ -957,6 +957,7 @@ mat-mdc-card {
 }
 
 .related-chapter-card {
+  position: relative;
   display: inline-flex;
   flex-direction: column;
   padding: 8px 14px;
@@ -965,12 +966,30 @@ mat-mdc-card {
   background: var(--table-stripe, #f5f5f5);
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   max-width: 280px;
 
   &:hover {
     border-color: var(--link-color, #1976d2);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  // RE-15: chapters already read get a muted look + green check in the corner.
+  &.related-chapter-read {
+    opacity: 0.55;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .related-chapter-check {
+    position: absolute;
+    top: 4px;
+    inset-inline-end: 8px;
+    font-size: 0.9rem;
+    color: #43a047;
+    pointer-events: none;
   }
 
   .related-book-name {

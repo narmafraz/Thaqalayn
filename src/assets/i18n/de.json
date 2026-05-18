@@ -282,7 +282,11 @@
     "resetAll": "Gesamten Lesefortschritt zurücksetzen",
     "resetAllConfirm": "Alle {{count}} Lesemarkierungen in allen Büchern entfernen?",
     "startedBooks": "Bücher, mit denen du angefangen hast",
-    "badgeEarnedTitle": "Abzeichen verdient — {{label}}"
+    "badgeEarnedTitle": "Abzeichen verdient — {{label}}",
+    "revisitTitle": "Wert, erneut zu lesen",
+    "revisitSubtitle": "Lesezeichen, die du vor einer Weile gespeichert hast — einfache Rückkehr.",
+    "daysAgo": "Tage her",
+    "alreadyRead": "Bereits gelesen"
   },
   "audio": {
     "play": "Abspielen",

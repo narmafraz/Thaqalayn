@@ -102,6 +102,23 @@
 
         <app-book-tree></app-book-tree>
 
+        <!-- RE-14: Spaced-repetition revisit suggestions -->
+        <section *ngIf="revisitCandidates.length > 0" class="revisit-panel">
+          <h2>{{ 'reading.revisitTitle' | translate }}</h2>
+          <p class="revisit-subtitle">{{ 'reading.revisitSubtitle' | translate }}</p>
+          <ul class="revisit-list">
+            <li *ngFor="let c of revisitCandidates" class="revisit-item">
+              <a [routerLink]="bookmarkRouterLink(c.bookmark.path)" queryParamsHandling="preserve" class="revisit-link">
+                <mat-icon>bookmark</mat-icon>
+                <div class="revisit-meta">
+                  <span class="revisit-title">{{ c.bookmark.title }}</span>
+                  <span class="revisit-since">{{ c.daysSinceLastSeen }} {{ 'reading.daysAgo' | translate }}</span>
+                </div>
+              </a>
+            </li>
+          </ul>
+        </section>
+
         <!-- RE-18: Per-book reading progress for books the user has started -->
         <section *ngIf="startedBookCards.length > 0" class="started-books-panel">
           <h2>{{ 'reading.startedBooks' | translate }}</h2>

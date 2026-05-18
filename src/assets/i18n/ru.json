@@ -282,7 +282,11 @@
     "resetAll": "Сбросить весь прогресс чтения",
     "resetAllConfirm": "Удалить все {{count}} отметок чтения по всем книгам?",
     "startedBooks": "Книги, которые вы начали",
-    "badgeEarnedTitle": "Получен значок — {{label}}"
+    "badgeEarnedTitle": "Получен значок — {{label}}",
+    "revisitTitle": "Стоит перечитать",
+    "revisitSubtitle": "Закладки, сохранённые некоторое время назад — лёгкие возвраты.",
+    "daysAgo": "дней назад",
+    "alreadyRead": "Уже прочитано"
   },
   "audio": {
     "play": "Воспроизвести",

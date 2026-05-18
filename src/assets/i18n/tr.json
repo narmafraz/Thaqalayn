@@ -282,7 +282,11 @@
     "resetAll": "Tüm okuma ilerlemesini sıfırla",
     "resetAllConfirm": "Tüm kitaplardaki {{count}} okuma işareti silinsin mi?",
     "startedBooks": "Başladığınız kitaplar",
-    "badgeEarnedTitle": "Rozet kazandın — {{label}}"
+    "badgeEarnedTitle": "Rozet kazandın — {{label}}",
+    "revisitTitle": "Tekrar göz atmaya değer",
+    "revisitSubtitle": "Bir süre önce kaydettiğin yer imleri — kolay dönüşler.",
+    "daysAgo": "gün önce",
+    "alreadyRead": "Zaten okundu"
   },
   "audio": {
     "play": "Oynat",

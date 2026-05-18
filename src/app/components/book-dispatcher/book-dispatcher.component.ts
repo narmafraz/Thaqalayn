@@ -3,7 +3,7 @@ import { Book } from '@app/models';
 import { BOOK_AUTHORS } from '@app/data/book-authors';
 import { BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
 import { RandomVerse, RandomVerseService } from '@app/services/random-verse.service';
-import { ReadingStatsService, BookProgress, StreakInfo } from '@app/services/reading-stats.service';
+import { ReadingStatsService, BookProgress, RevisitCandidate, StreakInfo } from '@app/services/reading-stats.service';
 import { VerseCountsService } from '@app/services/verse-counts.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -136,6 +136,8 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     continueRouterLink: string[];
     continueLabel: string;
   }> = [];
+  /** RE-14 — older bookmarks to gently re-surface. */
+  revisitCandidates: RevisitCandidate[] = [];
   private subscriptions: Subscription[] = [];
 
   private static readonly BOOK_NAMES: Record<string, string> = {
@@ -171,6 +173,14 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
         this.rebuildStartedBookCards();
         this.cdr.markForCheck();
       })
+    );
+    // RE-14 — refresh revisit suggestions whenever bookmarks change OR a
+    // read-mark lands (which affects the "last seen" timestamp).
+    this.subscriptions.push(
+      this.bookmarkService.bookmarks$.subscribe(() => this.refreshRevisitCandidates())
+    );
+    this.subscriptions.push(
+      this.bookmarkService.readVerses$.subscribe(() => this.refreshRevisitCandidates())
     );
     this.subscriptions.push(
       this.readingStats.bookProgressMap$.subscribe(map => {
@@ -271,6 +281,21 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   /** Per-book progress for the given slug, or `null` if unknown. Used by the homepage card template. */
   bookProgress(slug: string): BookProgress | null {
     return this.bookProgressMap.get(slug) ?? null;
+  }
+
+  private async refreshRevisitCandidates(): Promise<void> {
+    this.revisitCandidates = await this.readingStats.revisitCandidates(5);
+    this.cdr.markForCheck();
+  }
+
+  /** Path → routerLink segments. Mirrors getProgressRouterLink. */
+  bookmarkRouterLink(path: string): string[] {
+    const clean = path.replace(/^\//, '');
+    const slashIdx = clean.indexOf('/');
+    if (slashIdx > 0) {
+      return ['/' + clean.substring(0, slashIdx), clean.substring(slashIdx + 1)];
+    }
+    return [path];
   }
 
   /**

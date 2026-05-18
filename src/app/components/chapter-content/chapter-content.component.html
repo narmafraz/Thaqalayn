@@ -332,16 +332,19 @@
   </ng-container>
   </ng-container>
 
-  <!-- Related chapters in other books -->
+  <!-- Related chapters in other books (RE-15: unread first, faded if read) -->
   <section class="related-chapters-section" *ngIf="relatedChapters?.length">
     <h3>{{ 'book.relatedChapters' | translate }}</h3>
     <div class="related-chapters-list">
       <a *ngFor="let rc of relatedChapters"
          class="related-chapter-card"
+         [class.related-chapter-read]="rc.isRead"
          [routerLink]="['/books', stripBooksPrefix(rc.path)]"
-         queryParamsHandling="preserve">
+         queryParamsHandling="preserve"
+         [matTooltip]="rc.isRead ? ('reading.alreadyRead' | translate) : ''">
         <span class="related-book-name">{{ rc.book }}</span>
         <span class="related-chapter-title">{{ rc.title }}</span>
+        <span *ngIf="rc.isRead" class="related-chapter-check" aria-hidden="true">✓</span>
       </a>
     </div>
   </section>

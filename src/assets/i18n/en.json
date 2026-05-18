@@ -312,7 +312,11 @@
     "resetAll": "Reset all reading progress",
     "resetAllConfirm": "Remove all {{count}} read marks across every book?",
     "startedBooks": "Books you've started",
-    "badgeEarnedTitle": "Badge earned — {{label}}"
+    "badgeEarnedTitle": "Badge earned — {{label}}",
+    "revisitTitle": "Worth revisiting",
+    "revisitSubtitle": "Bookmarks you saved a while ago — easy wins to come back to.",
+    "daysAgo": "days ago",
+    "alreadyRead": "Already read"
   },
   "audio": {
     "play": "Play",

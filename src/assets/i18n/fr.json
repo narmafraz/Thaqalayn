@@ -282,7 +282,11 @@
     "resetAll": "Réinitialiser toute la progression de lecture",
     "resetAllConfirm": "Supprimer les {{count}} marques de lecture dans tous les livres ?",
     "startedBooks": "Livres que vous avez commencés",
-    "badgeEarnedTitle": "Badge obtenu — {{label}}"
+    "badgeEarnedTitle": "Badge obtenu — {{label}}",
+    "revisitTitle": "À revoir",
+    "revisitSubtitle": "Des marque-pages enregistrés il y a quelque temps — faciles à reprendre.",
+    "daysAgo": "jours",
+    "alreadyRead": "Déjà lu"
   },
   "audio": {
     "play": "Lecture",

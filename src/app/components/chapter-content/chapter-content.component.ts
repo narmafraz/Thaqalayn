@@ -14,6 +14,7 @@ import { ShareCardService } from '@app/services/share-card.service';
 import { TafsirService, TafsirEdition } from '@app/services/tafsir.service';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { RelatedChaptersService, RelatedChapter } from '@app/services/related-chapters.service';
+import { ReadingStatsService } from '@app/services/reading-stats.service';
 import { SeoService } from '@app/services/seo.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -112,7 +113,12 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   @HostBinding('class.show-read-marks-off') hideReadStyling = false;
 
   // Related chapters from other books
-  relatedChapters: RelatedChapter[] = [];
+  /**
+   * Related chapters with a read-fraction annotation tacked on (RE-15).
+   * Unread chapters are sorted before read ones so the user's eye lands on
+   * new material first.
+   */
+  relatedChapters: Array<RelatedChapter & { fraction: number; isRead: boolean }> = [];
 
   constructor(
     private store: Store,
@@ -130,6 +136,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     private renderer: Renderer2,
     private aiPrefs: AiPreferencesService,
     private relatedChaptersService: RelatedChaptersService,
+    private readingStats: ReadingStatsService,
     private seo: SeoService,
   ) {
     this.tafsirService.loadEditions().subscribe(editions => {
@@ -209,8 +216,16 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       // Load related chapters from other books
       this.relatedChaptersService.getRelatedChapters('/books/' + book.index)
         .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe(related => {
-          this.relatedChapters = related;
+        .subscribe(async related => {
+          // RE-15: annotate each related chapter with the user's read
+          // fraction, then promote unread ones to the front so new material
+          // is what the reader sees first.
+          const annotated = await this.readingStats.annotateChapterReadFractions(related);
+          annotated.sort((a, b) => {
+            if (a.isRead !== b.isRead) return a.isRead ? 1 : -1;
+            return b.score - a.score;
+          });
+          this.relatedChapters = annotated;
           this.cdr.markForCheck();
         });
     });

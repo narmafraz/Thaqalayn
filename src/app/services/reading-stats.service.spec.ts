@@ -247,4 +247,72 @@ describe('ReadingStatsService', () => {
       expect(s.size).toBe(2);
     });
   });
+
+  // RE-14: revisit suggestions
+  describe('revisitCandidates', () => {
+    async function seedBookmarkOnDate(path: string, title: string, daysAgo: number): Promise<void> {
+      const date = new Date(Date.now() - daysAgo * 86_400_000);
+      const db = (bookmarks as any).db;
+      await db.bookmarks.add({
+        path, title, bookId: path.replace('/books/', '').split(':')[0],
+        createdAt: date,
+      });
+      await (bookmarks as any).refreshBookmarks();
+    }
+
+    it('returns [] when there are no bookmarks', async () => {
+      expect(await stats.revisitCandidates()).toEqual([]);
+    });
+
+    it('orders oldest-first', async () => {
+      await seedBookmarkOnDate('/books/quran:1:1', 'a', 5);
+      await seedBookmarkOnDate('/books/quran:2:1', 'b', 30);
+      await seedBookmarkOnDate('/books/quran:3:1', 'c', 10);
+
+      const cands = await stats.revisitCandidates(10, 3);
+
+      expect(cands.length).toBe(3);
+      expect(cands[0].bookmark.title).toBe('b'); // 30 days ago
+      expect(cands[1].bookmark.title).toBe('c'); // 10 days
+      expect(cands[2].bookmark.title).toBe('a'); // 5 days
+      expect(cands[0].daysSinceLastSeen).toBeGreaterThanOrEqual(29);
+    });
+
+    it('respects the limit', async () => {
+      for (let i = 0; i < 5; i++) {
+        await seedBookmarkOnDate(`/books/quran:${i + 1}:1`, `b${i}`, 10 + i);
+      }
+      const cands = await stats.revisitCandidates(2, 3);
+      expect(cands.length).toBe(2);
+    });
+
+    it('filters out fresh bookmarks below minAgeDays', async () => {
+      await seedBookmarkOnDate('/books/quran:1:1', 'fresh', 1);
+      await seedBookmarkOnDate('/books/quran:2:1', 'old', 20);
+
+      const cands = await stats.revisitCandidates(10, 3);
+
+      expect(cands.length).toBe(1);
+      expect(cands[0].bookmark.title).toBe('old');
+    });
+
+    it('uses recent read marks to push a bookmark to the back', async () => {
+      await seedBookmarkOnDate('/books/quran:1:1', 'oldButRead', 30);
+      await seedBookmarkOnDate('/books/quran:2:1', 'oldUnread', 20);
+
+      // Mark the older one as read just now
+      await bookmarks.markRead('/books/quran:1:1');
+
+      const cands = await stats.revisitCandidates(10, 3);
+
+      // The unread one should be surfaced first, even though it's "newer"
+      expect(cands[0].bookmark.title).toBe('oldUnread');
+      // The recently-read one might be filtered out entirely (since it was
+      // "seen" just now — under the 3-day floor), but if both pass the floor
+      // it must be after the older-unread one.
+      if (cands.length > 1) {
+        expect(cands.find(c => c.bookmark.title === 'oldButRead')).toBeDefined();
+      }
+    });
+  });
 });

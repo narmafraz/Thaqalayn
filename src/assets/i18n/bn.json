@@ -282,7 +282,11 @@
     "resetAll": "সমস্ত পড়ার অগ্রগতি রিসেট করুন",
     "resetAllConfirm": "সব বই থেকে {{count}}টি পড়া চিহ্ন সরাবেন?",
     "startedBooks": "যেসব বই শুরু করেছেন",
-    "badgeEarnedTitle": "ব্যাজ অর্জন — {{label}}"
+    "badgeEarnedTitle": "ব্যাজ অর্জন — {{label}}",
+    "revisitTitle": "পুনরায় দেখার যোগ্য",
+    "revisitSubtitle": "কিছুদিন আগে সংরক্ষিত বুকমার্ক — সহজ পুনরাগমন।",
+    "daysAgo": "দিন আগে",
+    "alreadyRead": "ইতিমধ্যে পড়েছেন"
   },
   "audio": {
     "play": "চালান",

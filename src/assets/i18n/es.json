@@ -282,7 +282,11 @@
     "resetAll": "Reiniciar todo el progreso de lectura",
     "resetAllConfirm": "¿Eliminar las {{count}} marcas de lectura en todos los libros?",
     "startedBooks": "Libros que has comenzado",
-    "badgeEarnedTitle": "Insignia obtenida — {{label}}"
+    "badgeEarnedTitle": "Insignia obtenida — {{label}}",
+    "revisitTitle": "Vale la pena releer",
+    "revisitSubtitle": "Marcadores que guardaste hace tiempo — retornos fáciles.",
+    "daysAgo": "días",
+    "alreadyRead": "Ya leído"
   },
   "audio": {
     "play": "Reproducir",

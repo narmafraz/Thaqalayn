@@ -280,7 +280,8 @@
     "countNounHadith": "hadiths",
     "resetProgress": "Réinitialiser la progression de cette section",
     "resetAll": "Réinitialiser toute la progression de lecture",
-    "resetAllConfirm": "Supprimer les {{count}} marques de lecture dans tous les livres ?"
+    "resetAllConfirm": "Supprimer les {{count}} marques de lecture dans tous les livres ?",
+    "startedBooks": "Livres que vous avez commencés"
   },
   "audio": {
     "play": "Lecture",

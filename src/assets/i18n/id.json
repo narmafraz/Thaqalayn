@@ -280,7 +280,8 @@
     "countNounHadith": "hadis",
     "resetProgress": "Setel ulang kemajuan bagian ini",
     "resetAll": "Setel ulang seluruh kemajuan membaca",
-    "resetAllConfirm": "Hapus semua {{count}} tanda baca di semua kitab?"
+    "resetAllConfirm": "Hapus semua {{count}} tanda baca di semua kitab?",
+    "startedBooks": "Kitab yang telah Anda mulai"
   },
   "audio": {
     "play": "Putar",

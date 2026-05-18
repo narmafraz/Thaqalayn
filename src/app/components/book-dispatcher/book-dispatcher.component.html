@@ -101,6 +101,40 @@
         </div>
 
         <app-book-tree></app-book-tree>
+
+        <!-- RE-18: Per-book reading progress for books the user has started -->
+        <section *ngIf="startedBookCards.length > 0" class="started-books-panel">
+          <h2>{{ 'reading.startedBooks' | translate }}</h2>
+          <div class="started-books-grid">
+            <a *ngFor="let card of startedBookCards"
+               [routerLink]="card.continueRouterLink"
+               queryParamsHandling="preserve"
+               class="started-book-card"
+               [attr.aria-label]="card.titleEn + ': ' + card.progress.versesRead + ' / ' + card.progress.total + ' (' + card.progress.percent + '%)'">
+              <div class="started-book-header">
+                <mat-icon>{{ card.icon }}</mat-icon>
+                <div class="started-book-titles">
+                  <span class="started-book-title">{{ card.titleEn }}</span>
+                  <span *ngIf="card.titleAr" class="started-book-title-ar" lang="ar" dir="rtl">{{ card.titleAr }}</span>
+                </div>
+              </div>
+              <div class="started-book-progress-row">
+                <div class="started-book-progress-bar"
+                     [matTooltip]="card.progress.versesRead + ' / ' + card.progress.total + ' (' + card.progress.percent + '%)'">
+                  <div class="started-book-progress-fill" [style.width.%]="card.progress.fraction * 100"></div>
+                </div>
+                <span class="started-book-progress-text">
+                  {{ card.progress.versesRead }} / {{ card.progress.total }}
+                </span>
+              </div>
+              <div class="started-book-continue">
+                <mat-icon>arrow_forward</mat-icon>
+                <span class="started-book-continue-label">{{ card.continueLabel }}</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
         <div class="homepage-quick-links" *ngIf="exploreCards.length > 0">
           <h2>{{ 'nav.explore' | translate }}</h2>
           <div class="quick-links">

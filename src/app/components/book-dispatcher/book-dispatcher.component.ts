@@ -122,6 +122,20 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   goalTarget = 0;
   goalToday = 0;
   goalFraction = 0;
+  /**
+   * RE-18 — books the user has actually started, sorted by most-recently-read.
+   * Each card shows per-book progress and deep-links to the last-visited
+   * chapter (via readingProgress) when available, else to the book root.
+   */
+  startedBookCards: Array<{
+    slug: string;
+    titleEn: string;
+    titleAr: string;
+    icon: string;
+    progress: BookProgress;
+    continueRouterLink: string[];
+    continueLabel: string;
+  }> = [];
   private subscriptions: Subscription[] = [];
 
   private static readonly BOOK_NAMES: Record<string, string> = {
@@ -151,12 +165,17 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.bookmarkService.readingProgress$.subscribe(rp => {
         this.readingProgress = rp.slice(0, 3);
+        // readingProgress drives the "continue" link in the started-books
+        // panel, so rebuild that whenever the per-book last-position
+        // changes.
+        this.rebuildStartedBookCards();
         this.cdr.markForCheck();
       })
     );
     this.subscriptions.push(
       this.readingStats.bookProgressMap$.subscribe(map => {
         this.bookProgressMap = map;
+        this.rebuildStartedBookCards();
         this.cdr.markForCheck();
       })
     );
@@ -223,6 +242,7 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     });
 
     this.exploreCards = cards;
+    this.rebuildStartedBookCards();
     this.cdr.markForCheck();
   }
 
@@ -251,6 +271,55 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   /** Per-book progress for the given slug, or `null` if unknown. Used by the homepage card template. */
   bookProgress(slug: string): BookProgress | null {
     return this.bookProgressMap.get(slug) ?? null;
+  }
+
+  /**
+   * Rebuild the "books you've started" homepage panel (RE-18). Books with
+   * versesRead > 0 only, sorted by lastReadVerseAt desc. Continue-link
+   * targets the BookmarkService lastPath for that book if set, else the
+   * book root.
+   */
+  private rebuildStartedBookCards(): void {
+    if (this.bookProgressMap.size === 0 || this.exploreCards.length === 0) {
+      this.startedBookCards = [];
+      return;
+    }
+    const exploreBySlug = new Map(this.exploreCards.map(c => [c.slug, c]));
+    const progressByBook = new Map(
+      this.readingProgress.map(rp => [rp.bookId, rp]),
+    );
+
+    const candidates: typeof this.startedBookCards = [];
+    for (const bp of this.bookProgressMap.values()) {
+      if (bp.versesRead === 0) continue;
+      const explore = exploreBySlug.get(bp.bookId);
+      if (!explore) continue;
+
+      const rp = progressByBook.get(bp.bookId);
+      const continueRouterLink = rp
+        ? this.getProgressRouterLink(rp)
+        : ['/books', bp.bookId];
+      const continueLabel = rp?.lastTitle || explore.titleEn;
+
+      candidates.push({
+        slug: bp.bookId,
+        titleEn: explore.titleEn,
+        titleAr: explore.titleAr,
+        icon: explore.icon,
+        progress: bp,
+        continueRouterLink,
+        continueLabel,
+      });
+    }
+
+    // Most recently read first; fall back to alpha by slug if no timestamp.
+    candidates.sort((a, b) => {
+      const at = a.progress.lastReadVerseAt?.getTime() ?? 0;
+      const bt = b.progress.lastReadVerseAt?.getTime() ?? 0;
+      if (bt !== at) return bt - at;
+      return a.slug.localeCompare(b.slug);
+    });
+    this.startedBookCards = candidates;
   }
 
   shuffleQuran(event: Event): void {

@@ -280,7 +280,8 @@
     "countNounHadith": "احادیث",
     "resetProgress": "اس سیکشن کی پیش رفت ری سیٹ کریں",
     "resetAll": "تمام پڑھنے کی پیش رفت ری سیٹ کریں",
-    "resetAllConfirm": "تمام کتابوں میں {{count}} نشانات ہٹا دیں؟"
+    "resetAllConfirm": "تمام کتابوں میں {{count}} نشانات ہٹا دیں؟",
+    "startedBooks": "کتابیں جو آپ نے شروع کیں"
   },
   "audio": {
     "play": "چلائیں",

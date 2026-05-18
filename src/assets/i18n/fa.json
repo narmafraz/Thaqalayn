@@ -280,7 +280,8 @@
     "countNounHadith": "حدیث",
     "resetProgress": "بازنشانی پیشرفت این بخش",
     "resetAll": "بازنشانی کل پیشرفت مطالعه",
-    "resetAllConfirm": "همه {{count}} نشانه‌ی خواندن در کل کتاب‌ها حذف شود؟"
+    "resetAllConfirm": "همه {{count}} نشانه‌ی خواندن در کل کتاب‌ها حذف شود؟",
+    "startedBooks": "کتاب‌هایی که شروع کرده‌اید"
   },
   "audio": {
     "play": "پخش",

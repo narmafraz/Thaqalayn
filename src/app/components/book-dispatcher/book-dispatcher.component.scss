@@ -230,6 +230,139 @@
   }
 }
 
+// ---------------------------------------------------------------------------
+// RE-18: "Books you've started" panel
+// ---------------------------------------------------------------------------
+.started-books-panel {
+  margin: 24px auto;
+  max-width: 1000px;
+  padding: 0 16px;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    margin-bottom: 16px;
+  }
+}
+
+.started-books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+
+  @media (min-width: 768px) {
+    gap: 16px;
+  }
+}
+
+.started-book-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-left: 4px solid #43a047;
+  text-decoration: none;
+  color: var(--text-primary, #333);
+  transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    border-left-color: #2e7d32;
+  }
+
+  .started-book-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+
+    > mat-icon {
+      flex-shrink: 0;
+      color: #43a047;
+    }
+  }
+
+  .started-book-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .started-book-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .started-book-title-ar {
+    font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+    font-size: 0.95rem;
+    color: var(--text-secondary, #666);
+  }
+
+  .started-book-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .started-book-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border-color, rgba(0, 0, 0, 0.06));
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .started-book-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #66bb6a 0%, #43a047 100%);
+    transition: width 0.4s ease-out;
+  }
+
+  .started-book-progress-text {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .started-book-continue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    min-width: 0;
+
+    mat-icon {
+      flex-shrink: 0;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .started-book-continue-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+
+:host-context(body.dark-theme) .started-book-card {
+  background: rgba(255, 255, 255, 0.04);
+  color: #e0e0e0;
+}
+
 .quick-links {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));

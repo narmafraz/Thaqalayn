@@ -280,7 +280,8 @@
     "countNounHadith": "হাদিস",
     "resetProgress": "এই বিভাগের অগ্রগতি রিসেট করুন",
     "resetAll": "সমস্ত পড়ার অগ্রগতি রিসেট করুন",
-    "resetAllConfirm": "সব বই থেকে {{count}}টি পড়া চিহ্ন সরাবেন?"
+    "resetAllConfirm": "সব বই থেকে {{count}}টি পড়া চিহ্ন সরাবেন?",
+    "startedBooks": "যেসব বই শুরু করেছেন"
   },
   "audio": {
     "play": "চালান",

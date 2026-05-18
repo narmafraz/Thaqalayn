@@ -280,7 +280,8 @@
     "countNounHadith": "hadis",
     "resetProgress": "Bu bölümün ilerlemesini sıfırla",
     "resetAll": "Tüm okuma ilerlemesini sıfırla",
-    "resetAllConfirm": "Tüm kitaplardaki {{count}} okuma işareti silinsin mi?"
+    "resetAllConfirm": "Tüm kitaplardaki {{count}} okuma işareti silinsin mi?",
+    "startedBooks": "Başladığınız kitaplar"
   },
   "audio": {
     "play": "Oynat",

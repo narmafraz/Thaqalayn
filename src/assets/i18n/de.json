@@ -280,7 +280,8 @@
     "countNounHadith": "Hadithe",
     "resetProgress": "Fortschritt dieses Abschnitts zurücksetzen",
     "resetAll": "Gesamten Lesefortschritt zurücksetzen",
-    "resetAllConfirm": "Alle {{count}} Lesemarkierungen in allen Büchern entfernen?"
+    "resetAllConfirm": "Alle {{count}} Lesemarkierungen in allen Büchern entfernen?",
+    "startedBooks": "Bücher, mit denen du angefangen hast"
   },
   "audio": {
     "play": "Abspielen",

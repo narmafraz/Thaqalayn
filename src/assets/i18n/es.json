@@ -280,7 +280,8 @@
     "countNounHadith": "hadices",
     "resetProgress": "Reiniciar el progreso de esta sección",
     "resetAll": "Reiniciar todo el progreso de lectura",
-    "resetAllConfirm": "¿Eliminar las {{count}} marcas de lectura en todos los libros?"
+    "resetAllConfirm": "¿Eliminar las {{count}} marcas de lectura en todos los libros?",
+    "startedBooks": "Libros que has comenzado"
   },
   "audio": {
     "play": "Reproducir",

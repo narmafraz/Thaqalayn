@@ -292,7 +292,8 @@
     "countNounHadith": "حديث",
     "resetProgress": "إعادة تعيين تقدم هذا القسم",
     "resetAll": "إعادة تعيين كل تقدم القراءة",
-    "resetAllConfirm": "إزالة جميع علامات القراءة الـ {{count}} في كل الكتب؟"
+    "resetAllConfirm": "إزالة جميع علامات القراءة الـ {{count}} في كل الكتب؟",
+    "startedBooks": "كتب بدأت قراءتها"
   },
   "audio": {
     "play": "تشغيل",

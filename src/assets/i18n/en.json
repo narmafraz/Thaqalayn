@@ -304,7 +304,8 @@
     "todayLabel": "Today",
     "yesterdayLabel": "Yesterday",
     "hideCompleted": "Hide completed",
-    "muteReadVerses": "Mute verses I've already read"
+    "muteReadVerses": "Fade out verses I've read",
+    "muteReadVersesHint": "Read verses appear faded with a ✓; off makes every verse look the same."
   },
   "audio": {
     "play": "Play",

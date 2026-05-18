@@ -120,10 +120,13 @@
     <!-- Reading progress (RE-05 / RE-09) -->
     <section class="reading-sheet-section" *ngIf="preferences$ | async as prefs">
       <h3 class="reading-sheet-section-title">{{ 'reading.progress' | translate }}</h3>
-      <label class="reading-sheet-pref" for="rs-pref-mute-read">
+      <label class="reading-sheet-pref reading-sheet-pref-with-hint" for="rs-pref-mute-read">
         <input type="checkbox" id="rs-pref-mute-read" [checked]="prefs.muteReadVerses"
                (change)="onPrefChange('muteReadVerses', $any($event.target).checked)">
-        <span>{{ 'reading.muteReadVerses' | translate }}</span>
+        <span class="reading-sheet-pref-text">
+          <span>{{ 'reading.muteReadVerses' | translate }}</span>
+          <span class="reading-sheet-pref-hint">{{ 'reading.muteReadVersesHint' | translate }}</span>
+        </span>
       </label>
     </section>
 

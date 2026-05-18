@@ -274,7 +274,8 @@
     "todayLabel": "Hoy",
     "yesterdayLabel": "Ayer",
     "hideCompleted": "Ocultar completados",
-    "muteReadVerses": "Atenuar los versículos ya leídos"
+    "muteReadVerses": "Atenuar los versículos ya leídos",
+    "muteReadVersesHint": "Los versículos leídos aparecen atenuados con un ✓; desactivado, todos los versículos se ven igual."
   },
   "audio": {
     "play": "Reproducir",

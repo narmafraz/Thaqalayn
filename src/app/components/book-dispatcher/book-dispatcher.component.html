@@ -118,10 +118,10 @@
               <span class="quick-link-desc" *ngIf="card.descKey">{{ card.descKey | translate }}</span>
               <ng-container *ngIf="bookProgress(card.slug) as bp">
                 <div *ngIf="bp.versesRead > 0 && bp.total > 0" class="quick-link-progress"
-                     [attr.aria-label]="bp.percent + '% — ' + bp.versesRead + ' / ' + bp.total"
-                     [matTooltip]="bp.versesRead + ' / ' + bp.total">
+                     [attr.aria-label]="bp.versesRead + ' / ' + bp.total + ' (' + bp.percent + '%)'"
+                     [matTooltip]="bp.versesRead + ' / ' + bp.total + ' (' + bp.percent + '%)'">
                   <div class="quick-link-progress-fill" [style.width.%]="bp.fraction * 100"></div>
-                  <span class="quick-link-progress-text">{{ bp.percent }}%</span>
+                  <span class="quick-link-progress-text">{{ bp.versesRead }} / {{ bp.total }}</span>
                 </div>
               </ng-container>
             </a>

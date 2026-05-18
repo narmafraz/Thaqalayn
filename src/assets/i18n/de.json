@@ -274,7 +274,8 @@
     "todayLabel": "Heute",
     "yesterdayLabel": "Gestern",
     "hideCompleted": "Abgeschlossene ausblenden",
-    "muteReadVerses": "Bereits gelesene Verse dezent darstellen"
+    "muteReadVerses": "Gelesene Verse abblenden",
+    "muteReadVersesHint": "Gelesene Verse erscheinen blasser mit einem ✓; ausgeschaltet sehen alle Verse gleich aus."
   },
   "audio": {
     "play": "Abspielen",

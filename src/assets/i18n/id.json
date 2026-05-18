@@ -274,7 +274,8 @@
     "todayLabel": "Hari ini",
     "yesterdayLabel": "Kemarin",
     "hideCompleted": "Sembunyikan yang selesai",
-    "muteReadVerses": "Redupkan ayat yang sudah dibaca"
+    "muteReadVerses": "Redupkan ayat yang sudah dibaca",
+    "muteReadVersesHint": "Ayat yang sudah dibaca tampak redup dengan ✓; jika nonaktif, semua ayat tampak sama."
   },
   "audio": {
     "play": "Putar",

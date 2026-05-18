@@ -274,7 +274,8 @@
     "todayLabel": "آج",
     "yesterdayLabel": "کل",
     "hideCompleted": "مکمل چھپائیں",
-    "muteReadVerses": "پڑھی ہوئی آیات مدھم کریں"
+    "muteReadVerses": "پڑھی ہوئی آیات مدھم کریں",
+    "muteReadVersesHint": "پڑھی ہوئی آیات ✓ کے ساتھ مدھم نظر آتی ہیں؛ بند ہونے پر تمام آیات یکساں دکھتی ہیں۔"
   },
   "audio": {
     "play": "چلائیں",

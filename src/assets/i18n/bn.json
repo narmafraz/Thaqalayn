@@ -274,7 +274,8 @@
     "todayLabel": "আজ",
     "yesterdayLabel": "গতকাল",
     "hideCompleted": "সম্পন্ন লুকান",
-    "muteReadVerses": "পড়া আয়াত নিষ্প্রভ করুন"
+    "muteReadVerses": "পড়া আয়াত নিষ্প্রভ করুন",
+    "muteReadVersesHint": "পড়া আয়াত ✓ চিহ্ন সহ নিষ্প্রভ দেখায়; বন্ধ থাকলে সব আয়াত একরকম দেখায়।"
   },
   "audio": {
     "play": "চালান",

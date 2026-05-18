@@ -324,12 +324,14 @@
 
     .quick-link-progress-text {
       position: absolute;
-      inset-block-start: -16px;
+      inset-block-start: -15px;
       inset-inline-end: 0;
       font-size: 10px;
       font-weight: 600;
       color: var(--text-secondary, #666);
       letter-spacing: 0.02em;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
   }
 }

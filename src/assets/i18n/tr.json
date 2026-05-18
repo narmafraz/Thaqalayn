@@ -274,7 +274,8 @@
     "todayLabel": "Bugün",
     "yesterdayLabel": "Dün",
     "hideCompleted": "Tamamlananları gizle",
-    "muteReadVerses": "Okuduğum ayetleri sönükleştir"
+    "muteReadVerses": "Okuduğum ayetleri sönükleştir",
+    "muteReadVersesHint": "Okunan ayetler ✓ ile soluk görünür; kapatıldığında tüm ayetler aynı görünür."
   },
   "audio": {
     "play": "Oynat",

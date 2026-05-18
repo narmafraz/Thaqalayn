@@ -286,7 +286,8 @@
     "todayLabel": "اليوم",
     "yesterdayLabel": "أمس",
     "hideCompleted": "إخفاء المكتمل",
-    "muteReadVerses": "تخفيت الآيات التي قرأتها"
+    "muteReadVerses": "تخفيت الآيات التي قرأتها",
+    "muteReadVersesHint": "الآيات المقروءة تظهر باهتة مع علامة ✓؛ عند الإيقاف تظهر كل الآيات بنفس الشكل."
   },
   "audio": {
     "play": "تشغيل",

@@ -274,7 +274,8 @@
     "todayLabel": "今天",
     "yesterdayLabel": "昨天",
     "hideCompleted": "隐藏已完成",
-    "muteReadVerses": "弱化已读经文"
+    "muteReadVerses": "弱化已读经文",
+    "muteReadVersesHint": "已读经文显示为淡色并带 ✓；关闭时所有经文外观相同。"
   },
   "audio": {
     "play": "播放",

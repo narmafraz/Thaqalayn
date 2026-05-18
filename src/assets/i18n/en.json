@@ -607,10 +607,6 @@
       "label": "Fortnight",
       "desc": "A 14-day reading streak."
     },
-    "streakHundred": {
-      "label": "Century streak",
-      "desc": "A 100-day reading streak — a rare achievement."
-    },
     "dailyFifty": {
       "label": "Half-century",
       "desc": "Read 50 verses in a single day."
@@ -642,6 +638,42 @@
     "fourBooks": {
       "label": "The four pillars",
       "desc": "Finish all four of Al-Kafi, al-Faqih, Tahdhib al-Ahkam, and al-Istibsar."
+    },
+    "streakQuarter": {
+      "label": "Three months",
+      "desc": "A 90-day reading streak — three months of daily practice."
+    },
+    "streakHalfYear": {
+      "label": "Half a year",
+      "desc": "A 180-day streak — six months without breaking."
+    },
+    "streakNineMonths": {
+      "label": "Nine months",
+      "desc": "A 270-day streak — nine consecutive months of reading."
+    },
+    "streakYear": {
+      "label": "A full year",
+      "desc": "A 365-day streak — every day of an entire year."
+    },
+    "diversified": {
+      "label": "Diversified",
+      "desc": "Read in the Quran and at least three different hadith collections."
+    },
+    "shiaCanon": {
+      "label": "The canon",
+      "desc": "Touch at least one verse in each of the Four Books."
+    },
+    "varietyWeek": {
+      "label": "Renaissance week",
+      "desc": "Read in five different books within a single week."
+    },
+    "breadthFifteen": {
+      "label": "Cartographer",
+      "desc": "Read in fifteen or more different books."
+    },
+    "explorer": {
+      "label": "Explorer",
+      "desc": "Read in twenty or more different books — almost the whole library."
     }
   }
 }

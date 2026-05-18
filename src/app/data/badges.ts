@@ -68,6 +68,25 @@ function maxBookBreadthInOneDay(ctx: BadgeContext): number {
   return m;
 }
 
+/** Helper: max distinct books read across any rolling 7-day window. */
+function maxBookBreadthInOneWeek(ctx: BadgeContext): number {
+  // dailyTallies is newest-first; we want a rolling window over consecutive
+  // days. Sort ascending for the sweep.
+  const tallies = [...ctx.dailyTallies].sort((a, b) => a.date.localeCompare(b.date));
+  let best = 0;
+  for (let i = 0; i < tallies.length; i++) {
+    const start = new Date(tallies[i].date).getTime();
+    const distinct = new Set<string>();
+    for (let j = i; j < tallies.length; j++) {
+      const days = (new Date(tallies[j].date).getTime() - start) / 86_400_000;
+      if (days > 6) break;  // window of 7 inclusive days: 0..6
+      for (const b of tallies[j].bookIds) distinct.add(b);
+    }
+    if (distinct.size > best) best = distinct.size;
+  }
+  return best;
+}
+
 /** Helper: has the user read on N reads inside the [startHour, endHour) window (wraparound supported). */
 function readsInHourRange(ctx: BadgeContext, startHour: number, endHour: number, n: number): boolean {
   let count = 0;
@@ -120,10 +139,16 @@ function fractionForBook(ctx: BadgeContext, slug: string): number {
 
 /**
  * Catalogue order matters — it's the display order on the badge shelf.
- * Earned-then-unearned grouping happens in the shelf component, not here.
+ * Within each category, entries are sorted from easiest to hardest so a
+ * fresh user sees the closest goals first. Earned-then-unearned grouping
+ * happens in the shelf component, not here.
+ *
+ * Categories themselves render in the order:
+ *   milestone → streak → book → breadth → habit
+ * (matches `BadgeShelfComponent`'s categoryOrder array.)
  */
 export const BADGE_CATALOGUE: Badge[] = [
-  // Cumulative-volume milestones
+  // ===== MILESTONES — cumulative + single-day volume =====
   {
     id: 'first-steps',
     icon: '🌱',
@@ -133,12 +158,28 @@ export const BADGE_CATALOGUE: Badge[] = [
     predicate: ctx => ctx.totalVersesRead >= 10,
   },
   {
+    id: 'daily-fifty',
+    icon: '⚡',
+    labelKey: 'badges.dailyFifty.label',
+    descKey: 'badges.dailyFifty.desc',
+    category: 'milestone',
+    predicate: ctx => maxVersesInOneDay(ctx) >= 50,
+  },
+  {
     id: 'centurion',
     icon: '💯',
     labelKey: 'badges.centurion.label',
     descKey: 'badges.centurion.desc',
     category: 'milestone',
     predicate: ctx => ctx.totalVersesRead >= 100,
+  },
+  {
+    id: 'daily-hundred',
+    icon: '🚀',
+    labelKey: 'badges.dailyHundred.label',
+    descKey: 'badges.dailyHundred.desc',
+    category: 'milestone',
+    predicate: ctx => maxVersesInOneDay(ctx) >= 100,
   },
   {
     id: 'thousand',
@@ -156,8 +197,24 @@ export const BADGE_CATALOGUE: Badge[] = [
     category: 'milestone',
     predicate: ctx => ctx.totalVersesRead >= 10000,
   },
+  {
+    id: 'twenty-five-thousand',
+    icon: '👑',
+    labelKey: 'badges.twentyFiveThousand.label',
+    descKey: 'badges.twentyFiveThousand.desc',
+    category: 'milestone',
+    predicate: ctx => ctx.totalVersesRead >= 25000,
+  },
+  {
+    id: 'fifty-thousand',
+    icon: '✨',
+    labelKey: 'badges.fiftyThousand.label',
+    descKey: 'badges.fiftyThousand.desc',
+    category: 'milestone',
+    predicate: ctx => ctx.totalVersesRead >= 50000,
+  },
 
-  // Streak badges
+  // ===== STREAKS — ascending day-count =====
   {
     id: 'streak-three',
     icon: '🔥',
@@ -168,22 +225,92 @@ export const BADGE_CATALOGUE: Badge[] = [
   },
   {
     id: 'streak-week',
-    icon: '🔥🔥',
+    icon: '🔥',
     labelKey: 'badges.streakWeek.label',
     descKey: 'badges.streakWeek.desc',
     category: 'streak',
     predicate: ctx => ctx.streak.longest >= 7,
   },
   {
+    id: 'streak-fortnight',
+    icon: '🔥',
+    labelKey: 'badges.streakFortnight.label',
+    descKey: 'badges.streakFortnight.desc',
+    category: 'streak',
+    predicate: ctx => ctx.streak.longest >= 14,
+  },
+  {
     id: 'streak-month',
-    icon: '🔥🔥🔥',
+    icon: '🔥',
     labelKey: 'badges.streakMonth.label',
     descKey: 'badges.streakMonth.desc',
     category: 'streak',
     predicate: ctx => ctx.streak.longest >= 30,
   },
+  {
+    id: 'streak-quarter',
+    icon: '🌟',
+    labelKey: 'badges.streakQuarter.label',
+    descKey: 'badges.streakQuarter.desc',
+    category: 'streak',
+    predicate: ctx => ctx.streak.longest >= 90,
+  },
+  {
+    id: 'streak-half-year',
+    icon: '💎',
+    labelKey: 'badges.streakHalfYear.label',
+    descKey: 'badges.streakHalfYear.desc',
+    category: 'streak',
+    predicate: ctx => ctx.streak.longest >= 180,
+  },
+  {
+    id: 'streak-nine-months',
+    icon: '🏵️',
+    labelKey: 'badges.streakNineMonths.label',
+    descKey: 'badges.streakNineMonths.desc',
+    category: 'streak',
+    predicate: ctx => ctx.streak.longest >= 270,
+  },
+  {
+    id: 'streak-year',
+    icon: '🌳',
+    labelKey: 'badges.streakYear.label',
+    descKey: 'badges.streakYear.desc',
+    category: 'streak',
+    predicate: ctx => ctx.streak.longest >= 365,
+  },
 
-  // Book-completion badges
+  // ===== BOOK COMPLETION — ascending effort =====
+  {
+    id: 'quran-bronze',
+    icon: '🥉',
+    labelKey: 'badges.quranBronze.label',
+    descKey: 'badges.quranBronze.desc',
+    category: 'book',
+    predicate: ctx => fractionForBook(ctx, 'quran') >= 0.25,
+  },
+  {
+    id: 'imam-ali',
+    icon: '🕊️',
+    labelKey: 'badges.imamAli.label',
+    descKey: 'badges.imamAli.desc',
+    category: 'book',
+    predicate: ctx => fractionForBook(ctx, 'nahj-al-balagha') >= 1,
+  },
+  {
+    id: 'kafi-vol1',
+    icon: '🧠',
+    labelKey: 'badges.kafiVol1.label',
+    descKey: 'badges.kafiVol1.desc',
+    category: 'book',
+    predicate: ctx => {
+      // "al-kafi" book progress — vol 1 isn't tracked separately, so we
+      // approximate via the bookProgressMap. Gate on >= 9.4% of al-kafi
+      // (Vol 1 is ~1463/15397 ≈ 9.5%).
+      const bp = ctx.bookProgressMap.get('al-kafi');
+      return !!bp && bp.fraction >= 0.094;
+    },
+  },
   {
     id: 'completionist',
     icon: '📖',
@@ -198,30 +325,33 @@ export const BADGE_CATALOGUE: Badge[] = [
     },
   },
   {
-    id: 'imam-ali',
-    icon: '🕊️',
-    labelKey: 'badges.imamAli.label',
-    descKey: 'badges.imamAli.desc',
-    category: 'book',
-    predicate: ctx => fractionForBook(ctx, 'nahj-al-balagha') >= 1,
-  },
-
-  // Quran tiers (the user asked for ayah-coverage)
-  {
-    id: 'quran-bronze',
-    icon: '🥉',
-    labelKey: 'badges.quranBronze.label',
-    descKey: 'badges.quranBronze.desc',
-    category: 'book',
-    predicate: ctx => fractionForBook(ctx, 'quran') >= 0.25,
-  },
-  {
     id: 'quran-silver',
     icon: '🥈',
     labelKey: 'badges.quranSilver.label',
     descKey: 'badges.quranSilver.desc',
     category: 'book',
     predicate: ctx => fractionForBook(ctx, 'quran') >= 0.5,
+  },
+  {
+    id: 'al-saduq-master',
+    icon: '📜',
+    labelKey: 'badges.alSaduqMaster.label',
+    descKey: 'badges.alSaduqMaster.desc',
+    category: 'book',
+    predicate: ctx => {
+      const saduqSlugs = [
+        'al-amali-saduq', 'al-khisal', 'al-tawhid', 'kamal-al-din',
+        'maani-al-akhbar', 'man-la-yahduruhu-al-faqih', 'thawab-al-amal',
+        'uyun-akhbar-al-rida', 'fadail-al-shia', 'sifat-al-shia',
+      ];
+      let finished = 0;
+      for (const slug of saduqSlugs) {
+        const bp = ctx.bookProgressMap.get(slug);
+        if (bp && bp.total > 0 && bp.versesRead >= bp.total) finished++;
+        if (finished >= 3) return true;
+      }
+      return false;
+    },
   },
   {
     id: 'quran-gold',
@@ -231,8 +361,23 @@ export const BADGE_CATALOGUE: Badge[] = [
     category: 'book',
     predicate: ctx => fractionForBook(ctx, 'quran') >= 1,
   },
+  {
+    id: 'four-books',
+    icon: '🏛️',
+    labelKey: 'badges.fourBooks.label',
+    descKey: 'badges.fourBooks.desc',
+    category: 'book',
+    predicate: ctx => {
+      const four = ['al-kafi', 'man-la-yahduruhu-al-faqih', 'tahdhib-al-ahkam', 'al-istibsar'];
+      for (const slug of four) {
+        const bp = ctx.bookProgressMap.get(slug);
+        if (!bp || bp.total === 0 || bp.versesRead < bp.total) return false;
+      }
+      return true;
+    },
+  },
 
-  // Breadth — reading across multiple books
+  // ===== BREADTH — reading across distinct books =====
   {
     id: 'breadth-three',
     icon: '📚',
@@ -240,6 +385,14 @@ export const BADGE_CATALOGUE: Badge[] = [
     descKey: 'badges.breadthThree.desc',
     category: 'breadth',
     predicate: ctx => distinctBooksRead(ctx) >= 3,
+  },
+  {
+    id: 'variety-day',
+    icon: '🎨',
+    labelKey: 'badges.varietyDay.label',
+    descKey: 'badges.varietyDay.desc',
+    category: 'breadth',
+    predicate: ctx => maxBookBreadthInOneDay(ctx) >= 3,
   },
   {
     id: 'breadth-five',
@@ -250,6 +403,48 @@ export const BADGE_CATALOGUE: Badge[] = [
     predicate: ctx => distinctBooksRead(ctx) >= 5,
   },
   {
+    id: 'diversified',
+    icon: '⚖️',
+    labelKey: 'badges.diversified.label',
+    descKey: 'badges.diversified.desc',
+    category: 'breadth',
+    predicate: ctx => {
+      const quran = ctx.bookProgressMap.get('quran');
+      if (!quran || quran.versesRead === 0) return false;
+      let hadithBooks = 0;
+      for (const [bookId, bp] of ctx.bookProgressMap) {
+        if (bookId === 'quran') continue;
+        if (bp.versesRead > 0) hadithBooks++;
+        if (hadithBooks >= 3) return true;
+      }
+      return false;
+    },
+  },
+  {
+    id: 'shia-canon',
+    icon: '🏛️',
+    labelKey: 'badges.shiaCanon.label',
+    descKey: 'badges.shiaCanon.desc',
+    category: 'breadth',
+    predicate: ctx => {
+      // At least one verse touched in each of the Four Books.
+      const four = ['al-kafi', 'man-la-yahduruhu-al-faqih', 'tahdhib-al-ahkam', 'al-istibsar'];
+      for (const slug of four) {
+        const bp = ctx.bookProgressMap.get(slug);
+        if (!bp || bp.versesRead === 0) return false;
+      }
+      return true;
+    },
+  },
+  {
+    id: 'variety-week',
+    icon: '🎭',
+    labelKey: 'badges.varietyWeek.label',
+    descKey: 'badges.varietyWeek.desc',
+    category: 'breadth',
+    predicate: ctx => maxBookBreadthInOneWeek(ctx) >= 5,
+  },
+  {
     id: 'breadth-ten',
     icon: '🌍',
     labelKey: 'badges.breadthTen.label',
@@ -257,8 +452,24 @@ export const BADGE_CATALOGUE: Badge[] = [
     category: 'breadth',
     predicate: ctx => distinctBooksRead(ctx) >= 10,
   },
+  {
+    id: 'breadth-fifteen',
+    icon: '🗺️',
+    labelKey: 'badges.breadthFifteen.label',
+    descKey: 'badges.breadthFifteen.desc',
+    category: 'breadth',
+    predicate: ctx => distinctBooksRead(ctx) >= 15,
+  },
+  {
+    id: 'explorer',
+    icon: '🌌',
+    labelKey: 'badges.explorer.label',
+    descKey: 'badges.explorer.desc',
+    category: 'breadth',
+    predicate: ctx => distinctBooksRead(ctx) >= 20,
+  },
 
-  // Habit — *how* the user reads
+  // ===== HABIT — when + how the user reads =====
   {
     id: 'the-hours',
     icon: '⏰',
@@ -298,122 +509,6 @@ export const BADGE_CATALOGUE: Badge[] = [
     descKey: 'badges.consistentWeek.desc',
     category: 'habit',
     predicate: ctx => readEveryDayOfAnyWeek(ctx),
-  },
-
-  // Larger streak tiers
-  {
-    id: 'streak-fortnight',
-    icon: '🔥',
-    labelKey: 'badges.streakFortnight.label',
-    descKey: 'badges.streakFortnight.desc',
-    category: 'streak',
-    predicate: ctx => ctx.streak.longest >= 14,
-  },
-  {
-    id: 'streak-hundred',
-    icon: '💎',
-    labelKey: 'badges.streakHundred.label',
-    descKey: 'badges.streakHundred.desc',
-    category: 'streak',
-    predicate: ctx => ctx.streak.longest >= 100,
-  },
-
-  // Daily-volume badges (push for bigger sessions)
-  {
-    id: 'daily-fifty',
-    icon: '⚡',
-    labelKey: 'badges.dailyFifty.label',
-    descKey: 'badges.dailyFifty.desc',
-    category: 'milestone',
-    predicate: ctx => maxVersesInOneDay(ctx) >= 50,
-  },
-  {
-    id: 'daily-hundred',
-    icon: '🚀',
-    labelKey: 'badges.dailyHundred.label',
-    descKey: 'badges.dailyHundred.desc',
-    category: 'milestone',
-    predicate: ctx => maxVersesInOneDay(ctx) >= 100,
-  },
-  {
-    id: 'twenty-five-thousand',
-    icon: '👑',
-    labelKey: 'badges.twentyFiveThousand.label',
-    descKey: 'badges.twentyFiveThousand.desc',
-    category: 'milestone',
-    predicate: ctx => ctx.totalVersesRead >= 25000,
-  },
-  {
-    id: 'fifty-thousand',
-    icon: '✨',
-    labelKey: 'badges.fiftyThousand.label',
-    descKey: 'badges.fiftyThousand.desc',
-    category: 'milestone',
-    predicate: ctx => ctx.totalVersesRead >= 50000,
-  },
-
-  // Variety in a single day
-  {
-    id: 'variety-day',
-    icon: '🎨',
-    labelKey: 'badges.varietyDay.label',
-    descKey: 'badges.varietyDay.desc',
-    category: 'breadth',
-    predicate: ctx => maxBookBreadthInOneDay(ctx) >= 3,
-  },
-
-  // Specific book completions — adds character + variety
-  {
-    id: 'kafi-vol1',
-    icon: '🧠',
-    labelKey: 'badges.kafiVol1.label',
-    descKey: 'badges.kafiVol1.desc',
-    category: 'book',
-    predicate: ctx => {
-      // "al-kafi" book progress — check just vol 1 isn't tracked separately,
-      // so we approximate by checking the bookProgressMap. Better fidelity
-      // would require a per-prefix store; defer.
-      // For now: gate on >= 9% of al-kafi (vol 1 is ~1463/15397 ≈ 9.5%).
-      const bp = ctx.bookProgressMap.get('al-kafi');
-      return !!bp && bp.fraction >= 0.094;
-    },
-  },
-  {
-    id: 'al-saduq-master',
-    icon: '📜',
-    labelKey: 'badges.alSaduqMaster.label',
-    descKey: 'badges.alSaduqMaster.desc',
-    category: 'book',
-    predicate: ctx => {
-      // Finish any 3 of al-Saduq's books
-      const saduqSlugs = [
-        'al-amali-saduq', 'al-khisal', 'al-tawhid', 'kamal-al-din',
-        'maani-al-akhbar', 'man-la-yahduruhu-al-faqih', 'thawab-al-amal',
-        'uyun-akhbar-al-rida', 'fadail-al-shia', 'sifat-al-shia',
-      ];
-      let finished = 0;
-      for (const slug of saduqSlugs) {
-        const bp = ctx.bookProgressMap.get(slug);
-        if (bp && bp.total > 0 && bp.versesRead >= bp.total) finished++;
-        if (finished >= 3) return true;
-      }
-      return false;
-    },
-  },
-  {
-    id: 'four-books',
-    icon: '🏛️',
-    labelKey: 'badges.fourBooks.label',
-    descKey: 'badges.fourBooks.desc',
-    category: 'book',
-    predicate: ctx => {
-      const four = ['al-kafi', 'man-la-yahduruhu-al-faqih', 'tahdhib-al-ahkam', 'al-istibsar'];
-      for (const slug of four) {
-        const bp = ctx.bookProgressMap.get(slug);
-        if (!bp || bp.total === 0 || bp.versesRead < bp.total) return false;
-      }
-      return true;
-    },
   },
 ];
 

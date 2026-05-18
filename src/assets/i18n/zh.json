@@ -286,7 +286,21 @@
     "revisitTitle": "值得重读",
     "revisitSubtitle": "你不久前保存的书签 — 轻松回顾。",
     "daysAgo": "天前",
-    "alreadyRead": "已读"
+    "alreadyRead": "已读",
+    "banner": {
+      "streakAtRisk": {
+        "title": "你的连读快要中断",
+        "subtitleWithCount": "今天读一节经文来保持连读。当前："
+      },
+      "goalPending": {
+        "title": "今天的目标还没完成",
+        "left": "节经文剩余"
+      },
+      "open": "打开",
+      "dismiss": "关闭",
+      "toggleLabel": "显示每日提醒横幅",
+      "toggleHint": "当连读处于风险中或每日目标未完成时,页面顶部出现一个柔和的横幅。"
+    }
   },
   "audio": {
     "play": "播放",

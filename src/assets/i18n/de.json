@@ -286,7 +286,21 @@
     "revisitTitle": "Wert, erneut zu lesen",
     "revisitSubtitle": "Lesezeichen, die du vor einer Weile gespeichert hast — einfache Rückkehr.",
     "daysAgo": "Tage her",
-    "alreadyRead": "Bereits gelesen"
+    "alreadyRead": "Bereits gelesen",
+    "banner": {
+      "streakAtRisk": {
+        "title": "Deine Strähne ist in Gefahr",
+        "subtitleWithCount": "Lies heute einen Vers, um die Strähne zu halten. Aktuell:"
+      },
+      "goalPending": {
+        "title": "Tagesziel noch nicht erreicht",
+        "left": "Verse fehlen"
+      },
+      "open": "Öffnen",
+      "dismiss": "Schließen",
+      "toggleLabel": "Tägliche Erinnerung anzeigen",
+      "toggleHint": "Ein dezenter Banner oben, wenn deine Strähne in Gefahr ist oder dein Tagesziel offen."
+    }
   },
   "audio": {
     "play": "Abspielen",

@@ -21,6 +21,13 @@ export interface AiPreferences {
    * read-state styling globally so every verse looks the same.
    */
   muteReadVerses: boolean;
+  /**
+   * When true, suppress the in-app reading reminder banner that surfaces
+   * when the user's streak is at risk or their daily goal is unmet. Banner
+   * is opt-in (defaults to off-flag = visible). Defaults to `false` so the
+   * feature is on for new users.
+   */
+  muteReadingBanner: boolean;
   /** @deprecated mirror of showWordByWord; kept one release for legacy migration. */
   viewMode: ViewMode;
 }
@@ -37,6 +44,7 @@ const DEFAULTS: AiPreferences = {
   sidesheetOpenOnDesktop: false,
   wordByWordDefaultLang: 'en',
   muteReadVerses: true,
+  muteReadingBanner: false,
   viewMode: 'plain',
 };
 

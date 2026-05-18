@@ -286,7 +286,21 @@
     "revisitTitle": "Layak dikunjungi ulang",
     "revisitSubtitle": "Bookmark yang Anda simpan beberapa waktu lalu — kembali yang mudah.",
     "daysAgo": "hari lalu",
-    "alreadyRead": "Sudah dibaca"
+    "alreadyRead": "Sudah dibaca",
+    "banner": {
+      "streakAtRisk": {
+        "title": "Rentetan Anda terancam",
+        "subtitleWithCount": "Baca satu ayat hari ini untuk menjaga rentetan. Saat ini:"
+      },
+      "goalPending": {
+        "title": "Target hari ini belum tercapai",
+        "left": "ayat lagi"
+      },
+      "open": "Buka",
+      "dismiss": "Tutup",
+      "toggleLabel": "Tampilkan pengingat harian",
+      "toggleHint": "Spanduk halus di atas saat rentetan Anda terancam atau target harian belum terpenuhi."
+    }
   },
   "audio": {
     "play": "Putar",

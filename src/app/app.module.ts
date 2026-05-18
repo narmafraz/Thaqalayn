@@ -41,6 +41,7 @@ import { EmbedVerseComponent } from './components/embed-verse/embed-verse.compon
 import { DiffViewerComponent } from './components/diff-viewer/diff-viewer.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { MilestoneToasterComponent } from './components/milestone-toaster/milestone-toaster.component';
+import { ReadingBannerComponent } from './components/reading-banner/reading-banner.component';
 import { ErrorInterceptor } from './services/error.interceptor';
 import { ServiceWorkerModule } from '@angular/service-worker';
 
@@ -64,6 +65,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     DiffViewerComponent,
     NotFoundComponent,
     MilestoneToasterComponent,
+    ReadingBannerComponent,
   ],
   bootstrap: [AppComponent],
   imports: [

@@ -286,7 +286,21 @@
     "revisitTitle": "À revoir",
     "revisitSubtitle": "Des marque-pages enregistrés il y a quelque temps — faciles à reprendre.",
     "daysAgo": "jours",
-    "alreadyRead": "Déjà lu"
+    "alreadyRead": "Déjà lu",
+    "banner": {
+      "streakAtRisk": {
+        "title": "Ta série est en danger",
+        "subtitleWithCount": "Lis un verset aujourd'hui pour la garder. Actuelle :"
+      },
+      "goalPending": {
+        "title": "L'objectif du jour n'est pas atteint",
+        "left": "versets à lire"
+      },
+      "open": "Ouvrir",
+      "dismiss": "Fermer",
+      "toggleLabel": "Afficher la bannière de rappel quotidien",
+      "toggleHint": "Une bannière discrète en haut quand ta série est en danger ou ton objectif inachevé."
+    }
   },
   "audio": {
     "play": "Lecture",

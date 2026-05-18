@@ -286,7 +286,21 @@
     "revisitTitle": "Tekrar göz atmaya değer",
     "revisitSubtitle": "Bir süre önce kaydettiğin yer imleri — kolay dönüşler.",
     "daysAgo": "gün önce",
-    "alreadyRead": "Zaten okundu"
+    "alreadyRead": "Zaten okundu",
+    "banner": {
+      "streakAtRisk": {
+        "title": "Serin tehlikede",
+        "subtitleWithCount": "Bugün bir ayet oku, serini koru. Mevcut:"
+      },
+      "goalPending": {
+        "title": "Bugünkü hedefin henüz tamam değil",
+        "left": "ayet kaldı"
+      },
+      "open": "Aç",
+      "dismiss": "Kapat",
+      "toggleLabel": "Günlük hatırlatma bandını göster",
+      "toggleHint": "Serin tehlikedeyken veya günlük hedefin tamamlanmadığında sayfanın üstünde küçük bir bant."
+    }
   },
   "audio": {
     "play": "Oynat",

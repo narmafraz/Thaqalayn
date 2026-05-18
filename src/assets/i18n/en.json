@@ -316,7 +316,21 @@
     "revisitTitle": "Worth revisiting",
     "revisitSubtitle": "Bookmarks you saved a while ago — easy wins to come back to.",
     "daysAgo": "days ago",
-    "alreadyRead": "Already read"
+    "alreadyRead": "Already read",
+    "banner": {
+      "streakAtRisk": {
+        "title": "Your streak is at risk",
+        "subtitleWithCount": "Read a verse today to keep your streak going. Current:"
+      },
+      "goalPending": {
+        "title": "Today's goal isn't done yet",
+        "left": "verses to go"
+      },
+      "open": "Open",
+      "dismiss": "Dismiss",
+      "toggleLabel": "Show daily reminder banner",
+      "toggleHint": "A subtle banner at the top of the page when your streak is at risk or your daily goal is unmet."
+    }
   },
   "audio": {
     "play": "Play",

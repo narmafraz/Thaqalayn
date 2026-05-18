@@ -286,7 +286,21 @@
     "revisitTitle": "Vale la pena releer",
     "revisitSubtitle": "Marcadores que guardaste hace tiempo — retornos fáciles.",
     "daysAgo": "días",
-    "alreadyRead": "Ya leído"
+    "alreadyRead": "Ya leído",
+    "banner": {
+      "streakAtRisk": {
+        "title": "Tu racha está en riesgo",
+        "subtitleWithCount": "Lee un versículo hoy para mantenerla. Actual:"
+      },
+      "goalPending": {
+        "title": "El objetivo de hoy no se ha cumplido",
+        "left": "versículos por leer"
+      },
+      "open": "Abrir",
+      "dismiss": "Cerrar",
+      "toggleLabel": "Mostrar recordatorio diario",
+      "toggleHint": "Una banda discreta arriba cuando tu racha está en riesgo o tu objetivo del día está sin cumplir."
+    }
   },
   "audio": {
     "play": "Reproducir",

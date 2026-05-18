@@ -73,6 +73,8 @@
   </ng-container>
   <!-- Sticky reading toolbar (chain / diacritics / WBW) — book routes only -->
   <app-reading-toolbar *ngIf="(activeSection$ | async) === 'books'"></app-reading-toolbar>
+  <!-- RE-12: in-app reminder banner (streak-at-risk / goal-pending) -->
+  <app-reading-banner></app-reading-banner>
   <main id="main-content" class="main">
     <router-outlet></router-outlet>
   </main>

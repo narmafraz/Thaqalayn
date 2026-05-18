@@ -47,8 +47,49 @@ export class MilestoneToastService {
     this.badgeUnsubscribe = this.badges.onNewlyEarned(badge => this.onBadgeEarned(badge));
   }
 
+  /**
+   * Per-toast auto-dismiss timers. Tracked so we can pause + resume them
+   * when the user hovers over a toast (give them time to read without
+   * holding their breath). The map's value is `null` while a toast is
+   * paused — `pauseAutoDismiss` clears the timer and stashes the
+   * remaining time on `pauseRemainingMs`.
+   */
+  private autoDismissTimers = new Map<number, ReturnType<typeof setTimeout>>();
+  private pauseStartedAt = new Map<number, number>();
+  private pauseRemainingMs = new Map<number, number>();
+
   dismiss(id: number): void {
+    const timer = this.autoDismissTimers.get(id);
+    if (timer !== undefined) clearTimeout(timer);
+    this.autoDismissTimers.delete(id);
+    this.pauseStartedAt.delete(id);
+    this.pauseRemainingMs.delete(id);
     this.subject.next(this.subject.value.filter(t => t.id !== id));
+  }
+
+  /** Hover-enter on a toast — freeze its auto-dismiss timer. */
+  pauseAutoDismiss(id: number): void {
+    const timer = this.autoDismissTimers.get(id);
+    if (timer === undefined) return;
+    clearTimeout(timer);
+    this.autoDismissTimers.delete(id);
+    const startedAt = this.pauseStartedAt.get(id) ?? Date.now();
+    // Use the toast's full duration as a fallback if we lost the start.
+    const elapsed = Date.now() - startedAt;
+    const total = this.subject.value.find(t => t.id === id)?.durationMs ?? 0;
+    if (total <= 0) return;
+    const remaining = Math.max(1000, total - elapsed);
+    this.pauseRemainingMs.set(id, remaining);
+  }
+
+  /** Hover-leave — resume the timer with whatever time was left. */
+  resumeAutoDismiss(id: number): void {
+    if (this.autoDismissTimers.has(id)) return; // already running
+    const remaining = this.pauseRemainingMs.get(id);
+    if (remaining === undefined) return;
+    this.pauseStartedAt.set(id, Date.now());
+    this.pauseRemainingMs.delete(id);
+    this.autoDismissTimers.set(id, setTimeout(() => this.dismiss(id), remaining));
   }
 
   /** Manually push a toast — used by milestone unit tests and the chapter-content
@@ -58,7 +99,8 @@ export class MilestoneToastService {
     const t: MilestoneToast = { id: this.nextId++, ...toast };
     this.subject.next([...this.subject.value, t]);
     if (t.durationMs > 0) {
-      setTimeout(() => this.dismiss(t.id), t.durationMs);
+      this.pauseStartedAt.set(t.id, Date.now());
+      this.autoDismissTimers.set(t.id, setTimeout(() => this.dismiss(t.id), t.durationMs));
     }
   }
 
@@ -85,7 +127,8 @@ export class MilestoneToastService {
             title: this.formatBookCompleteTitle(bookId, cur.total),
             body: this.i18n.get('reading.milestoneChapterComplete'),
             routerLink: `/books/${bookId}`,
-            durationMs: 8000,
+            // Long — finishing a whole book is rare and worth dwelling on
+            durationMs: 20000,
           });
         }
       }
@@ -102,7 +145,9 @@ export class MilestoneToastService {
           kind: 'cumulative',
           title,
           routerLink: '/bookmarks',
-          durationMs: 6000,
+          // Cumulative thresholds fire more often than book-completes —
+          // keep them shorter but still visible enough to read.
+          durationMs: 12000,
         });
       }
     }
@@ -123,7 +168,9 @@ export class MilestoneToastService {
       body: desc === badge.descKey ? undefined : desc,
       icon: badge.icon,
       routerLink: '/bookmarks',
-      durationMs: 8000,
+      // A new badge is a once-only moment — give the user time to read the
+      // label + maybe click through to the shelf.
+      durationMs: 20000,
     });
   }
 

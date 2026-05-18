@@ -34,6 +34,16 @@ export class MilestoneToasterComponent implements OnInit, OnDestroy {
     this.svc.dismiss(id);
   }
 
+  /** Hover-enter on a toast — pause its auto-dismiss timer so the user can
+   * read it at their own pace. The complementary `onLeave` resumes. */
+  onHoverEnter(id: number): void {
+    this.svc.pauseAutoDismiss(id);
+  }
+
+  onHoverLeave(id: number): void {
+    this.svc.resumeAutoDismiss(id);
+  }
+
   iconFor(kind: MilestoneToast['kind']): string {
     switch (kind) {
       case 'book-complete':

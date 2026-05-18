@@ -5,6 +5,10 @@
        [class.toast-chapter-complete]="t.kind === 'chapter-complete'"
        [class.toast-cumulative]="t.kind === 'cumulative'"
        [class.toast-badge-earned]="t.kind === 'badge-earned'"
+       (pointerenter)="onHoverEnter(t.id)"
+       (pointerleave)="onHoverLeave(t.id)"
+       (focusin)="onHoverEnter(t.id)"
+       (focusout)="onHoverLeave(t.id)"
        role="status">
     <span class="toast-icon" aria-hidden="true">{{ t.icon || iconFor(t.kind) }}</span>
     <div class="toast-body">

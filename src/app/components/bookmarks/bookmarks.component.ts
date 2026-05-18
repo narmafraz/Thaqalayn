@@ -6,6 +6,8 @@ import { SyncService, SyncStatus, SyncUser } from '@app/services/sync.service';
 import { I18nService } from '@app/services/i18n.service';
 import { Observable, Subscription } from 'rxjs';
 
+export type BookmarksTab = 'progress' | 'plans' | 'badges' | 'saves' | 'settings';
+
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'app-bookmarks',
@@ -34,6 +36,18 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   planCatalogue: PlanCatalogueEntry[] = [];
   planStates: PlanState[] = [];
   enrolledIds = new Set<string>();
+
+  /** Active tab on /bookmarks. Persisted to localStorage so it survives reload. */
+  activeTab: BookmarksTab = 'progress';
+  readonly tabs: ReadonlyArray<{ id: BookmarksTab; labelKey: string; icon: string }> = [
+    { id: 'progress', labelKey: 'bookmark.tabs.progress', icon: 'insights' },
+    { id: 'plans',    labelKey: 'bookmark.tabs.plans',    icon: 'menu_book' },
+    { id: 'badges',   labelKey: 'bookmark.tabs.badges',   icon: 'workspace_premium' },
+    { id: 'saves',    labelKey: 'bookmark.tabs.saves',    icon: 'bookmark' },
+    { id: 'settings', labelKey: 'bookmark.tabs.settings', icon: 'settings' },
+  ];
+  private static readonly TAB_STORAGE_KEY = 'thaqalayn-bookmarks-tab';
+
   private subs: Subscription[] = [];
 
   // Sync
@@ -57,6 +71,15 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Restore last-selected tab from localStorage (if valid).
+    try {
+      const saved = localStorage.getItem(BookmarksComponent.TAB_STORAGE_KEY);
+      if (saved && this.tabs.some(t => t.id === saved)) {
+        this.activeTab = saved as BookmarksTab;
+      }
+    } catch {
+      // localStorage may be denied (SSR / strict privacy mode) — keep default
+    }
     this.subs.push(
       this.bookmarkService.bookmarks$.subscribe(bm => {
         this.bookmarks = bm;
@@ -116,6 +139,16 @@ export class BookmarksComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       })
     );
+  }
+
+  selectTab(id: BookmarksTab): void {
+    this.activeTab = id;
+    try {
+      localStorage.setItem(BookmarksComponent.TAB_STORAGE_KEY, id);
+    } catch {
+      // ignore
+    }
+    this.cdr.markForCheck();
   }
 
   isPlanEnrolled(id: string): boolean {

@@ -236,7 +236,14 @@
     "clearProgress": "Очистить прогресс чтения",
     "exportImport": "Экспорт / Импорт",
     "export": "Экспорт",
-    "import": "Импорт"
+    "import": "Импорт",
+    "tabs": {
+      "progress": "Прогресс",
+      "plans": "Планы",
+      "badges": "Значки",
+      "saves": "Сохранения",
+      "settings": "Настройки"
+    }
   },
   "reading": {
     "markRead": "Отметить как прочитанное",

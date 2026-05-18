@@ -1,8 +1,8 @@
 # Consolidated Roadmap
 
 > **Created:** 2026-03-15
-> **Last updated:** 2026-05-01 (SEO P3.3 /about + /bookmarks noindex shipped 2026-04-26; P5 named author deferred; P6 IndexNow declined; Tahdhib/Istibsar marked done; book count goal corrected; Search Console signals review noted in `SEO_ROADMAP.md` §17)
-> **Last verified against source code:** 2026-05-01
+> **Last updated:** 2026-05-19 (reading-engagement waves RE-01..RE-18 all complete — see `READING_ENGAGEMENT_PROPOSAL.md`; SEO state below unchanged since 2026-05-01)
+> **Last verified against source code:** 2026-05-19
 > **Purpose:** Single source of truth for all outstanding work across the Thaqalayn ecosystem.
 > Collates unfinished items from all prior roadmaps and proposals into one prioritized list.
 > All status assessments verified against actual source code, not documentation.

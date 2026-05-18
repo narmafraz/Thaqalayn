@@ -236,7 +236,14 @@
     "clearProgress": "پاک کردن پیشرفت مطالعه",
     "exportImport": "صادرات / واردات",
     "export": "صادرات",
-    "import": "واردات"
+    "import": "واردات",
+    "tabs": {
+      "progress": "پیشرفت",
+      "plans": "برنامه‌ها",
+      "badges": "نشان‌ها",
+      "saves": "ذخیره‌ها",
+      "settings": "تنظیمات"
+    }
   },
   "reading": {
     "markRead": "علامت‌گذاری به‌عنوان خوانده‌شده",

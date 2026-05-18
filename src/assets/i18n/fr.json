@@ -236,7 +236,14 @@
     "clearProgress": "Effacer la progression",
     "exportImport": "Exporter / Importer",
     "export": "Exporter",
-    "import": "Importer"
+    "import": "Importer",
+    "tabs": {
+      "progress": "Progrès",
+      "plans": "Plans",
+      "badges": "Badges",
+      "saves": "Enregistrés",
+      "settings": "Paramètres"
+    }
   },
   "reading": {
     "markRead": "Marquer comme lu",

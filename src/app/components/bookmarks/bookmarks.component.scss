@@ -611,3 +611,76 @@ section {
 :host-context(body.dark-theme) .plan-catalogue-row {
   background: rgba(255, 255, 255, 0.04);
 }
+
+// ---------------------------------------------------------------------------
+// Tab nav (custom — keeps bundle weight down)
+// ---------------------------------------------------------------------------
+.bookmarks-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.1));
+  margin: 8px 0 20px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  // Allow horizontal scroll on mobile without breaking the row.
+  -webkit-overflow-scrolling: touch;
+}
+
+.bookmarks-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.92rem;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    color: var(--text-primary, #333);
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  &.active {
+    color: var(--link-color, #673ab7);
+    border-bottom-color: var(--link-color, #673ab7);
+    font-weight: 600;
+  }
+
+  // Hide the text label on narrow screens, keep just the icon
+  @media (max-width: 540px) {
+    padding: 10px 12px;
+    .bookmarks-tab-label {
+      display: none;
+    }
+  }
+}
+
+:host-context(body.dark-theme) .bookmarks-tab {
+  &:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+  &.active {
+    color: #b39ddb;
+    border-bottom-color: #b39ddb;
+  }
+}
+
+.bookmarks-tab-panel {
+  // Sections inside a tab panel collapse their top margin so the first
+  // section's h2 sits flush with the tab nav.
+  > section:first-child,
+  app-badge-shelf:first-child {
+    margin-top: 0;
+  }
+}

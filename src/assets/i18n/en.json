@@ -266,7 +266,14 @@
     "exportImport": "Export / Import",
     "export": "Export",
     "import": "Import",
-    "startExploring": "Start exploring books"
+    "startExploring": "Start exploring books",
+    "tabs": {
+      "progress": "Progress",
+      "plans": "Plans",
+      "badges": "Badges",
+      "saves": "Saves",
+      "settings": "Settings"
+    }
   },
   "reading": {
     "markRead": "Mark as read",

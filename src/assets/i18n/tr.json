@@ -236,7 +236,14 @@
     "clearProgress": "Okuma ilerlemesini temizle",
     "exportImport": "Dışa Aktar / İçe Aktar",
     "export": "Dışa Aktar",
-    "import": "İçe Aktar"
+    "import": "İçe Aktar",
+    "tabs": {
+      "progress": "İlerleme",
+      "plans": "Planlar",
+      "badges": "Rozetler",
+      "saves": "Kaydedilenler",
+      "settings": "Ayarlar"
+    }
   },
   "reading": {
     "markRead": "Okundu olarak işaretle",

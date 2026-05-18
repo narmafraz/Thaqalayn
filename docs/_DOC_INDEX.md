@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-05-17
+> **Last updated:** 2026-05-19
 
 ## Status Legend
 
@@ -132,4 +132,4 @@
 
 | Document | Status | Summary |
 |----------|--------|---------|
-| [READING_ENGAGEMENT_PROPOSAL.md](READING_ENGAGEMENT_PROPOSAL.md) | **WAVES A–D COMPLETE** (2026-05-17, 5 commits in this session + 2 in the generator/data repos) | 15-item proposal extending `lastPath`-only progress into verse-level coverage tracking + habit features. **Shipped:** per-verse auto+manual marking via dedicated IntersectionObserver, Dexie v3 schema (`readVerses` + `goalConfig`) + extended JSON export/import, `VerseCountsService` + `ReadingStatsService` deriving book progress / daily tallies / streak / goal, per-book progress bars on homepage cards, per-chapter SVG rings in chapter-list with unread-only filter, `.verse-read` styling, /bookmarks reading-history section + streak chip + goal editor, deterministic "verse of the day", milestone toasts on book completion + cumulative thresholds. **Deferred:** RE-10 plans (Wave E), RE-12 push (Wave F), RE-14/15 (Wave G). 75 new Karma tests (649 → 724) + 10 new pytest tests (verse_counts module). All 1979 pytest + 724 Karma pass. See [DECISION_LOG.md D061](DECISION_LOG.md). |
+| [READING_ENGAGEMENT_PROPOSAL.md](READING_ENGAGEMENT_PROPOSAL.md) | **COMPLETE** — RE-01..RE-18 all shipped 2026-05-17..2026-05-19 | 18-item proposal extending `lastPath`-only progress into verse-level coverage tracking + habit features. **Shipped:** per-verse auto+manual marking, Dexie v5 schema (readVerses + goalConfig + earnedBadges + enrolledPlans) + extended JSON export/import (v3), `VerseCountsService` + `ReadingStatsService`, per-book progress bars + chapter-list rings + "hide completed" filter, global `muteReadVerses` pref, /bookmarks 5-tab layout (Progress/Plans/Badges/Saves/Settings), deterministic Verse of the Day, milestone toasts (12-20 s, pause-on-hover), **38-badge holographic-foil catalogue** with per-category accents + hover-tilt, reading-reminder banner (re-scoped from PWA push), per-section reset + global wipe, started-books homepage panel, revisit suggestions, cross-book unread highlighting, **17 reading plans** in `ThaqalaynData/plans/`. 108 new Karma tests (649 → 757) + 10 new pytest tests. All 1987 pytest + 757 Karma pass. 13 new Playwright E2E specs queued for next prod deploy. See [DECISION_LOG.md D061](DECISION_LOG.md). |

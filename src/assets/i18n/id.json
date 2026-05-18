@@ -236,7 +236,14 @@
     "clearProgress": "Hapus progres membaca",
     "exportImport": "Ekspor / Impor",
     "export": "Ekspor",
-    "import": "Impor"
+    "import": "Impor",
+    "tabs": {
+      "progress": "Kemajuan",
+      "plans": "Rencana",
+      "badges": "Lencana",
+      "saves": "Tersimpan",
+      "settings": "Pengaturan"
+    }
   },
   "reading": {
     "markRead": "Tandai sudah dibaca",

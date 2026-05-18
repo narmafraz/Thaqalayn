@@ -236,7 +236,14 @@
     "clearProgress": "পড়ার অগ্রগতি মুছুন",
     "exportImport": "রপ্তানি / আমদানি",
     "export": "রপ্তানি",
-    "import": "আমদানি"
+    "import": "আমদানি",
+    "tabs": {
+      "progress": "অগ্রগতি",
+      "plans": "পরিকল্পনা",
+      "badges": "ব্যাজ",
+      "saves": "সংরক্ষণ",
+      "settings": "সেটিংস"
+    }
   },
   "reading": {
     "markRead": "পড়া হয়েছে চিহ্নিত করুন",

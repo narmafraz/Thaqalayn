@@ -248,7 +248,14 @@
     "clearProgress": "مسح تقدم القراءة",
     "exportImport": "تصدير / استيراد",
     "export": "تصدير",
-    "import": "استيراد"
+    "import": "استيراد",
+    "tabs": {
+      "progress": "التقدم",
+      "plans": "الخطط",
+      "badges": "الأوسمة",
+      "saves": "المحفوظات",
+      "settings": "الإعدادات"
+    }
   },
   "reading": {
     "markRead": "وضع علامة كمقروء",

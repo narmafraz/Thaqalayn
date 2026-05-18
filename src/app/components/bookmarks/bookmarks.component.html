@@ -1,273 +1,304 @@
 <div class="content mat-elevation-z8">
   <h1>{{ 'bookmark.title' | translate }}</h1>
 
-  <!-- Streak + Reading-history summary chip strip -->
-  <section *ngIf="totalVersesRead > 0 || streak.current > 0 || goalTarget > 0" class="reading-stats-strip"
-           [attr.aria-label]="'reading.progress' | translate">
-    <div class="stat-chip streak-chip" [class.streak-in-danger]="streak.current > 0 && !streak.includesToday">
-      <span class="stat-chip-icon" aria-hidden="true">🔥</span>
-      <span class="stat-chip-value">{{ streak.current }}</span>
-      <span class="stat-chip-label">{{ 'reading.streak' | translate }}</span>
-      <span *ngIf="streak.longest > streak.current" class="stat-chip-secondary">
-        {{ 'reading.longestStreak' | translate }}: {{ streak.longest }}
-      </span>
-    </div>
-    <div class="stat-chip total-chip">
-      <span class="stat-chip-icon" aria-hidden="true">📖</span>
-      <span class="stat-chip-value">{{ totalVersesRead }}</span>
-      <span class="stat-chip-label">{{ 'reading.versesReadTotal' | translate }}</span>
-    </div>
-    <!-- Goal progress (RE-09) -->
-    <div *ngIf="goalTarget > 0" class="stat-chip goal-chip" [class.goal-met]="goalFraction >= 1">
-      <span class="stat-chip-icon" aria-hidden="true">🎯</span>
-      <span class="stat-chip-value">{{ goalToday }} / {{ goalTarget }}</span>
-      <span class="stat-chip-label">{{ 'reading.goalLabel' | translate }}</span>
-      <div class="goal-mini-bar" aria-hidden="true">
-        <div class="goal-mini-fill" [style.width.%]="goalFraction * 100"></div>
-      </div>
-    </div>
-    <div *ngIf="streak.current > 0 && !streak.includesToday" class="streak-danger-msg">
-      {{ 'reading.streakInDanger' | translate }}
-    </div>
-  </section>
+  <!-- Tab nav (custom — keeps bundle weight low, no MatTabsModule) -->
+  <nav class="bookmarks-tabs" role="tablist" [attr.aria-label]="'bookmark.title' | translate">
+    <button *ngFor="let t of tabs"
+            type="button"
+            role="tab"
+            class="bookmarks-tab"
+            [class.active]="activeTab === t.id"
+            [attr.aria-selected]="activeTab === t.id"
+            (click)="selectTab(t.id)">
+      <mat-icon>{{ t.icon }}</mat-icon>
+      <span class="bookmarks-tab-label">{{ t.labelKey | translate }}</span>
+    </button>
+  </nav>
 
-  <!-- Goal config (RE-09) -->
-  <section class="goal-section">
-    <h2>{{ 'reading.goal' | translate }}</h2>
-    <ng-container *ngIf="!goalEditing">
-      <p *ngIf="goalTarget === 0" class="goal-empty">{{ 'reading.setGoalDescription' | translate }}</p>
-      <p *ngIf="goalTarget > 0" class="goal-current">
-        <strong>{{ goalTarget }}</strong> {{ 'reading.dailyVerseTarget' | translate | lowercase }}
-      </p>
-      <div class="goal-actions">
-        <button mat-stroked-button (click)="openGoalEditor()">
-          <mat-icon>edit</mat-icon> {{ goalTarget > 0 ? ('annotation.edit' | translate) : ('reading.setGoal' | translate) }}
-        </button>
-        <button *ngIf="goalTarget > 0" mat-button (click)="disableGoal()">
-          <mat-icon>do_not_disturb</mat-icon> {{ 'reading.disableGoal' | translate }}
-        </button>
-      </div>
-    </ng-container>
-    <div *ngIf="goalEditing" class="goal-editor">
-      <label class="goal-label">
-        <span>{{ 'reading.dailyVerseTarget' | translate }}</span>
-        <input type="number" min="1" max="500" [(ngModel)]="goalDraft" class="goal-input" aria-label="Daily verse target">
-      </label>
-      <div class="goal-presets">
-        <button class="goal-preset" *ngFor="let n of [3, 5, 10, 20, 50]" (click)="goalDraft = n"
-                [class.active]="goalDraft === n">{{ n }}</button>
-      </div>
-      <div class="goal-actions">
-        <button mat-raised-button color="primary" (click)="saveGoal()">{{ 'reading.saveGoal' | translate }}</button>
-        <button mat-button (click)="cancelGoalEdit()">{{ 'annotation.cancel' | translate }}</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Continue Reading section -->
-  <section *ngIf="readingProgress.length > 0" class="continue-section">
-    <h2>{{ 'bookmark.continueReading' | translate }}</h2>
-    <div class="progress-list">
-      <div class="progress-item" *ngFor="let rp of readingProgress">
-        <div class="progress-info">
-          <a [routerLink]="getRouterLinkSegments(rp.lastPath)" queryParamsHandling="preserve" class="progress-link">
-            <mat-icon>menu_book</mat-icon>
-            <div>
-              <div class="progress-book">{{ formatBookId(rp.bookId) }}</div>
-              <div class="progress-title">{{ rp.lastTitle }}</div>
-            </div>
-          </a>
-        </div>
-        <button mat-icon-button (click)="clearProgress(rp.bookId)"
-                [attr.aria-label]="'bookmark.clearProgress' | translate"
-                [matTooltip]="'bookmark.clearProgress' | translate">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Reading plans (RE-10) -->
-  <section *ngIf="planCatalogue.length > 0" class="plans-section">
-    <h2>{{ 'reading.plans.title' | translate }}</h2>
-
-    <!-- Currently enrolled — collapsed status line -->
-    <div *ngFor="let s of planStates" class="plan-enrolled-row">
-      <div class="plan-enrolled-summary">
-        <span class="plan-enrolled-title">{{ s.plan.titleEn }}</span>
-        <span class="plan-enrolled-day">
-          {{ 'reading.plans.dayOf' | translate }} {{ s.currentDay }} / {{ s.plan.totalDays }}
-          · {{ s.todayRead }} / {{ s.today.verseCount }}
+  <!-- =============================== PROGRESS =============================== -->
+  <div *ngIf="activeTab === 'progress'" class="bookmarks-tab-panel" role="tabpanel">
+    <!-- Streak + Reading-history summary chip strip -->
+    <section *ngIf="totalVersesRead > 0 || streak.current > 0 || goalTarget > 0" class="reading-stats-strip"
+             [attr.aria-label]="'reading.progress' | translate">
+      <div class="stat-chip streak-chip" [class.streak-in-danger]="streak.current > 0 && !streak.includesToday">
+        <span class="stat-chip-icon" aria-hidden="true">🔥</span>
+        <span class="stat-chip-value">{{ streak.current }}</span>
+        <span class="stat-chip-label">{{ 'reading.streak' | translate }}</span>
+        <span *ngIf="streak.longest > streak.current" class="stat-chip-secondary">
+          {{ 'reading.longestStreak' | translate }}: {{ streak.longest }}
         </span>
       </div>
-      <div class="plan-enrolled-actions">
-        <button mat-stroked-button (click)="restartPlan(s.plan.id)">
-          <mat-icon>restart_alt</mat-icon> {{ 'reading.plans.restart' | translate }}
-        </button>
-        <button mat-button color="warn" (click)="unenrollPlan(s.plan.id)">
-          <mat-icon>close</mat-icon> {{ 'reading.plans.unenroll' | translate }}
-        </button>
+      <div class="stat-chip total-chip">
+        <span class="stat-chip-icon" aria-hidden="true">📖</span>
+        <span class="stat-chip-value">{{ totalVersesRead }}</span>
+        <span class="stat-chip-label">{{ 'reading.versesReadTotal' | translate }}</span>
       </div>
-    </div>
-
-    <!-- Catalogue (excludes already-enrolled by default) -->
-    <div *ngFor="let p of planCatalogue" class="plan-catalogue-row" [class.plan-already-enrolled]="isPlanEnrolled(p.id)">
-      <div class="plan-catalogue-meta">
-        <div class="plan-catalogue-title">{{ p.titleEn }}</div>
-        <div class="plan-catalogue-desc">{{ p.descEn }}</div>
-        <div class="plan-catalogue-stats">
-          {{ p.totalDays }} {{ 'reading.plans.daysLabel' | translate }}
-          · {{ p.totalVerses }} {{ 'reading.plans.versesLabel' | translate }}
+      <!-- Goal progress (RE-09) -->
+      <div *ngIf="goalTarget > 0" class="stat-chip goal-chip" [class.goal-met]="goalFraction >= 1">
+        <span class="stat-chip-icon" aria-hidden="true">🎯</span>
+        <span class="stat-chip-value">{{ goalToday }} / {{ goalTarget }}</span>
+        <span class="stat-chip-label">{{ 'reading.goalLabel' | translate }}</span>
+        <div class="goal-mini-bar" aria-hidden="true">
+          <div class="goal-mini-fill" [style.width.%]="goalFraction * 100"></div>
         </div>
       </div>
-      <button *ngIf="!isPlanEnrolled(p.id)" mat-raised-button color="primary" (click)="enrollPlan(p.id)">
-        {{ 'reading.plans.start' | translate }}
-      </button>
-      <span *ngIf="isPlanEnrolled(p.id)" class="plan-already-tag">
-        {{ 'reading.plans.alreadyEnrolled' | translate }}
-      </span>
-    </div>
-  </section>
+      <div *ngIf="streak.current > 0 && !streak.includesToday" class="streak-danger-msg">
+        {{ 'reading.streakInDanger' | translate }}
+      </div>
+    </section>
 
-  <!-- Achievement badges (RE-16) -->
-  <app-badge-shelf></app-badge-shelf>
-
-  <!-- Reading history (RE-06) -->
-  <section *ngIf="dailyTallies.length > 0" class="reading-history-section">
-    <h2>{{ 'reading.history' | translate }}</h2>
-    <ol class="reading-history-list">
-      <li *ngFor="let day of dailyTallies.slice(0, 30)" class="reading-history-day">
-        <div class="history-day-header">
-          <span class="history-day-label">{{ formatDayLabel(day.date) }}</span>
-          <span class="history-day-count">{{ day.versesRead }}</span>
+    <!-- Goal config (RE-09) -->
+    <section class="goal-section">
+      <h2>{{ 'reading.goal' | translate }}</h2>
+      <ng-container *ngIf="!goalEditing">
+        <p *ngIf="goalTarget === 0" class="goal-empty">{{ 'reading.setGoalDescription' | translate }}</p>
+        <p *ngIf="goalTarget > 0" class="goal-current">
+          <strong>{{ goalTarget }}</strong> {{ 'reading.dailyVerseTarget' | translate | lowercase }}
+        </p>
+        <div class="goal-actions">
+          <button mat-stroked-button (click)="openGoalEditor()">
+            <mat-icon>edit</mat-icon> {{ goalTarget > 0 ? ('annotation.edit' | translate) : ('reading.setGoal' | translate) }}
+          </button>
+          <button *ngIf="goalTarget > 0" mat-button (click)="disableGoal()">
+            <mat-icon>do_not_disturb</mat-icon> {{ 'reading.disableGoal' | translate }}
+          </button>
         </div>
-        <div class="history-day-books">
-          <span *ngFor="let bookId of day.bookIds" class="history-book-chip">
-            {{ formatBookId(bookId) }}
-          </span>
+      </ng-container>
+      <div *ngIf="goalEditing" class="goal-editor">
+        <label class="goal-label">
+          <span>{{ 'reading.dailyVerseTarget' | translate }}</span>
+          <input type="number" min="1" max="500" [(ngModel)]="goalDraft" class="goal-input" aria-label="Daily verse target">
+        </label>
+        <div class="goal-presets">
+          <button class="goal-preset" *ngFor="let n of [3, 5, 10, 20, 50]" (click)="goalDraft = n"
+                  [class.active]="goalDraft === n">{{ n }}</button>
         </div>
-      </li>
-    </ol>
-  </section>
+        <div class="goal-actions">
+          <button mat-raised-button color="primary" (click)="saveGoal()">{{ 'reading.saveGoal' | translate }}</button>
+          <button mat-button (click)="cancelGoalEdit()">{{ 'annotation.cancel' | translate }}</button>
+        </div>
+      </div>
+    </section>
 
-  <!-- Bookmarks section -->
-  <section class="bookmarks-section">
-    <h2>{{ 'bookmark.savedBookmarks' | translate }}</h2>
+    <!-- Continue Reading section -->
+    <section *ngIf="readingProgress.length > 0" class="continue-section">
+      <h2>{{ 'bookmark.continueReading' | translate }}</h2>
+      <div class="progress-list">
+        <div class="progress-item" *ngFor="let rp of readingProgress">
+          <div class="progress-info">
+            <a [routerLink]="getRouterLinkSegments(rp.lastPath)" queryParamsHandling="preserve" class="progress-link">
+              <mat-icon>menu_book</mat-icon>
+              <div>
+                <div class="progress-book">{{ formatBookId(rp.bookId) }}</div>
+                <div class="progress-title">{{ rp.lastTitle }}</div>
+              </div>
+            </a>
+          </div>
+          <button mat-icon-button (click)="clearProgress(rp.bookId)"
+                  [attr.aria-label]="'bookmark.clearProgress' | translate"
+                  [matTooltip]="'bookmark.clearProgress' | translate">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      </div>
+    </section>
 
-    <div *ngIf="bookmarks.length === 0" class="empty-state">
-      <mat-icon class="empty-icon">bookmark_border</mat-icon>
-      <p>{{ 'bookmark.noBookmarks' | translate }}</p>
+    <!-- Reading history (RE-06) -->
+    <section *ngIf="dailyTallies.length > 0" class="reading-history-section">
+      <h2>{{ 'reading.history' | translate }}</h2>
+      <ol class="reading-history-list">
+        <li *ngFor="let day of dailyTallies.slice(0, 30)" class="reading-history-day">
+          <div class="history-day-header">
+            <span class="history-day-label">{{ formatDayLabel(day.date) }}</span>
+            <span class="history-day-count">{{ day.versesRead }}</span>
+          </div>
+          <div class="history-day-books">
+            <span *ngFor="let bookId of day.bookIds" class="history-book-chip">
+              {{ formatBookId(bookId) }}
+            </span>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Empty state when the user has no reading data yet -->
+    <div *ngIf="totalVersesRead === 0 && streak.current === 0 && goalTarget === 0 && readingProgress.length === 0"
+         class="empty-state">
+      <mat-icon class="empty-icon">menu_book</mat-icon>
+      <p>{{ 'bookmark.noProgress' | translate }}</p>
       <a routerLink="/books" queryParamsHandling="preserve" class="empty-cta">
         {{ 'bookmark.startExploring' | translate }}
       </a>
     </div>
+  </div>
 
-    <div class="bookmark-list">
-      <div class="bookmark-item" *ngFor="let bm of bookmarks">
-        <a [routerLink]="getRouterLinkSegments(bm.path)" queryParamsHandling="preserve" class="bookmark-link">
-          <mat-icon>bookmark</mat-icon>
-          <div>
-            <div class="bookmark-title">{{ bm.title }}</div>
-            <div *ngIf="bm.arabicTitle" class="bookmark-arabic" dir="rtl" lang="ar">{{ bm.arabicTitle }}</div>
-            <div class="bookmark-path">{{ bm.path }}</div>
+  <!-- =============================== PLANS =============================== -->
+  <div *ngIf="activeTab === 'plans'" class="bookmarks-tab-panel" role="tabpanel">
+    <section *ngIf="planCatalogue.length > 0" class="plans-section">
+      <h2>{{ 'reading.plans.title' | translate }}</h2>
+
+      <div *ngFor="let s of planStates" class="plan-enrolled-row">
+        <div class="plan-enrolled-summary">
+          <span class="plan-enrolled-title">{{ s.plan.titleEn }}</span>
+          <span class="plan-enrolled-day">
+            {{ 'reading.plans.dayOf' | translate }} {{ s.currentDay }} / {{ s.plan.totalDays }}
+            · {{ s.todayRead }} / {{ s.today.verseCount }}
+          </span>
+        </div>
+        <div class="plan-enrolled-actions">
+          <button mat-stroked-button (click)="restartPlan(s.plan.id)">
+            <mat-icon>restart_alt</mat-icon> {{ 'reading.plans.restart' | translate }}
+          </button>
+          <button mat-button color="warn" (click)="unenrollPlan(s.plan.id)">
+            <mat-icon>close</mat-icon> {{ 'reading.plans.unenroll' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngFor="let p of planCatalogue" class="plan-catalogue-row" [class.plan-already-enrolled]="isPlanEnrolled(p.id)">
+        <div class="plan-catalogue-meta">
+          <div class="plan-catalogue-title">{{ p.titleEn }}</div>
+          <div class="plan-catalogue-desc">{{ p.descEn }}</div>
+          <div class="plan-catalogue-stats">
+            {{ p.totalDays }} {{ 'reading.plans.daysLabel' | translate }}
+            · {{ p.totalVerses }} {{ 'reading.plans.versesLabel' | translate }}
           </div>
-        </a>
-        <button mat-icon-button (click)="removeBookmark(bm.path)"
-                [attr.aria-label]="'bookmark.remove' | translate"
-                [matTooltip]="'bookmark.remove' | translate">
-          <mat-icon>delete_outline</mat-icon>
+        </div>
+        <button *ngIf="!isPlanEnrolled(p.id)" mat-raised-button color="primary" (click)="enrollPlan(p.id)">
+          {{ 'reading.plans.start' | translate }}
         </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- My Notes section -->
-  <section class="notes-section">
-    <h2>{{ 'annotation.notes' | translate }}</h2>
-
-    <div *ngIf="annotations.length === 0" class="empty-state">
-      <mat-icon class="empty-icon">note_add</mat-icon>
-      <p>{{ 'annotation.noNotes' | translate }}</p>
-    </div>
-
-    <div class="annotation-list">
-      <div class="annotation-item" *ngFor="let ann of annotations">
-        <a [routerLink]="getRouterLinkSegments(ann.path)" queryParamsHandling="preserve" class="annotation-link">
-          <mat-icon class="annotation-icon">sticky_note_2</mat-icon>
-          <div>
-            <div class="annotation-path">{{ ann.path }}</div>
-            <div class="annotation-text">{{ ann.text }}</div>
-          </div>
-        </a>
-        <button mat-icon-button (click)="deleteAnnotation(ann.path)"
-                [attr.aria-label]="'annotation.delete' | translate"
-                [matTooltip]="'annotation.delete' | translate">
-          <mat-icon>delete_outline</mat-icon>
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Cloud Sync section -->
-  <section *ngIf="syncConfigured" class="sync-section">
-    <h2>{{ 'sync.title' | translate }}</h2>
-
-    <div *ngIf="!(syncUser$ | async)" class="sync-login">
-      <p class="sync-description">{{ 'sync.description' | translate }}</p>
-      <div class="sync-actions">
-        <button mat-raised-button color="primary" (click)="signInWithGoogle()">
-          <mat-icon>account_circle</mat-icon> {{ 'sync.signInGoogle' | translate }}
-        </button>
-        <button mat-stroked-button (click)="signInAnonymously()">
-          <mat-icon>person_outline</mat-icon> {{ 'sync.signInAnonymous' | translate }}
-        </button>
-      </div>
-    </div>
-
-    <div *ngIf="syncUser$ | async as user" class="sync-connected">
-      <div class="sync-user-info">
-        <mat-icon>{{ user.isAnonymous ? 'person_outline' : 'account_circle' }}</mat-icon>
-        <span>{{ user.displayName || user.email || ('sync.anonymous' | translate) }}</span>
-      </div>
-      <div class="sync-status">
-        <span class="sync-status-badge" [ngClass]="syncStatus$ | async">
-          {{ 'sync.status.' + (syncStatus$ | async) | translate }}
-        </span>
-        <span *ngIf="lastSync$ | async as last" class="sync-last">
-          {{ 'sync.lastSync' | translate }}: {{ last | date:'short' }}
+        <span *ngIf="isPlanEnrolled(p.id)" class="plan-already-tag">
+          {{ 'reading.plans.alreadyEnrolled' | translate }}
         </span>
       </div>
-      <div class="sync-actions">
-        <button mat-raised-button color="primary" (click)="syncNow()"
-                [disabled]="(syncStatus$ | async) === 'syncing'">
-          <mat-icon>sync</mat-icon> {{ 'sync.syncNow' | translate }}
-        </button>
-        <button mat-stroked-button (click)="pushToCloud()"
-                [disabled]="(syncStatus$ | async) === 'syncing'">
-          <mat-icon>cloud_upload</mat-icon> {{ 'sync.push' | translate }}
-        </button>
-        <button mat-stroked-button (click)="pullFromCloud()"
-                [disabled]="(syncStatus$ | async) === 'syncing'">
-          <mat-icon>cloud_download</mat-icon> {{ 'sync.pull' | translate }}
-        </button>
-        <button mat-stroked-button color="warn" (click)="signOut()">
-          <mat-icon>logout</mat-icon> {{ 'sync.signOut' | translate }}
-        </button>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <!-- Export/Import section -->
-  <section class="export-section">
-    <h2>{{ 'bookmark.exportImport' | translate }}</h2>
-    <div class="export-actions">
-      <button mat-raised-button (click)="exportBookmarks()" [disabled]="bookmarks.length === 0 && annotations.length === 0">
-        <mat-icon>file_download</mat-icon> {{ 'bookmark.export' | translate }}
-      </button>
-      <button mat-raised-button (click)="fileInput.click()">
-        <mat-icon>file_upload</mat-icon> {{ 'bookmark.import' | translate }}
-      </button>
-      <input #fileInput type="file" accept=".json" (change)="importBookmarks($event)" hidden>
-    </div>
-  </section>
+  <!-- =============================== BADGES =============================== -->
+  <div *ngIf="activeTab === 'badges'" class="bookmarks-tab-panel" role="tabpanel">
+    <app-badge-shelf></app-badge-shelf>
+  </div>
+
+  <!-- =============================== SAVES (bookmarks + notes) =============================== -->
+  <div *ngIf="activeTab === 'saves'" class="bookmarks-tab-panel" role="tabpanel">
+    <section class="bookmarks-section">
+      <h2>{{ 'bookmark.savedBookmarks' | translate }}</h2>
+
+      <div *ngIf="bookmarks.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">bookmark_border</mat-icon>
+        <p>{{ 'bookmark.noBookmarks' | translate }}</p>
+        <a routerLink="/books" queryParamsHandling="preserve" class="empty-cta">
+          {{ 'bookmark.startExploring' | translate }}
+        </a>
+      </div>
+
+      <div class="bookmark-list">
+        <div class="bookmark-item" *ngFor="let bm of bookmarks">
+          <a [routerLink]="getRouterLinkSegments(bm.path)" queryParamsHandling="preserve" class="bookmark-link">
+            <mat-icon>bookmark</mat-icon>
+            <div>
+              <div class="bookmark-title">{{ bm.title }}</div>
+              <div *ngIf="bm.arabicTitle" class="bookmark-arabic" dir="rtl" lang="ar">{{ bm.arabicTitle }}</div>
+              <div class="bookmark-path">{{ bm.path }}</div>
+            </div>
+          </a>
+          <button mat-icon-button (click)="removeBookmark(bm.path)"
+                  [attr.aria-label]="'bookmark.remove' | translate"
+                  [matTooltip]="'bookmark.remove' | translate">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="notes-section">
+      <h2>{{ 'annotation.notes' | translate }}</h2>
+
+      <div *ngIf="annotations.length === 0" class="empty-state">
+        <mat-icon class="empty-icon">note_add</mat-icon>
+        <p>{{ 'annotation.noNotes' | translate }}</p>
+      </div>
+
+      <div class="annotation-list">
+        <div class="annotation-item" *ngFor="let ann of annotations">
+          <a [routerLink]="getRouterLinkSegments(ann.path)" queryParamsHandling="preserve" class="annotation-link">
+            <mat-icon class="annotation-icon">sticky_note_2</mat-icon>
+            <div>
+              <div class="annotation-path">{{ ann.path }}</div>
+              <div class="annotation-text">{{ ann.text }}</div>
+            </div>
+          </a>
+          <button mat-icon-button (click)="deleteAnnotation(ann.path)"
+                  [attr.aria-label]="'annotation.delete' | translate"
+                  [matTooltip]="'annotation.delete' | translate">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- =============================== SETTINGS (sync + export/import) =============================== -->
+  <div *ngIf="activeTab === 'settings'" class="bookmarks-tab-panel" role="tabpanel">
+    <section *ngIf="syncConfigured" class="sync-section">
+      <h2>{{ 'sync.title' | translate }}</h2>
+
+      <div *ngIf="!(syncUser$ | async)" class="sync-login">
+        <p class="sync-description">{{ 'sync.description' | translate }}</p>
+        <div class="sync-actions">
+          <button mat-raised-button color="primary" (click)="signInWithGoogle()">
+            <mat-icon>account_circle</mat-icon> {{ 'sync.signInGoogle' | translate }}
+          </button>
+          <button mat-stroked-button (click)="signInAnonymously()">
+            <mat-icon>person_outline</mat-icon> {{ 'sync.signInAnonymous' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="syncUser$ | async as user" class="sync-connected">
+        <div class="sync-user-info">
+          <mat-icon>{{ user.isAnonymous ? 'person_outline' : 'account_circle' }}</mat-icon>
+          <span>{{ user.displayName || user.email || ('sync.anonymous' | translate) }}</span>
+        </div>
+        <div class="sync-status">
+          <span class="sync-status-badge" [ngClass]="syncStatus$ | async">
+            {{ 'sync.status.' + (syncStatus$ | async) | translate }}
+          </span>
+          <span *ngIf="lastSync$ | async as last" class="sync-last">
+            {{ 'sync.lastSync' | translate }}: {{ last | date:'short' }}
+          </span>
+        </div>
+        <div class="sync-actions">
+          <button mat-raised-button color="primary" (click)="syncNow()"
+                  [disabled]="(syncStatus$ | async) === 'syncing'">
+            <mat-icon>sync</mat-icon> {{ 'sync.syncNow' | translate }}
+          </button>
+          <button mat-stroked-button (click)="pushToCloud()"
+                  [disabled]="(syncStatus$ | async) === 'syncing'">
+            <mat-icon>cloud_upload</mat-icon> {{ 'sync.push' | translate }}
+          </button>
+          <button mat-stroked-button (click)="pullFromCloud()"
+                  [disabled]="(syncStatus$ | async) === 'syncing'">
+            <mat-icon>cloud_download</mat-icon> {{ 'sync.pull' | translate }}
+          </button>
+          <button mat-stroked-button color="warn" (click)="signOut()">
+            <mat-icon>logout</mat-icon> {{ 'sync.signOut' | translate }}
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="export-section">
+      <h2>{{ 'bookmark.exportImport' | translate }}</h2>
+      <div class="export-actions">
+        <button mat-raised-button (click)="exportBookmarks()" [disabled]="bookmarks.length === 0 && annotations.length === 0">
+          <mat-icon>file_download</mat-icon> {{ 'bookmark.export' | translate }}
+        </button>
+        <button mat-raised-button (click)="fileInput.click()">
+          <mat-icon>file_upload</mat-icon> {{ 'bookmark.import' | translate }}
+        </button>
+        <input #fileInput type="file" accept=".json" (change)="importBookmarks($event)" hidden>
+      </div>
+    </section>
+  </div>
 </div>

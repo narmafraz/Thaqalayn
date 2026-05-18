@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
 
 /**
  * End-to-end flows for reading-engagement features. Each test starts
@@ -6,8 +6,14 @@ import { test, expect } from '@playwright/test';
  * clean.
  *
  * These exercise the click-path: open a chapter → mark verses →
- * navigate to /bookmarks → verify the chip/badge/history updated.
+ * navigate to /bookmarks → click the relevant tab → verify the
+ * chip/badge/history updated.
  */
+
+async function selectBookmarksTab(page: Page, label: RegExp): Promise<void> {
+  await page.getByRole('tab', { name: label }).click();
+  await page.waitForTimeout(150);
+}
 
 test.describe('Reading-engagement flows', () => {
   test('manual read-mark on a verse shows ✓ icon and persists across reload', async ({ page }) => {
@@ -35,7 +41,7 @@ test.describe('Reading-engagement flows', () => {
     await expect(readBtnAfter.locator('mat-icon')).toHaveText(/check_circle/);
   });
 
-  test('marking verses surfaces the streak chip and total chip on /bookmarks', async ({ page }) => {
+  test('marking verses surfaces the streak chip and total chip on the Progress tab', async ({ page }) => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2500);
@@ -50,7 +56,7 @@ test.describe('Reading-engagement flows', () => {
 
     await page.goto('/bookmarks?lang=en');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(800);
+    await selectBookmarksTab(page, /progress/i);
 
     // Stats strip should now be visible with the 🔥 streak chip and 📖 total chip
     await expect(page.locator('.reading-stats-strip')).toBeVisible();
@@ -63,7 +69,7 @@ test.describe('Reading-engagement flows', () => {
     expect(parseInt(text, 10)).toBeGreaterThanOrEqual(3);
   });
 
-  test('reading-history section appears after marking verses', async ({ page }) => {
+  test('reading-history section appears on the Progress tab after marking verses', async ({ page }) => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2500);
@@ -73,7 +79,7 @@ test.describe('Reading-engagement flows', () => {
 
     await page.goto('/bookmarks?lang=en');
     await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(500);
+    await selectBookmarksTab(page, /progress/i);
 
     await expect(page.getByRole('heading', { name: /reading history/i })).toBeVisible();
     // At least one day row should be rendered
@@ -83,6 +89,7 @@ test.describe('Reading-engagement flows', () => {
   test('enrolling in the Quran-30-days plan creates a homepage ribbon', async ({ page }) => {
     await page.goto('/bookmarks?lang=en');
     await page.waitForLoadState('networkidle');
+    await selectBookmarksTab(page, /plans/i);
 
     // Click "Start" on the Quran-in-30-days catalogue entry
     const startBtn = page.locator('.plan-catalogue-row').filter({ hasText: '30 Days' }).getByRole('button', { name: /start/i });

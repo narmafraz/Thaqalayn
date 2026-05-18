@@ -1192,4 +1192,41 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 
 **Out of scope this session (per the user's "to the end of Wave D" instruction):** RE-10 reading plans (Wave E — needs curated plan JSON authorship), RE-12 PWA push notifications (Wave F — copy review pending), RE-14/15 spaced-repetition and cross-book recommendations (Wave G).
 
+**Update 2026-05-19:** all of the above are now done — RE-10, RE-12, RE-14, RE-15 shipped in subsequent sessions plus three follow-ups (RE-16 badges, RE-17 reset, RE-18 homepage panel). RE-12 was re-scoped from "PWA push notifications" to an in-app reminder banner since the Notification Triggers API is Chromium-flag-only. See D062 for the plans-framework + bookmarks-tabs decisions.
+
+---
+
+### D062: Reading plans + holographic badges + /bookmarks tab layout (2026-05-19)
+
+**Context:** Following Waves A-D, several follow-up items shipped: RE-10 reading plans, RE-16 achievement badges, RE-17 reset, RE-18 homepage panel, plus the user-requested toast-duration / pause-on-hover, badge expansion (38 badges with month-based streak ladder), holographic badge styling, and a tab-based reorganisation of the /bookmarks page once it grew past 10 sections.
+
+**Sub-decisions:**
+
+1. **Plan schema: generic `chapterIndex` ranges, not Quran-only `surah`/ayah.** The first Quran-in-30-days plan used `{surah, verseStart, verseEnd}`, which only fits flat surah:ayah hierarchies. Refactored to `{chapterIndex, verseStart, verseEnd}` where `chapterIndex` is the canonical hierarchical index — `"quran:2"` for surah 2, `"al-kafi:1:1:1"` for a leaf hadith chapter. Legacy `surah` field still accepted as a fallback so the original plan JSON remains valid. Unlocks hadith-book plans without further schema churn.
+
+2. **Plan day-titles are auto-derived, not hand-written.** For hadith plans, titles are built from the first + last range in each day (e.g. `"1:1:1.1 → 1:2:5.18"`). Hand-writing 365 day titles per plan is unsustainable; auto-derivation is consistent and predictable.
+
+3. **Plan day-count splitting: two-tier even-split.** Allocates `floor(total / days)` verses to most days and adds one extra verse to the first `total % days` days. Produces exact day counts every time (no over/undershoot) and balances daily portions evenly. Same algorithm for Quran and hadith plans.
+
+4. **Natural-numeric chapter sort.** Manifest keys like `al-kafi:1:1:10` need to sort *after* `al-kafi:1:1:9`. Lexicographic sort would put them out of order. Plan generators apply a natural-key sort that parses numeric segments before comparing — same trick used in many file managers.
+
+5. **Holographic badges: CSS-only, no library.** Considered `simeydotme/pokemon-cards-css` (full library) and `simeydotme/hover-tilt` (just the parallax primitive). Built a thin ~70-line `HoloTiltDirective` that mirrors hover-tilt's approach: pointer-move listener outside Angular's zone, writes five CSS custom properties (`--pointer-x/y`, `--rotate-x/y`, `--pointer-from-center`). The CSS does everything else — conic-gradient foil background, two overlay layers (white spotlight + rainbow stripes), `transform-style: preserve-3d` with `translateZ(20px)` on the content. Respects `prefers-reduced-motion`. Per-category colour tints distinguish badge kinds at a glance. No bundle weight beyond the directive.
+
+6. **Toast durations: long + pause-on-hover, not sticky.** Bumped book-complete and badge-earned from 8 s to 20 s, cumulative from 6 s to 12 s. Added pause-on-hover (and focus-in for keyboard) so users can read milestone copy at their own pace without an indefinitely-sticky toast cluttering the corner. Service-side timer map tracks remaining time across pause/resume cycles.
+
+7. **/bookmarks tabs: custom buttons, not MatTabsModule.** Same logic as the milestone toaster — adding `@angular/material/tabs` for one feature would bring new module deps into shared.module. Five buttons + `*ngIf`-switched panels, with localStorage-persisted active tab, ships smaller. Tab labels collapse to icon-only on screens <540 px so the strip doesn't wrap.
+
+8. **RE-12 re-scoped from PWA push to in-app banner.** Original sketch leaned on the Notification Triggers API. Diagnosed during this session: API is Chromium-flag-only, not standards-track, not viable for production. Replacement is a slim banner at the top of the app (between sticky reading-toolbar and main outlet) that fires when streak is at risk or daily goal is unmet after noon local. Dismissible per-day via localStorage. Opt-out toggle in reading-sheet. Same celebratory purpose as a notification would have had, without the API gamble.
+
+9. **Badge catalogue ordering by difficulty within category.** Easiest goals first inside each of the 5 categories so a fresh user's eye lands on near-term targets. Categories themselves render in a fixed order (milestone → streak → book → breadth → habit) wired into BadgeShelfComponent's `categoryOrder`. Catalogue size grew from 18 → 38 over this session.
+
+10. **Plan-completion detection: per-day path-set intersection, not chapter-prefix.** A day-completion check expands the day's range tuples into concrete verse paths (`/books/quran:2:1` etc.) and asks how many are in `readVerses`. This is O(verses-in-day) but the day-sets are bounded (max ~600 for a juz-per-day Quran plan) so it's cheap. Avoids the alternative of storing per-day completion flags, which would create migration headaches if a plan's schedule ever changes.
+
+**Files / artefacts:**
+- `app/services/plans.service.ts`, `app/services/badge.service.ts`, `app/services/reading-banner.service.ts`, `app/services/milestone-toast.service.ts` (durations + pause)
+- `app/data/badges.ts` (38 badges)
+- `app/components/badge-shelf/` (with `holo-tilt.directive.ts`)
+- `app/components/reading-banner/`
+- `ThaqalaynData/plans/*.json` (17 plans + `index.json` catalogue)
+
 ---

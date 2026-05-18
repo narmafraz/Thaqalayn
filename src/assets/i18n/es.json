@@ -236,7 +236,14 @@
     "clearProgress": "Borrar progreso de lectura",
     "exportImport": "Exportar / Importar",
     "export": "Exportar",
-    "import": "Importar"
+    "import": "Importar",
+    "tabs": {
+      "progress": "Progreso",
+      "plans": "Planes",
+      "badges": "Insignias",
+      "saves": "Guardados",
+      "settings": "Ajustes"
+    }
   },
   "reading": {
     "markRead": "Marcar como leído",

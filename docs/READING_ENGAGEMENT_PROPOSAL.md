@@ -1,31 +1,34 @@
 # Reading Engagement & Progress-Tracking Proposal
 
-> **Date:** 2026-05-17 (drafted) / 2026-05-17 (Waves A–D shipped, same day)
-> **Status:** **WAVES A–D COMPLETE.** RE-10 (plans) + RE-12 (push) + RE-14/15 (recommendations) deferred to future sessions.
+> **Date:** 2026-05-17 (drafted) / 2026-05-17..2026-05-19 (shipped)
+> **Status:** **EVERYTHING SHIPPED.** RE-01 through RE-18 all DONE; RE-12 re-scoped from "PWA push" to "in-app banner" (the API limitation was identified post-draft).
 > **Scope:** Features that (a) encourage users to keep reading through the books and (b) let them see what they've already read.
 
 ## Status snapshot
 
 | Item | Status | Where it shipped |
 |---|---|---|
-| RE-01 per-verse auto + manual marks | **✅ DONE** | `bookmark.service.ts` (Dexie v3), `chapter-content.component.ts`, `verse-actions` |
+| RE-01 per-verse auto + manual marks | **✅ DONE** | `bookmark.service.ts` (Dexie v5), `chapter-content.component.ts`, `verse-actions` |
 | RE-02 verse-counts manifest | **✅ DONE** | `ThaqalaynDataGenerator/app/verse_counts.py` + `ThaqalaynData/index/verse-counts.json` |
 | RE-03 ReadingStatsService | **✅ DONE** | `reading-stats.service.ts` |
 | RE-04 per-book completion bars | **✅ DONE** | Homepage explore cards + chapter-list strip |
-| RE-05 read/unread verse styling | **✅ DONE** | `.verse-read` CSS in chapter-content (toolbar-level toggle still possible later) |
-| RE-06 reading-history page | **✅ DONE** | Section on `/bookmarks`, grouped by day with book chips |
-| RE-07 TOC coverage rings | **✅ DONE** | Per-row ring column in chapter-list + unread-only filter chip |
-| RE-08 streak counter | **✅ DONE** | Stats strip on `/bookmarks` + homepage chip |
-| RE-09 daily reading goal | **✅ DONE** | Goal editor on `/bookmarks` + homepage ring |
-| RE-10 structured reading plans | ⏳ DEFERRED | Wave E — needs curated plan JSON authoring |
+| RE-05 read/unread verse styling | **✅ DONE** | Global `muteReadVerses` preference (AiPreferencesService); chapter-content `.verse-read` class |
+| RE-06 reading-history page | **✅ DONE** | Section on `/bookmarks` Progress tab, grouped by day with book chips |
+| RE-07 TOC coverage rings | **✅ DONE** | Per-row ring column in chapter-list + "hide completed" filter chip |
+| RE-08 streak counter | **✅ DONE** | Stats strip on `/bookmarks` Progress tab + homepage chip |
+| RE-09 daily reading goal | **✅ DONE** | Goal editor on `/bookmarks` Progress tab + homepage ring |
+| RE-10 structured reading plans | **✅ DONE** | 17 plans in catalogue (4 Quran + 13 hadith). Plan picker on `/bookmarks` Plans tab, homepage Day-X-of-Y ribbon. Generic `chapterIndex` schema supports any book. |
 | RE-11 sticky verse of the day | **✅ DONE** | `RandomVerseService.getTodayQuranVerse()` + homepage relabel |
-| RE-12 opt-in PWA push notifications | ⏳ DEFERRED | Wave F — copy + cadence to be reviewed |
-| RE-13 milestone toasts | **✅ DONE** | `MilestoneToastService` + `<app-milestone-toaster>` |
-| RE-14 / RE-15 spaced-repetition & cross-book recs | ⏳ DEFERRED | Wave G |
-| **RE-16 Achievement badges** | ⏳ PROPOSED (Wave D extension) | See §6 below |
-| **RE-17 Reset progress at any level** | ⏳ PROPOSED (Wave A extension) | See §6 below |
-| **RE-18 Homepage per-book progress panel** | ⏳ PROPOSED (Wave B extension) | See §6 below |
-| Extended export/import covering new tables | **✅ DONE** | Bumped to format version 2; legacy v1 imports still accepted |
+| RE-12 opt-in reading-reminder banner | **✅ DONE (re-scoped)** | `ReadingBannerService` + `<app-reading-banner>`. Was originally PWA push — pivoted to in-app banner since the Notification Triggers API is Chromium-flag-only. |
+| RE-13 milestone toasts | **✅ DONE** | `MilestoneToastService` + `<app-milestone-toaster>`. Durations bumped 6→12s / 8→20s, pause-on-hover. |
+| RE-14 spaced-repetition revisits | **✅ DONE** | Homepage "Worth revisiting" panel via `ReadingStatsService.revisitCandidates()` |
+| RE-15 cross-book unread surfacing | **✅ DONE** | Read chapters in the related-chapters list are faded + ✓; unread float to the top |
+| **RE-16 Achievement badges** | **✅ DONE** | 38-badge catalogue across 5 categories (milestone/streak/book/breadth/habit). Pure-CSS holographic foil cards with hover-tilt + per-category accent colours. Badge-earned toast (20 s, pause-on-hover). |
+| **RE-17 Reset progress at any level** | **✅ DONE** | Per-section reset button on chapter-list strip + global wipe on reading-sheet, both with count-aware confirmation |
+| **RE-18 Homepage per-book progress panel** | **✅ DONE** | "Books you've started" grid after the book-tree, sorted by most-recently-read |
+| Extended export/import covering new tables | **✅ DONE** | Bumped to format version 3 (readVerses + goalConfig + earnedBadges + enrolledPlans). v1 + v2 imports still accepted. |
+| `/bookmarks` page tabbed | **✅ DONE** | 5 tabs (Progress · Plans · Badges · Saves · Settings), localStorage-persisted active tab |
+| `man-la-yahduruhu-al-faqih` start/end-column parser bug | **✅ DONE** | `set_index` rewrite in `app/lib_model.py` using a dedicated `verse_counter` distinct from the per-depth `indexes` array; 10 new tests pinning the corrected behaviour. Other books still need a full `add_data` regen. |
 
 Architectural decisions captured in [DECISION_LOG.md D061](DECISION_LOG.md#d061-reading-progress-architecture--single-dexie-db-derived-stats-service-intersectionobserver-auto-detect-2026-05-17).
 

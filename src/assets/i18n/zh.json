@@ -236,7 +236,14 @@
     "clearProgress": "清除阅读进度",
     "exportImport": "导出 / 导入",
     "export": "导出",
-    "import": "导入"
+    "import": "导入",
+    "tabs": {
+      "progress": "进度",
+      "plans": "计划",
+      "badges": "徽章",
+      "saves": "已保存",
+      "settings": "设置"
+    }
   },
   "reading": {
     "markRead": "标记为已读",

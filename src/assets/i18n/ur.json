@@ -236,7 +236,14 @@
     "clearProgress": "پڑھنے کی پیش رفت صاف کریں",
     "exportImport": "ایکسپورٹ / امپورٹ",
     "export": "ایکسپورٹ",
-    "import": "امپورٹ"
+    "import": "امپورٹ",
+    "tabs": {
+      "progress": "پیش رفت",
+      "plans": "منصوبے",
+      "badges": "بیجز",
+      "saves": "محفوظات",
+      "settings": "ترتیبات"
+    }
   },
   "reading": {
     "markRead": "پڑھا ہوا نشان کریں",

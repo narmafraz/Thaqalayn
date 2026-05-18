@@ -1,25 +1,45 @@
 # Path B Status Runbook
 
-> Live state of the Path B Spark word translation. Re-written every
-> major milestone. **Last updated:** 2026-05-14 ~02:25 (autonomous session).
+> **Updated 2026-05-19: ALL PATH B PIPELINE STAGES COMPLETE.** See "Final state" section below for the locked-in numbers; the historical "in flight" tables further down record how it ran.
 
-## TL;DR
+## TL;DR — Path B is done
 
-Path B pilot rounds 1-4 are complete and locked. Full-corpus runs are
-in progress on Spark Qwen 3.6-35B at $0.
+All four pilot rounds and the full-corpus runs completed on Spark Qwen 3.6-35B at **$0** compute. Translations are merged into ThaqalaynWords; the lemmas index now carries the 11-language `glosses` map; both source and shipped repos have been committed locally (not yet pushed).
 
-| Background task | Status | ETA |
-|---|---|---|
-| Lemma full pass (13K lemmas) | **running** | ~2.5 h (was ~3.7h; restarted with per-item persistence fix at 02:40, currently at ~1.4 items/s) |
-| Corpus context extraction (102K surfaces) | **done** | surface_contexts.json = 33.5 MB |
-| Surface prompt extraction (full corpus) | **pending** — chain script will run after lemma | ~5 min |
-| Surface full pass (~102K surfaces) | **pending** — chain script will run | ~9-11 h |
-| Merge translations into pages | **pending** — chain script | ~2 min |
-| Rebuild word indexes | **pending** — chain script | ~10 s |
+| Stage | Outcome |
+|---|---|
+| Lemma full pass (13,086 lemmas) | **DONE** — 12,985 (99.2%) with full 11-lang translations |
+| Surface full pass (102,003 surfaces) | **DONE** — 100,675 (98.7%) with full 11-lang translations |
+| Merge translations into pages | **DONE** — 12,808 lemma pages + 100,576 surface pages updated |
+| Rebuild word indexes | **DONE** — `index/lemmas.json` 2.8 MB → 5.6 MB (gains 11-lang `glosses` per entry) |
 
-**Chain script**: `scripts/path_b_continue_after_lemmas.ps1` is running detached (PID logged in `path_b_continue.log`). It polls for lemma_responses to reach 13000 files and then chains the rest of the pipeline automatically. So unattended completion *should* happen — just check `path_b_continue.log` when you return.
+Final-state commits:
+- `ThaqalaynDataGenerator @ 86d3349` — build_word_indexes emits `glosses` map
+- `ThaqalaynWords @ b6bc78697a` — 113,661 page updates + new index
+- `ThaqalaynWordSources @ 62616ef56` — full Path B archive (~115K files, ~430 MB)
 
-**Critical bug fixed at 02:38**: the runner was persisting all results AFTER `asyncio.gather` returned (so a 13K-item run that died mid-way lost everything). Now persists per-item via the progress callback. Resume on re-launch works correctly. Lemma pass restart cost ~25 min of compute.
+**What's left:**
+- Push the three repos (waited for owner approval per AFK rule)
+- Once `ThaqalaynWords` is deployed to Netlify, **revert Path C** in Thaqalayn UI:
+  ```bash
+  cd Thaqalayn
+  git revert d0ce4a9   # generator: drop Path C English-only gloss in index
+  git revert 34ff19c   # UI: switch from gloss → translations[lang]
+  ```
+  After Path C revert, every word card in the UI reads the active language gloss from the new 11-lang `glosses` field instead of the temporary English-only `gloss`.
+
+## Critical fix during the run
+
+The runner was persisting all results AFTER `asyncio.gather` returned, so a 13K-item run that died mid-way lost everything. Fixed at 02:38 on 2026-05-14 by persisting per-item via the progress callback. Resume on re-launch works correctly. The fix cost ~25 min of recompute on the lemma pass.
+
+## How it ran — wall-time receipts
+
+| Phase | Wall-clock | Compute | Notes |
+|---|---|---|---|
+| Lemma full pass | 2026-05-14 02:40 → 08:14 | ~5.5h (includes 1 sleep period) | 100% parse, $0 |
+| Corpus context extraction | 2026-05-16 ~21:00 → 21:57 | ~20 min CPU | Walked all 102K surfaces × occurrence_paths |
+| Surface full pass | 2026-05-16 22:00 → 2026-05-18 23:31 | ~50 h wall (includes multiple sleeps) | 100% parse, $0 |
+| Merge + index rebuild | 2026-05-18 23:32 → 23:37 | ~5 min | All in one chain-script handoff |
 
 ## Resumability
 

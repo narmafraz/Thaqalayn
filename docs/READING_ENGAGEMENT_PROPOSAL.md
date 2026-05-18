@@ -22,9 +22,70 @@
 | RE-12 opt-in PWA push notifications | ⏳ DEFERRED | Wave F — copy + cadence to be reviewed |
 | RE-13 milestone toasts | **✅ DONE** | `MilestoneToastService` + `<app-milestone-toaster>` |
 | RE-14 / RE-15 spaced-repetition & cross-book recs | ⏳ DEFERRED | Wave G |
+| **RE-16 Achievement badges** | ⏳ PROPOSED (Wave D extension) | See §6 below |
+| **RE-17 Reset progress at any level** | ⏳ PROPOSED (Wave A extension) | See §6 below |
+| **RE-18 Homepage per-book progress panel** | ⏳ PROPOSED (Wave B extension) | See §6 below |
 | Extended export/import covering new tables | **✅ DONE** | Bumped to format version 2; legacy v1 imports still accepted |
 
 Architectural decisions captured in [DECISION_LOG.md D061](DECISION_LOG.md#d061-reading-progress-architecture--single-dexie-db-derived-stats-service-intersectionobserver-auto-detect-2026-05-17).
+
+## 6. Post-ship additions (proposed 2026-05-18)
+
+Items the user asked for after living with Waves A–D for a day. Each is a small follow-up, not a new wave.
+
+### RE-16: Achievement badges
+
+User stories:
+- As a user, when I cross a meaningful milestone (first book complete, 7-day streak, 1,000 verses cumulative, etc.) I earn a badge that's permanently shown in my progress panel.
+- As a user, badges I haven't earned yet are visible as "locked" silhouettes — giving me something to aim for without being pushy.
+- As a user, I can tap any badge to see what triggers it and when (or if) I earned it.
+- As a user, badges sync across devices alongside the rest of my reading data.
+
+Sketch (no implementation yet):
+- New Dexie table `earnedBadges`: `{ badgeId, earnedAt, source }`.
+- Static badge definitions in `src/app/data/badges.ts` (icon, label key, description key, predicate).
+- Predicates run against existing stats — e.g. `streak.longest >= 7`, `bookProgress('al-kafi').versesRead >= 100`, `totalVersesRead >= 1000`.
+- `MilestoneToastService` extension: when a badge predicate flips true, emit a "badge earned" toast (distinct kind from the existing book-complete / cumulative toasts).
+- Badge shelf rendered on `/bookmarks` and (collapsed) on the homepage.
+
+Initial badge catalogue (open to revision):
+- **First steps** — read 10 verses
+- **Day one** — read on 3 consecutive days
+- **Week one** — 7-day streak
+- **Marathon** — 30-day streak
+- **Centurion** — 100 verses cumulative
+- **Thousand** — 1,000 verses cumulative
+- **Ten thousand** — 10,000 verses cumulative
+- **Completionist** — finish a whole book
+- **Breadth** — read at least one verse in 5+ different books
+- **Imam Ali's Companion** — finish Nahj al-Balagha specifically
+- **The Hours** — read at three different parts of the day (morning / afternoon / evening)
+- **Quran Bronze / Silver / Gold** — 25% / 50% / 100% of the Quran
+
+### RE-17: Reset progress at any level
+
+User stories:
+- As a user, I can clear all read marks under a chapter, book, volume, or whole-book by tapping a "Reset" action.
+- As a user, the action is destructive and asks me to confirm first, with a count of how many marks will be removed.
+- As a user, this only resets *read* marks — my bookmarks, notes, and reading history stay intact.
+
+Sketch:
+- `BookmarkService.resetReadProgress(pathPrefix: string): Promise<number>` returns the number of rows deleted. Iterates `readVerses` where path starts with `/books/<prefix>:` or equals `/books/<prefix>`.
+- Reset entry-point on chapter-list rows (under a kebab menu next to the progress ring) and on the chapter-content reading-toolbar.
+- Global "Reset all" lives in the reading-sheet next to the existing data-management section.
+- Confirmation dialog reuses the existing `error-display` styling pattern; copy says "Remove X read marks under {label}?" with a single OK/Cancel.
+
+### RE-18: Homepage per-book progress panel
+
+User stories:
+- As a user, after the book-tree on the homepage I see a "Continue your reading" panel: a card per book I've started, showing per-book progress + a deep-link to where I left off.
+- As a user, books I've never opened don't appear in the panel.
+
+Sketch:
+- Filter `readingStats.bookProgressMap$` to books where `versesRead > 0`, sorted by `lastReadVerseAt` desc.
+- For each, link target = `BookmarkService.readingProgress`'s `lastPath` for that book if set, else `/books/<slug>`.
+- Mobile: vertical list. Desktop: 2-3 column grid.
+- Visually distinct from the existing top-3 "Continue Reading" chips above the explore cards — those are book-level resumption only.
 
 This document complements `USER_STORIES.md` §8 (Bookmarks, Notes & Reading Progress) and `FEATURE_PROPOSALS.md` §3. Both established the foundation. This proposal extends it from *"save where I left off"* to *"motivate me to read and tell me what I've covered."*
 

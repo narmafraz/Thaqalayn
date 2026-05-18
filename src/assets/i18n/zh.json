@@ -281,7 +281,8 @@
     "resetProgress": "重置本部分进度",
     "resetAll": "重置所有阅读进度",
     "resetAllConfirm": "移除所有书籍中的 {{count}} 条已读标记？",
-    "startedBooks": "你已开始阅读的书籍"
+    "startedBooks": "你已开始阅读的书籍",
+    "badgeEarnedTitle": "获得徽章 — {{label}}"
   },
   "audio": {
     "play": "播放",
@@ -458,5 +459,88 @@
     "section": "部分",
     "surah": "章",
     "ayah": "节"
+  },
+  "badges": {
+    "title": "徽章",
+    "earnedOn": "获得于",
+    "category": {
+      "milestone": "里程碑",
+      "streak": "连读",
+      "book": "完整阅读",
+      "breadth": "广度",
+      "habit": "阅读习惯"
+    },
+    "firstSteps": {
+      "label": "First steps",
+      "desc": "Read 10 verses across any book."
+    },
+    "centurion": {
+      "label": "Centurion",
+      "desc": "Read 100 verses in total."
+    },
+    "thousand": {
+      "label": "Thousand",
+      "desc": "Read 1,000 verses in total."
+    },
+    "tenThousand": {
+      "label": "Ten thousand",
+      "desc": "Read 10,000 verses in total — a serious milestone."
+    },
+    "streakThree": {
+      "label": "Day three",
+      "desc": "Read on three consecutive days."
+    },
+    "streakWeek": {
+      "label": "Week one",
+      "desc": "Read on seven consecutive days."
+    },
+    "streakMonth": {
+      "label": "Month one",
+      "desc": "A 30-day reading streak."
+    },
+    "completionist": {
+      "label": "Completionist",
+      "desc": "Finish a whole book end to end."
+    },
+    "imamAli": {
+      "label": "The Eloquence",
+      "desc": "Read all of Nahj al-Balagha."
+    },
+    "quranBronze": {
+      "label": "Quran bronze",
+      "desc": "Read at least a quarter of the Quran."
+    },
+    "quranSilver": {
+      "label": "Quran silver",
+      "desc": "Read at least half of the Quran."
+    },
+    "quranGold": {
+      "label": "Quran gold",
+      "desc": "Read the entire Quran."
+    },
+    "breadthThree": {
+      "label": "Three windows",
+      "desc": "Read at least one verse in three different books."
+    },
+    "breadthFive": {
+      "label": "Five windows",
+      "desc": "Read at least one verse in five different books."
+    },
+    "breadthTen": {
+      "label": "The library",
+      "desc": "Read across ten or more books."
+    },
+    "theHours": {
+      "label": "The hours",
+      "desc": "Read at three different times of day."
+    },
+    "earlyBird": {
+      "label": "Early bird",
+      "desc": "Five reads logged between 4 AM and 7 AM."
+    },
+    "nightOwl": {
+      "label": "Night owl",
+      "desc": "Five reads logged between 10 PM and 2 AM."
+    }
   }
 }

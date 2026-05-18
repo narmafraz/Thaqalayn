@@ -42,6 +42,8 @@ export class MilestoneToasterComponent implements OnInit, OnDestroy {
         return '✅';
       case 'cumulative':
         return '🌟';
+      case 'badge-earned':
+        return '🏅';
       default:
         return '🎉';
     }

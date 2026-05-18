@@ -281,7 +281,8 @@
     "resetProgress": "Reiniciar el progreso de esta sección",
     "resetAll": "Reiniciar todo el progreso de lectura",
     "resetAllConfirm": "¿Eliminar las {{count}} marcas de lectura en todos los libros?",
-    "startedBooks": "Libros que has comenzado"
+    "startedBooks": "Libros que has comenzado",
+    "badgeEarnedTitle": "Insignia obtenida — {{label}}"
   },
   "audio": {
     "play": "Reproducir",
@@ -458,5 +459,88 @@
     "section": "Sección",
     "surah": "Sura",
     "ayah": "Aleya"
+  },
+  "badges": {
+    "title": "Insignias",
+    "earnedOn": "Obtenida el",
+    "category": {
+      "milestone": "Hitos",
+      "streak": "Rachas",
+      "book": "Libros completados",
+      "breadth": "Variedad",
+      "habit": "Hábitos de lectura"
+    },
+    "firstSteps": {
+      "label": "First steps",
+      "desc": "Read 10 verses across any book."
+    },
+    "centurion": {
+      "label": "Centurion",
+      "desc": "Read 100 verses in total."
+    },
+    "thousand": {
+      "label": "Thousand",
+      "desc": "Read 1,000 verses in total."
+    },
+    "tenThousand": {
+      "label": "Ten thousand",
+      "desc": "Read 10,000 verses in total — a serious milestone."
+    },
+    "streakThree": {
+      "label": "Day three",
+      "desc": "Read on three consecutive days."
+    },
+    "streakWeek": {
+      "label": "Week one",
+      "desc": "Read on seven consecutive days."
+    },
+    "streakMonth": {
+      "label": "Month one",
+      "desc": "A 30-day reading streak."
+    },
+    "completionist": {
+      "label": "Completionist",
+      "desc": "Finish a whole book end to end."
+    },
+    "imamAli": {
+      "label": "The Eloquence",
+      "desc": "Read all of Nahj al-Balagha."
+    },
+    "quranBronze": {
+      "label": "Quran bronze",
+      "desc": "Read at least a quarter of the Quran."
+    },
+    "quranSilver": {
+      "label": "Quran silver",
+      "desc": "Read at least half of the Quran."
+    },
+    "quranGold": {
+      "label": "Quran gold",
+      "desc": "Read the entire Quran."
+    },
+    "breadthThree": {
+      "label": "Three windows",
+      "desc": "Read at least one verse in three different books."
+    },
+    "breadthFive": {
+      "label": "Five windows",
+      "desc": "Read at least one verse in five different books."
+    },
+    "breadthTen": {
+      "label": "The library",
+      "desc": "Read across ten or more books."
+    },
+    "theHours": {
+      "label": "The hours",
+      "desc": "Read at three different times of day."
+    },
+    "earlyBird": {
+      "label": "Early bird",
+      "desc": "Five reads logged between 4 AM and 7 AM."
+    },
+    "nightOwl": {
+      "label": "Night owl",
+      "desc": "Five reads logged between 10 PM and 2 AM."
+    }
   }
 }

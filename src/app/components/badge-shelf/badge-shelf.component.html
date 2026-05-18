@@ -1,0 +1,20 @@
+<section class="badge-shelf">
+  <div class="badge-shelf-header">
+    <h2>{{ 'badges.title' | translate }}</h2>
+    <span class="badge-count">{{ earnedCount }} / {{ totalCount }}</span>
+  </div>
+
+  <div *ngFor="let group of groups" class="badge-group">
+    <h3 class="badge-group-title">{{ ('badges.category.' + group.category) | translate }}</h3>
+    <div class="badge-grid">
+      <div *ngFor="let b of group.rows; trackBy: trackById"
+           class="badge-tile"
+           [class.badge-earned]="b.earnedAt"
+           [matTooltip]="(b.descKey | translate) + (b.earnedAt ? ' — ' + ('badges.earnedOn' | translate) + ' ' + (b.earnedAt | date:'mediumDate') : '')">
+        <span class="badge-icon" aria-hidden="true">{{ b.icon }}</span>
+        <span class="badge-label">{{ b.labelKey | translate }}</span>
+        <span *ngIf="!b.earnedAt" class="badge-locked" aria-hidden="true">🔒</span>
+      </div>
+    </div>
+  </div>
+</section>

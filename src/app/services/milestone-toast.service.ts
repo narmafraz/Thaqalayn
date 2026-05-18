@@ -3,6 +3,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 
 import { BookProgress, MilestoneEvent, ReadingStatsService } from './reading-stats.service';
 import { I18nService } from './i18n.service';
+import { BadgeService } from './badge.service';
+import { Badge } from '@app/data/badges';
 
 export interface MilestoneToast {
   id: number;
@@ -11,18 +13,21 @@ export interface MilestoneToast {
   /** Optional secondary line. */
   body?: string;
   /** Visual variant — drives the emoji + accent colour. */
-  kind: MilestoneEvent['kind'];
+  kind: MilestoneEvent['kind'] | 'badge-earned';
   /** Auto-dismiss timer in ms. 0 = sticky. */
   durationMs: number;
   /** Optional router link to navigate to on click. */
   routerLink?: string;
+  /** Custom icon (overrides kind-based default). Used by badge toasts. */
+  icon?: string;
 }
 
-/** Emits toasts at meaningful reading milestones — book completion + cumulative thresholds. */
+/** Emits toasts at meaningful reading milestones — book completion + cumulative thresholds + badges earned. */
 @Injectable({ providedIn: 'root' })
 export class MilestoneToastService {
   private stats = inject(ReadingStatsService);
   private i18n = inject(I18nService);
+  private badges = inject(BadgeService);
 
   private subject = new BehaviorSubject<MilestoneToast[]>([]);
   toasts$: Observable<MilestoneToast[]> = this.subject.asObservable();
@@ -30,12 +35,16 @@ export class MilestoneToastService {
   private nextId = 1;
   private prevSnapshot: { books: Map<string, BookProgress>; total: number } | null = null;
   private started = false;
+  private badgeUnsubscribe: (() => void) | null = null;
 
   /** Wire up the subscription once at app boot. Safe to call multiple times. */
   start(): void {
     if (this.started) return;
     this.started = true;
     this.stats.bookProgressMap$.subscribe(map => this.onProgress(map));
+    // Boot the badge evaluator + listen for newly-earned events
+    this.badges.start();
+    this.badgeUnsubscribe = this.badges.onNewlyEarned(badge => this.onBadgeEarned(badge));
   }
 
   dismiss(id: number): void {
@@ -99,6 +108,23 @@ export class MilestoneToastService {
     }
 
     this.prevSnapshot = { books: new Map(map), total };
+  }
+
+  private onBadgeEarned(badge: Badge): void {
+    const label = this.i18n.get(badge.labelKey);
+    const desc = this.i18n.get(badge.descKey);
+    const tmpl = this.i18n.get('reading.badgeEarnedTitle');
+    const title = tmpl === 'reading.badgeEarnedTitle'
+      ? `Badge earned — ${label === badge.labelKey ? badge.id : label}`
+      : tmpl.replace(/\{\{\s*label\s*\}\}/g, label === badge.labelKey ? badge.id : label);
+    this.push({
+      kind: 'badge-earned',
+      title,
+      body: desc === badge.descKey ? undefined : desc,
+      icon: badge.icon,
+      routerLink: '/bookmarks',
+      durationMs: 8000,
+    });
   }
 
   private formatBookCompleteTitle(bookId: string, total: number): string {

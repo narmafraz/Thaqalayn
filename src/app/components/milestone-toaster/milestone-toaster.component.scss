@@ -44,6 +44,15 @@
     background: linear-gradient(135deg, rgba(94, 53, 177, 0.06), transparent 80%);
   }
 
+  &.toast-badge-earned {
+    border-inline-start-color: #ffc107;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), transparent 80%);
+
+    .toast-icon {
+      font-size: 1.8rem;
+    }
+  }
+
   .toast-icon {
     font-size: 1.5rem;
     line-height: 1;

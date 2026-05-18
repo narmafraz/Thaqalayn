@@ -1024,20 +1024,103 @@ describe('BookmarkService', () => {
   });
 
   // ---------------------------------------------------------------------------
+  // Earned badges (RE-16)
+  // ---------------------------------------------------------------------------
+  describe('earnedBadges', () => {
+    it('getEarnedBadges returns [] before any are earned', async () => {
+      expect(await service.getEarnedBadges()).toEqual([]);
+    });
+
+    it('earnBadge inserts a row and returns true on the first call', async () => {
+      const wasNew = await service.earnBadge('first-steps');
+      expect(wasNew).toBeTrue();
+      const all = await service.getEarnedBadges();
+      expect(all.length).toBe(1);
+      expect(all[0].badgeId).toBe('first-steps');
+      expect(all[0].earnedAt).toBeInstanceOf(Date);
+    });
+
+    it('earnBadge is idempotent — second call returns false and preserves the original earnedAt', async () => {
+      await service.earnBadge('first-steps');
+      const first = (await service.getEarnedBadges())[0];
+
+      await new Promise(r => setTimeout(r, 10));
+      const wasNew = await service.earnBadge('first-steps');
+
+      expect(wasNew).toBeFalse();
+      const all = await service.getEarnedBadges();
+      expect(all.length).toBe(1);
+      expect(all[0].earnedAt.getTime()).toBe(first.earnedAt.getTime());
+    });
+
+    it('earnBadge ignores empty badgeId', async () => {
+      const wasNew = await service.earnBadge('');
+      expect(wasNew).toBeFalse();
+      expect((await service.getEarnedBadges()).length).toBe(0);
+    });
+
+    it('earnedBadges$ emits after earning', async () => {
+      await service.earnBadge('centurion');
+      const current = await firstValueFrom(service.earnedBadges$);
+      expect(current.length).toBe(1);
+      expect(current[0].badgeId).toBe('centurion');
+    });
+
+    it('clearEarnedBadges wipes all rows', async () => {
+      await service.earnBadge('first-steps');
+      await service.earnBadge('centurion');
+      await service.clearEarnedBadges();
+      expect(await service.getEarnedBadges()).toEqual([]);
+    });
+
+    it('clearAll wipes earned badges along with everything else', async () => {
+      await service.earnBadge('first-steps');
+      await service.clearAll();
+      expect(await service.getEarnedBadges()).toEqual([]);
+    });
+
+    it('export/import round-trips earned badges (v3 payload)', async () => {
+      await service.earnBadge('first-steps');
+      await service.earnBadge('centurion');
+      const exported = await service.exportBookmarks();
+
+      await service.clearAll();
+      expect(await service.getEarnedBadges()).toEqual([]);
+
+      const imported = await service.importBookmarks(exported);
+      // 2 badges counted in the imported total
+      expect(imported).toBe(2);
+      const restored = await service.getEarnedBadges();
+      expect(restored.length).toBe(2);
+    });
+
+    it('import skips duplicate badges already in the DB', async () => {
+      await service.earnBadge('first-steps');
+      const exported = await service.exportBookmarks();
+      const imported = await service.importBookmarks(exported);
+      expect(imported).toBe(0);
+      expect((await service.getEarnedBadges()).length).toBe(1);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // Export / import covers new tables
   // ---------------------------------------------------------------------------
   describe('export/import — read verses and goal config (v2 format)', () => {
-    it('export includes readVerses and goalConfig under format version 2', async () => {
+    it('export includes readVerses, goalConfig and earnedBadges under format version 3', async () => {
       await service.markRead('/books/quran:1:1', 'manual');
       await service.markRead('/books/al-kafi:1:1:1:1');
       await service.setGoalConfig(7);
+      await service.earnBadge('first-steps');
 
       const json = await service.exportBookmarks();
       const data = JSON.parse(json);
 
-      expect(data.version).toBe(2);
+      expect(data.version).toBe(3);
       expect(data.readVerses.length).toBe(2);
       expect(data.goalConfig.dailyVerseTarget).toBe(7);
+      expect(data.earnedBadges.length).toBe(1);
+      expect(data.earnedBadges[0].badgeId).toBe('first-steps');
       expect(typeof data.exportedAt).toBe('string');
     });
 

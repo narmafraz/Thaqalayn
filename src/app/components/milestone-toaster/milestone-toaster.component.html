@@ -4,8 +4,9 @@
        [class.toast-book-complete]="t.kind === 'book-complete'"
        [class.toast-chapter-complete]="t.kind === 'chapter-complete'"
        [class.toast-cumulative]="t.kind === 'cumulative'"
+       [class.toast-badge-earned]="t.kind === 'badge-earned'"
        role="status">
-    <span class="toast-icon" aria-hidden="true">{{ iconFor(t.kind) }}</span>
+    <span class="toast-icon" aria-hidden="true">{{ t.icon || iconFor(t.kind) }}</span>
     <div class="toast-body">
       <div class="toast-title">{{ t.title }}</div>
       <div *ngIf="t.body" class="toast-subtitle">{{ t.body }}</div>

@@ -1,0 +1,105 @@
+.badge-shelf {
+  margin-block: 24px;
+}
+
+.badge-shelf-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .badge-count {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.badge-group {
+  margin-bottom: 18px;
+
+  .badge-group-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary, #888);
+    margin: 0 0 8px;
+  }
+}
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.badge-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px 10px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+
+  // Locked state — desaturated + faded
+  opacity: 0.42;
+  filter: grayscale(80%);
+
+  .badge-icon {
+    font-size: 2rem;
+    line-height: 1;
+  }
+
+  .badge-label {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #666);
+    line-height: 1.2;
+    min-height: 2.4em; // 2 lines reserved so earned/unearned cards align
+    display: flex;
+    align-items: center;
+  }
+
+  .badge-locked {
+    position: absolute;
+    top: 6px;
+    inset-inline-end: 8px;
+    font-size: 0.9rem;
+    opacity: 0.6;
+  }
+
+  &.badge-earned {
+    opacity: 1;
+    filter: none;
+    border-color: rgba(255, 193, 7, 0.6);
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.06), transparent 70%);
+
+    .badge-label {
+      color: var(--text-primary, #333);
+      font-weight: 600;
+    }
+  }
+}
+
+:host-context(body.dark-theme) .badge-tile {
+  background: rgba(255, 255, 255, 0.04);
+
+  &.badge-earned {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.12), transparent 70%);
+    border-color: rgba(255, 193, 7, 0.5);
+
+    .badge-label {
+      color: #e0e0e0;
+    }
+  }
+}

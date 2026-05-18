@@ -47,12 +47,20 @@ export interface GoalConfig {
   updatedAt: Date;
 }
 
+/** A badge the user has earned. Once earned, never auto-removed. */
+export interface EarnedBadge {
+  /** Stable badge identifier (matches `Badge.id` in the catalogue). Primary key. */
+  badgeId: string;
+  earnedAt: Date;
+}
+
 class ThaqalaynDb extends Dexie {
   bookmarks!: Table<Bookmark, number>;
   readingProgress!: Table<ReadingProgress, string>;
   annotations!: Table<Annotation, number>;
   readVerses!: Table<ReadVerse, number>;
   goalConfig!: Table<GoalConfig, number>;
+  earnedBadges!: Table<EarnedBadge, string>;
 
   constructor() {
     super('thaqalayn-bookmarks');
@@ -73,6 +81,16 @@ class ThaqalaynDb extends Dexie {
       readVerses: '++id, &path, bookId, readAt',
       goalConfig: 'id',
     });
+    this.version(4).stores({
+      bookmarks: '++id, path, bookId, createdAt',
+      readingProgress: 'bookId, lastVisited',
+      annotations: '++id, path, bookId, updatedAt',
+      readVerses: '++id, &path, bookId, readAt',
+      goalConfig: 'id',
+      // Primary key is `badgeId` directly — one row per badge, idempotent on
+      // re-earn (we just keep the original earnedAt).
+      earnedBadges: 'badgeId, earnedAt',
+    });
   }
 }
 
@@ -87,12 +105,14 @@ export class BookmarkService {
   private annotationsSubject = new BehaviorSubject<Annotation[]>([]);
   private readVersesSubject = new BehaviorSubject<ReadVerse[]>([]);
   private goalConfigSubject = new BehaviorSubject<GoalConfig | null>(null);
+  private earnedBadgesSubject = new BehaviorSubject<EarnedBadge[]>([]);
 
   bookmarks$: Observable<Bookmark[]> = this.bookmarksSubject.asObservable();
   readingProgress$: Observable<ReadingProgress[]> = this.progressSubject.asObservable();
   annotations$: Observable<Annotation[]> = this.annotationsSubject.asObservable();
   readVerses$: Observable<ReadVerse[]> = this.readVersesSubject.asObservable();
   goalConfig$: Observable<GoalConfig | null> = this.goalConfigSubject.asObservable();
+  earnedBadges$: Observable<EarnedBadge[]> = this.earnedBadgesSubject.asObservable();
 
   constructor() {
     this.db = new ThaqalaynDb();
@@ -178,14 +198,16 @@ export class BookmarkService {
     const annotations = await this.getAnnotations();
     const readVerses = await this.getReadVerses();
     const goalConfig = await this.getGoalConfig();
+    const earnedBadges = await this.getEarnedBadges();
     return JSON.stringify({
-      version: 2,
+      version: 3,
       exportedAt: new Date().toISOString(),
       bookmarks,
       readingProgress: progress,
       annotations,
       readVerses,
       goalConfig,
+      earnedBadges,
     }, null, 2);
   }
 
@@ -270,6 +292,20 @@ export class BookmarkService {
         createdAt: g.createdAt ? new Date(g.createdAt) : new Date(),
         updatedAt: g.updatedAt ? new Date(g.updatedAt) : new Date(),
       });
+    }
+
+    if (data.earnedBadges && Array.isArray(data.earnedBadges)) {
+      for (const eb of data.earnedBadges) {
+        if (!eb.badgeId) continue;
+        const existing = await this.db.earnedBadges.get(eb.badgeId);
+        if (!existing) {
+          await this.db.earnedBadges.add({
+            badgeId: eb.badgeId,
+            earnedAt: eb.earnedAt ? new Date(eb.earnedAt) : new Date(),
+          });
+          imported++;
+        }
+      }
     }
 
     await this.loadAll();
@@ -439,6 +475,44 @@ export class BookmarkService {
     await this.refreshGoalConfig();
   }
 
+  // ---------------------------------------------------------------------------
+  // Earned badges (RE-16)
+  // ---------------------------------------------------------------------------
+
+  async getEarnedBadges(): Promise<EarnedBadge[]> {
+    return this.db.earnedBadges.orderBy('earnedAt').toArray();
+  }
+
+  /**
+   * Mark a badge as earned. Idempotent — if it's already earned, the original
+   * earnedAt is kept. Returns true if this call was the one that earned it,
+   * false if it was already earned (lets callers fire the toast exactly once).
+   *
+   * The `add()` is wrapped in try/catch because two concurrent BadgeService
+   * evaluate() calls can both clear the pre-check but only one wins the
+   * unique-key constraint. The loser converts to `false` and the toast fires
+   * exactly once.
+   */
+  async earnBadge(badgeId: string): Promise<boolean> {
+    if (!badgeId) return false;
+    const existing = await this.db.earnedBadges.get(badgeId);
+    if (existing) return false;
+    try {
+      await this.db.earnedBadges.add({ badgeId, earnedAt: new Date() });
+    } catch {
+      // Concurrent earn lost the race — already in the table.
+      return false;
+    }
+    await this.refreshEarnedBadges();
+    return true;
+  }
+
+  /** Wipe all earned badges. Used by the badge-reset escape hatch + clearAll. */
+  async clearEarnedBadges(): Promise<void> {
+    await this.db.earnedBadges.clear();
+    await this.refreshEarnedBadges();
+  }
+
   /** Clear all bookmarks */
   async clearAll(): Promise<void> {
     await this.db.bookmarks.clear();
@@ -446,6 +520,7 @@ export class BookmarkService {
     await this.db.annotations.clear();
     await this.db.readVerses.clear();
     await this.db.goalConfig.clear();
+    await this.db.earnedBadges.clear();
     await this.loadAll();
   }
 
@@ -463,6 +538,12 @@ export class BookmarkService {
     await this.refreshAnnotations();
     await this.refreshReadVerses();
     await this.refreshGoalConfig();
+    await this.refreshEarnedBadges();
+  }
+
+  private async refreshEarnedBadges(): Promise<void> {
+    const earned = await this.getEarnedBadges();
+    this.earnedBadgesSubject.next(earned);
   }
 
   private async refreshBookmarks(): Promise<void> {

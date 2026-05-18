@@ -284,7 +284,9 @@
     "milestoneBookComplete": "أكملت {{book}} — {{count}} آية!",
     "milestoneChapterComplete": "اكتمل الفصل.",
     "todayLabel": "اليوم",
-    "yesterdayLabel": "أمس"
+    "yesterdayLabel": "أمس",
+    "hideCompleted": "إخفاء المكتمل",
+    "muteReadVerses": "تخفيت الآيات التي قرأتها"
   },
   "audio": {
     "play": "تشغيل",

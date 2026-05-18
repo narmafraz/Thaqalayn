@@ -272,7 +272,9 @@
     "milestoneBookComplete": "Du hast {{book}} beendet — {{count}} Verse!",
     "milestoneChapterComplete": "Kapitel abgeschlossen.",
     "todayLabel": "Heute",
-    "yesterdayLabel": "Gestern"
+    "yesterdayLabel": "Gestern",
+    "hideCompleted": "Abgeschlossene ausblenden",
+    "muteReadVerses": "Bereits gelesene Verse dezent darstellen"
   },
   "audio": {
     "play": "Abspielen",

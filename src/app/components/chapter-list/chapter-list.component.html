@@ -14,12 +14,13 @@
     </div>
   </div>
 
-  <!-- RE-07: Unread-only filter chip -->
+  <!-- RE-07: Hide fully-read chapters filter chip (per-page, intentionally
+       not persisted — flips back when navigating to a different chapter list) -->
   <div *ngIf="chapterProgressMap.size > 0" class="chapter-list-toolbar">
     <button class="filter-chip" [class.active]="unreadOnly" (click)="toggleUnreadOnly()"
             [attr.aria-pressed]="unreadOnly">
       <mat-icon>{{ unreadOnly ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-      <span>{{ (unreadOnly ? 'reading.hideReadMarks' : 'reading.showReadMarks') | translate }}</span>
+      <span>{{ 'reading.hideCompleted' | translate }}</span>
     </button>
   </div>
 

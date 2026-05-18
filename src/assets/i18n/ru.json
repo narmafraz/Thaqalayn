@@ -272,7 +272,9 @@
     "milestoneBookComplete": "Вы закончили {{book}} — {{count}} стихов!",
     "milestoneChapterComplete": "Глава завершена.",
     "todayLabel": "Сегодня",
-    "yesterdayLabel": "Вчера"
+    "yesterdayLabel": "Вчера",
+    "hideCompleted": "Скрыть завершённые",
+    "muteReadVerses": "Приглушить прочитанные стихи"
   },
   "audio": {
     "play": "Воспроизвести",

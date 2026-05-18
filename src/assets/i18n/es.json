@@ -272,7 +272,9 @@
     "milestoneBookComplete": "Terminaste {{book}} — ¡{{count}} versículos!",
     "milestoneChapterComplete": "Capítulo completo.",
     "todayLabel": "Hoy",
-    "yesterdayLabel": "Ayer"
+    "yesterdayLabel": "Ayer",
+    "hideCompleted": "Ocultar completados",
+    "muteReadVerses": "Atenuar los versículos ya leídos"
   },
   "audio": {
     "play": "Reproducir",

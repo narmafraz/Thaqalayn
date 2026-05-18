@@ -272,7 +272,9 @@
     "milestoneBookComplete": "{{book}} ختم — {{count}} آیات!",
     "milestoneChapterComplete": "باب مکمل۔",
     "todayLabel": "آج",
-    "yesterdayLabel": "کل"
+    "yesterdayLabel": "کل",
+    "hideCompleted": "مکمل چھپائیں",
+    "muteReadVerses": "پڑھی ہوئی آیات مدھم کریں"
   },
   "audio": {
     "play": "چلائیں",

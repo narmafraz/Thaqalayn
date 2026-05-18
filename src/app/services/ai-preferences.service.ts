@@ -15,6 +15,12 @@ export interface AiPreferences {
   showWordByWord: boolean;
   sidesheetOpenOnDesktop: boolean;
   wordByWordDefaultLang: AiLanguage;
+  /**
+   * When true (default), verse cards the user has already read are muted
+   * (~0.78 opacity + small ✓ in the corner). Setting to false hides the
+   * read-state styling globally so every verse looks the same.
+   */
+  muteReadVerses: boolean;
   /** @deprecated mirror of showWordByWord; kept one release for legacy migration. */
   viewMode: ViewMode;
 }
@@ -30,6 +36,7 @@ const DEFAULTS: AiPreferences = {
   showWordByWord: false,
   sidesheetOpenOnDesktop: false,
   wordByWordDefaultLang: 'en',
+  muteReadVerses: true,
   viewMode: 'plain',
 };
 

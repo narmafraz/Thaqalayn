@@ -302,7 +302,9 @@
     "milestoneBookComplete": "You finished {{book}} — {{count}} verses!",
     "milestoneChapterComplete": "Chapter complete.",
     "todayLabel": "Today",
-    "yesterdayLabel": "Yesterday"
+    "yesterdayLabel": "Yesterday",
+    "hideCompleted": "Hide completed",
+    "muteReadVerses": "Mute verses I've already read"
   },
   "audio": {
     "play": "Play",

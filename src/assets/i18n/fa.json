@@ -272,7 +272,9 @@
     "milestoneBookComplete": "{{book}} را تمام کردید — {{count}} آیه!",
     "milestoneChapterComplete": "فصل تمام شد.",
     "todayLabel": "امروز",
-    "yesterdayLabel": "دیروز"
+    "yesterdayLabel": "دیروز",
+    "hideCompleted": "پنهان کردن تکمیل‌شده",
+    "muteReadVerses": "کم‌رنگ کردن آیات خوانده‌شده"
   },
   "audio": {
     "play": "پخش",

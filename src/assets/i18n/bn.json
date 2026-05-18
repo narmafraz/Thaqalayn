@@ -272,7 +272,9 @@
     "milestoneBookComplete": "{{book}} শেষ — {{count}} আয়াত!",
     "milestoneChapterComplete": "অধ্যায় সম্পন্ন।",
     "todayLabel": "আজ",
-    "yesterdayLabel": "গতকাল"
+    "yesterdayLabel": "গতকাল",
+    "hideCompleted": "সম্পন্ন লুকান",
+    "muteReadVerses": "পড়া আয়াত নিষ্প্রভ করুন"
   },
   "audio": {
     "play": "চালান",

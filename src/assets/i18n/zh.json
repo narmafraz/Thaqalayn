@@ -272,7 +272,9 @@
     "milestoneBookComplete": "你读完了 {{book}} — {{count}} 节！",
     "milestoneChapterComplete": "本章完成。",
     "todayLabel": "今天",
-    "yesterdayLabel": "昨天"
+    "yesterdayLabel": "昨天",
+    "hideCompleted": "隐藏已完成",
+    "muteReadVerses": "弱化已读经文"
   },
   "audio": {
     "play": "播放",

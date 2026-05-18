@@ -272,7 +272,9 @@
     "milestoneBookComplete": "Kamu selesai membaca {{book}} — {{count}} ayat!",
     "milestoneChapterComplete": "Bab selesai.",
     "todayLabel": "Hari ini",
-    "yesterdayLabel": "Kemarin"
+    "yesterdayLabel": "Kemarin",
+    "hideCompleted": "Sembunyikan yang selesai",
+    "muteReadVerses": "Redupkan ayat yang sudah dibaca"
   },
   "audio": {
     "play": "Putar",

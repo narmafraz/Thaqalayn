@@ -272,7 +272,9 @@
     "milestoneBookComplete": "{{book}} bitirdin — {{count}} ayet!",
     "milestoneChapterComplete": "Bölüm tamamlandı.",
     "todayLabel": "Bugün",
-    "yesterdayLabel": "Dün"
+    "yesterdayLabel": "Dün",
+    "hideCompleted": "Tamamlananları gizle",
+    "muteReadVerses": "Okuduğum ayetleri sönükleştir"
   },
   "audio": {
     "play": "Oynat",

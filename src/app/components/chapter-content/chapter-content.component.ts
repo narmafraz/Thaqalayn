@@ -1,5 +1,5 @@
 import { isPlatformServer, ViewportScroller } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, inject, Input, OnDestroy, OnInit, PLATFORM_ID, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, HostBinding, inject, Input, OnDestroy, OnInit, PLATFORM_ID, Renderer2 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { ContentType, isAiTranslation, getAiLang, getAiTranslationText } from '@app/models/ai-content';
@@ -104,6 +104,13 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   showContentTypeBadges = true;
   showTopicTags = true;
 
+  /**
+   * RE-05: bound to `:host.show-read-marks-off` so the SCSS in this component
+   * can disable the `.verse-read` mute/checkmark styling globally based on the
+   * user's preference. `true` → class IS present → styling disabled.
+   */
+  @HostBinding('class.show-read-marks-off') hideReadStyling = false;
+
   // Related chapters from other books
   relatedChapters: RelatedChapter[] = [];
 
@@ -147,6 +154,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     this.aiPrefs.preferences$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(prefs => {
       this.showContentTypeBadges = prefs.showContentTypeBadges;
       this.showTopicTags = prefs.showTopicTags;
+      this.hideReadStyling = !prefs.muteReadVerses;
       this.cdr.markForCheck();
     });
 

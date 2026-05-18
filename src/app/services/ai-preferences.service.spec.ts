@@ -20,7 +20,33 @@ describe('AiPreferencesService', () => {
     expect(service.get('showWordByWord')).toBe(false);
     expect(service.get('sidesheetOpenOnDesktop')).toBe(false);
     expect(service.get('wordByWordDefaultLang')).toBe('en');
+    expect(service.get('muteReadVerses')).toBe(true);
     expect(service.get('viewMode')).toBe('plain');
+  });
+
+  it('persists muteReadVerses across instances', () => {
+    service.set('muteReadVerses', false);
+    const service2 = new AiPreferencesService();
+    expect(service2.get('muteReadVerses')).toBe(false);
+  });
+
+  it('defaults muteReadVerses to true when missing from stored prefs (migration)', () => {
+    // Simulate older stored prefs that predate the muteReadVerses key
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      showDiacritizedByDefault: false,
+      showContentTypeBadges: false,
+      showTopicTags: true,
+      showAiTranslationDisclaimer: true,
+      showChainDiagram: false,
+      showWordByWord: false,
+      sidesheetOpenOnDesktop: false,
+      wordByWordDefaultLang: 'en',
+      viewMode: 'plain',
+    }));
+    const fresh = new AiPreferencesService();
+    expect(fresh.get('muteReadVerses')).toBe(true);
+    // ...and that explicit prefs survive the merge
+    expect(fresh.get('showDiacritizedByDefault')).toBe(false);
   });
 
   it('should persist preferences to localStorage', () => {

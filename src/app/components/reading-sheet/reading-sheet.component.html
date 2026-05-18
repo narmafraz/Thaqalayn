@@ -117,6 +117,16 @@
       </label>
     </section>
 
+    <!-- Reading progress (RE-05 / RE-09) -->
+    <section class="reading-sheet-section" *ngIf="preferences$ | async as prefs">
+      <h3 class="reading-sheet-section-title">{{ 'reading.progress' | translate }}</h3>
+      <label class="reading-sheet-pref" for="rs-pref-mute-read">
+        <input type="checkbox" id="rs-pref-mute-read" [checked]="prefs.muteReadVerses"
+               (change)="onPrefChange('muteReadVerses', $any($event.target).checked)">
+        <span>{{ 'reading.muteReadVerses' | translate }}</span>
+      </label>
+    </section>
+
     <!-- Navigate -->
     <section class="reading-sheet-section">
       <h3 class="reading-sheet-section-title">{{ 'nav.navigate' | translate }}</h3>

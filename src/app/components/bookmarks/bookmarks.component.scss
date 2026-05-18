@@ -518,3 +518,96 @@ section {
 :host-context(body.dark-theme) .goal-section {
   background: rgba(255, 255, 255, 0.04);
 }
+
+// ---------------------------------------------------------------------------
+// Reading plans (RE-10)
+// ---------------------------------------------------------------------------
+.plans-section {
+  margin-block: 24px;
+
+  h2 {
+    font-size: 1.15rem;
+    margin-bottom: 12px;
+  }
+}
+
+.plan-enrolled-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, rgba(94, 53, 177, 0.06), transparent 70%);
+  border: 1px solid rgba(94, 53, 177, 0.2);
+  border-radius: 8px;
+  flex-wrap: wrap;
+
+  .plan-enrolled-summary {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .plan-enrolled-title {
+    font-weight: 600;
+    display: block;
+  }
+
+  .plan-enrolled-day {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+  }
+
+  .plan-enrolled-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+}
+
+.plan-catalogue-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+
+  .plan-catalogue-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .plan-catalogue-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .plan-catalogue-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+    margin-top: 2px;
+  }
+
+  .plan-catalogue-stats {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #888);
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &.plan-already-enrolled {
+    opacity: 0.65;
+  }
+}
+
+.plan-already-tag {
+  font-size: 0.82rem;
+  color: var(--text-secondary, #888);
+  font-style: italic;
+}
+
+:host-context(body.dark-theme) .plan-catalogue-row {
+  background: rgba(255, 255, 255, 0.04);
+}

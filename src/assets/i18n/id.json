@@ -300,6 +300,19 @@
       "dismiss": "Tutup",
       "toggleLabel": "Tampilkan pengingat harian",
       "toggleHint": "Spanduk halus di atas saat rentetan Anda terancam atau target harian belum terpenuhi."
+    },
+    "plans": {
+      "title": "Rencana membaca",
+      "dayOf": "Hari",
+      "todayDone": "Bacaan hari ini selesai",
+      "start": "Mulai",
+      "restart": "Mulai ulang",
+      "unenroll": "Hentikan",
+      "alreadyEnrolled": "Sudah dimulai",
+      "daysLabel": "hari",
+      "versesLabel": "ayat",
+      "restartConfirm": "Mulai ulang rencana ini dari Hari 1?",
+      "unenrollConfirm": "Hentikan rencana ini? Tanda baca tetap ada."
     }
   },
   "audio": {

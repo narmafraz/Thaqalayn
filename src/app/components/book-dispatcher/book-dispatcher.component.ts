@@ -3,6 +3,7 @@ import { Book } from '@app/models';
 import { BOOK_AUTHORS } from '@app/data/book-authors';
 import { BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
 import { RandomVerse, RandomVerseService } from '@app/services/random-verse.service';
+import { PlansService, PlanState } from '@app/services/plans.service';
 import { ReadingStatsService, BookProgress, RevisitCandidate, StreakInfo } from '@app/services/reading-stats.service';
 import { VerseCountsService } from '@app/services/verse-counts.service';
 import { Store } from '@ngxs/store';
@@ -138,6 +139,8 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
   }> = [];
   /** RE-14 — older bookmarks to gently re-surface. */
   revisitCandidates: RevisitCandidate[] = [];
+  /** RE-10 — active reading-plan ribbons. */
+  planStates: PlanState[] = [];
   private subscriptions: Subscription[] = [];
 
   private static readonly BOOK_NAMES: Record<string, string> = {
@@ -152,6 +155,7 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     private bookmarkService: BookmarkService,
     private readingStats: ReadingStatsService,
     private verseCounts: VerseCountsService,
+    private plansService: PlansService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -181,6 +185,13 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
     );
     this.subscriptions.push(
       this.bookmarkService.readVerses$.subscribe(() => this.refreshRevisitCandidates())
+    );
+    // RE-10 — active plan ribbons
+    this.subscriptions.push(
+      this.plansService.enrolledStates$.subscribe(states => {
+        this.planStates = states;
+        this.cdr.markForCheck();
+      })
     );
     this.subscriptions.push(
       this.readingStats.bookProgressMap$.subscribe(map => {
@@ -296,6 +307,20 @@ export class BookDispatcherComponent implements OnInit, OnDestroy {
       return ['/' + clean.substring(0, slashIdx), clean.substring(slashIdx + 1)];
     }
     return [path];
+  }
+
+  /** RE-10 — routerLink for a plan-state's "today" CTA. */
+  planTodayLink(state: PlanState): string[] {
+    const book = state.plan.books[0] ?? 'quran';
+    const firstPath = this.plansService.firstPathOfDay(book, state.today);
+    if (!firstPath) return ['/books', book];
+    return this.bookmarkRouterLink(firstPath);
+  }
+
+  planTodayPercent(state: PlanState): number {
+    const total = state.today.verseCount;
+    if (total <= 0) return 0;
+    return Math.round((state.todayRead / total) * 100);
   }
 
   /**

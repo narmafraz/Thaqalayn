@@ -300,6 +300,19 @@
       "dismiss": "Kapat",
       "toggleLabel": "Günlük hatırlatma bandını göster",
       "toggleHint": "Serin tehlikedeyken veya günlük hedefin tamamlanmadığında sayfanın üstünde küçük bir bant."
+    },
+    "plans": {
+      "title": "Okuma planları",
+      "dayOf": "Gün",
+      "todayDone": "Bugünkü okuma tamamlandı",
+      "start": "Başlat",
+      "restart": "Yeniden başlat",
+      "unenroll": "Durdur",
+      "alreadyEnrolled": "Zaten başlandı",
+      "daysLabel": "gün",
+      "versesLabel": "ayet",
+      "restartConfirm": "Bu plan 1. Günden yeniden başlatılsın mı?",
+      "unenrollConfirm": "Bu plan durdurulsun mu? Okuma işaretleri kalacak."
     }
   },
   "audio": {

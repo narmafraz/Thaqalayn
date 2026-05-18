@@ -300,6 +300,19 @@
       "dismiss": "Schließen",
       "toggleLabel": "Tägliche Erinnerung anzeigen",
       "toggleHint": "Ein dezenter Banner oben, wenn deine Strähne in Gefahr ist oder dein Tagesziel offen."
+    },
+    "plans": {
+      "title": "Lesepläne",
+      "dayOf": "Tag",
+      "todayDone": "Heutige Lektüre abgeschlossen",
+      "start": "Start",
+      "restart": "Neu starten",
+      "unenroll": "Stoppen",
+      "alreadyEnrolled": "Bereits gestartet",
+      "daysLabel": "Tage",
+      "versesLabel": "Verse",
+      "restartConfirm": "Diesen Plan von Tag 1 neu starten?",
+      "unenrollConfirm": "Diesen Plan stoppen? Deine Lesemarkierungen bleiben erhalten."
     }
   },
   "audio": {

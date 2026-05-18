@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Annotation, Bookmark, BookmarkService, ReadingProgress } from '@app/services/bookmark.service';
 import { DailyReadingTally, ReadingStatsService, StreakInfo } from '@app/services/reading-stats.service';
+import { PlanCatalogueEntry, PlanState, PlansService } from '@app/services/plans.service';
 import { SyncService, SyncStatus, SyncUser } from '@app/services/sync.service';
 import { I18nService } from '@app/services/i18n.service';
 import { Observable, Subscription } from 'rxjs';
@@ -28,6 +29,11 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   goalFraction = 0;
   goalEditing = false;
   goalDraft = 5;
+
+  // RE-10 plans state
+  planCatalogue: PlanCatalogueEntry[] = [];
+  planStates: PlanState[] = [];
+  enrolledIds = new Set<string>();
   private subs: Subscription[] = [];
 
   // Sync
@@ -39,6 +45,7 @@ export class BookmarksComponent implements OnInit, OnDestroy {
   constructor(
     private bookmarkService: BookmarkService,
     private readingStats: ReadingStatsService,
+    private plansService: PlansService,
     private syncService: SyncService,
     private i18n: I18nService,
     private cdr: ChangeDetectorRef,
@@ -94,6 +101,40 @@ export class BookmarksComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       })
     );
+
+    // RE-10 plans
+    this.subs.push(
+      this.plansService.catalogue$().subscribe(plans => {
+        this.planCatalogue = plans;
+        this.cdr.markForCheck();
+      })
+    );
+    this.subs.push(
+      this.plansService.enrolledStates$.subscribe(states => {
+        this.planStates = states;
+        this.enrolledIds = new Set(states.map(s => s.plan.id));
+        this.cdr.markForCheck();
+      })
+    );
+  }
+
+  isPlanEnrolled(id: string): boolean {
+    return this.enrolledIds.has(id);
+  }
+
+  async enrollPlan(id: string): Promise<void> {
+    await this.plansService.enroll(id);
+  }
+
+  async restartPlan(id: string): Promise<void> {
+    // Idempotent — put() overwrites startedAt, effectively restarting.
+    if (!confirm(this.i18n.get('reading.plans.restartConfirm'))) return;
+    await this.plansService.enroll(id);
+  }
+
+  async unenrollPlan(id: string): Promise<void> {
+    if (!confirm(this.i18n.get('reading.plans.unenrollConfirm'))) return;
+    await this.plansService.unenroll(id);
   }
 
   // ---------------------------------------------------------------------------

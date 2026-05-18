@@ -87,6 +87,48 @@
     </div>
   </section>
 
+  <!-- Reading plans (RE-10) -->
+  <section *ngIf="planCatalogue.length > 0" class="plans-section">
+    <h2>{{ 'reading.plans.title' | translate }}</h2>
+
+    <!-- Currently enrolled — collapsed status line -->
+    <div *ngFor="let s of planStates" class="plan-enrolled-row">
+      <div class="plan-enrolled-summary">
+        <span class="plan-enrolled-title">{{ s.plan.titleEn }}</span>
+        <span class="plan-enrolled-day">
+          {{ 'reading.plans.dayOf' | translate }} {{ s.currentDay }} / {{ s.plan.totalDays }}
+          · {{ s.todayRead }} / {{ s.today.verseCount }}
+        </span>
+      </div>
+      <div class="plan-enrolled-actions">
+        <button mat-stroked-button (click)="restartPlan(s.plan.id)">
+          <mat-icon>restart_alt</mat-icon> {{ 'reading.plans.restart' | translate }}
+        </button>
+        <button mat-button color="warn" (click)="unenrollPlan(s.plan.id)">
+          <mat-icon>close</mat-icon> {{ 'reading.plans.unenroll' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Catalogue (excludes already-enrolled by default) -->
+    <div *ngFor="let p of planCatalogue" class="plan-catalogue-row" [class.plan-already-enrolled]="isPlanEnrolled(p.id)">
+      <div class="plan-catalogue-meta">
+        <div class="plan-catalogue-title">{{ p.titleEn }}</div>
+        <div class="plan-catalogue-desc">{{ p.descEn }}</div>
+        <div class="plan-catalogue-stats">
+          {{ p.totalDays }} {{ 'reading.plans.daysLabel' | translate }}
+          · {{ p.totalVerses }} {{ 'reading.plans.versesLabel' | translate }}
+        </div>
+      </div>
+      <button *ngIf="!isPlanEnrolled(p.id)" mat-raised-button color="primary" (click)="enrollPlan(p.id)">
+        {{ 'reading.plans.start' | translate }}
+      </button>
+      <span *ngIf="isPlanEnrolled(p.id)" class="plan-already-tag">
+        {{ 'reading.plans.alreadyEnrolled' | translate }}
+      </span>
+    </div>
+  </section>
+
   <!-- Achievement badges (RE-16) -->
   <app-badge-shelf></app-badge-shelf>
 

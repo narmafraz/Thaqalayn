@@ -300,6 +300,19 @@
       "dismiss": "关闭",
       "toggleLabel": "显示每日提醒横幅",
       "toggleHint": "当连读处于风险中或每日目标未完成时,页面顶部出现一个柔和的横幅。"
+    },
+    "plans": {
+      "title": "阅读计划",
+      "dayOf": "第",
+      "todayDone": "今天的阅读已完成",
+      "start": "开始",
+      "restart": "重新开始",
+      "unenroll": "停止",
+      "alreadyEnrolled": "已开始",
+      "daysLabel": "天",
+      "versesLabel": "节",
+      "restartConfirm": "从第1天重新开始这个计划吗？",
+      "unenrollConfirm": "停止此计划？您的阅读标记将保留。"
     }
   },
   "audio": {

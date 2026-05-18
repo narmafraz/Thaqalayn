@@ -300,6 +300,19 @@
       "dismiss": "Cerrar",
       "toggleLabel": "Mostrar recordatorio diario",
       "toggleHint": "Una banda discreta arriba cuando tu racha está en riesgo o tu objetivo del día está sin cumplir."
+    },
+    "plans": {
+      "title": "Planes de lectura",
+      "dayOf": "Día",
+      "todayDone": "Lectura de hoy completada",
+      "start": "Empezar",
+      "restart": "Reiniciar",
+      "unenroll": "Detener",
+      "alreadyEnrolled": "Ya empezado",
+      "daysLabel": "días",
+      "versesLabel": "versículos",
+      "restartConfirm": "¿Reiniciar este plan desde el Día 1?",
+      "unenrollConfirm": "¿Detener este plan? Tus marcas de lectura permanecerán."
     }
   },
   "audio": {

@@ -330,6 +330,19 @@
       "dismiss": "Dismiss",
       "toggleLabel": "Show daily reminder banner",
       "toggleHint": "A subtle banner at the top of the page when your streak is at risk or your daily goal is unmet."
+    },
+    "plans": {
+      "title": "Reading plans",
+      "dayOf": "Day",
+      "todayDone": "Today's reading is done",
+      "start": "Start",
+      "restart": "Restart",
+      "unenroll": "Stop",
+      "alreadyEnrolled": "Already started",
+      "daysLabel": "days",
+      "versesLabel": "verses",
+      "restartConfirm": "Restart this plan from Day 1?",
+      "unenrollConfirm": "Stop this plan? Your read marks will remain."
     }
   },
   "audio": {

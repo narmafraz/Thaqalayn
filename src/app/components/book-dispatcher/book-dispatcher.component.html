@@ -14,6 +14,30 @@
   <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
     <ng-container *ngSwitchCase="'chapter_list'">
       <ng-container *ngIf="book.index === 'books'">
+        <!-- RE-10: active reading-plan ribbons -->
+        <section *ngIf="planStates.length > 0" class="plan-ribbons">
+          <a *ngFor="let s of planStates"
+             [routerLink]="planTodayLink(s)"
+             queryParamsHandling="preserve"
+             class="plan-ribbon"
+             [class.plan-ribbon-done]="s.todayDone">
+            <span class="plan-ribbon-icon" aria-hidden="true">{{ s.todayDone ? '✅' : '📖' }}</span>
+            <div class="plan-ribbon-body">
+              <div class="plan-ribbon-title">
+                {{ s.plan.titleEn }} — {{ 'reading.plans.dayOf' | translate }} {{ s.currentDay }} / {{ s.plan.totalDays }}
+              </div>
+              <div class="plan-ribbon-subtitle">
+                <ng-container *ngIf="!s.todayDone">{{ s.today.titleEn }} · {{ s.todayRead }} / {{ s.today.verseCount }}</ng-container>
+                <ng-container *ngIf="s.todayDone">{{ 'reading.plans.todayDone' | translate }}</ng-container>
+              </div>
+              <div class="plan-ribbon-bar">
+                <div class="plan-ribbon-fill" [style.width.%]="planTodayPercent(s)"></div>
+              </div>
+            </div>
+            <mat-icon class="plan-ribbon-cta" aria-hidden="true">arrow_forward</mat-icon>
+          </a>
+        </section>
+
         <!-- RE-08 / RE-09: streak chip + daily goal ring (visible only after the user has read something) -->
         <div *ngIf="streak.current > 0 || goalTarget > 0" class="homepage-stats-row">
           <a routerLink="/bookmarks" queryParamsHandling="preserve" class="homepage-streak-chip"

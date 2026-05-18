@@ -300,6 +300,19 @@
       "dismiss": "Fermer",
       "toggleLabel": "Afficher la bannière de rappel quotidien",
       "toggleHint": "Une bannière discrète en haut quand ta série est en danger ou ton objectif inachevé."
+    },
+    "plans": {
+      "title": "Plans de lecture",
+      "dayOf": "Jour",
+      "todayDone": "Lecture du jour terminée",
+      "start": "Démarrer",
+      "restart": "Recommencer",
+      "unenroll": "Arrêter",
+      "alreadyEnrolled": "Déjà commencé",
+      "daysLabel": "jours",
+      "versesLabel": "versets",
+      "restartConfirm": "Recommencer ce plan depuis le Jour 1 ?",
+      "unenrollConfirm": "Arrêter ce plan ? Tes marques de lecture restent."
     }
   },
   "audio": {

@@ -54,6 +54,15 @@ export interface EarnedBadge {
   earnedAt: Date;
 }
 
+/** An enrolled reading plan (RE-10). Only one active at a time per planId — the
+ *  table is keyed by planId so re-enrolling resets `startedAt` to "now". */
+export interface EnrolledPlan {
+  /** Stable plan id from `plans/index.json`. Primary key. */
+  planId: string;
+  /** Date the user pressed "Start this plan." `currentDay` derives from this. */
+  startedAt: Date;
+}
+
 class ThaqalaynDb extends Dexie {
   bookmarks!: Table<Bookmark, number>;
   readingProgress!: Table<ReadingProgress, string>;
@@ -61,6 +70,7 @@ class ThaqalaynDb extends Dexie {
   readVerses!: Table<ReadVerse, number>;
   goalConfig!: Table<GoalConfig, number>;
   earnedBadges!: Table<EarnedBadge, string>;
+  enrolledPlans!: Table<EnrolledPlan, string>;
 
   constructor() {
     super('thaqalayn-bookmarks');
@@ -91,6 +101,17 @@ class ThaqalaynDb extends Dexie {
       // re-earn (we just keep the original earnedAt).
       earnedBadges: 'badgeId, earnedAt',
     });
+    this.version(5).stores({
+      bookmarks: '++id, path, bookId, createdAt',
+      readingProgress: 'bookId, lastVisited',
+      annotations: '++id, path, bookId, updatedAt',
+      readVerses: '++id, &path, bookId, readAt',
+      goalConfig: 'id',
+      earnedBadges: 'badgeId, earnedAt',
+      // RE-10: plans the user has enrolled in. PK is the plan id so re-enrolling
+      // simply overwrites the startedAt timestamp.
+      enrolledPlans: 'planId, startedAt',
+    });
   }
 }
 
@@ -106,6 +127,7 @@ export class BookmarkService {
   private readVersesSubject = new BehaviorSubject<ReadVerse[]>([]);
   private goalConfigSubject = new BehaviorSubject<GoalConfig | null>(null);
   private earnedBadgesSubject = new BehaviorSubject<EarnedBadge[]>([]);
+  private enrolledPlansSubject = new BehaviorSubject<EnrolledPlan[]>([]);
 
   bookmarks$: Observable<Bookmark[]> = this.bookmarksSubject.asObservable();
   readingProgress$: Observable<ReadingProgress[]> = this.progressSubject.asObservable();
@@ -113,6 +135,7 @@ export class BookmarkService {
   readVerses$: Observable<ReadVerse[]> = this.readVersesSubject.asObservable();
   goalConfig$: Observable<GoalConfig | null> = this.goalConfigSubject.asObservable();
   earnedBadges$: Observable<EarnedBadge[]> = this.earnedBadgesSubject.asObservable();
+  enrolledPlans$: Observable<EnrolledPlan[]> = this.enrolledPlansSubject.asObservable();
 
   constructor() {
     this.db = new ThaqalaynDb();
@@ -513,6 +536,35 @@ export class BookmarkService {
     await this.refreshEarnedBadges();
   }
 
+  // ---------------------------------------------------------------------------
+  // Enrolled reading plans (RE-10)
+  // ---------------------------------------------------------------------------
+
+  async getEnrolledPlans(): Promise<EnrolledPlan[]> {
+    return this.db.enrolledPlans.toArray();
+  }
+
+  async getEnrollment(planId: string): Promise<EnrolledPlan | undefined> {
+    return this.db.enrolledPlans.get(planId);
+  }
+
+  /** Enroll in (or re-enroll in — resets startedAt) a plan. */
+  async enrollPlan(planId: string): Promise<void> {
+    if (!planId) return;
+    await this.db.enrolledPlans.put({ planId, startedAt: new Date() });
+    await this.refreshEnrolledPlans();
+  }
+
+  async unenrollPlan(planId: string): Promise<void> {
+    await this.db.enrolledPlans.delete(planId);
+    await this.refreshEnrolledPlans();
+  }
+
+  async clearEnrolledPlans(): Promise<void> {
+    await this.db.enrolledPlans.clear();
+    await this.refreshEnrolledPlans();
+  }
+
   /** Clear all bookmarks */
   async clearAll(): Promise<void> {
     await this.db.bookmarks.clear();
@@ -521,6 +573,7 @@ export class BookmarkService {
     await this.db.readVerses.clear();
     await this.db.goalConfig.clear();
     await this.db.earnedBadges.clear();
+    await this.db.enrolledPlans.clear();
     await this.loadAll();
   }
 
@@ -539,11 +592,17 @@ export class BookmarkService {
     await this.refreshReadVerses();
     await this.refreshGoalConfig();
     await this.refreshEarnedBadges();
+    await this.refreshEnrolledPlans();
   }
 
   private async refreshEarnedBadges(): Promise<void> {
     const earned = await this.getEarnedBadges();
     this.earnedBadgesSubject.next(earned);
+  }
+
+  private async refreshEnrolledPlans(): Promise<void> {
+    const plans = await this.getEnrolledPlans();
+    this.enrolledPlansSubject.next(plans);
   }
 
   private async refreshBookmarks(): Promise<void> {

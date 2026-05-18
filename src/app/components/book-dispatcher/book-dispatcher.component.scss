@@ -689,3 +689,88 @@
     color: #e0e0e0;
   }
 }
+
+// ---------------------------------------------------------------------------
+// RE-10: Reading-plan ribbons at the top of the homepage
+// ---------------------------------------------------------------------------
+.plan-ribbons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 12px auto;
+  max-width: 1000px;
+  padding: 0 16px;
+}
+
+.plan-ribbon {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(94, 53, 177, 0.08), rgba(94, 53, 177, 0.02));
+  border: 1px solid rgba(94, 53, 177, 0.18);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text-primary, #333);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(94, 53, 177, 0.12);
+  }
+
+  &.plan-ribbon-done {
+    background: linear-gradient(135deg, rgba(67, 160, 71, 0.12), rgba(67, 160, 71, 0.04));
+    border-color: rgba(67, 160, 71, 0.3);
+  }
+
+  .plan-ribbon-icon {
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+
+  .plan-ribbon-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .plan-ribbon-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.2;
+  }
+
+  .plan-ribbon-subtitle {
+    font-size: 0.82rem;
+    color: var(--text-secondary, #666);
+    margin-top: 2px;
+  }
+
+  .plan-ribbon-bar {
+    margin-top: 6px;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .plan-ribbon-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7e57c2, #5e35b1);
+    transition: width 0.4s ease-out;
+  }
+
+  &.plan-ribbon-done .plan-ribbon-fill {
+    background: linear-gradient(90deg, #66bb6a, #43a047);
+  }
+
+  .plan-ribbon-cta {
+    flex-shrink: 0;
+    color: var(--text-secondary, #666);
+  }
+}
+
+:host-context(body.dark-theme) .plan-ribbon {
+  color: #e0e0e0;
+  background: linear-gradient(135deg, rgba(126, 87, 194, 0.15), rgba(126, 87, 194, 0.04));
+}

@@ -256,7 +256,7 @@
     "history": "পঠনের ইতিহাস",
     "historyEmpty": "এখনও কিছু পড়া হয়নি। একটি অধ্যায় খুলুন।",
     "versesReadToday": "আজ",
-    "versesReadTotal": "আয়াত পঠিত",
+    "versesReadTotal": "মোট",
     "bookProgress": "{{percent}}% — {{read}} / {{total}}",
     "verseOfTheDay": "আজকের আয়াত",
     "shuffleAgain": "অন্যটি দেখান",
@@ -268,14 +268,16 @@
     "skipGoal": "এখন বাদ দিন",
     "continueReadingTitle": "যেখানে রেখেছিলেন সেখান থেকে চালিয়ে যান",
     "noChapter": "একটি অধ্যায় শুরু করুন",
-    "milestoneCumulative": "মোট {{count}} আয়াত পঠিত — চালিয়ে যান।",
-    "milestoneBookComplete": "{{book}} শেষ — {{count}} আয়াত!",
+    "milestoneCumulative": "মোট {{count}} পঠিত — চালিয়ে যান।",
+    "milestoneBookComplete": "{{book}} শেষ — {{count}} {{noun}}!",
     "milestoneChapterComplete": "অধ্যায় সম্পন্ন।",
     "todayLabel": "আজ",
     "yesterdayLabel": "গতকাল",
     "hideCompleted": "সম্পন্ন লুকান",
     "muteReadVerses": "পড়া আয়াত নিষ্প্রভ করুন",
-    "muteReadVersesHint": "পড়া আয়াত ✓ চিহ্ন সহ নিষ্প্রভ দেখায়; বন্ধ থাকলে সব আয়াত একরকম দেখায়।"
+    "muteReadVersesHint": "পড়া আয়াত ✓ চিহ্ন সহ নিষ্প্রভ দেখায়; বন্ধ থাকলে সব আয়াত একরকম দেখায়।",
+    "countNounAyah": "আয়াত",
+    "countNounHadith": "হাদিস"
   },
   "audio": {
     "play": "চালান",

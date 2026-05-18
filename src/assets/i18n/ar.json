@@ -268,7 +268,7 @@
     "history": "سجل القراءة",
     "historyEmpty": "لم تقرأ بعد. افتح فصلاً لبدء التتبع.",
     "versesReadToday": "اليوم",
-    "versesReadTotal": "آية مقروءة",
+    "versesReadTotal": "المجموع",
     "bookProgress": "{{percent}}٪ — {{read}} / {{total}}",
     "verseOfTheDay": "آية اليوم",
     "shuffleAgain": "آية أخرى",
@@ -280,14 +280,16 @@
     "skipGoal": "تخطي الآن",
     "continueReadingTitle": "تابع من حيث توقفت",
     "noChapter": "ابدأ فصلاً",
-    "milestoneCumulative": "{{count}} آية مقروءة إجمالاً — استمر.",
-    "milestoneBookComplete": "أكملت {{book}} — {{count}} آية!",
+    "milestoneCumulative": "قرأت {{count}} في المجموع — استمر.",
+    "milestoneBookComplete": "أكملت {{book}} — {{count}} {{noun}}!",
     "milestoneChapterComplete": "اكتمل الفصل.",
     "todayLabel": "اليوم",
     "yesterdayLabel": "أمس",
     "hideCompleted": "إخفاء المكتمل",
     "muteReadVerses": "تخفيت الآيات التي قرأتها",
-    "muteReadVersesHint": "الآيات المقروءة تظهر باهتة مع علامة ✓؛ عند الإيقاف تظهر كل الآيات بنفس الشكل."
+    "muteReadVersesHint": "الآيات المقروءة تظهر باهتة مع علامة ✓؛ عند الإيقاف تظهر كل الآيات بنفس الشكل.",
+    "countNounAyah": "آية",
+    "countNounHadith": "حديث"
   },
   "audio": {
     "play": "تشغيل",

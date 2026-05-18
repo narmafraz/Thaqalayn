@@ -256,7 +256,7 @@
     "history": "پڑھنے کی تاریخ",
     "historyEmpty": "ابھی تک کچھ نہیں پڑھا۔ کوئی باب کھولیں۔",
     "versesReadToday": "آج",
-    "versesReadTotal": "آیات پڑھیں",
+    "versesReadTotal": "کل",
     "bookProgress": "{{percent}}٪ — {{read}} / {{total}}",
     "verseOfTheDay": "آج کی آیت",
     "shuffleAgain": "ایک اور دکھائیں",
@@ -268,14 +268,16 @@
     "skipGoal": "ابھی چھوڑیں",
     "continueReadingTitle": "جہاں چھوڑا تھا وہیں سے شروع کریں",
     "noChapter": "ایک باب شروع کریں",
-    "milestoneCumulative": "مجموعی طور پر {{count}} آیات پڑھیں — جاری رکھیں۔",
-    "milestoneBookComplete": "{{book}} ختم — {{count}} آیات!",
+    "milestoneCumulative": "کل {{count}} پڑھیں — جاری رکھیں۔",
+    "milestoneBookComplete": "{{book}} مکمل — {{count}} {{noun}}!",
     "milestoneChapterComplete": "باب مکمل۔",
     "todayLabel": "آج",
     "yesterdayLabel": "کل",
     "hideCompleted": "مکمل چھپائیں",
     "muteReadVerses": "پڑھی ہوئی آیات مدھم کریں",
-    "muteReadVersesHint": "پڑھی ہوئی آیات ✓ کے ساتھ مدھم نظر آتی ہیں؛ بند ہونے پر تمام آیات یکساں دکھتی ہیں۔"
+    "muteReadVersesHint": "پڑھی ہوئی آیات ✓ کے ساتھ مدھم نظر آتی ہیں؛ بند ہونے پر تمام آیات یکساں دکھتی ہیں۔",
+    "countNounAyah": "آیات",
+    "countNounHadith": "احادیث"
   },
   "audio": {
     "play": "چلائیں",

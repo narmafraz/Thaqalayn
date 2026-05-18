@@ -105,11 +105,20 @@ export class MilestoneToastService {
     const tmpl = this.i18n.get('reading.milestoneBookComplete');
     return tmpl
       .replace(/\{\{\s*book\s*\}\}/g, this.formatBookId(bookId))
-      .replace(/\{\{\s*count\s*\}\}/g, String(total));
+      .replace(/\{\{\s*count\s*\}\}/g, String(total))
+      .replace(/\{\{\s*noun\s*\}\}/g, this.getCountNoun(bookId));
   }
 
   private formatBookId(bookId: string): string {
     if (bookId === 'quran') return 'the Quran';
     return bookId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  }
+
+  /** Plural noun for the units counted in a book. Quran ayat vs hadith narrations. */
+  private getCountNoun(bookId: string): string {
+    const key = bookId === 'quran' ? 'reading.countNounAyah' : 'reading.countNounHadith';
+    const val = this.i18n.get(key);
+    // Fallback when the i18n loader hasn't resolved the key (returns the key as-is)
+    return val === key ? (bookId === 'quran' ? 'ayahs' : 'hadiths') : val;
   }
 }

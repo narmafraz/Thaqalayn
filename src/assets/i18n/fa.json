@@ -256,7 +256,7 @@
     "history": "تاریخچه مطالعه",
     "historyEmpty": "هنوز چیزی نخوانده‌اید. یک فصل باز کنید تا شروع شود.",
     "versesReadToday": "امروز",
-    "versesReadTotal": "آیه خوانده شده",
+    "versesReadTotal": "مجموع",
     "bookProgress": "{{percent}}٪ — {{read}} / {{total}}",
     "verseOfTheDay": "آیه روز",
     "shuffleAgain": "نمایش دیگر",
@@ -268,14 +268,16 @@
     "skipGoal": "فعلاً رد کن",
     "continueReadingTitle": "از همان جا که ماندی ادامه بده",
     "noChapter": "یک فصل را شروع کن",
-    "milestoneCumulative": "در مجموع {{count}} آیه خواندید — ادامه دهید.",
-    "milestoneBookComplete": "{{book}} را تمام کردید — {{count}} آیه!",
+    "milestoneCumulative": "در مجموع {{count}} خوانده‌اید — ادامه دهید.",
+    "milestoneBookComplete": "{{book}} را تمام کردید — {{count}} {{noun}}!",
     "milestoneChapterComplete": "فصل تمام شد.",
     "todayLabel": "امروز",
     "yesterdayLabel": "دیروز",
     "hideCompleted": "پنهان کردن تکمیل‌شده",
     "muteReadVerses": "کم‌رنگ کردن آیات خوانده‌شده",
-    "muteReadVersesHint": "آیات خوانده‌شده با علامت ✓ کم‌رنگ نمایش داده می‌شوند؛ در حالت خاموش همه آیات یکسان دیده می‌شوند."
+    "muteReadVersesHint": "آیات خوانده‌شده با علامت ✓ کم‌رنگ نمایش داده می‌شوند؛ در حالت خاموش همه آیات یکسان دیده می‌شوند.",
+    "countNounAyah": "آیه",
+    "countNounHadith": "حدیث"
   },
   "audio": {
     "play": "پخش",

@@ -135,7 +135,11 @@
     "narratedFromTitle": "Narrated From",
     "narratedToTitle": "Narrated To",
     "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
-    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency",
+    "networkTitle": "Mit-Überlieferer-Netzwerk",
+    "networkSubtitle": "Die Überlieferer, die am häufigsten mit diesem in Ketten auftauchen.",
+    "networkLegendEdge": "Dickere Linie = mehr gemeinsame Hadithe",
+    "networkLegendImam": "Imam"
   },
   "search": {
     "filter": "Filter",

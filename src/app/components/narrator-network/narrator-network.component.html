@@ -1,0 +1,62 @@
+<section class="narrator-network" *ngIf="nodes.length > 0">
+  <h3>{{ 'narrator.networkTitle' | translate }}</h3>
+  <p class="network-subtitle">{{ 'narrator.networkSubtitle' | translate }}</p>
+
+  <div class="network-svg-wrapper">
+    <svg
+      class="network-svg"
+      [attr.viewBox]="'0 0 ' + VIEW_BOX + ' ' + VIEW_BOX"
+      role="img"
+      [attr.aria-label]="('narrator.networkTitle' | translate) + ' — ' + centerName">
+
+      <!-- Edges first, so nodes render on top -->
+      <line *ngFor="let n of nodes; trackBy: trackById"
+            [attr.x1]="CENTRE" [attr.y1]="CENTRE"
+            [attr.x2]="n.x"    [attr.y2]="n.y"
+            class="network-edge"
+            [attr.stroke-width]="n.edgeWidth" />
+
+      <!-- Centre node = current narrator -->
+      <g class="network-center" [class.network-center-imam]="centerIsImam"
+         [attr.transform]="'translate(' + CENTRE + ',' + CENTRE + ')'">
+        <circle [attr.r]="CENTRE_NODE_RADIUS" class="network-center-circle"></circle>
+        <text class="network-center-text arabic" lang="ar"
+              text-anchor="middle" dominant-baseline="central">
+          {{ centerName }}
+        </text>
+      </g>
+
+      <!-- Orbit nodes — each is a clickable group -->
+      <a *ngFor="let n of nodes; trackBy: trackById"
+         [attr.href]="'/people/narrators/' + n.id"
+         class="network-node-link"
+         [attr.aria-label]="n.name + ' — ' + n.count + ' shared'">
+        <g class="network-node" [class.network-node-imam]="n.isImam"
+           [attr.transform]="'translate(' + n.x + ',' + n.y + ')'">
+          <circle [attr.r]="n.r" class="network-node-circle"></circle>
+          <text class="network-node-count"
+                text-anchor="middle" dominant-baseline="central">
+            {{ n.count }}
+          </text>
+        </g>
+        <text class="network-node-label arabic" lang="ar"
+              [attr.x]="labelX(n)" [attr.y]="labelY(n)"
+              [attr.text-anchor]="labelAnchor(n)"
+              dominant-baseline="central">
+          {{ n.name }}
+        </text>
+      </a>
+    </svg>
+  </div>
+
+  <p class="network-legend">
+    <span class="legend-item">
+      <span class="legend-swatch legend-swatch-edge" aria-hidden="true"></span>
+      {{ 'narrator.networkLegendEdge' | translate }}
+    </span>
+    <span class="legend-item">
+      <span class="legend-swatch legend-swatch-imam" aria-hidden="true"></span>
+      {{ 'narrator.networkLegendImam' | translate }}
+    </span>
+  </p>
+</section>

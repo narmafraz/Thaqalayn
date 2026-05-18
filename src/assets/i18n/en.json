@@ -163,7 +163,11 @@
     "narratedFromTitle": "Narrated From",
     "narratedToTitle": "Narrated To",
     "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
-    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency",
+    "networkTitle": "Co-narrator network",
+    "networkSubtitle": "The narrators who most often appear in chains with this one.",
+    "networkLegendEdge": "Thicker line = more shared hadith",
+    "networkLegendImam": "Imam"
   },
   "search": {
     "filter": "Filter",

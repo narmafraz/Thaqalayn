@@ -135,7 +135,11 @@
     "narratedFromTitle": "Narrated From",
     "narratedToTitle": "Narrated To",
     "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
-    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency",
+    "networkTitle": "সহ-বর্ণনাকারী নেটওয়ার্ক",
+    "networkSubtitle": "যেসব বর্ণনাকারী এই ব্যক্তির সাথে সবচেয়ে বেশি সনদে দেখা যায়।",
+    "networkLegendEdge": "মোটা লাইন = বেশি অভিন্ন হাদিস",
+    "networkLegendImam": "ইমাম"
   },
   "search": {
     "filter": "ফিল্টার",

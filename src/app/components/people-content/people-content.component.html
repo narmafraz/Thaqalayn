@@ -248,6 +248,14 @@
     <section class="conarrators-section">
       <h2>{{ 'narrator.coNarrators' | translate }}</h2>
 
+      <!-- Network visualisation (PPL-19) — radial SVG of top co-narrators -->
+      <app-narrator-network
+        *ngIf="topConarrators.length > 0"
+        [centerId]="narrator.index"
+        [centerName]="narrator.titles?.ar || ''"
+        [topConarrators]="topConarrators">
+      </app-narrator-network>
+
       <!-- Top Co-Narrators Summary (NAR-04) -->
       <div class="top-conarrators" *ngIf="topConarrators.length > 0">
         <h3>{{ 'narrator.topConarrators' | translate }} ({{ uniqueConarratorCount }})</h3>

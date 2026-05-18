@@ -135,7 +135,11 @@
     "narratedFromTitle": "Narrated From",
     "narratedToTitle": "Narrated To",
     "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
-    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency",
+    "networkTitle": "Birlikte rivayet edenler ağı",
+    "networkSubtitle": "Bu raviyle zincirlerde en sık birlikte görünen raviler.",
+    "networkLegendEdge": "Daha kalın çizgi = daha fazla ortak hadis",
+    "networkLegendImam": "İmam"
   },
   "search": {
     "filter": "Filtre",

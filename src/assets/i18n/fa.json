@@ -135,7 +135,11 @@
     "narratedFromTitle": "Narrated From",
     "narratedToTitle": "Narrated To",
     "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
-    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency",
+    "networkTitle": "شبکه‌ی راویان همراه",
+    "networkSubtitle": "راویانی که بیشتر در سلسله‌ها همراه این راوی ظاهر می‌شوند.",
+    "networkLegendEdge": "خط ضخیم‌تر = حدیث مشترک بیشتر",
+    "networkLegendImam": "امام"
   },
   "search": {
     "filter": "فیلتر",

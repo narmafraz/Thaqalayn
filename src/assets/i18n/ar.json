@@ -147,7 +147,11 @@
     "narratedFromTitle": "روى عن",
     "narratedToTitle": "روى عنه",
     "narratedFromDesc": "الأشخاص الذين روى عنهم هذا الراوي، مرتبين حسب التكرار",
-    "narratedToDesc": "الأشخاص الذين رووا عن هذا الراوي، مرتبين حسب التكرار"
+    "narratedToDesc": "الأشخاص الذين رووا عن هذا الراوي، مرتبين حسب التكرار",
+    "networkTitle": "شبكة الرواة المشتركين",
+    "networkSubtitle": "الرواة الذين يظهرون مع هذا الراوي في السلاسل أكثر من غيرهم.",
+    "networkLegendEdge": "خط أعرض = أحاديث مشتركة أكثر",
+    "networkLegendImam": "إمام"
   },
   "search": {
     "filter": "تصفية",

@@ -67,20 +67,20 @@ Status legend: **[DONE]** = implemented & working, **[PARTIAL]** = partially imp
 | PPL-04 | As a user, I can see all hadiths narrated by a specific narrator (virtual-scrolled) | [DONE] |
 | PPL-05 | As a user, I can see co-narrators and click to navigate to their profiles | [DONE] |
 | PPL-06 | As a user, narrator names in hadith chains are clickable links | [DONE] |
-| PPL-07 | As a user, I can see narrator English transliteration prominently on list and profile pages | [PLANNED] |
-| PPL-08 | As a user, I can see a stats summary (total narrations, book distribution, reliability) on narrator profiles | [PLANNED] |
-| PPL-09 | As a user, I can see featured/prominent narrators (Imams, major companions) visually distinguished | [PLANNED] |
-| PPL-10 | As a user, I can see hadith preview cards (not just bare path links) in narrator profiles | [PLANNED] |
-| PPL-11 | As a user, I can sort narrators by narration count, reliability, or alphabetically | [PLANNED] |
-| PPL-12 | As a user, I can hover over narrator names in hadith chains to see a summary card | [PLANNED] |
-| PPL-13 | As a researcher, I can compare two narrators side-by-side | [PLANNED] |
-| PPL-14 | As a user, I can see teacher/student lists on each narrator's profile | [PLANNED] |
-| PPL-15 | As a researcher, I can see reliability ratings from multiple rijal scholars on narrator profiles | [PLANNED] |
-| PPL-16 | As a researcher, I can see a visual chain diagram for hadith isnad with color-coded reliability | [PLANNED] |
-| PPL-17 | As a user, I can browse narrators by category (Imams, Companions, scholars by era) | [PLANNED] |
-| PPL-18 | As a researcher, I can use advanced search to filter narrators by reliability, count, era, teacher | [PLANNED] |
-| PPL-19 | As a researcher, I can see an interactive network graph of narrator relationships | [PLANNED] |
-| PPL-20 | As a user, I can see which Imams a narrator was contemporary with | [PLANNED] |
+| PPL-07 | As a user, I can see narrator English transliteration prominently on list and profile pages | [DONE] — `hero-name-en` h2 on the profile, `name` column on the list |
+| PPL-08 | As a user, I can see a stats summary (total narrations, book distribution, reliability) on narrator profiles | [DONE] — 4 hero stats + Book Distribution Chart on every profile |
+| PPL-09 | As a user, I can see featured/prominent narrators (Imams, major companions) visually distinguished | [DONE] — `featured-imams` card on /people/narrators, inline `imam-badge` on every Imam row + profile hero |
+| PPL-10 | As a user, I can see hadith preview cards (not just bare path links) in narrator profiles | [DONE] — `paginatedPreviews` builds bookName + chapterTitle + hadithNumber + volumeLabel via `IndexState` lookup |
+| PPL-11 | As a user, I can sort narrators by narration count, reliability, or alphabetically | [PARTIAL] — MatSort on every column (narrations / from / to / name); reliability sort blocked on rijal data |
+| PPL-12 | As a user, I can hover over narrator names in hadith chains to see a summary card | [DONE] — `<app-narrator-hover-card>` mounted in `verse-text`, fed by hovered-narrator state |
+| PPL-13 | As a researcher, I can compare two narrators side-by-side | [DONE] — `/people/narrators/compare` route, autocomplete on both A/B selectors, full side-by-side render |
+| PPL-14 | As a user, I can see teacher/student lists on each narrator's profile | [DONE] — `narratedFromList` + `narratedToList` directional bars with percentages, clickable to navigate |
+| PPL-15 | As a researcher, I can see reliability ratings from multiple rijal scholars on narrator profiles | [PARTIAL] — single reliability badge wired when `biography.reliability` is present; multi-scholar tabulation blocked on rijal data |
+| PPL-16 | As a researcher, I can see a visual chain diagram for hadith isnad with color-coded reliability | [PLANNED] — colour-coding blocked on reliability data |
+| PPL-17 | As a user, I can browse narrators by category (Imams, Companions, scholars by era) | [PARTIAL] — Imams + Top categories shipped; per-era / Companions classification needs era data per narrator |
+| PPL-18 | As a researcher, I can use advanced search to filter narrators by reliability, count, era, teacher | [PARTIAL] — advanced filter exists for min/max narrations / from / to; reliability + era filters blocked on data |
+| PPL-19 | As a researcher, I can see an interactive network graph of narrator relationships | [DONE] — `<app-narrator-network>` radial SVG on profile pages, click a node to navigate (added 2026-05-19) |
+| PPL-20 | As a user, I can see which Imams a narrator was contemporary with | [PLANNED] — blocked on era / Hijri-date data per narrator |
 
 ## 6. Search & Discovery
 

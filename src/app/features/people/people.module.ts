@@ -13,6 +13,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { PeopleListComponent } from '../../components/people-list/people-list.component';
 import { PeopleContentComponent } from '../../components/people-content/people-content.component';
 import { NarratorCompareComponent } from '../../components/narrator-compare/narrator-compare.component';
+import { NarratorNetworkComponent } from '../../components/narrator-network/narrator-network.component';
 import { NarratorListResolver } from '../../routing/narrator-list-resolver';
 import { NarratorResolver } from '../../routing/narrator-resolver';
 
@@ -29,6 +30,7 @@ const routes: Routes = [
     PeopleListComponent,
     PeopleContentComponent,
     NarratorCompareComponent,
+    NarratorNetworkComponent,
   ],
   imports: [
     SharedModule,

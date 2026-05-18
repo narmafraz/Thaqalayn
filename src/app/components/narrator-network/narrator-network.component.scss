@@ -1,0 +1,188 @@
+.narrator-network {
+  margin-block: 24px;
+  padding: 16px 20px;
+  background: var(--card-bg, #fff);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+
+  h3 {
+    margin: 0 0 4px;
+    font-size: 1.05rem;
+  }
+
+  .network-subtitle {
+    margin: 0 0 14px;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #666);
+  }
+}
+
+.network-svg-wrapper {
+  width: 100%;
+  // Cap the visual size so the graph doesn't sprawl on wide screens.
+  max-width: 520px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.network-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  // Lock aspect so nodes don't squash on narrow viewports.
+  aspect-ratio: 1 / 1;
+}
+
+// ---------------------------------------------------------------------------
+// Edges
+// ---------------------------------------------------------------------------
+.network-edge {
+  stroke: rgba(94, 53, 177, 0.4);
+  stroke-linecap: round;
+  transition: stroke 0.15s ease, stroke-width 0.15s ease;
+}
+
+// ---------------------------------------------------------------------------
+// Centre node (current narrator)
+// ---------------------------------------------------------------------------
+.network-center {
+  pointer-events: none;
+
+  .network-center-circle {
+    fill: #5e35b1;
+    stroke: white;
+    stroke-width: 3;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.2));
+  }
+
+  .network-center-text {
+    fill: white;
+    font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &.network-center-imam .network-center-circle {
+    fill: #ff8f00;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Orbit nodes
+// ---------------------------------------------------------------------------
+.network-node-link {
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover .network-edge,
+  &:focus-visible .network-edge {
+    stroke: #5e35b1;
+  }
+
+  &:hover .network-node-circle {
+    fill: #7e57c2;
+    transform: scale(1.08);
+    transform-origin: center;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible .network-node-circle {
+    stroke: #5e35b1;
+    stroke-width: 3;
+  }
+}
+
+.network-node {
+  // Node groups need a transform-origin so scale-on-hover animates from
+  // the node centre rather than the SVG origin.
+  transform-box: fill-box;
+  transform-origin: center;
+
+  .network-node-circle {
+    fill: #9575cd;
+    stroke: white;
+    stroke-width: 2;
+    transition: fill 0.15s ease, transform 0.15s ease;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+  }
+
+  .network-node-count {
+    fill: white;
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+  }
+
+  &.network-node-imam .network-node-circle {
+    fill: #ffa726;
+  }
+
+  &.network-node-imam:hover .network-node-circle {
+    fill: #ffb74d;
+  }
+}
+
+.network-node-label {
+  fill: var(--text-primary, #333);
+  font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+// ---------------------------------------------------------------------------
+// Legend
+// ---------------------------------------------------------------------------
+.network-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 12px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #666);
+
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #9575cd;
+    display: inline-block;
+
+    &.legend-swatch-edge {
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(94, 53, 177, 0.5);
+    }
+
+    &.legend-swatch-imam {
+      background: #ffa726;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dark theme — adjust label colour + edge contrast
+// ---------------------------------------------------------------------------
+:host-context(body.dark-theme) {
+  .narrator-network {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .network-edge {
+    stroke: rgba(179, 157, 219, 0.45);
+  }
+
+  .network-node-label {
+    fill: #e0e0e0;
+  }
+}

@@ -135,7 +135,11 @@
     "narratedFromTitle": "Narrated From",
     "narratedToTitle": "Narrated To",
     "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
-    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency",
+    "networkTitle": "Сеть со-передатчиков",
+    "networkSubtitle": "Передатчики, чаще всего появляющиеся в цепях с этим.",
+    "networkLegendEdge": "Линия толще = больше общих хадисов",
+    "networkLegendImam": "Имам"
   },
   "search": {
     "filter": "Фильтр",

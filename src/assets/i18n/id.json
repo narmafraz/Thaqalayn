@@ -135,7 +135,11 @@
     "narratedFromTitle": "Narrated From",
     "narratedToTitle": "Narrated To",
     "narratedFromDesc": "People this narrator received hadith from, ranked by frequency",
-    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency"
+    "narratedToDesc": "People who received hadith from this narrator, ranked by frequency",
+    "networkTitle": "Jaringan periwayat bersama",
+    "networkSubtitle": "Periwayat yang paling sering muncul bersama dalam sanad dengan yang ini.",
+    "networkLegendEdge": "Garis lebih tebal = hadis bersama lebih banyak",
+    "networkLegendImam": "Imam"
   },
   "search": {
     "filter": "Filter",

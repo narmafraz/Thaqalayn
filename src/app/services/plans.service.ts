@@ -6,9 +6,27 @@ import { catchError, switchMap } from 'rxjs/operators';
 
 import { BookmarkService, EnrolledPlan, ReadVerse } from './bookmark.service';
 
-/** A single day's slot inside a plan — a list of (surah, range) tuples for now. */
+/**
+ * A single day's slot inside a plan — list of chapter-index ranges.
+ *
+ * `chapterIndex` is the canonical hierarchical index (same as the JSON
+ * `index` field on each chapter). Examples:
+ *   - Quran surah 2: "quran:2"
+ *   - Al-Kafi vol 1 / book 1 / chapter 1: "al-kafi:1:1:1"
+ *
+ * `verseStart` / `verseEnd` are 1-based, inclusive — the user-facing
+ * verse numbers within that chapter. expandDayPaths() turns them into
+ * `/books/<chapterIndex>:<n>` verse paths.
+ *
+ * The legacy `surah` field is still accepted for the original
+ * Quran-in-30-days plan; if present and `chapterIndex` is missing the
+ * loader builds `chapterIndex = "quran:<surah>"`.
+ */
 export interface PlanDayRange {
-  surah: number;
+  /** Canonical chapter index. Preferred for new plans. */
+  chapterIndex?: string;
+  /** Legacy Quran-only field. If set, `chapterIndex` is derived as `quran:<surah>`. */
+  surah?: number;
   verseStart: number;
   verseEnd: number;
 }
@@ -133,8 +151,9 @@ export class PlansService {
   expandDayPaths(book: string, day: PlanDay): string[] {
     const paths: string[] = [];
     for (const r of day.ranges) {
+      const idx = this.rangeChapterIndex(book, r);
       for (let v = r.verseStart; v <= r.verseEnd; v++) {
-        paths.push(`/books/${book}:${r.surah}:${v}`);
+        paths.push(`/books/${idx}:${v}`);
       }
     }
     return paths;
@@ -148,7 +167,14 @@ export class PlansService {
   firstPathOfDay(book: string, day: PlanDay): string | null {
     const first = day.ranges[0];
     if (!first) return null;
-    return `/books/${book}:${first.surah}:${first.verseStart}`;
+    return `/books/${this.rangeChapterIndex(book, first)}:${first.verseStart}`;
+  }
+
+  /** Resolve a range's chapter index, falling back to the legacy `surah` field for Quran plans. */
+  private rangeChapterIndex(book: string, r: PlanDayRange): string {
+    if (r.chapterIndex) return r.chapterIndex;
+    if (r.surah !== undefined) return `${book}:${r.surah}`;
+    return book;
   }
 
   // ---------------------------------------------------------------------------

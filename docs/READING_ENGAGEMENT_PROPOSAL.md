@@ -28,7 +28,7 @@
 | **RE-18 Homepage per-book progress panel** | **✅ DONE** | "Books you've started" grid after the book-tree, sorted by most-recently-read |
 | Extended export/import covering new tables | **✅ DONE** | Bumped to format version 3 (readVerses + goalConfig + earnedBadges + enrolledPlans). v1 + v2 imports still accepted. |
 | `/bookmarks` page tabbed | **✅ DONE** | 5 tabs (Progress · Plans · Badges · Saves · Settings), localStorage-persisted active tab |
-| `man-la-yahduruhu-al-faqih` start/end-column parser bug | **✅ DONE** | `set_index` rewrite in `app/lib_model.py` using a dedicated `verse_counter` distinct from the per-depth `indexes` array; 10 new tests pinning the corrected behaviour. Other books still need a full `add_data` regen. |
+| `set_index` first-chapter-at-each-level parser bug | **✅ DONE** | `set_index` rewrite in `app/lib_model.py` uses a dedicated `verse_counter` distinct from the per-depth `indexes` array; 10 new tests pin the corrected behaviour. Initially regenerated faqih only on 2026-05-19; full `add_data` regen across all 24 books on 2026-05-19 propagated the fix everywhere. `verse-counts.json` is byte-identical pre/post regen (counts come from `verse_refs` directly, not the bug-affected `chapter.verse_count` field). |
 
 Architectural decisions captured in [DECISION_LOG.md D061](DECISION_LOG.md#d061-reading-progress-architecture--single-dexie-db-derived-stats-service-intersectionobserver-auto-detect-2026-05-17).
 

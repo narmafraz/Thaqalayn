@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-05-19
+> **Last updated:** 2026-05-19 (added PATH_B_SPARK_LOG + PATH_B_STATUS entries; flipped WORDS_PROJECT_PLAN from ACTIVE to PARTIAL post Path B)
 
 ## Status Legend
 
@@ -114,7 +114,7 @@
 
 | Document | Status | Summary |
 |----------|--------|---------|
-| [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **ACTIVE** (Sessions 1+2 complete; Path B replanned 2026-05-14 for Spark, $0) | Per-word Arabic dictionary. **Sessions 1+2 done 2026-05-13**: data API live at <https://thaqalaynwords.netlify.app/> (102K surfaces + 13K lemmas + 2,769 roots, 76% Wiktextract definitions, Lane's body parsed, hawramani classical lexicons on top 15%); Angular UI shipped (browse + word pages + in-verse word-by-word toggle on every hadith with lazy popups); temporary English-gloss-on-lemma-index ("Path C") wired in 2026-05-13 to put translations on every word card pending Path B. **Path B replanned 2026-05-14**: 11-lang Spark Qwen36 translation of **both** 13K lemmas AND 102K surfaces, $0 compute, ~10-12 h Spark wall time, structured as 5 experiment rounds (lemma baseline → lemma refinement → surface baseline → surface + corpus context A/B → tough-case spot check). Path C reverts when Path B lands (commits `34ff19c` + `d0ce4a9`). |
+| [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **PARTIAL** (Sessions 1+2 + Path B complete; small Track D polish + hawramani re-scrape outstanding) | Per-word Arabic dictionary. Path B shipped 2026-05-19: 99.2% of lemmas + 98.7% of surfaces translated into 11 languages via Spark Qwen 3.6-35B at $0. UI reads surface-level translations including clitic context. Path C English-only glosses retired. See `PATH_B_SPARK_LOG.md` for the round-by-round results and `PATH_B_STATUS.md` for the runbook. |
 
 ### 2026-05-12
 
@@ -133,3 +133,10 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [READING_ENGAGEMENT_PROPOSAL.md](READING_ENGAGEMENT_PROPOSAL.md) | **COMPLETE** — RE-01..RE-18 all shipped 2026-05-17..2026-05-19 | 18-item proposal extending `lastPath`-only progress into verse-level coverage tracking + habit features. **Shipped:** per-verse auto+manual marking, Dexie v5 schema (readVerses + goalConfig + earnedBadges + enrolledPlans) + extended JSON export/import (v3), `VerseCountsService` + `ReadingStatsService`, per-book progress bars + chapter-list rings + "hide completed" filter, global `muteReadVerses` pref, /bookmarks 5-tab layout (Progress/Plans/Badges/Saves/Settings), deterministic Verse of the Day, milestone toasts (12-20 s, pause-on-hover), **38-badge holographic-foil catalogue** with per-category accents + hover-tilt, reading-reminder banner (re-scoped from PWA push), per-section reset + global wipe, started-books homepage panel, revisit suggestions, cross-book unread highlighting, **17 reading plans** in `ThaqalaynData/plans/`. 108 new Karma tests (649 → 757) + 10 new pytest tests. All 1987 pytest + 757 Karma pass. 13 new Playwright E2E specs queued for next prod deploy. See [DECISION_LOG.md D061](DECISION_LOG.md). |
+
+### 2026-05-19
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [PATH_B_SPARK_LOG.md](PATH_B_SPARK_LOG.md) | **COMPLETE** — Path B fully shipped 2026-05-19 | Round-by-round experiment log for the Path B Spark Qwen 3.6-35B word translation pipeline. Rounds 1-4 (lemma baseline → lemma+classical_definitions → surface baseline → surface+corpus-context) all locked decisions; Round 5 deferred (no remaining systematic issues). Full-corpus runs: 12,985 / 13,086 lemmas (99.2%) + 100,675 / 102,003 surfaces (98.7%) with 11-lang glosses. $0 Spark compute, ~55 h pure compute over ~5 days wall. |
+| [PATH_B_STATUS.md](PATH_B_STATUS.md) | **REFERENCE** (runbook — Path B complete 2026-05-19) | Live status runbook + resumability recipe for the Path B pipeline. Useful as the canonical resume-on-crash / re-run reference if any stage needs to be replayed (extract → Spark → merge → index rebuild). Locked-in final commits across 4 repos noted at top. |

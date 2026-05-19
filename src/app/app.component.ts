@@ -5,6 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { Book, Crumb, getChapter, Narrator } from '@app/models';
 import { BreadcrumbItem, I18nService, SeoService, ThemeService, KeyboardShortcutService, WebVitalsService } from '@app/services';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
+import { AiLanguage } from '@app/models/ai-content';
 import { ReadingSheetService } from '@app/services/reading-sheet.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
@@ -191,6 +192,20 @@ export class AppComponent implements OnInit, OnDestroy {
       this.subscriptions.push(
         this.i18n.currentLang$.subscribe(lang => {
           document.documentElement.lang = lang;
+          // Sync word-by-word language to the site language when there's
+          // an AI-translation equivalent (every site lang except `ar`,
+          // since the WBW set doesn't include Arabic — the surface text
+          // is already Arabic). Users can still override the WBW lang
+          // independently afterwards; the next site-lang change will
+          // re-sync. See AiLanguage in models/ai-content.ts for the
+          // full set.
+          const WBW_LANGS: ReadonlySet<AiLanguage> = new Set([
+            'en', 'fa', 'ur', 'tr', 'id', 'bn', 'es', 'fr', 'de', 'ru', 'zh',
+          ]);
+          if (WBW_LANGS.has(lang as AiLanguage) &&
+              this.aiPrefs.get('wordByWordDefaultLang') !== lang) {
+            this.aiPrefs.set('wordByWordDefaultLang', lang as AiLanguage);
+          }
         })
       );
 

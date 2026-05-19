@@ -46,8 +46,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   /** Set of surface slugs we're currently fetching. */
   private surfaceCardLoading = new Set<string>();
 
-  /** Lemma slug → English gloss, populated once from the lemmas index. */
-  lemmaGlossMap = new Map<string, string>();
 
   @Input() verse: Verse;
   @Input() isQuran = false;
@@ -87,12 +85,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
       if (this.showWordAnalysis && !wasWBW && !this.hasWordAnalysis) {
         this.prefetchSurfaceData();
       }
-      this.cdr.markForCheck();
-    });
-    // Load the lemma → gloss lookup once. WordsService caches it
-    // session-wide; multiple verse-text instances share the same map.
-    this.words.getLemmaGlossMap().pipe(takeUntil(this.destroy$)).subscribe(m => {
-      this.lemmaGlossMap = m;
       this.cdr.markForCheck();
     });
   }
@@ -156,16 +148,17 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return data?.morphology?.lemma_slug || null;
   }
 
-  /** Read-only helper: English gloss for a card. Prefers the inline v3
-   *  entry's translation for the active lang; falls back to the lemma
-   *  gloss map (English only — Path B will fill other langs later). */
+  /** Card gloss for the active language. v3 inline translation wins;
+   *  otherwise read from the prefetched surface JSON
+   *  (`surfaceCardData[slug].translations[activeLang]`). Empty when the
+   *  surface isn't prefetched yet or Path B didn't translate it (~1.3%
+   *  of surfaces had validator issues and were skipped by the merger). */
   cardTranslation(entry: WordAnalysisEntry): string {
     const inline = entry.translation?.[this.wordAnalysisLang];
     if (inline) return inline;
-    if (this.wordAnalysisLang !== 'en') return '';
-    const lemmaSlug = this.cardLemmaSlug(entry);
-    if (!lemmaSlug) return '';
-    return this.lemmaGlossMap.get(lemmaSlug) || '';
+    const surface = this.surfaceCardData.get(entry.word);
+    if (!surface?.translations) return '';
+    return surface.translations[this.wordAnalysisLang] || '';
   }
 
   toggleChainDiagram(): void {
@@ -414,22 +407,17 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   }
 
   /** Resolve the popup's translation from any source already loaded:
-   *  inline v3 entry → lemmas-index gloss map (English) → fully-loaded
-   *  lemma page first sense. We check the cached sources first so the
-   *  popup hydrates instantly when the card already had a gloss to
-   *  show, instead of spinning while we re-fetch the lemma. */
+   *  inline v3 entry → prefetched surface JSON's Path B translation.
+   *  We read what's already in memory; no extra fetches. Empty when
+   *  neither source has a translation for the active language. */
   get popupTranslation(): string {
     if (!this.wordPopup) return '';
     const entry = this.wordPopup.entry;
     const inline = entry.translation?.[this.wordAnalysisLang];
     if (inline) return inline;
-    if (this.wordAnalysisLang === 'en') {
-      const lemmaSlug = this.cardLemmaSlug(entry);
-      const cached = lemmaSlug ? this.lemmaGlossMap.get(lemmaSlug) : '';
-      if (cached) return cached;
-    }
-    if (this.popupLemma && this.wordAnalysisLang === 'en') {
-      return this.popupLemma.definition?.senses?.[0]?.gloss || '';
+    const surface = this.surfaceCardData.get(entry.word);
+    if (surface?.translations) {
+      return surface.translations[this.wordAnalysisLang] || '';
     }
     return '';
   }

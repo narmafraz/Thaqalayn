@@ -50,6 +50,11 @@ export interface SurfacePage {
   lemma_link: string | null;
   /** Path to the root page (`/words/roots/{root_slug}`). Null when morphology is null or root is null. */
   root_link: string | null;
+  /** Per-language translations of the WHOLE surface form (incl. clitics).
+   *  Populated by Path B Spark translation. Null on the ~1.3% of surfaces
+   *  the merger skipped (validator issues). Keys: en, fa, ur, tr, id, bn,
+   *  es, fr, de, ru, zh. */
+  translations: Record<string, string> | null;
 }
 
 /** A single form in a lemma's full paradigm. */
@@ -230,10 +235,6 @@ export interface LemmaIndexEntry {
   root: string | null;
   root_slug: string | null;
   pos: string | null;
-  /** First English Wiktextract gloss aligned with the lemma's POS,
-   *  truncated to 80 chars. Empty when Wiktionary has no POS-aligned
-   *  sense (typical for some function words). */
-  gloss: string;
   frequency: number;
   paradigm_size: number;
   in_corpus_forms: number;

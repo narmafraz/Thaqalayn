@@ -1,23 +1,22 @@
 # Thaqalayn — public scholarly resource for Shia Islamic primary texts.
-# All crawlers (search + AI training + AI retrieval) are intentionally allowed.
-# Goal: maximize discoverability across Google, Bing, and AI assistants
-# (ChatGPT, Claude, Perplexity, Gemini, Copilot).
+#
+# Policy (revised 2026-05-20 after bandwidth incident):
+#   - Search engines + user-triggered AI retrieval: ALLOWED.
+#     These produce minimal traffic (one page per query) and surface our
+#     content to readers actively looking for it.
+#   - AI training crawlers: BLOCKED.
+#     These do full-site sweeps for model training. They consumed the
+#     entire Netlify free-tier bandwidth budget in mid-May 2026.
 
 User-agent: *
 Allow: /
 
-# OpenAI
-User-agent: GPTBot
-Allow: /
+# --- User-triggered AI retrieval (allowed: low traffic, sends real readers) ---
 
 User-agent: OAI-SearchBot
 Allow: /
 
 User-agent: ChatGPT-User
-Allow: /
-
-# Anthropic
-User-agent: ClaudeBot
 Allow: /
 
 User-agent: Claude-SearchBot
@@ -26,50 +25,58 @@ Allow: /
 User-agent: Claude-User
 Allow: /
 
-User-agent: anthropic-ai
-Allow: /
-
-# Perplexity
-User-agent: PerplexityBot
-Allow: /
-
 User-agent: Perplexity-User
 Allow: /
 
-# Google AI Overviews / Gemini training (separate token from Googlebot;
-# Allow keeps the content eligible for AI Overviews citations)
-User-agent: Google-Extended
-Allow: /
-
-# Apple Intelligence
-User-agent: Applebot-Extended
-Allow: /
-
-# Common Crawl (used by many open-source training pipelines)
-User-agent: CCBot
-Allow: /
-
-# Meta / Llama
-User-agent: meta-externalagent
-Allow: /
-
-User-agent: FacebookBot
-Allow: /
-
-# ByteDance / Doubao
-User-agent: Bytespider
-Allow: /
-
-# Amazon
-User-agent: Amazonbot
-Allow: /
-
-# Mistral
 User-agent: MistralAI-User
 Allow: /
 
-# Cohere
+# --- AI training crawlers (blocked: full-site sweeps, no traffic back) ---
+
+# OpenAI training (distinct from OAI-SearchBot / ChatGPT-User)
+User-agent: GPTBot
+Disallow: /
+
+# Anthropic training (distinct from Claude-SearchBot / Claude-User)
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+# Perplexity full-site indexing (distinct from Perplexity-User)
+User-agent: PerplexityBot
+Disallow: /
+
+# Google Gemini training (distinct from Googlebot search — Googlebot stays allowed)
+User-agent: Google-Extended
+Disallow: /
+
+# Apple Intelligence training (distinct from Applebot search — Applebot stays allowed)
+User-agent: Applebot-Extended
+Disallow: /
+
+# Common Crawl (powers many open-source training pipelines)
+User-agent: CCBot
+Disallow: /
+
+# Meta / Llama training
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+# ByteDance / Doubao
+User-agent: Bytespider
+Disallow: /
+
+# Amazon
+User-agent: Amazonbot
+Disallow: /
+
+# Cohere training
 User-agent: cohere-ai
-Allow: /
+Disallow: /
 
 Sitemap: https://thaqalayn.netlify.app/sitemap.xml

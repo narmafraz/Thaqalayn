@@ -76,15 +76,30 @@ function dataPathToUrl(rel) {
   return '/books/' + parts.join(':');
 }
 
+function segCount(urlPath) {
+  return (urlPath.match(/:/g) || []).length;
+}
+
 // Priority heuristic: deeper paths (verse-detail) get lower priority than
 // chapters and book roots.
 function priorityForUrl(urlPath) {
-  const segCount = (urlPath.match(/:/g) || []).length;
-  if (segCount === 0) return '0.9';   // /books/quran
-  if (segCount === 1) return '0.8';   // /books/quran:1
-  if (segCount === 2) return '0.7';   // /books/al-kafi:1:1
-  if (segCount === 3) return '0.6';   // /books/al-kafi:1:1:1
-  return '0.5';                       // /books/al-kafi:1:1:1:1 (verse-detail)
+  const c = segCount(urlPath);
+  if (c === 0) return '0.9';   // /books/quran
+  if (c === 1) return '0.8';   // /books/quran:1
+  if (c === 2) return '0.7';   // /books/al-kafi:1:1
+  if (c === 3) return '0.6';   // /books/al-kafi:1:1:1
+  return '0.5';                // /books/al-kafi:1:1:1:1 (verse-detail)
+}
+
+// Drop verse-detail URLs (the deepest segment count for each book). Chapter
+// pages inline all verse content (commit 2cd3d02), so individual verse-detail
+// URLs are duplicate content for SEO. Removing them cuts Googlebot's crawl
+// frontier by ~20× — major cause of the May 2026 bandwidth incident.
+function dropVerseDetails(entries) {
+  if (entries.length === 0) return entries;
+  const maxDepth = entries.reduce((m, e) => Math.max(m, segCount(e.url)), 0);
+  if (maxDepth <= 1) return entries; // book has no verse-detail layer to drop
+  return entries.filter(e => segCount(e.url) < maxDepth);
 }
 
 // Walk a book directory, returning entries [{ url, lastmod }, ...].
@@ -168,12 +183,19 @@ async function generateLocal() {
 
   // One sitemap per book slug
   const slugs = discoverBookSlugs(booksDir);
+  let droppedTotal = 0;
   for (const slug of slugs) {
-    const entries = walkBookDir(booksDir, slug);
+    const allEntries = walkBookDir(booksDir, slug);
+    if (allEntries.length === 0) continue;
+    const entries = dropVerseDetails(allEntries);
+    droppedTotal += allEntries.length - entries.length;
     if (entries.length === 0) continue;
     buckets[`sitemap-${slug}.xml`] = entries.map(e =>
       urlEntry(BASE_URL + e.url, e.lastmod, 'monthly', priorityForUrl(e.url))
     );
+  }
+  if (droppedTotal > 0) {
+    console.log(`  Dropped ${droppedTotal} verse-detail URLs (content already inlined on chapter pages)`);
   }
 
   // Narrators
@@ -237,10 +259,18 @@ async function generateRemote() {
     if (!m) continue;
     const slug = m[1];
     if (!bySlug[slug]) bySlug[slug] = [];
-    bySlug[slug].push(urlEntry(BASE_URL + urlPath, TODAY_ISO, 'monthly', priorityForUrl(urlPath)));
+    bySlug[slug].push({ url: urlPath });
   }
-  for (const [slug, urls] of Object.entries(bySlug)) {
-    buckets[`sitemap-${slug}.xml`] = urls;
+  let droppedTotal = 0;
+  for (const [slug, slugEntries] of Object.entries(bySlug)) {
+    const kept = dropVerseDetails(slugEntries);
+    droppedTotal += slugEntries.length - kept.length;
+    buckets[`sitemap-${slug}.xml`] = kept.map(e =>
+      urlEntry(BASE_URL + e.url, TODAY_ISO, 'monthly', priorityForUrl(e.url))
+    );
+  }
+  if (droppedTotal > 0) {
+    console.log(`  Dropped ${droppedTotal} verse-detail URLs (content already inlined on chapter pages)`);
   }
 
   const narratorEntries = [urlEntry(BASE_URL + '/people/narrators/index', TODAY_ISO, 'monthly', '0.7')];

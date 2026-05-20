@@ -114,7 +114,7 @@
 
 | Document | Status | Summary |
 |----------|--------|---------|
-| [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **PARTIAL** (Sessions 1+2 + Path B complete; small Track D polish + hawramani re-scrape outstanding) | Per-word Arabic dictionary. Path B shipped 2026-05-19: 99.2% of lemmas + 98.7% of surfaces translated into 11 languages via Spark Qwen 3.6-35B at $0. UI reads surface-level translations including clitic context. Path C English-only glosses retired. See `PATH_B_SPARK_LOG.md` for the round-by-round results and `PATH_B_STATUS.md` for the runbook. |
+| [WORDS_PROJECT_PLAN.md](WORDS_PROJECT_PLAN.md) | **ACTIVE** (Sessions 1+2 + Path B + hawramani-full complete; small Track D polish outstanding) | Per-word Arabic dictionary. Path B shipped 2026-05-19: 99.2% of lemmas + 98.7% of surfaces translated into 11 languages via Spark Qwen 3.6-35B at $0. Hawramani full re-scrape also done 2026-05-19 (Spark, 17.5h): classical_definitions coverage 15% → 45.9%. UI reads surface-level translations including clitic context. Path C English-only glosses retired. See `PATH_B_SPARK_LOG.md` for the round-by-round results, `PATH_B_STATUS.md` for the runbook, and `WORDS_PROJECT_PLAN.md` Phase 18 for the hawramani details. |
 
 ### 2026-05-12
 

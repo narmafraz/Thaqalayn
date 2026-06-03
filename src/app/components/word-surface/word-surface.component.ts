@@ -135,4 +135,22 @@ export class WordSurfaceComponent implements OnInit, OnDestroy {
     if (!c) return [];
     return Object.keys(c).sort().map(slot => ({ slot, code: c[slot] }));
   }
+
+  /** Ordered list of the languages Path B emits, with display labels
+   *  and direction flags. Used by the surface page to render
+   *  translations in a stable order regardless of object-key order. */
+  readonly translationLangs: Array<{ code: string; label: string; rtl?: boolean }> = [
+    { code: 'en', label: 'English' },
+    { code: 'ar', label: 'Arabic', rtl: true },
+    { code: 'fa', label: 'Persian', rtl: true },
+    { code: 'ur', label: 'Urdu', rtl: true },
+    { code: 'tr', label: 'Turkish' },
+    { code: 'id', label: 'Indonesian' },
+    { code: 'bn', label: 'Bengali' },
+    { code: 'es', label: 'Spanish' },
+    { code: 'fr', label: 'French' },
+    { code: 'de', label: 'German' },
+    { code: 'ru', label: 'Russian' },
+    { code: 'zh', label: 'Chinese' },
+  ];
 }

@@ -69,13 +69,14 @@
            [attr.aria-label]="cardPos(entry) ? (entry.word + ' - ' + getPosLabel(cardPos(entry))) : entry.word">
         <span class="word-arabic">{{ entry.word }}</span>
         <!-- Inline translation: v3 word_analysis when present, otherwise
-             the lemma's English Wiktextract gloss from the lemmas index.
+             the surface JSON's Path B translation in the active language.
              title shows the full text when CSS ellipsis truncates it. -->
         <span class="word-translation" dir="ltr" *ngIf="cardTranslation(entry) as t" [title]="t">
           {{ t }}
         </span>
-        <!-- POS: from v3 entry or eagerly-loaded surface data. -->
-        <span class="word-pos" *ngIf="cardPos(entry)" [style.color]="getPosColor(cardPos(entry))">{{ getPosLabel(cardPos(entry)) }}</span>
+        <!-- POS intentionally not shown on the card itself — it lives
+             in the popup only. Reading flow is cleaner without per-word
+             grammar labels in the way. -->
       </div>
     </div>
     <!-- Word detail popup -->

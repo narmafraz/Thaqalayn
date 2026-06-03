@@ -49,6 +49,26 @@ h2 {
   margin: 0;
 }
 
+.translations-grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1rem;
+  margin: 1rem 0;
+}
+
+.translations-grid dt {
+  color: var(--mat-sys-on-surface-variant, #666);
+  font-size: 0.85rem;
+}
+
+.translations-grid dd {
+  margin: 0;
+}
+
+.lang-label {
+  font-weight: 600;
+}
+
 .lemma-link {
   font-size: 1.3rem;
   font-family: var(--arabic-font, 'Amiri', serif);

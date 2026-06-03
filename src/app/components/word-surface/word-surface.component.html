@@ -17,6 +17,18 @@
       </p>
     </header>
 
+    <section class="translations" *ngIf="surface.translations as t">
+      <h2>Translations</h2>
+      <dl class="translations-grid">
+        <ng-container *ngFor="let lang of translationLangs">
+          <ng-container *ngIf="t[lang.code] as gloss">
+            <dt><span class="lang-label">{{ lang.label }}</span></dt>
+            <dd [attr.lang]="lang.code" [attr.dir]="lang.rtl ? 'rtl' : 'ltr'">{{ gloss }}</dd>
+          </ng-container>
+        </ng-container>
+      </dl>
+    </section>
+
     <section class="morphology" *ngIf="surface.morphology as m">
       <h2>Morphology</h2>
       <dl class="morphology-grid">

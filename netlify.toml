@@ -39,6 +39,19 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# NOTE: Install "Prerender" from the Netlify Extensions marketplace
-# (free tier available). Bots (Googlebot, etc.) will receive
-# pre-rendered HTML snapshots for full SEO indexing of the SPA.
+# Edge function for diagnosing the June 2026 bandwidth incident.
+# Logs User-Agent + path + IP for /books/* and /people/* requests so
+# we can identify the scrapers responsible. Path config lives in the
+# function's `config` export. Remove this block + the function file
+# once the top consumers are identified.
+[[edge_functions]]
+  function = "log-ua"
+  path = "/books/*"
+
+[[edge_functions]]
+  function = "log-ua"
+  path = "/people/*"
+
+# Note on the Netlify Prerender extension: previously installed via the
+# Extensions marketplace dashboard. Disable it there if it is still
+# consuming Puppeteer-render bandwidth on bot traffic.

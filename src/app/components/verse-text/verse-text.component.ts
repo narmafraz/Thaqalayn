@@ -3,7 +3,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AiLanguage, AiTranslationEntry, Chunk, ContentType, KeyPhrase, WordAnalysisEntry, getAiTranslationText, isAiTranslation, getAiLang } from '@app/models/ai-content';
 import { NarratorMetadata, Verse } from '@app/models';
 import { SpecialText } from '@app/models/book';
-import { LemmaPage, SurfacePage } from '@app/models/word';
+import { SurfacePage } from '@app/models/word';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { WordsService } from '@app/services/words.service';
 import { slug as wordSlug } from '@app/services/word-normalize';
@@ -32,15 +32,13 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   private words = inject(WordsService);
   private destroy$ = new Subject<void>();
 
-  /** Lemma data fetched lazily on word-card click, keyed by surface slug. */
-  popupLemma: LemmaPage | null = null;
-  popupLemmaLoading = false;
-
   /**
    * Per-card surface data fetched eagerly when word-by-word view is
-   * toggled on for a hadith with no v3 word_analysis. The surface
-   * page is small and gives us POS for the inline card display
-   * (translation still requires the heavier lemma fetch on click).
+   * toggled on. The surface page is small and carries everything the
+   * card + popup need: POS (`morphology.pos`), lemma slug for the
+   * "Full word page →" link, and Path B's 11-language `translations`.
+   * No further lemma fetch happens from this component — that's
+   * `word-lemma.component`'s job on the dedicated lemma page.
    */
   surfaceCardData = new Map<string, SurfacePage>();
   /** Set of surface slugs we're currently fetching. */
@@ -182,8 +180,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     if (this.activeWordIndex === index) {
       this.activeWordIndex = null;
       this.wordPopup = null;
-      this.popupLemma = null;
-      this.popupLemmaLoading = false;
       this.cdr.markForCheck();
       return;
     }
@@ -191,9 +187,9 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     if (index !== null && event) {
       const entry = this.wordTokens[index];
       if (entry) {
-        // Lazy-load the lemma in parallel so the popup hydrates after
-        // a network round-trip. Cached via WordsService.shareReplay.
-        this.loadPopupLemma(entry.word);
+        // No extra fetch on click — the surface page was eagerly
+        // prefetched when WBW was toggled on, and carries everything
+        // the popup renders (POS + 11-language translations).
         const target = event.currentTarget as HTMLElement;
         const containerRect = target.closest('.word-analysis-grid')?.getBoundingClientRect();
         const cardRect = target.getBoundingClientRect();
@@ -229,8 +225,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   closeWordPopup(): void {
     this.activeWordIndex = null;
     this.wordPopup = null;
-    this.popupLemma = null;
-    this.popupLemmaLoading = false;
   }
 
   @HostListener('document:keydown.escape')
@@ -381,31 +375,6 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return wordSlug(word);
   }
 
-  /**
-   * Lazy-load the lemma data for a clicked word and merge it into the
-   * popup so POS and translation light up after the network round-trip.
-   * Uses WordsService which has shareReplay caching — fetches each
-   * lemma at most once per session.
-   */
-  private loadPopupLemma(surface: string): void {
-    this.popupLemma = null;
-    this.popupLemmaLoading = true;
-    this.cdr.markForCheck();
-    this.words.getSurface(surface).subscribe(surfacePage => {
-      if (!surfacePage?.morphology?.lemma_slug) {
-        this.popupLemmaLoading = false;
-        this.cdr.markForCheck();
-        return;
-      }
-      const lemmaSlug = surfacePage.morphology.lemma_slug;
-      this.words.getLemma(lemmaSlug).subscribe(lemma => {
-        this.popupLemma = lemma;
-        this.popupLemmaLoading = false;
-        this.cdr.markForCheck();
-      });
-    });
-  }
-
   /** Resolve the popup's translation from any source already loaded:
    *  inline v3 entry → prefetched surface JSON's Path B translation.
    *  We read what's already in memory; no extra fetches. Empty when
@@ -422,16 +391,13 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  /** Popup POS — inline v3 entry, eagerly-prefetched surface page, or
-   *  the lazy-loaded lemma (in that order). The first two are
-   *  typically already in memory by the time the user clicks. */
+  /** Popup POS — inline v3 entry or the eagerly-prefetched surface
+   *  page. Both are in memory by the time the user clicks. */
   get popupPos(): string {
     if (!this.wordPopup) return '';
     const entry = this.wordPopup.entry;
     if (entry.pos) return entry.pos;
-    const surf = this.surfaceCardData.get(entry.word);
-    if (surf?.morphology?.pos) return surf.morphology.pos;
-    return this.popupLemma?.pos || '';
+    return this.surfaceCardData.get(entry.word)?.morphology?.pos || '';
   }
 
   get hasChunks(): boolean {

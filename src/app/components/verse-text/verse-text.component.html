@@ -90,9 +90,6 @@
           {{ getPosLabel(popupPos) }}
         </span>
       </div>
-      <div class="word-popup-loading" *ngIf="popupLemmaLoading && !popupTranslation">
-        <mat-spinner diameter="16"></mat-spinner>
-      </div>
       <div class="word-popup-translation" *ngIf="popupTranslation">
         <span class="word-popup-lang-label">{{ getWordLangLabel(wordAnalysisLang) }}</span>
         <span class="word-popup-trans-text">{{ popupTranslation }}</span>

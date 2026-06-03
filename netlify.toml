@@ -52,6 +52,10 @@
   function = "log-ua"
   path = "/people/*"
 
+[[edge_functions]]
+  function = "log-ua"
+  path = "/words/*"
+
 # Note on the Netlify Prerender extension: previously installed via the
 # Extensions marketplace dashboard. Disable it there if it is still
 # consuming Puppeteer-render bandwidth on bot traffic.

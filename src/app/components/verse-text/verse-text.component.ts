@@ -71,15 +71,25 @@ export class VerseTextComponent implements OnInit, OnDestroy {
   wordPopup: { entry: WordAnalysisEntry; x: number; y: number } | null = null;
 
   ngOnInit(): void {
+    // If WBW is already on at component mount (saved preference, or
+    // we're remounting after a navigate-away/back), kick the prefetch
+    // before the subscription handler runs. The handler's off→on guard
+    // would otherwise see wasWBW=true (matching the initial field
+    // value) and skip the fetch — leaving cards empty on the second
+    // visit. shareReplay in WordsService makes this idempotent if the
+    // subscription handler also fires.
+    if (this.showWordAnalysis && !this.hasWordAnalysis) {
+      this.prefetchSurfaceData();
+    }
     this.aiPrefs.preferences$.pipe(takeUntil(this.destroy$)).subscribe(prefs => {
       const wasWBW = this.showWordAnalysis;
       this.showDiacritics = prefs.showDiacritizedByDefault;
       this.showWordAnalysis = prefs.showWordByWord;
       this.showChainDiagram = prefs.showChainDiagram;
       this.wordAnalysisLang = prefs.wordByWordDefaultLang;
-      // When WBW transitions off→on (toolbar/sheet flip or other surface)
-      // and this verse has no v3 word_analysis, kick the prefetch so cards
-      // populate without an extra click. shareReplay makes it idempotent.
+      // Off→on transition (toolbar toggle, sheet flip, or another
+      // surface enabling WBW) — kick the prefetch so cards populate
+      // without an extra click.
       if (this.showWordAnalysis && !wasWBW && !this.hasWordAnalysis) {
         this.prefetchSurfaceData();
       }

@@ -60,8 +60,18 @@ Disallow: /
 User-agent: CCBot
 Disallow: /
 
-# Meta / Llama training
+# Meta / Llama training + indexing
+# meta-webindexer was the dominant scraper in the June 2026 bandwidth
+# incident — 99.4% of bot traffic to content pages. Also blocked at
+# the edge (see netlify/edge-functions/log-ua.ts) in case Meta ignores
+# this declaration.
+User-agent: meta-webindexer
+Disallow: /
+
 User-agent: meta-externalagent
+Disallow: /
+
+User-agent: meta-externalfetcher
 Disallow: /
 
 User-agent: FacebookBot

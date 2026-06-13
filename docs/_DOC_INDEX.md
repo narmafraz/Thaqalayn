@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-05-19 (added PATH_B_SPARK_LOG + PATH_B_STATUS entries; flipped WORDS_PROJECT_PLAN from ACTIVE to PARTIAL post Path B)
+> **Last updated:** 2026-06-12 (added PER_LANGUAGE_VERSE_SPLIT)
 
 ## Status Legend
 
@@ -140,3 +140,9 @@
 |----------|--------|---------|
 | [PATH_B_SPARK_LOG.md](PATH_B_SPARK_LOG.md) | **COMPLETE** — Path B fully shipped 2026-05-19 | Round-by-round experiment log for the Path B Spark Qwen 3.6-35B word translation pipeline. Rounds 1-4 (lemma baseline → lemma+classical_definitions → surface baseline → surface+corpus-context) all locked decisions; Round 5 deferred (no remaining systematic issues). Full-corpus runs: 12,985 / 13,086 lemmas (99.2%) + 100,675 / 102,003 surfaces (98.7%) with 11-lang glosses. $0 Spark compute, ~55 h pure compute over ~5 days wall. |
 | [PATH_B_STATUS.md](PATH_B_STATUS.md) | **REFERENCE** (runbook — Path B complete 2026-05-19) | Live status runbook + resumability recipe for the Path B pipeline. Useful as the canonical resume-on-crash / re-run reference if any stage needs to be replayed (extract → Spark → merge → index rebuild). Locked-in final commits across 4 repos noted at top. |
+
+### 2026-06-12
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [PER_LANGUAGE_VERSE_SPLIT.md](PER_LANGUAGE_VERSE_SPLIT.md) | **ACTIVE** (proposed; not yet implemented) | Symmetric per-language verse-detail file split: `1.json` (base, language-agnostic) + `1.{lang}.json` sister per language. Cuts per-user fetch bandwidth ~60% by serving only the active-language sister instead of all 11 langs. Side effects: per-language cache invalidation isolation + uniform loader code. Includes concrete before/after JSON schemas, generator merger changes, and UI `loadVerseDetail(path, lang)` migration. |

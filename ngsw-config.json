@@ -25,6 +25,16 @@
           "/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
         ]
       }
+    },
+    {
+      "name": "i18n",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/i18n/*.json"
+        ]
+      }
     }
   ],
   "dataGroups": [
@@ -62,18 +72,6 @@
         "maxAge": "30d",
         "strategy": "freshness",
         "timeout": "5s"
-      }
-    },
-    {
-      "name": "i18n",
-      "urls": [
-        "/assets/i18n/**"
-      ],
-      "cacheConfig": {
-        "maxSize": 20,
-        "maxAge": "7d",
-        "strategy": "freshness",
-        "timeout": "10s"
       }
     },
     {

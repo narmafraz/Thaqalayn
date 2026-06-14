@@ -7,6 +7,46 @@
   flex-direction: column;
 }
 
+.support-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.action-hint {
+  color: #777;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+
+.refresh-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 2px solid #26a69a;
+  border-radius: 8px;
+  background: transparent;
+  color: #00796b;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: #26a69a;
+    color: white;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .reset-button {
   display: inline-flex;
   align-items: center;
@@ -66,6 +106,27 @@
       margin-bottom: 4px;
     }
   }
+}
+
+// Safe-refresh confirmation uses a calmer info palette than the destructive reset.
+.refresh-confirm {
+  border-color: #26a69a;
+  background: #e0f2f1;
+
+  .info-icon {
+    color: #00897b;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  h3 { color: #00695c; }
+}
+
+.refresh-confirm-button {
+  background: #00897b;
+
+  &:hover { background: #00695c; }
 }
 
 .reset-actions {
@@ -171,6 +232,23 @@
     h3 { color: #ffb74d; }
     p, li { color: #ccc; }
   }
+
+  .refresh-confirm {
+    background: #00332e;
+    border-color: #26a69a;
+
+    h3 { color: #4db6ac; }
+    p, li { color: #ccc; }
+  }
+
+  .refresh-button {
+    color: #4db6ac;
+    border-color: #26a69a;
+
+    &:hover { color: white; }
+  }
+
+  .action-hint { color: #999; }
 
   .reset-success {
     background: #1b5e20;

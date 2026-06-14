@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-06-14 (added SEARCH_OVERHAUL_PLAN)
+> **Last updated:** 2026-06-14 (added CACHE_FRESHNESS_PLAN)
 
 ## Status Legend
 
@@ -151,4 +151,5 @@
 
 | Document | Status | Summary |
 |----------|--------|---------|
+| [CACHE_FRESHNESS_PLAN.md](CACHE_FRESHNESS_PLAN.md) | **ACTIVE** (proposed; not yet implemented) | Diagnoses two mobile caching bugs and lays out zero-cost fixes. (A) Raw i18n keys after a deploy: i18n JSON lives in an SW `dataGroup` that isn't versioned with the hashed JS bundle, so it drifts stale → fix is moving `assets/i18n/*.json` into a versioned `assetGroup`. (B) Stale AI content on revisited books: `BooksService.getPart` is cache-first and the only invalidator (`data_version.json`) is stale (stamped May 19, never bumped by incremental AI merges) → fix is auto-bumping `data_version.json` on data deploys. Also proposes a safe "Refresh app data" button that clears server caches + `thaqalayn-offline` IDB but preserves `thaqalayn-bookmarks` + localStorage (vs the existing nuclear reset). |
 | [SEARCH_OVERHAUL_PLAN.md](SEARCH_OVERHAUL_PLAN.md) | **ACTIVE** (proposed; not yet implemented) | Bandwidth-first search rebuild. Fixes the stale full-text index (builder must read `verse_detail`, not the dead `verses` array) and the ~2.2 MB-per-visit eager title load. Three tiers: in-memory titles from already-loaded nav data (zero fetch; delete `titles.json`), topics/tags/phrases as Pagefind facets (delete `topics.json`), and a **Pagefind term-sharded** full-text index (Arabic + 11 langs + AI summaries/key-terms/phrases) fetching only per-query fragments. Nothing downloads until search is used. Pagefind bundle lives in a dedicated repo + Netlify site. Adds AI summaries (snippet), topic/tag facets, `phrase:` + `ref:` operators, full UI redesign, IndexedDB/SW offline caching. Root/morphological search deferred. |

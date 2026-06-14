@@ -11,13 +11,53 @@
   <h2>{{ 'support.troubleshooting' | translate }}</h2>
   <p>{{ 'support.troubleshootingDesc' | translate }}</p>
 
-  <!-- Reset button -->
-  <button *ngIf="!showResetConfirm && !resetComplete"
-          class="reset-button"
-          (click)="promptReset()">
-    <mat-icon>restart_alt</mat-icon>
-    {{ 'support.resetSiteData' | translate }}
-  </button>
+  <!-- Action buttons (hidden while any dialog/success state is showing) -->
+  <div *ngIf="!showResetConfirm && !resetComplete && !showRefreshConfirm && !refreshComplete"
+       class="support-actions">
+    <button class="refresh-button" (click)="promptRefresh()">
+      <mat-icon>refresh</mat-icon>
+      {{ 'support.refreshData' | translate }}
+    </button>
+    <p class="action-hint">{{ 'support.refreshDataDesc' | translate }}</p>
+
+    <button class="reset-button" (click)="promptReset()">
+      <mat-icon>restart_alt</mat-icon>
+      {{ 'support.resetSiteData' | translate }}
+    </button>
+    <p class="action-hint">{{ 'support.resetSiteDataDesc' | translate }}</p>
+  </div>
+
+  <!-- Safe refresh confirmation -->
+  <div *ngIf="showRefreshConfirm" class="reset-confirm refresh-confirm">
+    <mat-icon class="info-icon">refresh</mat-icon>
+    <h3>{{ 'support.refreshConfirmTitle' | translate }}</h3>
+    <p>{{ 'support.refreshConfirmDesc' | translate }}</p>
+    <ul>
+      <li>{{ 'support.refreshKept1' | translate }}</li>
+      <li>{{ 'support.refreshKept2' | translate }}</li>
+      <li>{{ 'support.refreshKept3' | translate }}</li>
+    </ul>
+    <p>{{ 'support.refreshCleared' | translate }}</p>
+    <div class="reset-actions">
+      <button class="cancel-button" (click)="cancelRefresh()">
+        {{ 'support.resetCancel' | translate }}
+      </button>
+      <button class="confirm-button refresh-confirm-button" (click)="confirmSafeRefresh()">
+        <mat-icon>refresh</mat-icon>
+        {{ 'support.refreshConfirm' | translate }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Safe refresh success -->
+  <div *ngIf="refreshComplete" class="reset-success">
+    <mat-icon>check_circle</mat-icon>
+    <p>{{ 'support.refreshSuccess' | translate }}</p>
+    <button class="reload-button" (click)="reloadPage()">
+      <mat-icon>refresh</mat-icon>
+      {{ 'support.resetReload' | translate }}
+    </button>
+  </div>
 
   <!-- Confirmation dialog -->
   <div *ngIf="showResetConfirm" class="reset-confirm">

@@ -35,7 +35,7 @@ Book / chapter / surah name lookup — the most common navigational query.
 
 - Reuse `IndexState.books`, already eagerly loaded (~2.2 MB) for breadcrumbs. Build a small **in-memory** index lazily **on first search focus**, from `IndexState.books['en'] + ['ar'] + [uiLang]`. Fuzzy + boosted, instant, no network.
 - **Why in-memory and not Pagefind:** the title data is *already in RAM* (loaded for navigation → zero extra bytes), and title typeahead fires on *every keystroke* — per-keystroke Pagefind fragment fetches would add latency. Neither property holds for any other tier.
-- **Delete `titles.json`** and stop generating it — net **−1.4 MB**. Keep Orama (`@orama/orama`) as a dependency *only* for this in-memory tier, built from in-memory data and never fetched. (A plain fuzzy matcher would also work; Orama gives boosting/fuzziness for free.)
+- **Delete `titles.json`** and stop generating it — net **−1.4 MB**. **Keep Orama (`@orama/orama`)** for this tier — built from in-memory data, never fetched — and **lazy-load it via dynamic import** on first search focus (~30 KB gzipped tree-shaken; ~46 KB for the whole package). So non-searching visitors pay nothing, and searchers pay it once alongside the title-index build. We keep Orama rather than hand-rolling a matcher: it's a tiny, already-present dependency that gives boosting + typo tolerance for free. Pagefind is *not* used for titles (per-keystroke typeahead would mean a network fetch per key, and the data is already in RAM).
 
 ### Tier 2 — Topics / tags / phrases → Pagefind (no separate search index)
 
@@ -58,35 +58,28 @@ The large, multilingual, AI-enriched corpus (Arabic + 11 languages + summaries /
 - **Per-query wire size ≈ 33 KB** (one ~28 KB term-index chunk + ~5 × ~1 KB fragments). **First search per language per session ≈ 130–200 KB** one-time (loader 45 KB + wasm ~70 KB + lang meta ~11 KB + filter meta ~25 KB), then cached. Confirms the bandwidth thesis.
 - **On-server footprint ≈ 6–8.5 MB per language** for these 1,469 *fully-AI-covered* verses, and **~one fragment file per verse per language** (≈ 1,500 files/lang here).
 
-**Extrapolation + the real risk — file count.** At full corpus (58K verses), each language index is **~58K+ files**; `en` + `ar` alone ≈ **116K files**, and full 12-language coverage trends to **hundreds of thousands of files and >1 GB** on disk. (Corpus AI coverage is ~17% today so non-ar/en languages are far smaller now and grow over time.) Per-query download stays tiny regardless — this is purely a *deploy/host* concern: very large file counts slow Netlify deploys.
+**Extrapolation + the real risk — file count.** At full corpus (58K verses), each language index is **~58K+ files**; `en` + `ar` alone ≈ **116K files**, and full 12-language coverage trends to **hundreds of thousands of files (~700K) and >1 GB** on disk. **AI-translation coverage is now ~90%+ across nearly all books** (al-kafi 87%, tahdhib 94%, faqih 98%, quran 95%; laggards uyun 47%, sifat-al-shia 40%) — and the AI pipeline emits all 11 languages *together* per verse, so languages rise and fall together. Coverage-gating by language therefore barely helps; we should expect to build ~all languages. Per-query download stays tiny regardless — this is purely a *deploy/host* concern.
 
 **Decisions:**
-- **Dedicated repo + Netlify site** (e.g. `thaqalaynsearch.netlify.app`), **confirmed** by the spike — the bundle is a regenerated build artifact, far too many files to commit into `ThaqalaynData` (~908 MB) or slow its deploys. CORS headers (free) let the Angular app fetch cross-origin; Angular reads the origin from a new `environment.searchBaseUrl`.
-- **Coverage-gated language rollout** to contain file count: ship `ar` + `en` first; add a language's index only once its AI translation coverage is material. The build emits a manifest of available languages so the client's language picker only offers built ones.
+- **Dedicated repo + Netlify site** `thaqalaynsearch.netlify.app` (mirrors `ThaqalaynWords` / `ThaqalaynTafsirData`). CORS + cache headers in `netlify.toml`; Angular reads the origin from `environment.searchBaseUrl`.
+- **Deploy via Netlify CLI, bundle gitignored** (NOT git-autodeploy). Why: with ~700K generated fragment files, committing the bundle would bloat git/GitHub to the point of breaking (slow clones/pushes, repo-size limits). So the repo holds only *source* (`build.mjs`, `lib/`, config); the bundle is built locally and uploaded with `netlify deploy --prod --dir=.`. Netlify dedupes by file hash, so re-deploys only upload changed fragments. (Trade-off vs git-push autodeploy: the deployed artifact isn't in git history and deploys are a manual local command — acceptable for a regenerated artifact.) If a future build comes in small enough, committing + git-autodeploy stays an option.
 
 ---
 
-## Build side — `ThaqalaynDataGenerator` + a new Pagefind step
+## Build side — self-contained Node build in `ThaqalaynSearch` (IMPLEMENTED)
 
-### Generator (`search_index.py` rewrite)
+The build is **one self-contained Node script in the `ThaqalaynSearch` repo** — no Python `search_index.py` step. This avoids a Python→Node handoff that would spill hundreds of MB of intermediate records, and Pagefind's indexer is Node anyway. The same JS Arabic normalizer is shared with the Angular query path.
 
-The builder must read `verse_detail` files (resolve `verse_refs[].path` → `books/<slug>/.../n.json`; `books/complete/*.json` are also shells — no shortcut). Walk the ~68K files **once, book-by-book**, reusing `app/build_ai_indexes.py::_walk_json_files()` + `_extract_verses()`. Per verse, emit a normalized record carrying, per language: translation text (+ AI summary, key-term glosses, key phrases) and, for Arabic, `normalize_arabic(text)` + Arabic key-terms / phrases. Attach facet fields: book, content_type, derived grade token, has_chain, topics, tags. `_select_translation_id()` must pick exactly one id per language (critical for Quran's 17 en / 11 fa translations, else the `en` shard explodes).
+`ThaqalaynSearch/build.mjs`:
+- Reads `verse_detail` files directly from `../ThaqalaynData/books/` (discovers book dirs; skips `complete/`). The merged `ThaqalaynData` `verse.ai` retains the fields we need (summaries, key_terms, chunks.translations, key_phrases, topics, tags, content_type, related_quran, isnad_matn.has_chain).
+- Per verse, per language, builds `content` = translation text (human `<lang>.*` id, else `ai.chunks[].translations[lang]`) + `ai.summaries[lang]` + `ai.key_terms[lang]` glosses + (en) key-phrase EN. For `ar`: `normalizeArabic(text)` + normalized Arabic key-terms/phrases.
+- Emits **one Pagefind index per language** (keyed by the real verse URL — Pagefind dedupes by URL globally) via the NodeJS Indexing API, with `filters: { book, content_type, has_chain, topic, tag }`.
+- Also writes **`qref.json`** (Quran cross-refs: `ai.related_quran` cites + Quran self-refs) and **`manifest.json`** (`data_version` from `index/data_version.json`, built languages + page counts, filter list).
+- Skips languages with zero records (so `manifest.json` only lists built languages; the client picker offers only those).
 
-Outputs:
+`ThaqalaynSearch/lib/normalize-arabic.mjs` mirrors `ThaqalaynDataGenerator/app/arabic_normalization.py` (built from numeric code points to keep the source ASCII). **Parity verified** by `tests/parity-check.{py,mjs}` against real verse text — 50/50 exact match. The Angular query path reuses this same normalizer.
 
-- **Pagefind source records** — a JSONL/NDJSON manifest of `{url, language, content, meta, filters}` per verse-language, consumed by the Pagefind indexing step (or fed to Pagefind directly).
-- **`qref.json`** — Quran cross-ref inverted index `{ "2:255": [paths…] }`, built in the same pass (hadith `related_quran` cites + Quran self-refs). Small; loaded only on a `ref:` query.
-- **Remove generation of `titles.json`, `*-docs.json`, `search-meta.json`** — and delete them from the data repo.
-
-Wire into `app/main_add.py` **after `merge_ai_content()`** (AI blocks must be on disk); share one `data_version` written to both `index/data_version.json` and the search manifest. Log per-book AI-coverage % to catch zero-coverage regressions.
-
-### Pagefind index build (new Node step → dedicated repo)
-
-A Node script uses Pagefind's **NodeJS Indexing API** (`createIndex()` → `addCustomRecord({url, content, language, meta, filters})`) over the generator's records, writing the bundle into the **dedicated search repo** (deployed to its own Netlify site with CORS). Pin the Pagefind version. Build-time only — zero recurring cost. Document the command in [COMMANDS.md](COMMANDS.md).
-
-### Tests
-
-Rewrite `tests/test_search_index.py` around `verse_detail` fixtures: per-language record building + `<lang>.ai` fallback; Arabic normalization; facet fields with optional omission; graceful no-record when a language has neither translation nor AI; `_derive_grade_token`; `build_qref_index` (cite + Quran self-ref, dedup/sort); assert old flat files are no longer produced.
+**Removed:** generation of `titles.json`, `*-docs.json`, `search-meta.json` (the old, stale Orama doc indexes) — delete them from `ThaqalaynData` during cleanup.
 
 ---
 
@@ -102,7 +95,7 @@ Rewrite `tests/test_search_index.py` around `verse_detail` fixtures: per-languag
 ### UI redesign (full)
 
 - **Search bar:** language pill; sectioned dropdown (Recent / Titles / Topics / Phrases); operator hints; instant Tier-1 typeahead.
-- **`/search` page:** sticky **facet sidebar** with live counts (hide empty groups — AI coverage ~17%), sort control, removable filter chips, **bilingual highlighted result cards** (Pagefind excerpts; summary as snippet when present, else translation / Arabic), Pagefind-paginated. Reuse the existing `IntersectionObserver` + `verse-loader.service.ts` for any detail hydration.
+- **`/search` page:** sticky **facet sidebar** with live counts (hide empty groups; AI coverage ~90%+ but uneven across books), sort control, removable filter chips, **bilingual highlighted result cards** (Pagefind excerpts; summary as snippet when present, else translation / Arabic), Pagefind-paginated. Reuse the existing `IntersectionObserver` + `verse-loader.service.ts` for any detail hydration.
 - Keep Angular Material + the deeppurple-amber theme; production-grade, distinctive cards.
 
 ---
@@ -121,20 +114,28 @@ Rewrite `tests/test_search_index.py` around `verse_detail` fixtures: per-languag
 
 ---
 
-## Phasing
+## Build orchestration (regen scripts)
 
-0. **(gating)** Commit this doc; run the **Pagefind spike** (2 books, Arabic + 2 languages) to validate Arabic tokenization, filter/facet counts, per-query wire size, and total bundle size + Netlify file-count.
-1. Generator rewrite + `qref.json` + tests; delete `titles.json` / `*-docs.json` / `search-meta.json`; wire `main_add.py`.
-2. Pagefind Node build step → dedicated repo/site.
-3. Client: shared normalizer; Tier-1 in-memory titles; defer-until-engaged; remove the `titles.json` consumer.
-4. Client: Pagefind wrapper, language picker, operators, facets, highlighting; NGXS state.
+Kick-off scripts all live in `ThaqalaynDataGenerator/` (even when the work runs in a sibling repo), so there's one place to start any rebuild:
+- `add_data.ps1` — regenerate `ThaqalaynData` (hadith pipeline). *Existing.*
+- `regen_words.ps1` — rebuild `ThaqalaynWords`. *Existing.*
+- `regen_search.ps1` — **(new)** `cd ../ThaqalaynSearch; node build.mjs` (npm install on first run). Kept out of `add_data.ps1` because the build is slow (one fragment per verse per language) — same convention as `regen_words.ps1`.
+- `regen_all.ps1` — **(new)** runs the regens in dependency order: `add_data.ps1` → `regen_words.ps1` → `regen_search.ps1` (search last; it depends on the merged `ThaqalaynData`).
+
+## Phasing (status)
+
+0. ✅ Doc committed; Pagefind spike validated the architecture.
+1. ✅ Build side: `ThaqalaynSearch` repo + all-Node `build.mjs` (per-language indexes + `qref.json` + `manifest.json`) + shared normalizer (parity verified 50/50) + `netlify.toml`; `regen_search.ps1`; `environment.searchBaseUrl`.
+2. ⏳ **Infra (user):** create `thaqalaynsearch` GitHub repo + Netlify site; then a deploy spike (full local build → `netlify deploy`) to confirm the file-count/deploy works.
+3. Client: lazy-load Orama; Tier-1 in-memory titles; defer **all** index loading until search is engaged; remove the `titles.json` consumer.
+4. Client: Pagefind wrapper, language picker, operators (`topic:`/`tag:`/`type:`/`phrase:`/`ref:`/`book:`), facets, highlighting; NGXS state.
 5. UI redesign (bar + `/search`), recent searches, suggestions, accessibility.
-6. robots.txt update; cleanup stale data files; docs/index updates.
+6. robots.txt `Disallow: /search`; cleanup stale data files (`titles.json`/`*-docs.json`/`search-meta.json`/`topics.json`); docs/index updates.
 
 ## Verification
 
-- **Generator:** `cd ThaqalaynDataGenerator; source .venv/Scripts/activate; … python -m pytest tests/test_search_index.py --no-cov -q`; regenerate; spot-check records, `qref.json`, per-book coverage logs.
-- **Pagefind spike:** measure per-query bytes (DevTools Network), facet-count correctness, fragment file count vs Netlify limit.
+- **Search build:** `cd ThaqalaynSearch; npm run build` (or `node build.mjs <book>` for a subset); spot-check `manifest.json`, a couple of `<lang>/` indexes, and `qref.json`. Normalizer parity: run `tests/parity-check.py` (generator venv) then `node tests/parity-check.mjs` — must be 0 mismatches.
+- **Deploy spike:** full local build → measure file count + run `netlify deploy` to confirm a large bundle deploys within Netlify's limits.
 - **Client unit:** `CHROME_BIN=… npx ng test --watch=false --browsers=ChromeHeadless` — normalizer parity, operator parsing, Tier-1 in-memory titles, language switch, SSR guards.
 - **E2E / manual:** full stack (`ThaqalaynData/serve.py` + `npm start`): confirm **no index fetch on page load** (Network tab) until search is focused; first full-text query downloads only small fragments; reload/offline works; facets, `topic:` / `phrase:` / `ref:` / `book:`, highlighted snippets, `/` shortcut. Playwright `/search` spec + SSR no-crash check.
 
@@ -143,7 +144,8 @@ Rewrite `tests/test_search_index.py` around `verse_detail` fixtures: per-languag
 - **Pagefind Arabic quality / multilingual API** — validate in the spike; pin version.
 - **Netlify deploy file-count** for the fragment bundle — validate in the spike; volume-level grouping is the fallback.
 - **New Node build step** in a Python pipeline — isolate as a standalone script; document in COMMANDS.md.
-- **AI coverage ~17%** — graceful degradation everywhere (hide empty facets, snippet fallback); grows on each regen.
+- **AI coverage ~90%+ but uneven** (laggards: uyun 47%, sifat-al-shia 40%, kitab-al-duafa 34%) — graceful degradation everywhere (hide empty facets, snippet fallback).
+- **~700K-file bundle** — deploy via Netlify CLI (gitignored), not git-autodeploy; deploy spike must confirm Netlify handles it.
 - **Normalizer drift** — shared fixture parity test is mandatory.
 - **Two engines (Orama in-memory + Pagefind)** — bounded: Orama only for already-loaded titles; no Orama fetch.
 - **Cross-repo contract** — land the generator + Pagefind bundle first, then the client.

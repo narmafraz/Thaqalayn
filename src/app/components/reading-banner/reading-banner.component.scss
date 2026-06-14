@@ -18,12 +18,12 @@
 
   &.banner-streak {
     border-inline-start-color: #f4511e;
-    background: linear-gradient(135deg, rgba(244, 81, 30, 0.05), transparent 70%);
+    background: linear-gradient(135deg, rgba(244, 81, 30, 0.1), transparent 70%), var(--card-bg, #fff);
   }
 
   &.banner-goal {
     border-inline-start-color: #43a047;
-    background: linear-gradient(135deg, rgba(67, 160, 71, 0.05), transparent 70%);
+    background: linear-gradient(135deg, rgba(67, 160, 71, 0.1), transparent 70%), var(--card-bg, #fff);
   }
 
   .banner-icon {

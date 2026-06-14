@@ -12,7 +12,7 @@
   },
   "pageTitle": {
     "about": "About",
-    "bookmarks": "Bookmarks",
+    "bookmarks": "My Library",
     "download": "Download",
     "support": "Support",
     "topics": "Topics",
@@ -33,7 +33,7 @@
     "navigateNext": "Navigate to the next chapter",
     "navigateParent": "Navigate to the parent",
     "hadithNavigation": "Hadith navigation",
-    "bookmarks": "Bookmarks",
+    "bookmarks": "My Library",
     "topics": "Topics",
     "backToTop": "Back to top",
     "view": "View",
@@ -257,7 +257,7 @@
     "growthHope": "We hope that we can grow this data over time, hopefully with your help."
   },
   "bookmark": {
-    "title": "Bookmarks",
+    "title": "My Library",
     "bookmark": "Bookmark",
     "bookmarked": "Bookmarked",
     "add": "Add bookmark",

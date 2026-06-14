@@ -24,7 +24,7 @@
     "navigateNext": "转到下一章",
     "navigateParent": "返回上级",
     "hadithNavigation": "圣训导航",
-    "bookmarks": "书签",
+    "bookmarks": "我的图书馆",
     "topics": "主题",
     "backToTop": "返回顶部",
     "explore": "探索",
@@ -228,7 +228,7 @@
     "growthHope": "希望在您的帮助下扩展数据。"
   },
   "bookmark": {
-    "title": "书签",
+    "title": "我的图书馆",
     "bookmark": "书签",
     "bookmarked": "已添加书签",
     "add": "添加书签",

@@ -24,7 +24,7 @@
     "navigateNext": "رفتن به باب بعدی",
     "navigateParent": "رفتن به بالا",
     "hadithNavigation": "پیمایش حدیث",
-    "bookmarks": "نشانک‌ها",
+    "bookmarks": "کتابخانه من",
     "topics": "موضوعات",
     "backToTop": "بازگشت به بالا",
     "explore": "کاوش",
@@ -228,7 +228,7 @@
     "growthHope": "امیدواریم با کمک شما این داده‌ها رشد کنند."
   },
   "bookmark": {
-    "title": "نشانک‌ها",
+    "title": "کتابخانه من",
     "bookmark": "نشانک",
     "bookmarked": "نشانک‌گذاری شد",
     "add": "افزودن نشانک",

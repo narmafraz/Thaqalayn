@@ -24,7 +24,7 @@
     "navigateNext": "اگلے باب پر جائیں",
     "navigateParent": "اوپر جائیں",
     "hadithNavigation": "حدیث نیویگیشن",
-    "bookmarks": "بُک مارکس",
+    "bookmarks": "میری لائبریری",
     "topics": "موضوعات",
     "backToTop": "اوپر واپس جائیں",
     "explore": "دریافت کریں",
@@ -228,7 +228,7 @@
     "growthHope": "امید ہے آپ کی مدد سے ڈیٹا بڑھے گا۔"
   },
   "bookmark": {
-    "title": "بُک مارکس",
+    "title": "میری لائبریری",
     "bookmark": "بُک مارک",
     "bookmarked": "بُک مارک ہو گیا",
     "add": "بُک مارک شامل کریں",

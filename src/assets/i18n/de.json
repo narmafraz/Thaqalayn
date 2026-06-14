@@ -24,7 +24,7 @@
     "navigateNext": "Zum nächsten Kapitel",
     "navigateParent": "Zur übergeordneten Ebene",
     "hadithNavigation": "Hadith-Navigation",
-    "bookmarks": "Lesezeichen",
+    "bookmarks": "Meine Bibliothek",
     "topics": "Themen",
     "backToTop": "Zurück nach oben",
     "explore": "Entdecken",
@@ -228,7 +228,7 @@
     "growthHope": "Wir hoffen, die Daten mit Ihrer Hilfe zu erweitern."
   },
   "bookmark": {
-    "title": "Lesezeichen",
+    "title": "Meine Bibliothek",
     "bookmark": "Lesezeichen",
     "bookmarked": "Lesezeichen gesetzt",
     "add": "Lesezeichen hinzufügen",

@@ -24,7 +24,7 @@
     "navigateNext": "Sonraki bölüme git",
     "navigateParent": "Üst seviyeye git",
     "hadithNavigation": "Hadis navigasyonu",
-    "bookmarks": "Yer İmleri",
+    "bookmarks": "Kitaplığım",
     "topics": "Konular",
     "backToTop": "Başa dön",
     "explore": "Keşfet",
@@ -228,7 +228,7 @@
     "growthHope": "Yardımınızla verileri büyütmeyi umuyoruz."
   },
   "bookmark": {
-    "title": "Yer İmleri",
+    "title": "Kitaplığım",
     "bookmark": "Yer imi",
     "bookmarked": "Yer imi eklendi",
     "add": "Yer imi ekle",

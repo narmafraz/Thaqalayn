@@ -24,7 +24,7 @@
     "navigateNext": "Aller au chapitre suivant",
     "navigateParent": "Aller au parent",
     "hadithNavigation": "Navigation des hadiths",
-    "bookmarks": "Signets",
+    "bookmarks": "Ma bibliothèque",
     "topics": "Sujets",
     "backToTop": "Retour en haut",
     "explore": "Explorer",
@@ -228,7 +228,7 @@
     "growthHope": "Nous espérons enrichir ces données avec votre aide."
   },
   "bookmark": {
-    "title": "Signets",
+    "title": "Ma bibliothèque",
     "bookmark": "Signet",
     "bookmarked": "Ajouté aux signets",
     "add": "Ajouter un signet",

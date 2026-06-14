@@ -24,7 +24,7 @@
     "navigateNext": "Ke bab berikutnya",
     "navigateParent": "Ke atas",
     "hadithNavigation": "Navigasi hadis",
-    "bookmarks": "Penanda",
+    "bookmarks": "Perpustakaan Saya",
     "topics": "Topik",
     "backToTop": "Kembali ke atas",
     "explore": "Jelajahi",
@@ -228,7 +228,7 @@
     "growthHope": "Semoga data ini berkembang dengan bantuan Anda."
   },
   "bookmark": {
-    "title": "Penanda",
+    "title": "Perpustakaan Saya",
     "bookmark": "Penanda",
     "bookmarked": "Ditandai",
     "add": "Tambah penanda",

@@ -24,7 +24,7 @@
     "navigateNext": "Ir al capítulo siguiente",
     "navigateParent": "Ir al nivel superior",
     "hadithNavigation": "Navegación de hadices",
-    "bookmarks": "Marcadores",
+    "bookmarks": "Mi biblioteca",
     "topics": "Temas",
     "backToTop": "Volver arriba",
     "explore": "Explorar",
@@ -228,7 +228,7 @@
     "growthHope": "Esperamos hacer crecer estos datos con su ayuda."
   },
   "bookmark": {
-    "title": "Marcadores",
+    "title": "Mi biblioteca",
     "bookmark": "Marcador",
     "bookmarked": "Marcado",
     "add": "Añadir marcador",

@@ -27,26 +27,29 @@
   padding: 14px 16px;
   background: var(--card-bg, #fff);
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-inline-start: 4px solid #66bb6a;
   pointer-events: auto;
   animation: toast-slide-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
   font-size: 0.92rem;
   color: var(--text-primary, #333);
 
+  // Tints layer OVER a solid card background so the toast stays fully opaque
+  // and never lets page text bleed through.
   &.toast-book-complete {
     border-inline-start-color: #ff9800;
-    background: linear-gradient(135deg, rgba(255, 152, 0, 0.06), transparent 80%);
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.12), transparent 80%), var(--card-bg, #fff);
   }
 
   &.toast-cumulative {
     border-inline-start-color: #5e35b1;
-    background: linear-gradient(135deg, rgba(94, 53, 177, 0.06), transparent 80%);
+    background: linear-gradient(135deg, rgba(94, 53, 177, 0.12), transparent 80%), var(--card-bg, #fff);
   }
 
   &.toast-badge-earned {
     border-inline-start-color: #ffc107;
-    background: linear-gradient(135deg, rgba(255, 193, 7, 0.1), transparent 80%);
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.16), transparent 80%), var(--card-bg, #fff);
 
     .toast-icon {
       font-size: 1.8rem;
@@ -113,9 +116,22 @@
 }
 
 :host-context(body.dark-theme) .toast {
-  background: rgba(48, 48, 48, 0.98);
+  background: #2c2c2c;
+  border-color: rgba(255, 255, 255, 0.1);
   color: #e0e0e0;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+
+  &.toast-book-complete {
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.18), transparent 80%), #2c2c2c;
+  }
+
+  &.toast-cumulative {
+    background: linear-gradient(135deg, rgba(124, 77, 255, 0.2), transparent 80%), #2c2c2c;
+  }
+
+  &.toast-badge-earned {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), transparent 80%), #2c2c2c;
+  }
 
   .toast-subtitle {
     color: #bdbdbd;

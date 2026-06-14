@@ -24,7 +24,7 @@
     "navigateNext": "পরবর্তী অধ্যায়ে যান",
     "navigateParent": "উপরে যান",
     "hadithNavigation": "হাদিস নেভিগেশন",
-    "bookmarks": "বুকমার্ক",
+    "bookmarks": "আমার লাইব্রেরি",
     "topics": "বিষয়সমূহ",
     "backToTop": "শীর্ষে ফিরুন",
     "explore": "অন্বেষণ",
@@ -228,7 +228,7 @@
     "growthHope": "আশা করি আপনার সাহায্যে ডেটা বাড়বে।"
   },
   "bookmark": {
-    "title": "বুকমার্ক",
+    "title": "আমার লাইব্রেরি",
     "bookmark": "বুকমার্ক",
     "bookmarked": "বুকমার্ক করা হয়েছে",
     "add": "বুকমার্ক যোগ",

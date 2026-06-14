@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-06-12 (added PER_LANGUAGE_VERSE_SPLIT)
+> **Last updated:** 2026-06-14 (added SEARCH_OVERHAUL_PLAN)
 
 ## Status Legend
 
@@ -146,3 +146,9 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [PER_LANGUAGE_VERSE_SPLIT.md](PER_LANGUAGE_VERSE_SPLIT.md) | **ACTIVE** (proposed; not yet implemented) | Symmetric per-language verse-detail file split: `1.json` (base, language-agnostic) + `1.{lang}.json` sister per language. Cuts per-user fetch bandwidth ~60% by serving only the active-language sister instead of all 11 langs. Side effects: per-language cache invalidation isolation + uniform loader code. Includes concrete before/after JSON schemas, generator merger changes, and UI `loadVerseDetail(path, lang)` migration. |
+
+### 2026-06-14
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [SEARCH_OVERHAUL_PLAN.md](SEARCH_OVERHAUL_PLAN.md) | **ACTIVE** (proposed; not yet implemented) | Bandwidth-first search rebuild. Fixes the stale full-text index (builder must read `verse_detail`, not the dead `verses` array) and the ~2.2 MB-per-visit eager title load. Three tiers: in-memory titles from already-loaded nav data (zero fetch; delete `titles.json`), topics/tags/phrases as Pagefind facets (delete `topics.json`), and a **Pagefind term-sharded** full-text index (Arabic + 11 langs + AI summaries/key-terms/phrases) fetching only per-query fragments. Nothing downloads until search is used. Pagefind bundle lives in a dedicated repo + Netlify site. Adds AI summaries (snippet), topic/tag facets, `phrase:` + `ref:` operators, full UI redesign, IndexedDB/SW offline caching. Root/morphological search deferred. |

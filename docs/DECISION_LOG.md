@@ -1230,3 +1230,27 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 - `ThaqalaynData/plans/*.json` (17 plans + `index.json` catalogue)
 
 ---
+
+### D063: Cache-freshness fixes — ship A1 + safe-reset, skip B1 and B2 to conserve bandwidth (2026-06-14)
+
+**Context:** Two mobile caching bugs were diagnosed (see `docs/CACHE_FRESHNESS_PLAN.md`): (A) after a deploy the UI shows raw i18n keys instead of translated text; (B) revisited books never show newly generated AI content. The plan offered options A1–A5 for the i18n problem and B1–B5 for the stale-content problem. Two of the proposed fixes (B1, B2) were deliberately **not** taken.
+
+**What shipped (commit `8069b43`):**
+- **A1 — i18n moved to a versioned `assetGroup`.** `assets/i18n/*.json` was a service-worker *dataGroup* (unversioned, persisted independently across deploys), so a freshly deployed JS bundle could run against a stale `en.json` missing its new keys → raw keys. Moving it to an `assetGroup` (lazy install, prefetch update) makes the translation files hash-tracked in `ngsw.json` and swap atomically with the bundle. Verified: 12 i18n files now carry content hashes in the generated manifest.
+- **Safe "Refresh App Data" button** on the Support page — clears only re-downloadable data (SW caches + the `thaqalayn-offline` cache DB) while preserving personally authored data (`thaqalayn-bookmarks` DB + localStorage prefs). The existing full "Reset Site Data" stays as the nuclear fallback.
+
+**Skipped — B1 (auto-bump `data_version.json` on every data deploy):**
+- **Reason:** the existing invalidation already works — `OfflineStorageService.checkDataVersion()` clears the client cache when `index/data_version.json` changes — and the user prefers that bump to remain gated on a **full pipeline run** (`main_add.py` → `_write_data_version()`). A full run is the deliberate, conscious trigger for invalidating *everyone's* cache. Auto-bumping on every incremental AI-merge deploy would invalidate all clients on every minor content drop, multiplying re-download bandwidth (network-first reads after a clear). Given the June 2026 bandwidth incident, that cost isn't justified when content changes are usually small and not urgent to propagate.
+
+**Skipped — B2 (stale-while-revalidate reads in `BooksService.getPart`):**
+- **Reason:** B2 would serve the cached book instantly *and* fire a background network fetch on every revisit to self-update content. That adds a network request per revisit where there is currently **zero** (reads are cache-first and short-circuit on a hit). The per-revisit bandwidth is unnecessary when content rarely changes, and partially overlaps the SW `api-books` dataGroup's existing freshness behaviour. Parked in the plan doc as a possible future upgrade if continuous per-page self-updating ever becomes worth the bandwidth.
+
+**Net stance:** prefer **structural correctness for i18n** (A1, free, no runtime cost) + a **manual user-triggered escape hatch** (safe-reset) over **automatic background revalidation/invalidation** (B1/B2) that spends bandwidth on every deploy or revisit. Stale book content is healed deliberately — by the user tapping "Refresh App Data", or globally by running the full data pipeline.
+
+**Files / artefacts:**
+- `ngsw-config.json` (i18n assetGroup)
+- `app/components/support/support.component.{ts,html,scss,spec.ts}` (safe-reset button + tests)
+- `assets/i18n/en.json` (new support strings)
+- `docs/CACHE_FRESHNESS_PLAN.md` (full diagnosis + option matrix)
+
+---

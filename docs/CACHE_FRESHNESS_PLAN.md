@@ -135,12 +135,27 @@ action; keep the existing full reset as a clearly-labelled "nuclear" fallback.
 
 ---
 
-## 4. Recommended package (all zero-cost)
+## 4. Decision (2026-06-14 — see DECISION_LOG D063)
 
-1. **A1** — move i18n files into a versioned `assetGroup` → kills raw-keys at the source.
-2. **B1** — automate the `data_version.json` bump on data deploys → stale AI content self-heals (batch deploys per bandwidth note).
-3. **§3 safe-reset button** — user-facing escape hatch that fixes both without touching bookmarks/notes.
-4. *(Optional follow-ups)* A4 (i18n init barrier/retry), B2 (stale-while-revalidate), B5 (pull-to-refresh).
+**Shipped** (commit `8069b43`):
+1. **A1** — moved i18n files into a versioned `assetGroup` → kills raw-keys at the source. Verified: 12 files now hash-tracked in `ngsw.json`.
+2. **§3 safe-reset button** — user-facing escape hatch that fixes both symptoms without touching bookmarks/notes.
+
+**Deliberately skipped to conserve bandwidth:**
+- **B1** (auto-bump `data_version.json` per deploy) — the existing version-gated
+  invalidation is kept, but the bump stays tied to a **full pipeline run**
+  (`main_add.py`), which is the conscious trigger for a global cache clear.
+  Auto-bumping every incremental merge would re-download for all clients on
+  every minor content drop — not justified given the June 2026 bandwidth incident.
+- **B2** (stale-while-revalidate reads) — would add a background fetch on every
+  book revisit where there is currently zero. Unnecessary bandwidth when content
+  rarely changes. Parked here as a possible future upgrade.
+
+Stale book content is therefore healed **deliberately** — the user taps
+"Refresh App Data", or a full data-pipeline run bumps the version globally.
+
+*Remaining optional follow-ups if ever needed:* A4 (i18n init barrier/retry),
+B5 (pull-to-refresh).
 
 ### Key files
 - `Thaqalayn/ngsw-config.json` — i18n group (A1)

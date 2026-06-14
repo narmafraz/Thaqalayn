@@ -49,14 +49,20 @@ There is **no benefit** to a separate index here (not preloaded, not per-keystro
 The large, multilingual, AI-enriched corpus (Arabic + 11 languages + summaries / key-terms / phrases).
 
 - **Pagefind** (static, build-time, zero recurring cost, MIT). The browser loads a tiny entry chunk + only the per-term fragments for the words typed (~tens of KB/query). Nothing preloaded.
-- Pagefind **per-language sub-indexes** → only the user's chosen search language is fetched. **Filters** provide facets (book, content_type, grading, has_chain, topics, tags) with counts. Built-in highlighted **excerpts**.
+- **One Pagefind index PER LANGUAGE**, each in its own subdirectory (`<searchBaseUrl>/<lang>/`) and keyed by the **real verse URL**. (Pagefind dedups records by URL *globally*, so a single mixed-language index collapses a verse's languages into one — separate per-language indexes are required, and they match our "pick one search language" model.) The client inits Pagefind against the chosen language's subdir → only that language's files are ever fetched. **Filters** provide facets (book, content_type, grading, has_chain, topics, tags) with counts (`filters` = counts in current result set; `totalFilters` = counts ignoring each filter — drives the sidebar). Built-in highlighted **excerpts**.
 - Lazy-import the Pagefind runtime on first full-text search; **SSR-guard** (platform check — the app uses `@angular/ssr`). The service worker caches fetched fragments → progressively offline + zero repeat bandwidth.
 
 ### Where the Pagefind bundle lives + size → dedicated repo + Netlify site
 
-- **Estimated footprint:** searchable text ≈ 30 MB Arabic + 40 MB English today, trending to ~40 MB × 11 languages as AI translation coverage grows (currently ~17% → 100%). A Pagefind bundle is ≈ 30–50% of source text plus many fragment files ⇒ **~50–80 MB now, ~150–250 MB at full coverage, tens of thousands of files**. (The per-query *download* stays tiny regardless — this is on-server footprint only.)
-- **Decision:** the bundle is a *regenerated build artifact*, too big and too many files to sit in `ThaqalaynData` (already ~908 MB; committing it bloats git like a compiled binary and slows Netlify deploys). Put it in a **dedicated repo + Netlify site** (e.g. `thaqalaynsearch.netlify.app`) serving only the Pagefind bundle, with **CORS headers** (free Netlify config) so the Angular app fetches cross-origin. 100% static, zero recurring cost. Angular reads the origin from a new `environment.searchBaseUrl`.
-- The **Phase-0 spike** measures real size + file-count to confirm this threshold (if it comes in small — under ~50 MB / a few thousand files — co-locating under `ThaqalaynData/pagefind/` stays an option, but the trajectory argues for the separate site).
+**Spike results (2026-06-14, 2 fully-AI-covered books = 1,469 verses × ar/en/fa):** validated Arabic + Farsi tokenization/normalization, AI-summary/key-term concept recall, highlighted excerpts, and faceted counts. Measured:
+- **Per-query wire size ≈ 33 KB** (one ~28 KB term-index chunk + ~5 × ~1 KB fragments). **First search per language per session ≈ 130–200 KB** one-time (loader 45 KB + wasm ~70 KB + lang meta ~11 KB + filter meta ~25 KB), then cached. Confirms the bandwidth thesis.
+- **On-server footprint ≈ 6–8.5 MB per language** for these 1,469 *fully-AI-covered* verses, and **~one fragment file per verse per language** (≈ 1,500 files/lang here).
+
+**Extrapolation + the real risk — file count.** At full corpus (58K verses), each language index is **~58K+ files**; `en` + `ar` alone ≈ **116K files**, and full 12-language coverage trends to **hundreds of thousands of files and >1 GB** on disk. (Corpus AI coverage is ~17% today so non-ar/en languages are far smaller now and grow over time.) Per-query download stays tiny regardless — this is purely a *deploy/host* concern: very large file counts slow Netlify deploys.
+
+**Decisions:**
+- **Dedicated repo + Netlify site** (e.g. `thaqalaynsearch.netlify.app`), **confirmed** by the spike — the bundle is a regenerated build artifact, far too many files to commit into `ThaqalaynData` (~908 MB) or slow its deploys. CORS headers (free) let the Angular app fetch cross-origin; Angular reads the origin from a new `environment.searchBaseUrl`.
+- **Coverage-gated language rollout** to contain file count: ship `ar` + `en` first; add a language's index only once its AI translation coverage is material. The build emits a manifest of available languages so the client's language picker only offers built ones.
 
 ---
 

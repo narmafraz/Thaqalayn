@@ -123,7 +123,7 @@ export class KeyboardShortcutService implements OnDestroy {
 
   private focusSearch(): void {
     if (!this.isBrowser) { return; }
-    const searchInput = document.querySelector<HTMLInputElement>('.search-bar-input input, .search-bar-input');
+    const searchInput = document.getElementById('global-search-input') as HTMLInputElement | null;
     if (searchInput) {
       searchInput.focus();
     }

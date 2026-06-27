@@ -26,14 +26,16 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   showDropdown = false;
   showTips = false;
   activeResultIndex = -1;
+  private indexRequested = false;
   private searchSubject = new Subject<string>();
   private subscriptions: Subscription[] = [];
 
   constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
-    this.store.dispatch(new InitSearchIndex());
-
+    // NOTE: the search index is NOT loaded here. It is loaded lazily on first
+    // focus (onFocus) so nothing downloads on page load — the search bar is in
+    // the header on every page (mobile-bandwidth rule).
     this.subscriptions.push(
       this.searchSubject.pipe(
         debounceTime(300),
@@ -91,6 +93,11 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   }
 
   onFocus(): void {
+    // Lazy-load the search index on first engagement (not on page load).
+    if (!this.indexRequested) {
+      this.indexRequested = true;
+      this.store.dispatch(new InitSearchIndex());
+    }
     if (this.searchValue.length >= 2) {
       this.showDropdown = true;
     }

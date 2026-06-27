@@ -261,5 +261,42 @@ describe('BooksState', () => {
       const retryCall = dispatchSpy.calls.allArgs().find(([action]) => action instanceof RetryLoadBookPart);
       expect(retryCall).toBeUndefined();
     }));
+
+    it('dispatches RetryLoadBookPart when the active translation changes to a different AI lang', fakeAsync(() => {
+      // wordByWord stays at 'en'; the user picks fa.ai from the Translation
+      // dropdown — that changes the effective AI lang from 'en' to 'fa', so
+      // the sister must refetch. (Bug fix: prior to #69 the listener only
+      // watched wordByWordDefaultLang and missed this transition.)
+      seedRoute('al-kafi:1:1:1:1', splitShapeVerseDetail());
+      dispatchSpy.calls.reset();
+      store.reset({
+        ...store.snapshot(),
+        myrouter: { ...store.snapshot().myrouter, translation: 'fa.ai' },
+      });
+      tick(0);
+      const retryCall = dispatchSpy.calls.allArgs().find(([action]) => action instanceof RetryLoadBookPart);
+      expect(retryCall).toBeDefined();
+      expect((retryCall[0] as RetryLoadBookPart).payload).toBe('al-kafi:1:1:1:1');
+    }));
+
+    it('does NOT dispatch when active translation switches between human translators in the same lang', fakeAsync(() => {
+      // en.qarai → en.sarwar: human translator change, effective AI lang stays 'en'.
+      seedRoute('al-kafi:1:1:1:1', splitShapeVerseDetail());
+      // Set initial translation to en.qarai
+      store.reset({
+        ...store.snapshot(),
+        myrouter: { ...store.snapshot().myrouter, translation: 'en.qarai' },
+      });
+      tick(0);
+      dispatchSpy.calls.reset();
+      // Switch to en.sarwar — same AI lang fallback (wordByWord = 'en')
+      store.reset({
+        ...store.snapshot(),
+        myrouter: { ...store.snapshot().myrouter, translation: 'en.sarwar' },
+      });
+      tick(0);
+      const retryCall = dispatchSpy.calls.allArgs().find(([action]) => action instanceof RetryLoadBookPart);
+      expect(retryCall).toBeUndefined();
+    }));
   });
 });

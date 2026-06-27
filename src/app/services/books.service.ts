@@ -1,10 +1,12 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Book, VerseDetail, Verse } from '@app/models';
+import { Book, VerseDetail, Verse, effectiveAiLang } from '@app/models';
 import { OfflineStorageService } from './offline-storage.service';
 import { AiPreferencesService } from './ai-preferences.service';
+import { RouterState } from '@store/router/router.state';
+import { Store } from '@ngxs/store';
 import { environment } from '@env/environment';
-import { Observable, from, of } from 'rxjs';
+import { Observable, combineLatest, from, of } from 'rxjs';
 import { catchError, map, retry, switchMap, take, tap, timeout } from 'rxjs/operators';
 
 interface SisterFile {
@@ -62,8 +64,14 @@ export class BooksService {
           // legacy/inline-shape, or no AI content: nothing to merge
           return of(book);
         }
-        return this.aiPrefs.preferences$.pipe(
-          map(p => p.wordByWordDefaultLang),
+        // Effective AI lang composes two inputs that both drive the view:
+        // the active translation (if it's an AI one), else the wordByWord
+        // preference. Either changing should refetch a different sister.
+        return combineLatest([
+          this.aiPrefs.preferences$.pipe(map(p => p.wordByWordDefaultLang)),
+          this.store.select(RouterState.getTranslation),
+        ]).pipe(
+          map(([w, t]) => effectiveAiLang(t, w)),
           take(1),
           switchMap(lang => {
             const sisterUrl = `${BooksService.bookpartsUrl}/${index.replace(/:/g, '/')}.${lang}.json`;
@@ -139,4 +147,5 @@ export class BooksService {
   private http = inject(HttpClient);
   private offlineStorage = inject(OfflineStorageService);
   private aiPrefs = inject(AiPreferencesService);
+  private store = inject(Store);
 }

@@ -11,6 +11,9 @@ import {
   RelatedQuran,
   SimilarContentHint,
   WordAnalysisEntry,
+  effectiveAiLang,
+  getAiLang,
+  isAiTranslation,
 } from './ai-content';
 
 describe('AI Content interfaces', () => {
@@ -286,6 +289,46 @@ describe('AI Content interfaces', () => {
       };
       expect(entry.summary).toBeDefined();
       expect(Object.keys(entry.key_terms).length).toBe(2);
+    });
+  });
+
+  describe('isAiTranslation', () => {
+    it('returns true for .ai-suffixed IDs', () => {
+      expect(isAiTranslation('en.ai')).toBe(true);
+      expect(isAiTranslation('fa.ai')).toBe(true);
+    });
+    it('returns false for human translations', () => {
+      expect(isAiTranslation('en.qarai')).toBe(false);
+      expect(isAiTranslation('en.transliteration')).toBe(false);
+      expect(isAiTranslation('')).toBe(false);
+    });
+  });
+
+  describe('getAiLang', () => {
+    it('extracts the lang prefix from an AI translation ID', () => {
+      expect(getAiLang('en.ai')).toBe('en');
+      expect(getAiLang('fa.ai')).toBe('fa');
+      expect(getAiLang('zh.ai')).toBe('zh');
+    });
+    it('returns undefined for non-AI translation IDs', () => {
+      expect(getAiLang('en.qarai')).toBeUndefined();
+      expect(getAiLang('')).toBeUndefined();
+    });
+  });
+
+  describe('effectiveAiLang', () => {
+    it('returns the active translation lang when it is an AI translation', () => {
+      // User picked fa.ai from the dropdown — that wins over wordByWord pref.
+      expect(effectiveAiLang('fa.ai', 'en')).toBe('fa');
+      expect(effectiveAiLang('zh.ai', 'en')).toBe('zh');
+    });
+    it('falls back to wordByWord when active translation is human', () => {
+      expect(effectiveAiLang('en.qarai', 'fa')).toBe('fa');
+      expect(effectiveAiLang('en.sarwar', 'ur')).toBe('ur');
+    });
+    it('falls back to wordByWord when translation is empty / undefined', () => {
+      expect(effectiveAiLang(undefined, 'en')).toBe('en');
+      expect(effectiveAiLang('', 'fa')).toBe('fa');
     });
   });
 });

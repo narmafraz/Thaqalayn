@@ -1,12 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { Book, ChapterList, Crumb, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation, VerseDetail } from '@app/models';
+import { Book, ChapterList, Crumb, effectiveAiLang, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation, VerseDetail } from '@app/models';
 import { BooksService } from '@app/services';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { IndexedTitles, IndexState } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
 import { catchError, distinctUntilChanged, map, skip, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import { LoadBookPart, RetryLoadBookPart } from './books.actions';
 
 export interface BooksStateModel {
@@ -31,18 +31,24 @@ export class BooksState {
   private aiPrefs = inject(AiPreferencesService);
 
   constructor(private booksService: BooksService) {
-    // Refetch the currently-navigated verse_detail when the active AI
-    // language changes. The split shape stores per-language content in
-    // sister files; BooksService.getPart is one-shot per call (required
-    // for the NGXS resolver to complete the route activation), so the
-    // sister is only fetched once at load time. Without this listener,
-    // switching `wordByWordDefaultLang` would leave the page rendering
-    // the previously-loaded language until manual reload.
+    // Refetch the currently-navigated verse_detail when the effective AI
+    // language changes. Two inputs both drive what the user sees:
+    //   - wordByWordDefaultLang (AI Settings → word-by-word language)
+    //   - the active translation in the URL — if it's `xx.ai`, the user
+    //     is reading in lang `xx`
+    // `effectiveAiLang` composes them. The split shape stores per-language
+    // content in sister files; BooksService.getPart is one-shot per call
+    // (NGXS resolver completion), so the sister is fetched once at load.
+    // Without this listener, switching either source leaves the page
+    // rendering the previously-loaded sister.
     //
     // Only verse_detail kind triggers a refetch — chapter shells and
     // legacy-shape verses don't depend on the sister at all.
-    this.aiPrefs.preferences$.pipe(
-      map(p => p.wordByWordDefaultLang),
+    combineLatest([
+      this.aiPrefs.preferences$.pipe(map(p => p.wordByWordDefaultLang)),
+      this.store.select(RouterState.getTranslation),
+    ]).pipe(
+      map(([w, t]) => effectiveAiLang(t, w)),
       distinctUntilChanged(),
       skip(1),
     ).subscribe(() => {

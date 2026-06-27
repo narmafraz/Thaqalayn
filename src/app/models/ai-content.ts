@@ -144,3 +144,16 @@ export function getAiLang(translationId: string): AiLanguage | undefined {
   if (!isAiTranslation(translationId)) return undefined;
   return translationId.replace('.ai', '') as AiLanguage;
 }
+
+/**
+ * The AI language whose sister file backs the current view. Active translation
+ * wins when it's an AI translation (the user is reading in that language);
+ * otherwise fall back to the word-by-word preference (the lang for word-level
+ * AI translations + summary / key_terms / seo_question display).
+ *
+ * Used by BooksService to decide which `{path}.{lang}.json` sister to fetch
+ * and by BooksState to trigger a refetch when this composite value changes.
+ */
+export function effectiveAiLang(translationId: string | undefined, wordByWord: AiLanguage): AiLanguage {
+  return getAiLang(translationId || '') ?? wordByWord;
+}

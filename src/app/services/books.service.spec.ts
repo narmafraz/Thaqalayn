@@ -2,11 +2,14 @@ import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { BooksService } from './books.service';
 import { OfflineStorageService } from './offline-storage.service';
-import { Book } from '@app/models';
+import { AiPreferencesService, AiPreferences } from './ai-preferences.service';
+import { Book, Verse, VerseDetail } from '@app/models';
+import { BehaviorSubject } from 'rxjs';
 
 describe('BooksService', () => {
   let service: BooksService;
   let httpMock: HttpTestingController;
+  let prefsSubject: BehaviorSubject<AiPreferences>;
 
   const API_BASE = 'http://localhost:8888/';
 
@@ -19,11 +22,25 @@ describe('BooksService', () => {
   beforeEach(() => {
     mockOfflineStorage.getPartFromBook.and.returnValue(Promise.resolve(null));
     mockOfflineStorage.getCachedResponse.and.returnValue(Promise.resolve(null));
+    prefsSubject = new BehaviorSubject<AiPreferences>({
+      showDiacritizedByDefault: true,
+      showContentTypeBadges: true,
+      showTopicTags: true,
+      showAiTranslationDisclaimer: true,
+      showChainDiagram: false,
+      showWordByWord: false,
+      sidesheetOpenOnDesktop: false,
+      wordByWordDefaultLang: 'en',
+      muteReadVerses: true,
+      muteReadingBanner: false,
+      viewMode: 'plain',
+    });
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
         { provide: OfflineStorageService, useValue: mockOfflineStorage },
+        { provide: AiPreferencesService, useValue: { preferences$: prefsSubject.asObservable() } },
       ],
     });
     service = TestBed.inject(BooksService);
@@ -353,6 +370,124 @@ describe('BooksService', () => {
         const req = httpMock.expectOne(`${API_BASE}books/quran/2.json`);
         expect(req.request.method).toBe('GET');
         req.flush({ kind: 'verse_list', index: 'quran:2', data: {} });
+      }));
+    });
+
+    describe('per-language sister merge', () => {
+
+      function detailWithSplitAi(): VerseDetail {
+        return {
+          kind: 'verse_detail',
+          index: 'al-kafi:1:1:1:1',
+          data: {
+            verse: {
+              index: 1, local_index: 1, path: '/books/al-kafi:1:1:1:1',
+              text: ['arabic'], sajda_type: '',
+              translations: {}, part_type: 'Hadith',
+              relations: {}, narrator_chain: { parts: [], text: '' },
+              ai: {
+                available_languages: ['en', 'fa'],
+                key_terms_keys: ['العقل'],
+                chunks: [{ chunk_type: 'body', arabic_text: 'foo', word_start: 0, word_end: 1 }],
+              } as unknown as Verse['ai'],
+            },
+            chapter_path: '/books/al-kafi:1:1:1',
+            chapter_title: { en: 'Test' },
+            nav: { prev: '', next: '', up: '' },
+          },
+        } as VerseDetail;
+      }
+
+      it('skips sister fetch for non-verse_detail kinds', fakeAsync(() => {
+        service.getPart('al-kafi:1').subscribe();
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1.json`)
+          .flush({ kind: 'chapter_list', index: 'al-kafi:1', data: {} });
+        tick(0);
+        httpMock.expectNone(req => req.url.includes('.en.json'));
+      }));
+
+      it('skips sister fetch when ai.summaries is inline (legacy shape)', fakeAsync(() => {
+        service.getPart('al-kafi:1:1:1:1').subscribe();
+        tick(0);
+        const legacy: VerseDetail = {
+          kind: 'verse_detail',
+          index: 'al-kafi:1:1:1:1',
+          data: {
+            verse: { ...detailWithSplitAi().data.verse, ai: { summaries: { en: 'Inline' } } as unknown as Verse['ai'] },
+            chapter_path: '/books/al-kafi:1:1:1',
+            chapter_title: { en: 'Test' },
+            nav: { prev: '', next: '', up: '' },
+          },
+        } as VerseDetail;
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(legacy);
+        tick(0);
+        httpMock.expectNone(req => req.url.includes('.en.json'));
+      }));
+
+      it('fetches sister and merges per-lang fields into legacy shape (split base)', fakeAsync(() => {
+        let receivedBook: Book | undefined;
+        service.getPart('al-kafi:1:1:1:1').subscribe(b => receivedBook = b);
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(detailWithSplitAi());
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.en.json`).flush({
+          lang: 'en',
+          path: '/books/al-kafi:1:1:1:1',
+          ai: {
+            summary: 'EN summary',
+            seo_question: 'EN seo?',
+            chunks: ['foo-en'],
+            key_terms: { 'العقل': 'intellect' },
+          },
+        });
+        tick(0);
+        const ai = (receivedBook as VerseDetail).data.verse.ai as unknown as Record<string, unknown>;
+        expect((ai['summaries'] as Record<string, string>)['en']).toBe('EN summary');
+        expect((ai['seo_questions'] as Record<string, string>)['en']).toBe('EN seo?');
+        const chunks = ai['chunks'] as Array<Record<string, unknown>>;
+        expect((chunks[0]['translations'] as Record<string, string>)['en']).toBe('foo-en');
+      }));
+
+      it('returns base verse unchanged when sister 404s', fakeAsync(() => {
+        let receivedBook: Book | undefined;
+        service.getPart('al-kafi:1:1:1:1').subscribe(b => receivedBook = b);
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(detailWithSplitAi());
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.en.json`)
+          .flush('', { status: 404, statusText: 'Not Found' });
+        tick(0);
+        const ai = (receivedBook as VerseDetail).data.verse.ai as unknown as Record<string, unknown>;
+        expect(ai['summaries']).toBeUndefined();
+      }));
+
+      it('completes after first emission (terminating observable for NGXS resolver)', fakeAsync(() => {
+        let completed = false;
+        service.getPart('al-kafi:1:1:1:1').subscribe({ complete: () => { completed = true; } });
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(detailWithSplitAi());
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.en.json`).flush({
+          lang: 'en', path: '/books/al-kafi:1:1:1:1', ai: { summary: 'EN summary' },
+        });
+        tick(0);
+        expect(completed).toBe(true);
+      }));
+
+      it('uses the active lang at fetch time on each call', fakeAsync(() => {
+        // Switch lang before fetch; the next getPart call should target the new sister
+        prefsSubject.next({ ...prefsSubject.value, wordByWordDefaultLang: 'fa' });
+
+        service.getPart('al-kafi:1:1:1:1').subscribe();
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(detailWithSplitAi());
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.fa.json`).flush({
+          lang: 'fa', path: '/books/al-kafi:1:1:1:1', ai: { summary: 'FA summary' },
+        });
+        tick(0);
+        httpMock.expectNone(req => req.url.endsWith('.en.json'));
       }));
     });
   });

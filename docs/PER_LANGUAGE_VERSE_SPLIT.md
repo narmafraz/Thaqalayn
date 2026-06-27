@@ -58,7 +58,8 @@ Everything that varies by AI-translation language:
 |---|---|---|
 | `data.verse.ai.summaries.{lang}` | `{summaries: {en: "...", fa: "...", ...}}` | `{summary: "..."}` (no lang dimension) |
 | `data.verse.ai.seo_questions.{lang}` | `{seo_questions: {en: "...", fa: "...", ...}}` | `{seo_question: "..."}` |
-| `data.verse.ai.chunks[i].translations.{lang}` | per-chunk per-lang | `{chunks: [{translation: "..."}]}` (one translation per chunk) |
+| `data.verse.ai.chunks[i].translations.{lang}` | per-chunk per-lang | `{chunks: ["...", null, "..."]}` (flat string array, index-aligned with base.chunks; `null` where this lang has no translation for that chunk) |
+| `data.verse.ai.word_analysis[i].translation.{lang}` (v3) | per-word per-lang | `{word_analysis: ["...", null, "..."]}` (flat string array, index-aligned with base.word_analysis) |
 | `data.verse.ai.key_terms.{lang}.{ar_term}` | nested by lang then Arabic term | `{key_terms: {ar_term: "..."}}` (no lang dimension) |
 
 ### Concrete before/after schemas
@@ -162,9 +163,7 @@ Everything that varies by AI-translation language:
   "ai": {
     "summary": "In Shia exegesis, this verse underscores the absolute sovereignty (Mulku) of Allah, often cited to refute the notion of independent intercessors...",
     "seo_question": "What does the Quran say about God's ownership of the heavens and the earth?",
-    "chunks": [
-      {"translation": "Do you not know that God's is the kingdom of the heavens and the earth..."}
-    ],
+    "chunks": ["Do you not know that God's is the kingdom of the heavens and the earth..."],
     "key_terms": {
       "السَّمَاوَاتِ": "The heavens",
       "الْأَرْضِ": "The earth",
@@ -178,9 +177,11 @@ Everything that varies by AI-translation language:
 
 **`books/quran/2/107.fa.json`** (Persian sister, identical shape with Persian content) — same shape; `chunks[]` aligns with the base's `chunks[]` array index, `key_terms` keys align with the base's `key_terms_keys`.
 
+For v3 verses (al-amali-mufid, al-amali-saduq, etc.) the sister also carries an index-aligned `word_analysis: ["...", null, ...]` string array, one entry per word in the base's `word_analysis`.
+
 ### A few design notes on the sister shape
 
-- **`chunks` array in sisters has only `{translation: "..."}` per element** — Arabic text, type, word ranges all live in base. UI joins index-wise.
+- **Sister `chunks` / `word_analysis` are flat string arrays** — not arrays of `{translation: "..."}` objects. Index-aligned with the base's `chunks` / `word_analysis`. `null` marks "no translation for this lang at this index" so positional alignment is preserved. Saves ~15 bytes per entry vs the object-wrapped form (significant for v3 verses with 80-100 words across 11 langs).
 - **`key_terms_keys` in base** preserves the canonical key order. Sisters' `key_terms` is a flat `{ar: lang_string}` map. The keys must match. Could also be a parallel array; map form is simpler to consume.
 - **`available_languages` in base** tells the UI which sisters exist for this verse. Useful for verses where Phase 4 only generated some langs (rare, but happens — when a verse quarantines for one lang the merger may drop that lang).
 - **`lang` + `path` at the top of each sister** make it self-identifying for debugging.

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BooksService } from './books.service';
 import { Verse, VerseDetail } from '@app/models/book';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
 @Injectable({

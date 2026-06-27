@@ -56,7 +56,7 @@
         "https://thaqalayndata.netlify.app/books/**"
       ],
       "cacheConfig": {
-        "maxSize": 500,
+        "maxSize": 1500,
         "maxAge": "30d",
         "strategy": "freshness",
         "timeout": "5s"

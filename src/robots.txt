@@ -10,6 +10,9 @@
 
 User-agent: *
 Allow: /
+# Search results are a dynamic, infinite query-space, JS-only (no SSR) — nothing
+# to index, and crawling them would trigger client-side search-index fetches.
+Disallow: /search
 
 # --- User-triggered AI retrieval (allowed: low traffic, sends real readers) ---
 

@@ -8,15 +8,13 @@ import { PagefindFilterCounts, PagefindService } from '@app/services/pagefind.se
 import { VerseLoaderService } from '@app/services/verse-loader.service';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 
-interface FacetValue { value: string; label: string; count: number; active: boolean; }
-interface FacetGroup { filter: string; label: string; values: FacetValue[]; }
+// label = data-derived display text (book/type/topic/tag values); labelKey = an
+// i18n key (group headers, and has_chain values) resolved via the translate pipe.
+interface FacetValue { value: string; label: string; labelKey?: string; count: number; active: boolean; }
+interface FacetGroup { filter: string; labelKey: string; values: FacetValue[]; }
 
-// Display order + labels for the facet groups.
+// Display order for the facet groups (labels come from i18n: search.facet.*).
 const FACET_ORDER = ['book', 'content_type', 'has_chain', 'topic', 'tag'];
-const FACET_LABELS: Record<string, string> = {
-  book: 'Book', content_type: 'Type', has_chain: 'Chain', topic: 'Topic', tag: 'Tag',
-};
-const HAS_CHAIN_LABELS: Record<string, string> = { yes: 'With chain', no: 'No chain' };
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -160,21 +158,21 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
         .map(([value, count]) => ({
           value,
           label: this.facetValueLabel(filter, value),
+          labelKey: filter === 'has_chain' ? `search.chain.${value}` : undefined,
           count,
           active: activeSet.has(value),
         }))
         .sort((a, b) => b.count - a.count);
       if (values.length) {
-        groups.push({ filter, label: FACET_LABELS[filter] || this.titleCase(filter), values });
+        groups.push({ filter, labelKey: `search.facet.${filter}`, values });
       }
     }
     return groups;
   }
 
   private facetValueLabel(filter: string, value: string): string {
-    if (filter === 'has_chain') { return HAS_CHAIN_LABELS[value] || value; }
     if (filter === 'book') { return this.formatPath(`/books/${value}`); }
-    return this.titleCase(value);
+    return this.titleCase(value); // has_chain uses labelKey instead
   }
 
   private titleCase(value: string): string {

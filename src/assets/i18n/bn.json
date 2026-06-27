@@ -169,7 +169,28 @@
     "loadMore": "আরো লোড করুন",
     "showingAll": "সব ফলাফল দেখানো হয়েছে",
     "placeholder": "অনুসন্ধান...",
-    "filteredBy": "ফিল্টার করা হয়েছে"
+    "filteredBy": "ফিল্টার করা হয়েছে",
+    "searchLanguage": "Search language",
+    "clearFilters": "Clear filters",
+    "facet": {
+      "book": "Book",
+      "content_type": "Type",
+      "has_chain": "Chain",
+      "topic": "Topic",
+      "tag": "Tag"
+    },
+    "chain": {
+      "yes": "With chain",
+      "no": "No chain"
+    },
+    "tipOperators": "Operators",
+    "tipAllWords": "Multiple words: results must contain all of them",
+    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
+    "opTopic": "topic:sincerity — browse everything on a topic",
+    "opRef": "ref:2:255 — verses citing a Qur'an verse",
+    "opPhrase": "phrase:\"in the name of\" — exact phrase",
+    "opBook": "book:al-kafi — limit to one book",
+    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
   },
   "translation": {
     "selectTranslation": "অনুবাদ নির্বাচন করুন",
@@ -338,7 +359,15 @@
     "en": "English",
     "ar": "العربية",
     "fa": "فارسی",
-    "fr": "Français"
+    "fr": "Français",
+    "ur": "اردو",
+    "tr": "Türkçe",
+    "id": "Bahasa Indonesia",
+    "bn": "বাংলা",
+    "es": "Español",
+    "de": "Deutsch",
+    "ru": "Русский",
+    "zh": "中文"
   },
   "annotation": {
     "add": "নোট যোগ",

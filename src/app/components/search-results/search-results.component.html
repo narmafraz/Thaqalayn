@@ -17,8 +17,8 @@
     <label class="search-lang-picker" *ngIf="(mode$ | async) === 'fulltext' && availableLangs.length">
       <mat-icon>translate</mat-icon>
       <select [value]="(searchLang$ | async)" (change)="setLanguage($any($event.target).value)"
-        [attr.aria-label]="'search.search' | translate">
-        <option *ngFor="let l of availableLangs" [value]="l">{{ l | uppercase }}</option>
+        [attr.aria-label]="'search.searchLanguage' | translate">
+        <option *ngFor="let l of availableLangs" [value]="l">{{ ('language.' + l) | translate }}</option>
       </select>
     </label>
   </div>
@@ -55,17 +55,17 @@
             <mat-icon>filter_list</mat-icon>{{ 'search.filter' | translate }}
           </span>
           <button *ngIf="hasActiveFacets" class="facet-clear" (click)="clearFacets()"
-            [attr.aria-label]="'search.clearSearch' | translate"
-            [matTooltip]="'search.clearSearch' | translate">
+            [attr.aria-label]="'search.clearFilters' | translate"
+            [matTooltip]="'search.clearFilters' | translate">
             <mat-icon>clear_all</mat-icon>
           </button>
         </div>
         <div class="facet-group" *ngFor="let group of facetGroups">
-          <h3 class="facet-group-label">{{ group.label }}</h3>
+          <h3 class="facet-group-label">{{ group.labelKey | translate }}</h3>
           <button *ngFor="let v of group.values"
             class="facet-chip" [class.active]="v.active"
             (click)="toggleFacet(group.filter, v.value, v.active)">
-            <span class="facet-chip-label">{{ v.label }}</span>
+            <span class="facet-chip-label">{{ v.labelKey ? (v.labelKey | translate) : v.label }}</span>
             <span class="chip-count">{{ v.count }}</span>
           </button>
         </div>

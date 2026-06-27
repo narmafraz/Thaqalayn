@@ -391,7 +391,6 @@ describe('BooksService', () => {
               translations: {}, part_type: 'Hadith',
               relations: {}, narrator_chain: { parts: [], text: '' },
               ai: {
-                available_languages: ['en', 'fa'],
                 key_terms_keys: ['العقل'],
                 chunks: [{ chunk_type: 'body', arabic_text: 'foo', word_start: 0, word_end: 1 }],
               } as unknown as Verse['ai'],

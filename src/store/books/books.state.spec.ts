@@ -187,7 +187,7 @@ describe('BooksState', () => {
             text: ['Arabic'], sajda_type: '',
             translations: {}, part_type: 'Hadith',
             relations: {}, narrator_chain: { parts: [], text: '' },
-            ai: { available_languages: ['en', 'fa'], chunks: [] } as any,
+            ai: { chunks: [] } as any,
           },
         },
       } as VerseDetail;

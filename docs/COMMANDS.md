@@ -311,6 +311,26 @@ print(f'{clean}/{len(files)} clean ({100*clean/len(files):.1f}%)')
 "
 ```
 
+**Coverage reports** — where are the gaps in `ThaqalaynWords/`?
+
+```bash
+# Per-lemma lexicon coverage: % of lemmas that have lanes_definition /
+# classical_definitions (hawramani) / qac / wiktextract / Path-B translations
+# populated. Shows top-N highest-corpus-frequency lemmas with each field null
+# (so you can prioritise filling the gaps that matter most).
+python scripts/report_lemma_coverage.py            # default top 20
+python scripts/report_lemma_coverage.py --top 0    # only headline percentages
+python scripts/report_lemma_coverage.py --top 50 > lemma_coverage.txt
+
+# Corpus surface → words coverage: of every unique surface in
+# corpus_surface_set.json, do we have a surfaces/{slug}.json + a
+# resolvable lemma_link? Catches build_word_pages.py filtering bugs.
+python scripts/report_surface_coverage.py
+python scripts/report_surface_coverage.py --top 30
+```
+
+Both run on the already-built `ThaqalaynWords/` output — invoke them after `regen_words.ps1` finishes. Read-only, fast (a few seconds).
+
 ---
 
 ## 4. Pipeline Monitoring & Analysis

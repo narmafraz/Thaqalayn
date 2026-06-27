@@ -145,8 +145,7 @@ Everything that varies by AI-translation language:
         "key_terms_keys": ["السَّمَاوَاتِ", "الْأَرْضِ", "مُلْكُ", "نَصِيرٍ", "وَلِيٍّ"],
         "related_quran": [],
         "tags": [...],
-        "topics": ["tawhid", "divine_attributes", "quran_interpretation_method"],
-        "available_languages": ["en", "fa", "ur", "tr", "id", "bn", "es", "fr", "de", "ru", "zh"]
+        "topics": ["tawhid", "divine_attributes", "quran_interpretation_method"]
       }
     }
   },
@@ -183,7 +182,7 @@ For v3 verses (al-amali-mufid, al-amali-saduq, etc.) the sister also carries an 
 
 - **Sister `chunks` / `word_analysis` are flat string arrays** — not arrays of `{translation: "..."}` objects. Index-aligned with the base's `chunks` / `word_analysis`. `null` marks "no translation for this lang at this index" so positional alignment is preserved. Saves ~15 bytes per entry vs the object-wrapped form (significant for v3 verses with 80-100 words across 11 langs).
 - **`key_terms_keys` in base** preserves the canonical key order. Sisters' `key_terms` is a flat `{ar: lang_string}` map. The keys must match. Could also be a parallel array; map form is simpler to consume.
-- **`available_languages` in base** tells the UI which sisters exist for this verse. Useful for verses where Phase 4 only generated some langs (rare, but happens — when a verse quarantines for one lang the merger may drop that lang).
+- **No `available_languages` field.** It would duplicate data: `verse_translations` (chapter/verse-level) already lists every `{lang}.ai` ID. UI consumers can derive the AI lang set with `.endsWith('.ai')` filter + `.slice(0, -3)`.
 - **`lang` + `path` at the top of each sister** make it self-identifying for debugging.
 
 ## UI changes

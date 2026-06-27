@@ -1,12 +1,20 @@
 import { Injectable } from '@angular/core';
 import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
+import { PagefindFilterCounts } from '@app/services/pagefind.service';
+import { I18nService } from '@app/services/i18n.service';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { ClearSearch, InitSearchIndex, SearchQuery, SetSearchMode } from './search.actions';
+import {
+  ClearFacets, ClearSearch, InitSearchIndex, SearchQuery,
+  SetFacet, SetSearchLanguage, SetSearchMode,
+} from './search.actions';
 
 export interface SearchStateModel {
   query: string;
   mode: SearchMode;
+  searchLang: string;
   results: SearchResult[];
+  facets: PagefindFilterCounts; // counts for the sidebar (from Pagefind totalFilters)
+  activeFacets: Record<string, string[]>; // selected facet values per filter
   loading: boolean;
   indexReady: boolean;
   fullTextLoading: boolean;
@@ -18,54 +26,56 @@ export interface SearchStateModel {
   defaults: {
     query: '',
     mode: 'titles',
+    searchLang: 'en',
     results: [],
+    facets: {},
+    activeFacets: {},
     loading: false,
     indexReady: false,
     fullTextLoading: false,
-    error: undefined
-  }
+    error: undefined,
+  },
 })
 @Injectable()
 export class SearchState {
-  constructor(private searchService: SearchService) {}
+  constructor(private searchService: SearchService, private i18n: I18nService) {}
 
   @Selector([SearchState])
-  public static getQuery(state: SearchStateModel): string {
-    return state.query;
-  }
+  public static getQuery(state: SearchStateModel): string { return state.query; }
 
   @Selector([SearchState])
-  public static getMode(state: SearchStateModel): SearchMode {
-    return state.mode;
-  }
+  public static getMode(state: SearchStateModel): SearchMode { return state.mode; }
 
   @Selector([SearchState])
-  public static getResults(state: SearchStateModel): SearchResult[] {
-    return state.results;
-  }
+  public static getSearchLang(state: SearchStateModel): string { return state.searchLang; }
 
   @Selector([SearchState])
-  public static isLoading(state: SearchStateModel): boolean {
-    return state.loading;
-  }
+  public static getResults(state: SearchStateModel): SearchResult[] { return state.results; }
 
   @Selector([SearchState])
-  public static isIndexReady(state: SearchStateModel): boolean {
-    return state.indexReady;
-  }
+  public static getFacets(state: SearchStateModel): PagefindFilterCounts { return state.facets; }
 
   @Selector([SearchState])
-  public static isFullTextLoading(state: SearchStateModel): boolean {
-    return state.fullTextLoading;
-  }
+  public static getActiveFacets(state: SearchStateModel): Record<string, string[]> { return state.activeFacets; }
 
   @Selector([SearchState])
-  public static getError(state: SearchStateModel): string | undefined {
-    return state.error;
-  }
+  public static isLoading(state: SearchStateModel): boolean { return state.loading; }
+
+  @Selector([SearchState])
+  public static isIndexReady(state: SearchStateModel): boolean { return state.indexReady; }
+
+  @Selector([SearchState])
+  public static isFullTextLoading(state: SearchStateModel): boolean { return state.fullTextLoading; }
+
+  @Selector([SearchState])
+  public static getError(state: SearchStateModel): string | undefined { return state.error; }
 
   @Action(InitSearchIndex)
   public async initIndex(ctx: StateContext<SearchStateModel>) {
+    // Default the search language to the active UI language (the picker can change it).
+    if (ctx.getState().searchLang === 'en' && this.i18n.currentLang) {
+      ctx.patchState({ searchLang: this.i18n.currentLang });
+    }
     try {
       await this.searchService.loadTitlesIndex();
       ctx.patchState({ indexReady: true });
@@ -75,21 +85,42 @@ export class SearchState {
   }
 
   @Action(SetSearchMode)
-  public async setMode(ctx: StateContext<SearchStateModel>, action: SetSearchMode) {
-    const state = ctx.getState();
+  public setMode(ctx: StateContext<SearchStateModel>, action: SetSearchMode) {
     ctx.patchState({ mode: action.mode });
+    const { query } = ctx.getState();
+    if (query) { ctx.dispatch(new SearchQuery(query)); }
+  }
 
-    // If switching to fulltext and we have a query, re-run the search
-    if (state.query) {
-      ctx.dispatch(new SearchQuery(state.query));
-    }
+  @Action(SetSearchLanguage)
+  public setLanguage(ctx: StateContext<SearchStateModel>, action: SetSearchLanguage) {
+    ctx.patchState({ searchLang: action.lang });
+    const { query, mode } = ctx.getState();
+    if (query && mode === 'fulltext') { ctx.dispatch(new SearchQuery(query)); }
+  }
+
+  @Action(SetFacet)
+  public setFacet(ctx: StateContext<SearchStateModel>, action: SetFacet) {
+    const active = { ...ctx.getState().activeFacets };
+    const current = new Set(active[action.filter] || []);
+    if (action.selected) { current.add(action.value); } else { current.delete(action.value); }
+    if (current.size) { active[action.filter] = [...current]; } else { delete active[action.filter]; }
+    ctx.patchState({ activeFacets: active });
+    const { query } = ctx.getState();
+    if (query) { ctx.dispatch(new SearchQuery(query)); }
+  }
+
+  @Action(ClearFacets)
+  public clearFacets(ctx: StateContext<SearchStateModel>) {
+    ctx.patchState({ activeFacets: {} });
+    const { query } = ctx.getState();
+    if (query) { ctx.dispatch(new SearchQuery(query)); }
   }
 
   @Action(SearchQuery)
   public async search(ctx: StateContext<SearchStateModel>, action: SearchQuery) {
     const query = action.query.trim();
     if (!query) {
-      ctx.patchState({ query: '', results: [], loading: false });
+      ctx.patchState({ query: '', results: [], facets: {}, loading: false });
       return;
     }
 
@@ -99,29 +130,28 @@ export class SearchState {
     ctx.patchState({
       query,
       loading: true,
-      fullTextLoading: isFullText && !this.searchService.isFullTextLoaded,
-      error: undefined
+      fullTextLoading: isFullText && !this.searchService.isFullTextLoaded(state.searchLang),
+      error: undefined,
     });
 
     try {
-      // Ensure titles index is loaded before searching
       await this.searchService.loadTitlesIndex();
-      if (!ctx.getState().indexReady) {
-        ctx.patchState({ indexReady: true });
-      }
-      const results = await this.searchService.searchAll(query, state.mode);
-      ctx.patchState({ results, loading: false, fullTextLoading: false });
-    } catch {
+      if (!ctx.getState().indexReady) { ctx.patchState({ indexReady: true }); }
+
+      const outcome = await this.searchService.searchAll(query, state.mode, state.searchLang, state.activeFacets);
       ctx.patchState({
+        results: outcome.results,
+        facets: outcome.facets,
         loading: false,
         fullTextLoading: false,
-        error: 'Search failed'
       });
+    } catch {
+      ctx.patchState({ loading: false, fullTextLoading: false, error: 'Search failed' });
     }
   }
 
   @Action(ClearSearch)
   public clear(ctx: StateContext<SearchStateModel>) {
-    ctx.patchState({ query: '', results: [], error: undefined });
+    ctx.patchState({ query: '', results: [], facets: {}, activeFacets: {}, error: undefined });
   }
 }

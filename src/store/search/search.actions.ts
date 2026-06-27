@@ -14,6 +14,21 @@ export class SetSearchMode {
   constructor(public mode: SearchMode) { }
 }
 
+export class SetSearchLanguage {
+  public static readonly type = '[Search] Set language';
+  constructor(public lang: string) { }
+}
+
+/** Toggle a facet value on/off (filter e.g. 'book' | 'content_type' | 'has_chain' | 'topic' | 'tag'). */
+export class SetFacet {
+  public static readonly type = '[Search] Set facet';
+  constructor(public filter: string, public value: string, public selected: boolean) { }
+}
+
+export class ClearFacets {
+  public static readonly type = '[Search] Clear facets';
+}
+
 export class ClearSearch {
   public static readonly type = '[Search] Clear';
 }

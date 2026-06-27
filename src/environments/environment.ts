@@ -7,7 +7,8 @@ export const environment = {
   apiBaseUrl: 'http://localhost:8888/',
   wordsApiBaseUrl: 'http://localhost:8889/',
   tafsirBaseUrl: 'https://thaqalayntafsir.netlify.app/',
-  searchBaseUrl: 'https://thaqalaynsearch.netlify.app/',
+  searchBaseUrl: 'https://thaqalaynsearch.netlify.app/', // meta: manifest.json + qref.json
+  searchLangUrl: 'https://thaqalaynsearch-{lang}.netlify.app/', // per-language Pagefind bundle
   firebase: {
     apiKey: '',
     authDomain: '',

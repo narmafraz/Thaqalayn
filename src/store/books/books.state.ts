@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Book, ChapterList, Crumb, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation } from '@app/models';
+import { Injectable, inject } from '@angular/core';
+import { Book, ChapterList, Crumb, getChapter, getDefaultVerseTranslationIds, getVerseTranslations, Navigation, Translation, VerseDetail } from '@app/models';
 import { BooksService } from '@app/services';
-import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { AiPreferencesService } from '@app/services/ai-preferences.service';
+import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { IndexedTitles, IndexState } from '@store/index/index.state';
 import { RouterState } from '@store/router/router.state';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, distinctUntilChanged, map, skip, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LoadBookPart, RetryLoadBookPart } from './books.actions';
 
@@ -26,7 +27,35 @@ export interface BooksStateModel {
 })
 @Injectable()
 export class BooksState {
-  constructor(private booksService: BooksService) {}
+  private store = inject(Store);
+  private aiPrefs = inject(AiPreferencesService);
+
+  constructor(private booksService: BooksService) {
+    // Refetch the currently-navigated verse_detail when the active AI
+    // language changes. The split shape stores per-language content in
+    // sister files; BooksService.getPart is one-shot per call (required
+    // for the NGXS resolver to complete the route activation), so the
+    // sister is only fetched once at load time. Without this listener,
+    // switching `wordByWordDefaultLang` would leave the page rendering
+    // the previously-loaded language until manual reload.
+    //
+    // Only verse_detail kind triggers a refetch — chapter shells and
+    // legacy-shape verses don't depend on the sister at all.
+    this.aiPrefs.preferences$.pipe(
+      map(p => p.wordByWordDefaultLang),
+      distinctUntilChanged(),
+      skip(1),
+    ).subscribe(() => {
+      const index = this.store.selectSnapshot(RouterState.getBookPartIndex);
+      if (!index) return;
+      const part = this.store.selectSnapshot(BooksState.getCurrentNavigatedPart) as Book | undefined;
+      if (part?.kind !== 'verse_detail') return;
+      const ai = (part as VerseDetail).data?.verse?.ai as { summaries?: unknown } | undefined;
+      // Legacy-shape verses carry every language inline; no sister to refetch.
+      if (!ai || ai.summaries !== undefined) return;
+      this.store.dispatch(new RetryLoadBookPart(index));
+    });
+  }
 
   @Selector([BooksState])
   public static getState(state: BooksStateModel) {

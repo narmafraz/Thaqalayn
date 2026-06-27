@@ -125,12 +125,20 @@ Kick-off scripts all live in `ThaqalaynDataGenerator/` (even when the work runs 
 ## Phasing (status)
 
 0. ✅ Doc committed; Pagefind spike validated the architecture.
-1. ✅ Build side: `ThaqalaynSearch` repo + all-Node `build.mjs` (per-language indexes + `qref.json` + `manifest.json`) + shared normalizer (parity verified 50/50) + `netlify.toml`; `regen_search.ps1`; `environment.searchBaseUrl`.
-2. ⏳ **Infra (user):** create `thaqalaynsearch` GitHub repo + Netlify site; then a deploy spike (full local build → `netlify deploy`) to confirm the file-count/deploy works.
-3. Client: lazy-load Orama; Tier-1 in-memory titles; defer **all** index loading until search is engaged; remove the `titles.json` consumer.
-4. Client: Pagefind wrapper, language picker, operators (`topic:`/`tag:`/`type:`/`phrase:`/`ref:`/`book:`), facets, highlighting; NGXS state.
-5. UI redesign (bar + `/search`), recent searches, suggestions, accessibility.
-6. robots.txt `Disallow: /search`; cleanup stale data files (`titles.json`/`*-docs.json`/`search-meta.json`/`topics.json`); docs/index updates.
+1. ✅ Build side: `ThaqalaynSearch` repo + all-Node `build.mjs` (per-language indexes + `qref.json` + `manifest.json`) + shared normalizer (parity 50/50) + `netlify.toml`; `regen_search.ps1` (deploy-by-default) + resilient `deploy.mjs` + `regen_all.ps1`; `environment.searchBaseUrl`/`searchLangUrl`.
+2. ✅ **Hosting** (one site per language + a meta site): single-site (~650K files) proved impractical; sharded to 12 `thaqalaynsearch-<lang>` sites + meta. `en` + meta **deployed**; cross-origin load + CORS + search + facets **verified live** from `thaqalayn.netlify.app`. Remaining 11 language sites still to deploy.
+3. ✅ Client: Orama lazy-imported (Tier-1 titles, still from `titles.json`); index loading deferred to first focus; `/` shortcut fixed; shared normalizer + spec.
+4. ✅ Client: `PagefindService` (per-language, SSR-guarded) + `SearchService` routing full-text to Pagefind; operators `topic:`/`ref:`/`phrase:`/`book:`/`tag:`/`type:`; facets; NGXS `searchLang`/`facets`/`activeFacets`.
+5. ✅ UI: `/search` language picker + facet sidebar + highlighted `<mark>` excerpts. (Search-*bar* polish — language pill, sectioned dropdown, recent searches — deferred; see follow-ups.)
+6. ✅ robots.txt `Disallow: /search`; removed stale `*-docs.json` + `search-meta.json` from `ThaqalaynData` (kept `titles.json`/`topics.json`/`phrases.json`, still consumed).
+
+## Follow-ups (not yet done)
+- **Deploy the other 11 language sites** (`foreach … netlify deploy` or `regen_search.ps1`).
+- **Facet completeness:** live `en` returned only `content_type` counts on a plain query — confirm `book`/`has_chain`/`topic`/`tag` facet counts (Pagefind filter load-timing or a cardinality cap?).
+- **Search-bar redesign:** language pill, sectioned dropdown (Recent/Titles/Topics/Phrases), recent searches (localStorage), operator hints.
+- **Tier-1 from `IndexState.books`:** drop the `titles.json` fetch (reuse the already-loaded nav data) — then delete `titles.json` too.
+- **i18n:** add proper language-name strings for the picker (currently shows uppercased codes) + any new search keys.
+- **CSP note:** `PagefindService` uses `new Function('u','return import(u)')`; fine today (no strict CSP) — revisit if a strict CSP is added.
 
 ## Verification
 

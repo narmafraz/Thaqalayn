@@ -2,22 +2,28 @@ import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
-import { InitSearchIndex, SearchQuery, SetSearchMode } from '@store/search/search.actions';
-import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
+import { ClearFacets, InitSearchIndex, SearchQuery, SetFacet, SetSearchLanguage, SetSearchMode } from '@store/search/search.actions';
+import { SearchMode, SearchResult } from '@app/services/search.service';
+import { PagefindFilterCounts, PagefindService } from '@app/services/pagefind.service';
 import { VerseLoaderService } from '@app/services/verse-loader.service';
-import { Observable, Subscription } from 'rxjs';
+import { combineLatest, Observable, Subscription } from 'rxjs';
 
-interface BookFilterEntry {
-  name: string;
-  count: number;
-}
+interface FacetValue { value: string; label: string; count: number; active: boolean; }
+interface FacetGroup { filter: string; label: string; values: FacetValue[]; }
+
+// Display order + labels for the facet groups.
+const FACET_ORDER = ['book', 'content_type', 'has_chain', 'topic', 'tag'];
+const FACET_LABELS: Record<string, string> = {
+  book: 'Book', content_type: 'Type', has_chain: 'Chain', topic: 'Topic', tag: 'Tag',
+};
+const HAS_CHAIN_LABELS: Record<string, string> = { yes: 'With chain', no: 'No chain' };
 
 @Component({
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'app-search-results',
-    templateUrl: './search-results.component.html',
-    styleUrls: ['./search-results.component.scss'],
-    standalone: false
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'app-search-results',
+  templateUrl: './search-results.component.html',
+  styleUrls: ['./search-results.component.scss'],
+  standalone: false,
 })
 export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewChecked {
   results$: Observable<SearchResult[]> = inject(Store).select(SearchState.getResults);
@@ -25,68 +31,78 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   query$: Observable<string> = inject(Store).select(SearchState.getQuery);
   error$: Observable<string> = inject(Store).select(SearchState.getError);
   mode$: Observable<SearchMode> = inject(Store).select(SearchState.getMode);
+  searchLang$: Observable<string> = inject(Store).select(SearchState.getSearchLang);
   fullTextLoading$: Observable<boolean> = inject(Store).select(SearchState.isFullTextLoading);
 
-  bookFilters: BookFilterEntry[] = [];
-  activeBookFilter: string | null = null;
-  filteredResults: SearchResult[] = [];
-  activeFilter: { prefix: string; value: string } | null = null;
+  private facets$: Observable<PagefindFilterCounts> = inject(Store).select(SearchState.getFacets);
+  private activeFacets$: Observable<Record<string, string[]>> = inject(Store).select(SearchState.getActiveFacets);
+
+  availableLangs: string[] = [];
+  facetGroups: FacetGroup[] = [];
+  hasActiveFacets = false;
+  pathOnlyMode = false; // topic:/ref: results carry only paths -> lazy-load snippets
   displayedCount = 30;
 
-  // Topic-mode lazy-load state: each card fetches its verse_detail as it scrolls into view
+  // Path-only lazy-load: each card fetches its verse_detail as it scrolls into view.
   resolvedSnippets = new Map<string, string>();
   private observer: IntersectionObserver | null = null;
   private observedElements = new Set<Element>();
 
-  private allResults: SearchResult[] = [];
+  private results: SearchResult[] = [];
   private subscriptions: Subscription[] = [];
-  private searchService = inject(SearchService);
+  private pagefind = inject(PagefindService);
   private verseLoader = inject(VerseLoaderService);
   private el = inject(ElementRef);
 
   constructor(private store: Store, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
 
-  get isTopicMode(): boolean {
-    return this.activeFilter?.prefix === 'topic';
-  }
-
   ngOnInit(): void {
     this.store.dispatch(new InitSearchIndex());
 
+    // Languages offered by the picker come from the meta-site manifest.
     this.subscriptions.push(
-      this.route.queryParamMap.subscribe(params => {
-        const q = params.get('q');
-        if (q) {
-          this.activeFilter = this.searchService.parseFilteredQuery(q);
-          this.store.dispatch(new SearchQuery(q));
-        } else {
-          this.activeFilter = null;
-        }
-      })
+      this.pagefind.getManifest().subscribe((m) => {
+        this.availableLangs = m?.languages.map((l) => l.code) ?? [];
+        this.cdr.markForCheck();
+      }),
     );
 
     this.subscriptions.push(
-      this.results$.subscribe(results => {
-        this.allResults = results;
+      this.route.queryParamMap.subscribe((params) => {
+        const q = params.get('q');
+        this.pathOnlyMode = !!q && /^(topic|ref):/i.test(q.trim());
+        if (q) { this.store.dispatch(new SearchQuery(q)); }
+      }),
+    );
+
+    this.subscriptions.push(
+      this.results$.subscribe((results) => {
+        this.results = results;
         this.displayedCount = 30;
         this.resolvedSnippets.clear();
         this.destroyObserver();
-        this.buildBookFilters(results);
-        this.applyFilter();
         this.cdr.markForCheck();
-      })
+      }),
+    );
+
+    this.subscriptions.push(
+      combineLatest([this.facets$, this.activeFacets$]).subscribe(([facets, active]) => {
+        this.facetGroups = this.buildFacetGroups(facets, active);
+        this.hasActiveFacets = Object.keys(active).length > 0;
+        this.cdr.markForCheck();
+      }),
     );
   }
 
   ngAfterViewChecked(): void {
-    if (this.isTopicMode) {
+    if (this.pathOnlyMode) {
       this.ensureObserver();
-      this.observeTopicCards();
+      this.observeCards();
     }
   }
 
   ngOnDestroy(): void {
-    this.subscriptions.forEach(s => s.unsubscribe());
+    this.subscriptions.forEach((s) => s.unsubscribe());
     this.destroyObserver();
   }
 
@@ -94,57 +110,92 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
     this.store.dispatch(new SetSearchMode(mode));
   }
 
-  toggleBookFilter(bookName: string): void {
-    this.activeBookFilter = this.activeBookFilter === bookName ? null : bookName;
-    this.applyFilter();
-    this.cdr.markForCheck();
+  setLanguage(lang: string): void {
+    this.store.dispatch(new SetSearchLanguage(lang));
+  }
+
+  toggleFacet(filter: string, value: string, active: boolean): void {
+    this.store.dispatch(new SetFacet(filter, value, !active));
+  }
+
+  clearFacets(): void {
+    this.store.dispatch(new ClearFacets());
   }
 
   getBookPath(result: SearchResult): string {
-    return result.path.startsWith('/books/')
-      ? result.path.substring(7)
-      : result.path;
+    return result.path.startsWith('/books/') ? result.path.substring(7) : result.path;
   }
 
-  /** Format a raw path like "/books/al-khisal:4:189" to "Al-Khisal 4:189" */
+  /** Format a raw path like "/books/al-khisal:4:189" to "Al-Khisal 4:189". */
   formatPath(path: string): string {
     const match = path.match(/\/books\/([^:]+):?(.*)/);
-    if (!match) return path;
-    const slug = match[1];
-    const rest = match[2];
-    const name = slug
-      .split('-')
-      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-      .join('-');
-    return rest ? `${name} ${rest}` : name;
+    if (!match) { return path; }
+    const name = match[1].split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('-');
+    return match[2] ? `${name} ${match[2]}` : name;
   }
 
   get displayedResults(): SearchResult[] {
-    // Topic results render all at once — IntersectionObserver handles content lazy-load per card
-    if (this.isTopicMode) return this.filteredResults;
-    return this.filteredResults.slice(0, this.displayedCount);
+    if (this.pathOnlyMode) { return this.results; } // observer lazy-loads per card
+    return this.results.slice(0, this.displayedCount);
   }
 
   get hasMoreResults(): boolean {
-    if (this.isTopicMode) return false;
-    return this.displayedCount < this.filteredResults.length;
+    return !this.pathOnlyMode && this.displayedCount < this.results.length;
   }
 
+  loadMore(): void {
+    this.displayedCount += 30;
+    this.cdr.markForCheck();
+  }
+
+  private buildFacetGroups(facets: PagefindFilterCounts, active: Record<string, string[]>): FacetGroup[] {
+    const groups: FacetGroup[] = [];
+    const keys = Object.keys(facets).sort(
+      (a, b) => (FACET_ORDER.indexOf(a) + 1 || 99) - (FACET_ORDER.indexOf(b) + 1 || 99),
+    );
+    for (const filter of keys) {
+      const activeSet = new Set(active[filter] || []);
+      const values: FacetValue[] = Object.entries(facets[filter])
+        .filter(([, count]) => count > 0 || activeSet.size)
+        .map(([value, count]) => ({
+          value,
+          label: this.facetValueLabel(filter, value),
+          count,
+          active: activeSet.has(value),
+        }))
+        .sort((a, b) => b.count - a.count);
+      if (values.length) {
+        groups.push({ filter, label: FACET_LABELS[filter] || this.titleCase(filter), values });
+      }
+    }
+    return groups;
+  }
+
+  private facetValueLabel(filter: string, value: string): string {
+    if (filter === 'has_chain') { return HAS_CHAIN_LABELS[value] || value; }
+    if (filter === 'book') { return this.formatPath(`/books/${value}`); }
+    return this.titleCase(value);
+  }
+
+  private titleCase(value: string): string {
+    return value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  // --- path-only lazy-load (topic:/ref:) ---
+
   private ensureObserver(): void {
-    if (this.observer) return;
+    if (this.observer) { return; }
     this.observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) { return; }
           const path = (entry.target as HTMLElement).getAttribute('data-topic-path');
           if (path && !this.resolvedSnippets.has(path)) {
-            this.verseLoader.loadVerse(path).subscribe(verse => {
-              if (!verse) return;
-              const translations = verse.translations || {};
-              const first = Object.values(translations)[0] as string[] | undefined;
+            this.verseLoader.loadVerse(path).subscribe((verse) => {
+              if (!verse) { return; }
+              const first = Object.values(verse.translations || {})[0] as string[] | undefined;
               const en = (first || []).join(' ').replace(/<[^>]*>/g, '').trim();
-              const snippet = en.length > 200 ? en.slice(0, 200) + '...' : en;
-              this.resolvedSnippets.set(path, snippet);
+              this.resolvedSnippets.set(path, en.length > 200 ? en.slice(0, 200) + '...' : en);
               this.cdr.markForCheck();
             });
           }
@@ -152,12 +203,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
           this.observedElements.delete(entry.target);
         });
       },
-      { rootMargin: '200px' }
+      { rootMargin: '200px' },
     );
   }
 
-  private observeTopicCards(): void {
-    if (!this.observer) return;
+  private observeCards(): void {
+    if (!this.observer) { return; }
     const cards = this.el.nativeElement.querySelectorAll('.result-card[data-topic-path]');
     cards.forEach((card: Element) => {
       if (!this.observedElements.has(card)) {
@@ -168,44 +219,8 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   }
 
   private destroyObserver(): void {
-    if (this.observer) {
-      this.observer.disconnect();
-      this.observer = null;
-    }
+    this.observer?.disconnect();
+    this.observer = null;
     this.observedElements.clear();
-  }
-
-  loadMore(): void {
-    this.displayedCount += 30;
-    this.cdr.markForCheck();
-  }
-
-  formatFilterLabel(value: string): string {
-    return value.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  private buildBookFilters(results: SearchResult[]): void {
-    const counts = new Map<string, number>();
-    for (const r of results) {
-      if (r.bookName) {
-        counts.set(r.bookName, (counts.get(r.bookName) || 0) + 1);
-      }
-    }
-    this.bookFilters = Array.from(counts.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
-
-    // Reset filter if the active book is no longer in results
-    if (this.activeBookFilter && !counts.has(this.activeBookFilter)) {
-      this.activeBookFilter = null;
-    }
-  }
-
-  private applyFilter(): void {
-    if (!this.activeBookFilter) {
-      this.filteredResults = this.allResults;
-    } else {
-      this.filteredResults = this.allResults.filter(r => r.bookName === this.activeBookFilter);
-    }
   }
 }

@@ -1,21 +1,26 @@
 <div class="search-results-container">
   <h1>{{ 'search.search' | translate }}</h1>
 
-  <div class="search-mode-toggle" *ngIf="(mode$ | async) as mode">
-    <button
-      class="mode-btn"
-      [class.active]="mode === 'titles'"
-      (click)="setMode('titles')">
-      <mat-icon>title</mat-icon>
-      {{ 'search.modeTitles' | translate }}
-    </button>
-    <button
-      class="mode-btn"
-      [class.active]="mode === 'fulltext'"
-      (click)="setMode('fulltext')">
-      <mat-icon>article</mat-icon>
-      {{ 'search.modeFullText' | translate }}
-    </button>
+  <div class="search-controls">
+    <div class="search-mode-toggle" *ngIf="(mode$ | async) as mode">
+      <button class="mode-btn" [class.active]="mode === 'titles'" (click)="setMode('titles')">
+        <mat-icon>title</mat-icon>
+        {{ 'search.modeTitles' | translate }}
+      </button>
+      <button class="mode-btn" [class.active]="mode === 'fulltext'" (click)="setMode('fulltext')">
+        <mat-icon>article</mat-icon>
+        {{ 'search.modeFullText' | translate }}
+      </button>
+    </div>
+
+    <!-- Search-language picker (full-text only) -->
+    <label class="search-lang-picker" *ngIf="(mode$ | async) === 'fulltext' && availableLangs.length">
+      <mat-icon>translate</mat-icon>
+      <select [value]="(searchLang$ | async)" (change)="setLanguage($any($event.target).value)"
+        [attr.aria-label]="'search.search' | translate">
+        <option *ngFor="let l of availableLangs" [value]="l">{{ l | uppercase }}</option>
+      </select>
+    </label>
   </div>
 
   <div *ngIf="(fullTextLoading$ | async)" class="fulltext-loading-banner">
@@ -32,82 +37,95 @@
     <span>{{ error }}</span>
   </div>
 
-  <div *ngIf="activeFilter" class="filter-banner">
-    <mat-icon>filter_alt</mat-icon>
-    <span>{{ 'search.filteredBy' | translate }} {{ activeFilter.prefix }}: <strong>{{ formatFilterLabel(activeFilter.value) }}</strong></span>
-  </div>
-
   <ng-container *ngIf="(results$ | async) as results">
     <p *ngIf="(query$ | async) as query" class="results-summary">
-      <span *ngIf="results.length > 0">{{ results.length }} {{ 'search.resultsFor' | translate }} "{{ activeFilter ? formatFilterLabel(activeFilter.value) : query }}"</span>
+      <span *ngIf="results.length > 0">{{ results.length }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
       <span *ngIf="results.length === 0 && !(loading$ | async)" class="no-results-message">
         <mat-icon class="no-results-icon">search_off</mat-icon>
-        {{ 'search.noResultsFor' | translate }} "{{ activeFilter ? formatFilterLabel(activeFilter.value) : query }}"
+        {{ 'search.noResultsFor' | translate }} "{{ query }}"
         <span class="no-results-hint">{{ 'search.tryDifferent' | translate }}</span>
       </span>
     </p>
 
-    <div class="book-filters" *ngIf="bookFilters.length > 1">
-      <span class="filter-label">
-        <mat-icon>filter_list</mat-icon>
-        {{ 'search.filter' | translate }}:
-      </span>
-      <button
-        *ngFor="let filter of bookFilters"
-        class="book-filter-chip"
-        [class.active]="activeBookFilter === filter.name"
-        (click)="toggleBookFilter(filter.name)">
-        {{ filter.name }}
-        <span class="chip-count">{{ filter.count }}</span>
-      </button>
+    <div class="results-layout">
+      <!-- Facet sidebar (full-text only; driven by Pagefind facet counts) -->
+      <aside class="facet-sidebar" *ngIf="facetGroups.length">
+        <div class="facet-sidebar-header">
+          <span class="facet-sidebar-title">
+            <mat-icon>filter_list</mat-icon>{{ 'search.filter' | translate }}
+          </span>
+          <button *ngIf="hasActiveFacets" class="facet-clear" (click)="clearFacets()"
+            [attr.aria-label]="'search.clearSearch' | translate"
+            [matTooltip]="'search.clearSearch' | translate">
+            <mat-icon>clear_all</mat-icon>
+          </button>
+        </div>
+        <div class="facet-group" *ngFor="let group of facetGroups">
+          <h3 class="facet-group-label">{{ group.label }}</h3>
+          <button *ngFor="let v of group.values"
+            class="facet-chip" [class.active]="v.active"
+            (click)="toggleFacet(group.filter, v.value, v.active)">
+            <span class="facet-chip-label">{{ v.label }}</span>
+            <span class="chip-count">{{ v.count }}</span>
+          </button>
+        </div>
+      </aside>
+
+      <div class="results-main">
+        <p *ngIf="results.length > 0" class="showing-count">
+          {{ 'search.showing' | translate }} {{ displayedResults.length }} {{ 'search.of' | translate }} {{ results.length }} {{ 'search.results' | translate }}
+        </p>
+
+        <div class="results-list">
+          <mat-card
+            *ngFor="let result of displayedResults"
+            appearance="outlined"
+            class="result-card"
+            [class.hadith-result]="result.kind === 'hadith' || result.kind === 'verse'"
+            [attr.data-topic-path]="pathOnlyMode ? result.path : null"
+            [routerLink]="['/books', getBookPath(result)]"
+            queryParamsHandling="preserve">
+            <mat-card-content>
+              <div class="result-header">
+                <div class="result-title">{{ result.title || formatPath(result.path) }}</div>
+                <span *ngIf="result.kind !== 'title'" class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
+              </div>
+              <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
+
+              <!-- Highlighted Pagefind excerpt (innerHTML keeps <mark>; Angular sanitizes) -->
+              <div class="result-snippet" *ngIf="result.excerpt; else lazyOrPlain" [innerHTML]="result.excerpt"></div>
+              <ng-template #lazyOrPlain>
+                <ng-container *ngIf="pathOnlyMode; else plainSnippet">
+                  <div class="result-snippet" *ngIf="resolvedSnippets.get(result.path) as snippet; else skel">{{ snippet }}</div>
+                  <ng-template #skel>
+                    <div class="skeleton-line skeleton-snippet"></div>
+                    <div class="skeleton-line skeleton-snippet-short"></div>
+                  </ng-template>
+                </ng-container>
+                <ng-template #plainSnippet>
+                  <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
+                </ng-template>
+              </ng-template>
+
+              <div class="result-footer">
+                <span class="result-book">{{ result.bookName }}</span>
+                <span class="result-path">{{ formatPath(result.path) }}</span>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <div class="load-more-container" *ngIf="hasMoreResults">
+          <button class="load-more-btn" (click)="loadMore()">
+            <mat-icon>expand_more</mat-icon>
+            {{ 'search.loadMore' | translate }}
+          </button>
+        </div>
+
+        <p *ngIf="results.length > 0 && !hasMoreResults" class="showing-all">
+          {{ 'search.showingAll' | translate }} ({{ results.length }})
+        </p>
+      </div>
     </div>
-
-    <p *ngIf="filteredResults.length > 0" class="showing-count">
-      {{ 'search.showing' | translate }} {{ displayedResults.length }} {{ 'search.of' | translate }} {{ filteredResults.length }} {{ 'search.results' | translate }}
-    </p>
-
-    <div class="results-list">
-      <mat-card
-        *ngFor="let result of displayedResults"
-        appearance="outlined"
-        class="result-card"
-        [class.hadith-result]="result.kind !== 'title' && result.kind !== 'chapter'"
-        [attr.data-topic-path]="isTopicMode ? result.path : null"
-        [routerLink]="['/books', getBookPath(result)]"
-        queryParamsHandling="preserve">
-        <mat-card-content>
-          <div class="result-header">
-            <div class="result-title">{{ result.title }}</div>
-            <span *ngIf="result.kind !== 'title'" class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
-          </div>
-          <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
-          <ng-container *ngIf="isTopicMode; else defaultSnippet">
-            <div class="result-snippet" *ngIf="resolvedSnippets.get(result.path) as snippet; else topicSkeleton">{{ snippet }}</div>
-            <ng-template #topicSkeleton>
-              <div class="skeleton-line skeleton-snippet"></div>
-              <div class="skeleton-line skeleton-snippet-short"></div>
-            </ng-template>
-          </ng-container>
-          <ng-template #defaultSnippet>
-            <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
-          </ng-template>
-          <div class="result-footer">
-            <span class="result-book">{{ result.bookName }}</span>
-            <span class="result-path">{{ formatPath(result.path) }}</span>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-
-    <div class="load-more-container" *ngIf="hasMoreResults">
-      <button class="load-more-btn" (click)="loadMore()">
-        <mat-icon>expand_more</mat-icon>
-        {{ 'search.loadMore' | translate }}
-      </button>
-    </div>
-
-    <p *ngIf="filteredResults.length > 0 && !hasMoreResults" class="showing-all">
-      {{ 'search.showingAll' | translate }} ({{ filteredResults.length }})
-    </p>
   </ng-container>
 </div>

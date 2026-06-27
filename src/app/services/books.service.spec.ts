@@ -1,5 +1,6 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { NgxsModule, Store } from '@ngxs/store';
 import { BooksService } from './books.service';
 import { OfflineStorageService } from './offline-storage.service';
 import { AiPreferencesService, AiPreferences } from './ai-preferences.service';
@@ -10,6 +11,7 @@ describe('BooksService', () => {
   let service: BooksService;
   let httpMock: HttpTestingController;
   let prefsSubject: BehaviorSubject<AiPreferences>;
+  let translationSubject: BehaviorSubject<string>;
 
   const API_BASE = 'http://localhost:8888/';
 
@@ -35,12 +37,15 @@ describe('BooksService', () => {
       muteReadingBanner: false,
       viewMode: 'plain',
     });
+    translationSubject = new BehaviorSubject<string>('');
+    const mockStore = { select: () => translationSubject.asObservable() };
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, NgxsModule.forRoot([])],
       providers: [
         { provide: OfflineStorageService, useValue: mockOfflineStorage },
         { provide: AiPreferencesService, useValue: { preferences$: prefsSubject.asObservable() } },
+        { provide: Store, useValue: mockStore },
       ],
     });
     service = TestBed.inject(BooksService);
@@ -488,6 +493,39 @@ describe('BooksService', () => {
         });
         tick(0);
         httpMock.expectNone(req => req.url.endsWith('.en.json'));
+      }));
+
+      it('active AI translation overrides wordByWord when picking the sister', fakeAsync(() => {
+        // wordByWord = en (default), but user selected fa.ai from the Translation
+        // dropdown. The sister fetch must follow the active translation lang,
+        // otherwise rendering reads ai.summaries[fa] which is empty.
+        translationSubject.next('fa.ai');
+
+        service.getPart('al-kafi:1:1:1:1').subscribe();
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(detailWithSplitAi());
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.fa.json`).flush({
+          lang: 'fa', path: '/books/al-kafi:1:1:1:1', ai: { summary: 'FA summary' },
+        });
+        tick(0);
+        httpMock.expectNone(req => req.url.endsWith('.en.json'));
+      }));
+
+      it('human translation falls through to wordByWord lang', fakeAsync(() => {
+        // en.qarai is a human translator, not an AI one. The sister should use
+        // the wordByWord pref (en) for the AI summary / key_terms / etc.
+        translationSubject.next('en.qarai');
+
+        service.getPart('al-kafi:1:1:1:1').subscribe();
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(detailWithSplitAi());
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.en.json`).flush({
+          lang: 'en', path: '/books/al-kafi:1:1:1:1', ai: { summary: 'EN summary' },
+        });
+        tick(0);
+        httpMock.expectNone(req => req.url.endsWith('.fa.json'));
       }));
     });
   });

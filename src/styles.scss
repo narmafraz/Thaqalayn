@@ -189,6 +189,15 @@ body.dark-theme {
   max-width: calc(100vw - 16px);
 }
 
+/* The reading-sheet side panel sits at z-index 1300 (see
+   reading-sheet.component.scss). Material's cdk-overlay-container defaults
+   to 1000, so mat-select dropdowns and other overlays rendered while the
+   sheet is open would otherwise be hidden behind it. Push the overlay
+   container above the sheet so dropdowns / dialogs / tooltips show on top. */
+.cdk-overlay-container {
+  z-index: 1400;
+}
+
 /* ===================== Base Styles ===================== */
 html, body {
   margin:0;

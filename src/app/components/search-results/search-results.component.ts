@@ -2,8 +2,9 @@ import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
-import { ClearFacets, HydrateSearch, InitSearchIndex, SetFacet, SetSearchLanguage, SetSearchMode } from '@store/search/search.actions';
+import { ClearFacets, ClearSearch, HydrateSearch, InitSearchIndex, SearchQuery, SetFacet, SetSearchLanguage, SetSearchMode } from '@store/search/search.actions';
 import { SearchMode, SearchResult } from '@app/services/search.service';
+import { hasArabic } from '@app/services/arabic-normalize';
 import { PagefindFilterCounts, PagefindService } from '@app/services/pagefind.service';
 import { VerseLoaderService } from '@app/services/verse-loader.service';
 import { combineLatest, Observable, Subscription } from 'rxjs';
@@ -41,6 +42,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   hasActiveFacets = false;
   pathOnlyMode = false; // topic:/ref: results carry only paths -> lazy-load snippets
   displayedCount = 30;
+  queryInput = ''; // the in-page search box (kept in sync with the active query)
 
   // Path-only lazy-load: each card fetches its verse_detail as it scrolls into view.
   resolvedSnippets = new Map<string, string>();
@@ -98,6 +100,13 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
       }),
     );
 
+    // Keep the in-page search box filled with the active query (incl. when it
+    // arrives from the header bar or a shared URL), without clobbering typing
+    // (the query only changes on submit, not per keystroke).
+    this.subscriptions.push(
+      this.query$.subscribe((q) => { this.queryInput = q; this.cdr.markForCheck(); }),
+    );
+
     this.subscriptions.push(
       combineLatest([this.facets$, this.activeFacets$]).subscribe(([facets, active]) => {
         this.facetGroups = this.buildFacetGroups(facets, active);
@@ -121,6 +130,22 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
 
   setMode(mode: SearchMode): void {
     this.store.dispatch(new SetSearchMode(mode));
+  }
+
+  /** Run the search from the in-page box. */
+  submitSearch(): void {
+    const q = this.queryInput.trim();
+    if (q) { this.store.dispatch(new SearchQuery(q)); }
+  }
+
+  clearBox(): void {
+    this.queryInput = '';
+    this.store.dispatch(new ClearSearch());
+  }
+
+  /** Render an excerpt RTL when it contains Arabic-script text (ar / fa / ur results). */
+  isRtl(text: string | undefined): boolean {
+    return hasArabic(text || '');
   }
 
   setLanguage(lang: string): void {

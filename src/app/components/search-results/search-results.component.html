@@ -1,5 +1,26 @@
 <div class="search-results-container">
-  <h1>{{ 'search.search' | translate }}</h1>
+  <h1 class="sr-only">{{ 'search.search' | translate }}</h1>
+
+  <!-- Prominent in-page search box: pre-filled with the active query, editable here -->
+  <form class="search-page-box" role="search" (submit)="$event.preventDefault(); submitSearch()">
+    <mat-icon class="search-page-icon">search</mat-icon>
+    <input
+      class="search-page-input"
+      type="search"
+      [value]="queryInput"
+      (input)="queryInput = $any($event.target).value"
+      [placeholder]="'search.searchBooksAndChapters' | translate"
+      [attr.aria-label]="'search.search' | translate"
+      autocomplete="off" autocapitalize="off" spellcheck="false" />
+    <button *ngIf="queryInput" type="button" class="search-page-clear"
+      (click)="clearBox()" [attr.aria-label]="'search.clearSearch' | translate"
+      [matTooltip]="'search.clearSearch' | translate">
+      <mat-icon>close</mat-icon>
+    </button>
+    <button type="submit" class="search-page-submit" [attr.aria-label]="'search.search' | translate">
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </form>
 
   <div class="search-controls">
     <div class="search-mode-toggle" *ngIf="(mode$ | async) as mode">
@@ -94,17 +115,19 @@
               <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
 
               <!-- Highlighted Pagefind excerpt (innerHTML keeps <mark>; Angular sanitizes) -->
-              <div class="result-snippet" *ngIf="result.excerpt; else lazyOrPlain" [innerHTML]="result.excerpt"></div>
+              <div class="result-snippet" *ngIf="result.excerpt; else lazyOrPlain" [innerHTML]="result.excerpt"
+                [attr.dir]="isRtl(result.excerpt) ? 'rtl' : 'ltr'"></div>
               <ng-template #lazyOrPlain>
                 <ng-container *ngIf="pathOnlyMode; else plainSnippet">
-                  <div class="result-snippet" *ngIf="resolvedSnippets.get(result.path) as snippet; else skel">{{ snippet }}</div>
+                  <div class="result-snippet" *ngIf="resolvedSnippets.get(result.path) as snippet; else skel"
+                    [attr.dir]="isRtl(snippet) ? 'rtl' : 'ltr'">{{ snippet }}</div>
                   <ng-template #skel>
                     <div class="skeleton-line skeleton-snippet"></div>
                     <div class="skeleton-line skeleton-snippet-short"></div>
                   </ng-template>
                 </ng-container>
                 <ng-template #plainSnippet>
-                  <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
+                  <div class="result-snippet" *ngIf="result.snippet" [attr.dir]="isRtl(result.snippet) ? 'rtl' : 'ltr'">{{ result.snippet }}</div>
                 </ng-template>
               </ng-template>
 

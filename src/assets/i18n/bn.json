@@ -196,7 +196,10 @@
     "startTitle": "সংগ্রহে অনুসন্ধান করুন",
     "startHint": "হাদিস, আয়াত, সারসংক্ষেপ ও অনুবাদ খুঁজুন — আপনার ভাষায় এবং মূল আরবিতে।",
     "recentSearches": "সাম্প্রতিক অনুসন্ধান",
-    "clearRecent": "মুছুন"
+    "clearRecent": "মুছুন",
+    "sortBy": "সাজান",
+    "sortRelevance": "প্রাসঙ্গিকতা",
+    "sortBook": "কিতাব অনুযায়ী"
   },
   "translation": {
     "selectTranslation": "অনুবাদ নির্বাচন করুন",

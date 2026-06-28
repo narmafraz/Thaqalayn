@@ -652,3 +652,33 @@ h1 {
   font-size: 14px;
 }
 .search-tips-list li { margin-bottom: 2px; }
+
+/* --- search overhaul: results toolbar + sort control --- */
+.results-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.results-toolbar .showing-count { margin: 0; }
+.sort-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-muted, #777);
+
+  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  select {
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 6px;
+    background: var(--card-bg, #fff);
+    color: var(--text-color, #333);
+    padding: 4px 8px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+}

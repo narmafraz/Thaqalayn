@@ -196,7 +196,10 @@
     "startTitle": "در مجموعه جستجو کنید",
     "startHint": "احادیث، آیات، خلاصه‌ها و ترجمه‌ها را بیابید — به زبان شما و به عربی اصلی.",
     "recentSearches": "جستجوهای اخیر",
-    "clearRecent": "پاک کردن"
+    "clearRecent": "پاک کردن",
+    "sortBy": "مرتب‌سازی بر اساس",
+    "sortRelevance": "ارتباط",
+    "sortBook": "بر اساس کتاب"
   },
   "translation": {
     "selectTranslation": "انتخاب ترجمه",

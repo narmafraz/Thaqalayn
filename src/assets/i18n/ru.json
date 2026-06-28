@@ -196,7 +196,10 @@
     "startTitle": "Поиск по собранию",
     "startHint": "Найдите хадисы, аяты, краткие изложения и переводы — на вашем языке и в оригинале на арабском.",
     "recentSearches": "Недавние запросы",
-    "clearRecent": "Очистить"
+    "clearRecent": "Очистить",
+    "sortBy": "Сортировать",
+    "sortRelevance": "Релевантность",
+    "sortBook": "По книге"
   },
   "translation": {
     "selectTranslation": "Выбрать перевод",

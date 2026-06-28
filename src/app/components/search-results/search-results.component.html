@@ -120,9 +120,19 @@
       </aside>
 
       <div class="results-main">
-        <p *ngIf="results.length > 0" class="showing-count">
-          {{ 'search.showing' | translate }} {{ displayedResults.length }} {{ 'search.of' | translate }} {{ results.length }} {{ 'search.results' | translate }}
-        </p>
+        <div *ngIf="results.length > 0" class="results-toolbar">
+          <p class="showing-count">
+            {{ 'search.showing' | translate }} {{ displayedResults.length }} {{ 'search.of' | translate }} {{ results.length }} {{ 'search.results' | translate }}
+          </p>
+          <label class="sort-control" *ngIf="!pathOnlyMode">
+            <mat-icon>sort</mat-icon>
+            <select [value]="sortMode" (change)="setSort($any($event.target).value)"
+              [attr.aria-label]="'search.sortBy' | translate">
+              <option value="relevance">{{ 'search.sortRelevance' | translate }}</option>
+              <option value="book">{{ 'search.sortBook' | translate }}</option>
+            </select>
+          </label>
+        </div>
 
         <div class="results-list">
           <mat-card

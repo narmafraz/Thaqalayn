@@ -196,7 +196,10 @@
     "startTitle": "搜索文集",
     "startHint": "查找圣训、经文、摘要和译文——以您的语言和阿拉伯语原文。",
     "recentSearches": "最近搜索",
-    "clearRecent": "清除"
+    "clearRecent": "清除",
+    "sortBy": "排序方式",
+    "sortRelevance": "相关性",
+    "sortBook": "按书籍"
   },
   "translation": {
     "selectTranslation": "选择翻译",

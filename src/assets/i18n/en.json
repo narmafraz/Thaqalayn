@@ -225,7 +225,10 @@
     "startTitle": "Search the collection",
     "startHint": "Find hadith, verses, summaries and translations — in your language and in the original Arabic.",
     "recentSearches": "Recent searches",
-    "clearRecent": "Clear"
+    "clearRecent": "Clear",
+    "sortBy": "Sort by",
+    "sortRelevance": "Relevance",
+    "sortBook": "By book"
   },
   "translation": {
     "selectTranslation": "Select Translation",

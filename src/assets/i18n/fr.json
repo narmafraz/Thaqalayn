@@ -196,7 +196,10 @@
     "startTitle": "Rechercher dans la collection",
     "startHint": "Trouvez des hadiths, des versets, des résumés et des traductions — dans votre langue et en arabe original.",
     "recentSearches": "Recherches récentes",
-    "clearRecent": "Effacer"
+    "clearRecent": "Effacer",
+    "sortBy": "Trier par",
+    "sortRelevance": "Pertinence",
+    "sortBook": "Par livre"
   },
   "translation": {
     "selectTranslation": "Sélectionner la traduction",

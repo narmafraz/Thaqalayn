@@ -1,17 +1,18 @@
 import { Injectable } from '@angular/core';
-import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
+import { SearchMode, SearchResult, SearchService, SortMode } from '@app/services/search.service';
 import { PagefindFilterCounts } from '@app/services/pagefind.service';
 import { I18nService } from '@app/services/i18n.service';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
   ClearFacets, ClearSearch, HydrateSearch, InitSearchIndex, SearchQuery,
-  SetFacet, SetSearchLanguage, SetSearchMode,
+  SetFacet, SetSearchLanguage, SetSearchMode, SetSort,
 } from './search.actions';
 
 export interface SearchStateModel {
   query: string;
   mode: SearchMode;
   searchLang: string;
+  sort: SortMode;
   results: SearchResult[];
   facets: PagefindFilterCounts; // counts for the sidebar (from Pagefind totalFilters)
   activeFacets: Record<string, string[]>; // selected facet values per filter
@@ -28,6 +29,7 @@ export interface SearchStateModel {
     query: '',
     mode: 'fulltext', // content search by default (Pagefind fetches only per-query fragments)
     searchLang: 'both', // 'both' = the UI language + the original Arabic, merged
+    sort: 'relevance', // 'relevance' (engine score) | 'book' (canonical book order)
     results: [],
     facets: {},
     activeFacets: {},
@@ -50,6 +52,9 @@ export class SearchState {
 
   @Selector([SearchState])
   public static getSearchLang(state: SearchStateModel): string { return state.searchLang; }
+
+  @Selector([SearchState])
+  public static getSort(state: SearchStateModel): SortMode { return state.sort; }
 
   @Selector([SearchState])
   public static getResults(state: SearchStateModel): SearchResult[] { return state.results; }
@@ -108,6 +113,13 @@ export class SearchState {
     ctx.patchState({ activeFacets: active });
     const { query } = ctx.getState();
     if (query) { ctx.dispatch(new SearchQuery(query)); }
+  }
+
+  // Sort is a pure view-ordering change — no re-query needed; the results
+  // component re-orders the existing results when this changes.
+  @Action(SetSort)
+  public setSort(ctx: StateContext<SearchStateModel>, action: SetSort) {
+    ctx.patchState({ sort: action.sort });
   }
 
   @Action(ClearFacets)
@@ -170,6 +182,7 @@ export class SearchState {
     const patch: Partial<SearchStateModel> = {};
     if (p.lang) { patch.searchLang = p.lang; }
     if (p.mode) { patch.mode = p.mode; }
+    if (p.sort) { patch.sort = p.sort; }
     if (p.facets) { patch.activeFacets = p.facets; }
     if (Object.keys(patch).length) { ctx.patchState(patch); }
     ctx.dispatch(new SearchQuery(p.query || ''));

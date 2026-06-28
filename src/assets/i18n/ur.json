@@ -196,7 +196,10 @@
     "startTitle": "مجموعہ میں تلاش کریں",
     "startHint": "احادیث، آیات، خلاصے اور تراجم تلاش کریں — آپ کی زبان میں اور اصل عربی میں۔",
     "recentSearches": "حالیہ تلاشیں",
-    "clearRecent": "صاف کریں"
+    "clearRecent": "صاف کریں",
+    "sortBy": "ترتیب دیں بلحاظ",
+    "sortRelevance": "مطابقت",
+    "sortBook": "کتاب کے لحاظ سے"
   },
   "translation": {
     "selectTranslation": "ترجمہ منتخب کریں",

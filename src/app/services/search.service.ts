@@ -7,6 +7,7 @@ import { normalizeArabic } from './arabic-normalize';
 import { PagefindFilterCounts, PagefindService } from './pagefind.service';
 
 export type SearchMode = 'titles' | 'fulltext';
+export type SortMode = 'relevance' | 'book';
 
 export interface SearchResult {
   path: string;

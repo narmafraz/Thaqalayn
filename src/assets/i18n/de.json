@@ -196,7 +196,10 @@
     "startTitle": "Die Sammlung durchsuchen",
     "startHint": "Finde Hadithe, Verse, Zusammenfassungen und Übersetzungen — in deiner Sprache und im arabischen Original.",
     "recentSearches": "Letzte Suchen",
-    "clearRecent": "Löschen"
+    "clearRecent": "Löschen",
+    "sortBy": "Sortieren nach",
+    "sortRelevance": "Relevanz",
+    "sortBook": "Nach Buch"
   },
   "translation": {
     "selectTranslation": "Übersetzung auswählen",

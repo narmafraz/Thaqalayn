@@ -208,7 +208,10 @@
     "startTitle": "ابحث في المجموعة",
     "startHint": "اعثر على الأحاديث والآيات والملخصات والترجمات — بلغتك وبالعربية الأصلية.",
     "recentSearches": "عمليات البحث الأخيرة",
-    "clearRecent": "مسح"
+    "clearRecent": "مسح",
+    "sortBy": "ترتيب حسب",
+    "sortRelevance": "الصلة",
+    "sortBook": "حسب الكتاب"
   },
   "translation": {
     "selectTranslation": "اختيار الترجمة",

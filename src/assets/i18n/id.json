@@ -196,7 +196,10 @@
     "startTitle": "Cari dalam koleksi",
     "startHint": "Temukan hadis, ayat, ringkasan, dan terjemahan — dalam bahasa Anda dan dalam bahasa Arab asli.",
     "recentSearches": "Pencarian terakhir",
-    "clearRecent": "Hapus"
+    "clearRecent": "Hapus",
+    "sortBy": "Urutkan menurut",
+    "sortRelevance": "Relevansi",
+    "sortBook": "Menurut kitab"
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",

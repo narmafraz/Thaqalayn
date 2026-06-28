@@ -2,8 +2,8 @@ import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
-import { ClearFacets, ClearSearch, HydrateSearch, InitSearchIndex, SearchQuery, SetFacet, SetSearchLanguage, SetSearchMode } from '@store/search/search.actions';
-import { SearchMode, SearchResult } from '@app/services/search.service';
+import { ClearFacets, ClearSearch, HydrateSearch, InitSearchIndex, SearchQuery, SetFacet, SetSearchLanguage, SetSearchMode, SetSort } from '@store/search/search.actions';
+import { SearchMode, SearchResult, SortMode } from '@app/services/search.service';
 import { hasArabic } from '@app/services/arabic-normalize';
 import { PagefindFilterCounts, PagefindService } from '@app/services/pagefind.service';
 import { VerseLoaderService } from '@app/services/verse-loader.service';
@@ -33,6 +33,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   error$: Observable<string> = inject(Store).select(SearchState.getError);
   mode$: Observable<SearchMode> = inject(Store).select(SearchState.getMode);
   searchLang$: Observable<string> = inject(Store).select(SearchState.getSearchLang);
+  sort$: Observable<SortMode> = inject(Store).select(SearchState.getSort);
   fullTextLoading$: Observable<boolean> = inject(Store).select(SearchState.isFullTextLoading);
   resultsCapped$: Observable<boolean> = inject(Store).select(SearchState.getResultsCapped);
 
@@ -46,6 +47,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   displayedCount = 30;
   queryInput = ''; // the in-page search box (kept in sync with the active query)
   readonly skeletonRows = [0, 1, 2, 3, 4]; // placeholder cards shown while a search runs
+  sortMode: SortMode = 'relevance';
 
   // Path-only lazy-load: each card fetches its verse_detail as it scrolls into view.
   resolvedSnippets = new Map<string, string>();
@@ -86,11 +88,15 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
       }),
     );
 
-    // state -> URL, so a copied link reproduces the exact search (q + language + mode + facets).
+    // state -> URL, so a copied link reproduces the exact search (q + language + mode + sort + facets).
     this.subscriptions.push(
-      combineLatest([this.query$, this.mode$, this.searchLang$, this.activeFacets$])
+      combineLatest([this.query$, this.mode$, this.searchLang$, this.sort$, this.activeFacets$])
         .pipe(debounceTime(100))
         .subscribe(() => this.writeUrl()),
+    );
+
+    this.subscriptions.push(
+      this.sort$.subscribe((sort) => { this.sortMode = sort; this.cdr.markForCheck(); }),
     );
 
     this.subscriptions.push(
@@ -155,6 +161,10 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
     this.store.dispatch(new SetSearchLanguage(lang));
   }
 
+  setSort(sort: SortMode): void {
+    this.store.dispatch(new SetSort(sort));
+  }
+
   toggleFacet(filter: string, value: string, active: boolean): void {
     this.store.dispatch(new SetFacet(filter, value, !active));
   }
@@ -183,7 +193,34 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
 
   get displayedResults(): SearchResult[] {
     if (this.pathOnlyMode) { return this.results; } // observer lazy-loads per card
-    return this.results.slice(0, this.displayedCount);
+    const ordered = this.sortMode === 'book' ? this.sortByBook(this.results) : this.results;
+    return ordered.slice(0, this.displayedCount);
+  }
+
+  /**
+   * Canonical ordering: group by book slug (alphabetical), then by the numeric
+   * reference segments (volume:book:chapter:verse) so a book's results read in
+   * their natural sequence rather than by relevance score.
+   */
+  private sortByBook(results: SearchResult[]): SearchResult[] {
+    const segs = (path: string): number[] => {
+      const ref = this.reference(path); // e.g. "5:3:10:1"
+      return ref ? ref.split(':').map((n) => parseInt(n, 10) || 0) : [];
+    };
+    const slug = (path: string): string => {
+      const m = path.match(/\/books\/([^:]+)/);
+      return m ? m[1] : path;
+    };
+    return [...results].sort((a, b) => {
+      const sa = slug(a.path), sb = slug(b.path);
+      if (sa !== sb) { return sa.localeCompare(sb); }
+      const na = segs(a.path), nb = segs(b.path);
+      for (let i = 0; i < Math.max(na.length, nb.length); i++) {
+        const d = (na[i] ?? 0) - (nb[i] ?? 0);
+        if (d !== 0) { return d; }
+      }
+      return 0;
+    });
   }
 
   get hasMoreResults(): boolean {
@@ -197,26 +234,29 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
 
   // --- URL <-> state sync ---
 
-  private parseParams(params: ParamMap): { query: string; lang?: string; mode?: SearchMode; facets: Record<string, string[]> } {
+  private parseParams(params: ParamMap): { query: string; lang?: string; mode?: SearchMode; sort?: SortMode; facets: Record<string, string[]> } {
     const facets: Record<string, string[]> = {};
     for (const [param, filter] of Object.entries(this.PARAM_TO_FILTER)) {
       const v = params.get(param);
       if (v) { facets[filter] = v.split(',').map((s) => s.trim()).filter(Boolean); }
     }
     const mode = params.get('mode');
+    const sort = params.get('sort');
     return {
       query: params.get('q') || '',
       // 'slang' (search language), NOT 'lang' — 'lang' is the site UI-language param.
       lang: params.get('slang') || undefined,
       mode: mode === 'titles' || mode === 'fulltext' ? mode : undefined,
+      sort: sort === 'relevance' || sort === 'book' ? sort : undefined,
       facets,
     };
   }
 
-  private differsFromState(d: { query: string; lang?: string; mode?: SearchMode; facets: Record<string, string[]> }): boolean {
+  private differsFromState(d: { query: string; lang?: string; mode?: SearchMode; sort?: SortMode; facets: Record<string, string[]> }): boolean {
     if (d.query !== this.store.selectSnapshot(SearchState.getQuery)) { return true; }
     if (d.lang && d.lang !== this.store.selectSnapshot(SearchState.getSearchLang)) { return true; }
     if (d.mode && d.mode !== this.store.selectSnapshot(SearchState.getMode)) { return true; }
+    if (d.sort && d.sort !== this.store.selectSnapshot(SearchState.getSort)) { return true; }
     const cur = this.store.selectSnapshot(SearchState.getActiveFacets);
     return JSON.stringify(this.sortFacets(d.facets)) !== JSON.stringify(this.sortFacets(cur));
   }
@@ -231,10 +271,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
     const query = this.store.selectSnapshot(SearchState.getQuery);
     if (!query) { return; } // nothing to reproduce; leave the URL untouched
     const facets = this.store.selectSnapshot(SearchState.getActiveFacets);
+    const sort = this.store.selectSnapshot(SearchState.getSort);
     const queryParams: Record<string, string | null> = {
       q: query,
       slang: this.store.selectSnapshot(SearchState.getSearchLang), // search language (distinct from site ?lang=)
       mode: this.store.selectSnapshot(SearchState.getMode),
+      sort: sort === 'relevance' ? null : sort, // default sort -> omit from URL
     };
     for (const [filter, param] of Object.entries(this.FILTER_TO_PARAM)) {
       const vals = facets[filter];

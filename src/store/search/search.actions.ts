@@ -1,4 +1,4 @@
-import { SearchMode } from '@app/services/search.service';
+import { SearchMode, SortMode } from '@app/services/search.service';
 
 export class InitSearchIndex {
   public static readonly type = '[Search] Init index';
@@ -29,6 +29,12 @@ export class ClearFacets {
   public static readonly type = '[Search] Clear facets';
 }
 
+/** Set the result ordering ('relevance' = engine score, 'book' = canonical book order). */
+export class SetSort {
+  public static readonly type = '[Search] Set sort';
+  constructor(public sort: SortMode) { }
+}
+
 /** Restore a full search from URL params (query + language + mode + facets) in one shot. */
 export class HydrateSearch {
   public static readonly type = '[Search] Hydrate';
@@ -36,6 +42,7 @@ export class HydrateSearch {
     query?: string;
     lang?: string;
     mode?: SearchMode;
+    sort?: SortMode;
     facets?: Record<string, string[]>;
   }) { }
 }

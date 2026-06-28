@@ -196,7 +196,10 @@
     "startTitle": "Buscar en la colección",
     "startHint": "Encuentra hadices, versículos, resúmenes y traducciones, en tu idioma y en el árabe original.",
     "recentSearches": "Búsquedas recientes",
-    "clearRecent": "Borrar"
+    "clearRecent": "Borrar",
+    "sortBy": "Ordenar por",
+    "sortRelevance": "Relevancia",
+    "sortBook": "Por libro"
   },
   "translation": {
     "selectTranslation": "Seleccionar traducción",

@@ -19,13 +19,23 @@ describe('SupportComponent', () => {
     .compileComponents();
   }));
 
+  // Override `reload()` at the prototype level for the lifetime of the
+  // entire Karma run. The motivating leak is confirmSafeRefresh's
+  // `setTimeout(() => this.reload(), 600)`: the timer outlives the spec,
+  // and once the override is unwound it fires the real
+  // `window.location.reload()` in whichever unrelated spec is running
+  // 600 ms later — aborting Karma with "Some of your tests did a full
+  // page reload!". Restoring in afterAll races with the timer (it can
+  // fire hundreds of specs later). Leaving the override in place is
+  // safe: no other test or production code calls
+  // `SupportComponent.prototype.reload` directly.
+  const reloadSpy = jasmine.createSpy('reload');
+  (SupportComponent.prototype as any).reload = reloadSpy;
+
   beforeEach(() => {
+    reloadSpy.calls.reset();
     fixture = TestBed.createComponent(SupportComponent);
     component = fixture.componentInstance;
-    // Stub the reload indirection so confirmSafeRefresh's scheduled
-    // setTimeout(() => this.reload(), 600) doesn't crash Karma with
-    // "Some of your tests did a full page reload!".
-    spyOn(component as any, 'reload');
     fixture.detectChanges();
   });
 
@@ -75,16 +85,13 @@ describe('SupportComponent', () => {
       });
       spyOn(window.caches, 'keys').and.resolveTo([]);
 
-      jasmine.clock().install();
-      try {
-        await component.confirmSafeRefresh();
-        // confirmSafeRefresh schedules `this.reload()` via setTimeout(..., 600).
-        // Advance jasmine's mock clock past the delay and assert reload fires.
-        jasmine.clock().tick(700);
-        expect((component as any).reload).toHaveBeenCalled();
-      } finally {
-        jasmine.clock().uninstall();
-      }
+      await component.confirmSafeRefresh();
+      // confirmSafeRefresh schedules `this.reload()` via setTimeout(..., 600).
+      // Wait past the delay in real time (no jasmine.clock — it interferes
+      // with Karma's WebSocket heartbeat). The prototype-level reloadSpy is
+      // safe because no real navigation can fire.
+      await new Promise(r => setTimeout(r, 700));
+      expect(reloadSpy).toHaveBeenCalled();
     });
   });
 });

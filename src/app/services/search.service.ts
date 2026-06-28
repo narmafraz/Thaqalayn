@@ -176,13 +176,12 @@ export class SearchService {
     }
 
     if (mode === 'fulltext') {
-      // Titles first (in-memory, instant), then each requested language's
-      // full-text results, de-duplicated by verse path.
-      const titleResults = parsed.term ? await this.searchTitles(parsed.term, 10) : [];
+      // Full-text mode returns ONLY Pagefind content results (across the chosen
+      // language(s)), de-duplicated by verse path. Title/navigation matches are
+      // available via 'titles' mode and the home page.
       const ftOutcomes = await Promise.all(langs.map((l) => this.searchFullText(parsed.term, l, filters)));
-
-      const seen = new Set(titleResults.map((r) => r.path));
-      const merged: SearchResult[] = [...titleResults];
+      const seen = new Set<string>();
+      const merged: SearchResult[] = [];
       for (const o of ftOutcomes) {
         for (const r of o.results) {
           if (!seen.has(r.path)) { seen.add(r.path); merged.push(r); }

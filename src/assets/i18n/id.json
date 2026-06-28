@@ -191,7 +191,8 @@
     "opPhrase": "phrase:\"in the name of\" — frasa persis",
     "opBook": "book:al-kafi — batasi ke satu kitab",
     "opTagType": "tag:ethics / type:legal_ruling — saring berdasarkan tag atau jenis",
-    "langBoth": "Bahasa Anda + Arab"
+    "langBoth": "Bahasa Anda + Arab",
+    "refineHint": "Menampilkan hasil teratas — persempit dengan memperjelas pencarian"
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",

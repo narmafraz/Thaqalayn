@@ -22,7 +22,8 @@ export interface SearchResult {
 /** Result of a full search: hits + facet counts for the sidebar. */
 export interface SearchOutcome {
   results: SearchResult[];
-  facets: PagefindFilterCounts; // Pagefind `totalFilters` (counts ignoring each filter)
+  facets: PagefindFilterCounts;
+  capped: boolean; // true if more matches exist than were loaded (show "N+")
 }
 
 /** Parsed query: operators + residual term + facet filters. */
@@ -125,17 +126,19 @@ export class SearchService {
 
   /** Full-text search via Pagefind for the given language. */
   async searchFullText(
-    term: string, lang: string, filters: Record<string, string[]> = {}, limit = 1000,
+    term: string, lang: string, filters: Record<string, string[]> = {}, limit = 100,
   ): Promise<SearchOutcome> {
     const cleaned = Object.fromEntries(Object.entries(filters).filter(([, v]) => v && v.length));
     // The Arabic index is normalized (diacritics stripped, letters folded) — apply
     // the same normalization to the query so it matches.
     const q = lang === 'ar' ? normalizeArabic(term) : term;
     const resp = await this.pagefind.search(lang, q, cleaned, limit);
-    if (!resp) { return { results: [], facets: {} }; }
+    if (!resp) { return { results: [], facets: {}, capped: false }; }
 
+    // Only `limit` fragments are fetched (bandwidth); resp.total is the true match
+    // count, so flag when there are more than we loaded.
     const results = resp.results.map((r) => this.pagefindToResult(r.url, r.excerpt));
-    return { results, facets: resp.totalFilters };
+    return { results, facets: resp.totalFilters, capped: resp.total > results.length };
   }
 
   private pagefindToResult(path: string, excerpt: string): SearchResult {
@@ -163,10 +166,10 @@ export class SearchService {
     const parsed = this.parseQuery(query);
 
     if (parsed.route === 'topic') {
-      return { results: await this.searchByTopic(parsed.value), facets: {} };
+      return { results: await this.searchByTopic(parsed.value), facets: {}, capped: false };
     }
     if (parsed.route === 'ref') {
-      return { results: await this.searchByRef(parsed.value), facets: {} };
+      return { results: await this.searchByRef(parsed.value), facets: {}, capped: false };
     }
 
     // merge query-operator filters with sidebar facet selections
@@ -191,11 +194,11 @@ export class SearchService {
       // unreliable/empty for these indexes); facet values are shared across
       // languages, so the primary language's index is representative.
       const facets = (await this.pagefind.getFilters(langs[0])) || {};
-      return { results: merged, facets };
+      return { results: merged, facets, capped: ftOutcomes.some((o) => o.capped) };
     }
 
     // titles mode
-    return { results: await this.searchTitles(parsed.term || query), facets: {} };
+    return { results: await this.searchTitles(parsed.term || query), facets: {}, capped: false };
   }
 
 

@@ -191,7 +191,8 @@
     "opPhrase": "phrase:\"in the name of\" — হুবহু বাক্যাংশ",
     "opBook": "book:al-kafi — একটি কিতাবে সীমাবদ্ধ করুন",
     "opTagType": "tag:ethics / type:legal_ruling — ট্যাগ বা ধরন অনুযায়ী ফিল্টার",
-    "langBoth": "আপনার ভাষা + আরবি"
+    "langBoth": "আপনার ভাষা + আরবি",
+    "refineHint": "শীর্ষ ফলাফল দেখানো হচ্ছে — আরও সংকীর্ণ করতে অনুসন্ধান নির্দিষ্ট করুন"
   },
   "translation": {
     "selectTranslation": "অনুবাদ নির্বাচন করুন",

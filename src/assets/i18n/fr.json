@@ -191,7 +191,8 @@
     "opPhrase": "phrase:\"in the name of\" — expression exacte",
     "opBook": "book:al-kafi — limiter à un seul livre",
     "opTagType": "tag:ethics / type:legal_ruling — filtrer par étiquette ou type",
-    "langBoth": "Votre langue + arabe"
+    "langBoth": "Votre langue + arabe",
+    "refineHint": "Affichage des meilleurs résultats — affinez votre recherche pour la restreindre"
   },
   "translation": {
     "selectTranslation": "Sélectionner la traduction",

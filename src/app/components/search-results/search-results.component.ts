@@ -34,6 +34,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   mode$: Observable<SearchMode> = inject(Store).select(SearchState.getMode);
   searchLang$: Observable<string> = inject(Store).select(SearchState.getSearchLang);
   fullTextLoading$: Observable<boolean> = inject(Store).select(SearchState.isFullTextLoading);
+  resultsCapped$: Observable<boolean> = inject(Store).select(SearchState.getResultsCapped);
 
   private facets$: Observable<PagefindFilterCounts> = inject(Store).select(SearchState.getFacets);
   private activeFacets$: Observable<Record<string, string[]>> = inject(Store).select(SearchState.getActiveFacets);
@@ -198,7 +199,8 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
     const mode = params.get('mode');
     return {
       query: params.get('q') || '',
-      lang: params.get('lang') || undefined,
+      // 'slang' (search language), NOT 'lang' — 'lang' is the site UI-language param.
+      lang: params.get('slang') || undefined,
       mode: mode === 'titles' || mode === 'fulltext' ? mode : undefined,
       facets,
     };
@@ -224,14 +226,15 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
     const facets = this.store.selectSnapshot(SearchState.getActiveFacets);
     const queryParams: Record<string, string | null> = {
       q: query,
-      lang: this.store.selectSnapshot(SearchState.getSearchLang),
+      slang: this.store.selectSnapshot(SearchState.getSearchLang), // search language (distinct from site ?lang=)
       mode: this.store.selectSnapshot(SearchState.getMode),
     };
     for (const [filter, param] of Object.entries(this.FILTER_TO_PARAM)) {
       const vals = facets[filter];
       queryParams[param] = vals && vals.length ? vals.join(',') : null; // null drops the param
     }
-    this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true });
+    // merge: preserve the site UI-language param (?lang=) and any other params.
+    this.router.navigate([], { relativeTo: this.route, queryParams, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   private buildFacetGroups(facets: PagefindFilterCounts, active: Record<string, string[]>): FacetGroup[] {

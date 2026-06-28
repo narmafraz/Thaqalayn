@@ -191,7 +191,8 @@
     "opPhrase": "phrase:\"in the name of\" — عبارت دقیق",
     "opBook": "book:al-kafi — محدود کردن به یک کتاب",
     "opTagType": "tag:ethics / type:legal_ruling — فیلتر بر اساس برچسب یا نوع",
-    "langBoth": "زبان شما + عربی"
+    "langBoth": "زبان شما + عربی",
+    "refineHint": "نتایج برتر نمایش داده می‌شود — برای محدودتر شدن، جستجو را دقیق‌تر کنید"
   },
   "translation": {
     "selectTranslation": "انتخاب ترجمه",

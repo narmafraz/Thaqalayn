@@ -61,7 +61,7 @@
 
   <ng-container *ngIf="(results$ | async) as results">
     <p *ngIf="(query$ | async) as query" class="results-summary">
-      <span *ngIf="results.length > 0">{{ results.length }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
+      <span *ngIf="results.length > 0">{{ results.length }}{{ (resultsCapped$ | async) ? '+' : '' }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
       <span *ngIf="results.length === 0 && !(loading$ | async)" class="no-results-message">
         <mat-icon class="no-results-icon">search_off</mat-icon>
         {{ 'search.noResultsFor' | translate }} "{{ query }}"
@@ -146,8 +146,11 @@
           </button>
         </div>
 
-        <p *ngIf="results.length > 0 && !hasMoreResults" class="showing-all">
+        <p *ngIf="results.length > 0 && !hasMoreResults && !(resultsCapped$ | async)" class="showing-all">
           {{ 'search.showingAll' | translate }} ({{ results.length }})
+        </p>
+        <p *ngIf="results.length > 0 && !hasMoreResults && (resultsCapped$ | async)" class="showing-all">
+          {{ 'search.refineHint' | translate }}
         </p>
       </div>
     </div>

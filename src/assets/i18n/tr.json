@@ -191,7 +191,8 @@
     "opPhrase": "phrase:\"in the name of\" — tam ifade",
     "opBook": "book:al-kafi — tek bir kitapla sınırla",
     "opTagType": "tag:ethics / type:legal_ruling — etikete veya türe göre filtrele",
-    "langBoth": "Diliniz + Arapça"
+    "langBoth": "Diliniz + Arapça",
+    "refineHint": "En iyi sonuçlar gösteriliyor — daraltmak için aramanızı belirginleştirin"
   },
   "translation": {
     "selectTranslation": "Çeviri seçin",

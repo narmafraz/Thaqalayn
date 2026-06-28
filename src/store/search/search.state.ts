@@ -15,6 +15,7 @@ export interface SearchStateModel {
   results: SearchResult[];
   facets: PagefindFilterCounts; // counts for the sidebar (from Pagefind totalFilters)
   activeFacets: Record<string, string[]>; // selected facet values per filter
+  resultsCapped: boolean; // more matches exist than were loaded
   loading: boolean;
   indexReady: boolean;
   fullTextLoading: boolean;
@@ -30,6 +31,7 @@ export interface SearchStateModel {
     results: [],
     facets: {},
     activeFacets: {},
+    resultsCapped: false,
     loading: false,
     indexReady: false,
     fullTextLoading: false,
@@ -57,6 +59,9 @@ export class SearchState {
 
   @Selector([SearchState])
   public static getActiveFacets(state: SearchStateModel): Record<string, string[]> { return state.activeFacets; }
+
+  @Selector([SearchState])
+  public static getResultsCapped(state: SearchStateModel): boolean { return state.resultsCapped; }
 
   @Selector([SearchState])
   public static isLoading(state: SearchStateModel): boolean { return state.loading; }
@@ -148,6 +153,7 @@ export class SearchState {
       ctx.patchState({
         results: outcome.results,
         facets: outcome.facets,
+        resultsCapped: outcome.capped,
         loading: false,
         fullTextLoading: false,
       });

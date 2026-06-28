@@ -191,7 +191,8 @@
     "opPhrase": "phrase:\"in the name of\" — точная фраза",
     "opBook": "book:al-kafi — ограничить одной книгой",
     "opTagType": "tag:ethics / type:legal_ruling — фильтр по метке или типу",
-    "langBoth": "Ваш язык + арабский"
+    "langBoth": "Ваш язык + арабский",
+    "refineHint": "Показаны лучшие совпадения — уточните запрос, чтобы сузить"
   },
   "translation": {
     "selectTranslation": "Выбрать перевод",

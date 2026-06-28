@@ -194,7 +194,9 @@
     "langBoth": "Deine Sprache + Arabisch",
     "refineHint": "Top-Treffer werden angezeigt — verfeinere die Suche, um einzugrenzen",
     "startTitle": "Die Sammlung durchsuchen",
-    "startHint": "Finde Hadithe, Verse, Zusammenfassungen und Übersetzungen — in deiner Sprache und im arabischen Original."
+    "startHint": "Finde Hadithe, Verse, Zusammenfassungen und Übersetzungen — in deiner Sprache und im arabischen Original.",
+    "recentSearches": "Letzte Suchen",
+    "clearRecent": "Löschen"
   },
   "translation": {
     "selectTranslation": "Übersetzung auswählen",

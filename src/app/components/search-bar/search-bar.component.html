@@ -60,6 +60,23 @@
     <button class="tips-close-btn" (mousedown)="showTips = false">{{ 'search.tipsClose' | translate }}</button>
   </div>
 
+  <!-- Recent searches: shown on focus when the box is empty -->
+  <div class="search-recent-panel" *ngIf="showRecent && !showDropdown && recentSearches.length"
+       (mousedown)="$event.stopPropagation()">
+    <div class="recent-header">
+      <span class="recent-title">{{ 'search.recentSearches' | translate }}</span>
+      <button class="recent-clear-btn" (mousedown)="clearRecent($event)">{{ 'search.clearRecent' | translate }}</button>
+    </div>
+    <div class="recent-item" *ngFor="let term of recentSearches" (mousedown)="runRecent(term)">
+      <mat-icon class="recent-icon">history</mat-icon>
+      <span class="recent-term">{{ term }}</span>
+      <button class="recent-remove-btn" (mousedown)="removeRecent(term, $event)"
+              [attr.aria-label]="'search.clearSearch' | translate">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
   <div class="search-dropdown" *ngIf="showDropdown" role="listbox" id="search-results-listbox">
     <div *ngIf="(loading$ | async)" class="dropdown-loading">
       <mat-spinner diameter="20"></mat-spinner>

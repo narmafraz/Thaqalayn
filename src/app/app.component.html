@@ -9,7 +9,7 @@
 
           <!-- Desktop: all controls visible -->
           <div class="header-desktop-controls">
-            <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
+            <app-search-bar *ngIf="!(onSearchPage$ | async)" class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
 
             <div class="font-controls" (click)="$event.stopPropagation()" *ngIf="fontSize$ | async as fontSize">
               <button (click)="decreaseFontSize()" [attr.aria-label]="'settings.decreaseFont' | translate" [matTooltip]="'settings.decreaseFont' | translate" [disabled]="fontSize <= 75">A-</button>

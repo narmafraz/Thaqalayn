@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
@@ -25,14 +26,21 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   searchValue = '';
   showDropdown = false;
   showTips = false;
+  showRecent = false;
+  recentSearches: string[] = [];
   activeResultIndex = -1;
   private indexRequested = false;
   private searchSubject = new Subject<string>();
   private subscriptions: Subscription[] = [];
+  private readonly RECENT_KEY = 'thaqalayn-recent-searches';
+  private readonly RECENT_MAX = 6;
+  private isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(private store: Store, private router: Router) {}
 
   ngOnInit(): void {
+    this.recentSearches = this.loadRecent();
+
     // NOTE: the search index is NOT loaded here. It is loaded lazily on first
     // focus (onFocus) so nothing downloads on page load — the search bar is in
     // the header on every page (mobile-bandwidth rule).
@@ -58,18 +66,66 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   onSearchInput(value: string): void {
     this.searchValue = value;
     this.showTips = false;
+    this.showRecent = value.trim().length === 0 && this.recentSearches.length > 0;
     this.activeResultIndex = -1;
     this.searchSubject.next(value);
   }
 
   onSearchSubmit(): void {
-    if (this.searchValue.trim().length >= 2) {
+    const q = this.searchValue.trim();
+    if (q.length >= 2) {
       this.showDropdown = false;
+      this.showRecent = false;
+      this.recordRecent(q);
       this.router.navigate(['/search'], {
-        queryParams: { q: this.searchValue.trim() },
+        queryParams: { q },
         queryParamsHandling: 'merge'
       });
     }
+  }
+
+  /** Run a saved recent search. */
+  runRecent(term: string): void {
+    this.searchValue = term;
+    this.showRecent = false;
+    this.onSearchSubmit();
+  }
+
+  removeRecent(term: string, event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.recentSearches = this.recentSearches.filter((t) => t !== term);
+    this.persistRecent();
+    if (!this.recentSearches.length) { this.showRecent = false; }
+  }
+
+  clearRecent(event: Event): void {
+    event.stopPropagation();
+    event.preventDefault();
+    this.recentSearches = [];
+    this.persistRecent();
+    this.showRecent = false;
+  }
+
+  private loadRecent(): string[] {
+    if (!this.isBrowser) { return []; }
+    try {
+      const raw = localStorage.getItem(this.RECENT_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter((t) => typeof t === 'string').slice(0, this.RECENT_MAX) : [];
+    } catch { return []; }
+  }
+
+  private recordRecent(term: string): void {
+    const t = term.trim();
+    if (!t) { return; }
+    this.recentSearches = [t, ...this.recentSearches.filter((x) => x !== t)].slice(0, this.RECENT_MAX);
+    this.persistRecent();
+  }
+
+  private persistRecent(): void {
+    if (!this.isBrowser) { return; }
+    try { localStorage.setItem(this.RECENT_KEY, JSON.stringify(this.recentSearches)); } catch { /* ignore quota */ }
   }
 
   selectResult(result: SearchResult): void {
@@ -89,6 +145,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.showDropdown = false;
       this.showTips = false;
+      this.showRecent = false;
     }, 200);
   }
 
@@ -100,6 +157,8 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     }
     if (this.searchValue.length >= 2) {
       this.showDropdown = true;
+    } else if (this.recentSearches.length > 0) {
+      this.showRecent = true;
     }
   }
 
@@ -143,6 +202,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
   clearSearch(): void {
     this.searchValue = '';
     this.showDropdown = false;
+    this.showRecent = this.recentSearches.length > 0;
     this.activeResultIndex = -1;
     this.store.dispatch(new ClearSearch());
   }

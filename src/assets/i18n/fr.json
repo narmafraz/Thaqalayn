@@ -194,7 +194,9 @@
     "langBoth": "Votre langue + arabe",
     "refineHint": "Affichage des meilleurs résultats — affinez votre recherche pour la restreindre",
     "startTitle": "Rechercher dans la collection",
-    "startHint": "Trouvez des hadiths, des versets, des résumés et des traductions — dans votre langue et en arabe original."
+    "startHint": "Trouvez des hadiths, des versets, des résumés et des traductions — dans votre langue et en arabe original.",
+    "recentSearches": "Recherches récentes",
+    "clearRecent": "Effacer"
   },
   "translation": {
     "selectTranslation": "Sélectionner la traduction",

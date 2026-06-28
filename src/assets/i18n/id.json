@@ -194,7 +194,9 @@
     "langBoth": "Bahasa Anda + Arab",
     "refineHint": "Menampilkan hasil teratas — persempit dengan memperjelas pencarian",
     "startTitle": "Cari dalam koleksi",
-    "startHint": "Temukan hadis, ayat, ringkasan, dan terjemahan — dalam bahasa Anda dan dalam bahasa Arab asli."
+    "startHint": "Temukan hadis, ayat, ringkasan, dan terjemahan — dalam bahasa Anda dan dalam bahasa Arab asli.",
+    "recentSearches": "Pencarian terakhir",
+    "clearRecent": "Hapus"
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",

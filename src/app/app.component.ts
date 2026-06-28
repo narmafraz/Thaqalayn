@@ -47,6 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
   helpVisible$: Observable<boolean>;
   isEmbed$: Observable<boolean>;
   activeSection$: Observable<string>;
+  onSearchPage$: Observable<boolean>;
   readingSheetOpen$: Observable<boolean>;
   showBackToTop = false;
   headerCompact = false;
@@ -103,6 +104,15 @@ export class AppComponent implements OnInit, OnDestroy {
         return 'home';
       }),
       startWith('home'),
+      distinctUntilChanged()
+    );
+    // On the /search page the prominent in-page box replaces the header search,
+    // so the header bar is hidden there to avoid two duplicate inputs.
+    const initialSearchPage = this.isBrowser ? window.location.pathname.split('?')[0] === '/search' : false;
+    this.onSearchPage$ = this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map((event: NavigationEnd) => (event.urlAfterRedirects || event.url).split('?')[0] === '/search'),
+      startWith(initialSearchPage),
       distinctUntilChanged()
     );
   }

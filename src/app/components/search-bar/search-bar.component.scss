@@ -267,3 +267,84 @@ input {
     background: var(--table-hover, #f5f5f5);
   }
 }
+
+/* --- recent searches panel --- */
+.search-recent-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  min-width: min(280px, 90vw);
+  background: var(--card-bg, #fff);
+  border-radius: 0 0 4px 4px;
+  box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.15));
+  z-index: 1000;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-bottom: 4px;
+}
+
+.recent-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px 4px;
+}
+
+.recent-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-secondary, #777);
+}
+
+.recent-clear-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--link-color, #673ab7);
+  padding: 2px 4px;
+}
+
+.recent-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+
+  &:hover { background: var(--table-hover, #f5f5f5); }
+
+  .recent-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--text-secondary, #999);
+    flex: 0 0 auto;
+  }
+
+  .recent-term {
+    flex: 1 1 auto;
+    font-size: 14px;
+    color: var(--text-primary, #333);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .recent-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary, #999);
+    display: inline-flex;
+    padding: 2px;
+    opacity: .6;
+
+    &:hover { opacity: 1; }
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+  }
+}

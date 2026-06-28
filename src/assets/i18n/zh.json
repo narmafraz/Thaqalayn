@@ -194,7 +194,9 @@
     "langBoth": "你的语言 + 阿拉伯语",
     "refineHint": "显示最相关的结果 — 优化搜索以缩小范围",
     "startTitle": "搜索文集",
-    "startHint": "查找圣训、经文、摘要和译文——以您的语言和阿拉伯语原文。"
+    "startHint": "查找圣训、经文、摘要和译文——以您的语言和阿拉伯语原文。",
+    "recentSearches": "最近搜索",
+    "clearRecent": "清除"
   },
   "translation": {
     "selectTranslation": "选择翻译",

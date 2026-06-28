@@ -194,7 +194,9 @@
     "langBoth": "Tu idioma + árabe",
     "refineHint": "Mostrando los mejores resultados — refina tu búsqueda para acotarla",
     "startTitle": "Buscar en la colección",
-    "startHint": "Encuentra hadices, versículos, resúmenes y traducciones, en tu idioma y en el árabe original."
+    "startHint": "Encuentra hadices, versículos, resúmenes y traducciones, en tu idioma y en el árabe original.",
+    "recentSearches": "Búsquedas recientes",
+    "clearRecent": "Borrar"
   },
   "translation": {
     "selectTranslation": "Seleccionar traducción",

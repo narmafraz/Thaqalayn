@@ -17,6 +17,7 @@ export interface SearchResult {
   bookName: string;
   kind: 'title' | 'hadith' | 'verse' | 'chapter';
   score: number;
+  lang?: string; // which language index this full-text result came from
 }
 
 /** Result of a full search: hits + facet counts for the sidebar. */
@@ -137,11 +138,11 @@ export class SearchService {
 
     // Only `limit` fragments are fetched (bandwidth); resp.total is the true match
     // count, so flag when there are more than we loaded.
-    const results = resp.results.map((r) => this.pagefindToResult(r.url, r.excerpt));
+    const results = resp.results.map((r) => this.pagefindToResult(r.url, r.excerpt, lang));
     return { results, facets: resp.totalFilters, capped: resp.total > results.length };
   }
 
-  private pagefindToResult(path: string, excerpt: string): SearchResult {
+  private pagefindToResult(path: string, excerpt: string, lang: string): SearchResult {
     const isQuran = path.startsWith('/books/quran:');
     return {
       path,
@@ -151,6 +152,7 @@ export class SearchService {
       bookName: this.bookNameFromPath(path),
       kind: isQuran ? 'verse' : 'hadith',
       score: 1,
+      lang,
     };
   }
 

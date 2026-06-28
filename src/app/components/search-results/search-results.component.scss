@@ -558,3 +558,28 @@ h1 {
 @media (max-width: 768px) {
   .search-page-box .search-page-input { font-size: 16px; }
 }
+
+/* --- search overhaul: result-card header (book + reference + tags) --- */
+.result-card .result-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.result-card .result-book { font-weight: 600; color: var(--text-color, #222); }
+.result-card .result-ref {
+  color: var(--text-muted, #888);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.result-card .result-flex { flex: 1 1 auto; }
+.result-card .result-lang-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: var(--chip-bg, #ece7f6);
+  color: var(--accent-color, #673ab7);
+}

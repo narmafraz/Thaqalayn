@@ -109,9 +109,13 @@
             queryParamsHandling="preserve">
             <mat-card-content>
               <div class="result-header">
-                <div class="result-title">{{ result.title || formatPath(result.path) }}</div>
+                <span class="result-book">{{ result.bookName }}</span>
+                <span class="result-ref" *ngIf="reference(result.path)">{{ reference(result.path) }}</span>
+                <span class="result-flex"></span>
+                <span *ngIf="(searchLang$ | async) === 'both' && result.lang" class="result-lang-tag">{{ result.lang | uppercase }}</span>
                 <span *ngIf="result.kind !== 'title'" class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
               </div>
+              <div class="result-title" *ngIf="result.title">{{ result.title }}</div>
               <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
 
               <!-- Highlighted Pagefind excerpt (innerHTML keeps <mark>; Angular sanitizes) -->
@@ -131,10 +135,6 @@
                 </ng-template>
               </ng-template>
 
-              <div class="result-footer">
-                <span class="result-book">{{ result.bookName }}</span>
-                <span class="result-path">{{ formatPath(result.path) }}</span>
-              </div>
             </mat-card-content>
           </mat-card>
         </div>

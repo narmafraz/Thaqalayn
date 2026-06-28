@@ -174,6 +174,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
     return match[2] ? `${name} ${match[2]}` : name;
   }
 
+  /** Just the numeric reference after the book slug, e.g. "5:3:10:1" or "2:255". */
+  reference(path: string): string {
+    const m = path.match(/\/books\/[^:]+:(.+)$/);
+    return m ? m[1] : '';
+  }
+
   get displayedResults(): SearchResult[] {
     if (this.pathOnlyMode) { return this.results; } // observer lazy-loads per card
     return this.results.slice(0, this.displayedCount);

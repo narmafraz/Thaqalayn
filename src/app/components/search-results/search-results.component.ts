@@ -17,6 +17,7 @@ interface FacetGroup { filter: string; labelKey: string; values: FacetValue[]; }
 
 // Display order for the facet groups (labels come from i18n: search.facet.*).
 const FACET_ORDER = ['book', 'content_type', 'has_chain', 'topic', 'tag'];
+const MAX_FACET_VALUES = 12; // cap per group (e.g. ~90 topics) — keep top by count + active
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -240,7 +241,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
     );
     for (const filter of keys) {
       const activeSet = new Set(active[filter] || []);
-      const values: FacetValue[] = Object.entries(facets[filter])
+      let values: FacetValue[] = Object.entries(facets[filter])
         .filter(([, count]) => count > 0 || activeSet.size)
         .map(([value, count]) => ({
           value,
@@ -250,6 +251,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
           active: activeSet.has(value),
         }))
         .sort((a, b) => b.count - a.count);
+      // Cap long facet lists (e.g. ~90 topics) to the top values; always keep selected ones.
+      if (values.length > MAX_FACET_VALUES) {
+        const top = values.slice(0, MAX_FACET_VALUES);
+        for (const v of values) { if (v.active && !top.includes(v)) { top.push(v); } }
+        values = top;
+      }
       if (values.length) {
         groups.push({ filter, labelKey: `search.facet.${filter}`, values });
       }

@@ -187,28 +187,17 @@ export class SearchService {
           if (!seen.has(r.path)) { seen.add(r.path); merged.push(r); }
         }
       }
-      return { results: merged, facets: this.mergeFacets(ftOutcomes.map((o) => o.facets)) };
+      // Facets come from the global filter listing (per-query search().filters is
+      // unreliable/empty for these indexes); facet values are shared across
+      // languages, so the primary language's index is representative.
+      const facets = (await this.pagefind.getFilters(langs[0])) || {};
+      return { results: merged, facets };
     }
 
     // titles mode
     return { results: await this.searchTitles(parsed.term || query), facets: {} };
   }
 
-  /** Sum facet counts across multiple languages' outcomes (approximate when a
-   *  verse appears in more than one language's results). */
-  private mergeFacets(list: PagefindFilterCounts[]): PagefindFilterCounts {
-    if (list.length <= 1) { return list[0] || {}; }
-    const out: PagefindFilterCounts = {};
-    for (const facets of list) {
-      for (const [filter, values] of Object.entries(facets)) {
-        out[filter] ||= {};
-        for (const [value, count] of Object.entries(values)) {
-          out[filter][value] = (out[filter][value] || 0) + count;
-        }
-      }
-    }
-    return out;
-  }
 
   // --- operators ---
 

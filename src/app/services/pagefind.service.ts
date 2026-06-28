@@ -41,6 +41,7 @@ interface PagefindModule {
     filters: PagefindFilterCounts;
     totalFilters: PagefindFilterCounts;
   }>;
+  filters(): Promise<PagefindFilterCounts>;
 }
 
 /**
@@ -59,6 +60,7 @@ export class PagefindService {
   private manifest$?: Observable<SearchManifest | null>;
   private qref$?: Observable<Record<string, string[]> | null>;
   private readonly instances = new Map<string, Promise<PagefindModule | null>>();
+  private readonly filtersCache = new Map<string, Promise<PagefindFilterCounts | null>>();
 
   constructor(@Inject(PLATFORM_ID) platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -117,6 +119,25 @@ export class PagefindService {
   /** Has a given language's bundle been requested/loaded already? */
   isLoaded(lang: string): boolean {
     return this.instances.has(lang);
+  }
+
+  /**
+   * Global facet values + counts for a language (pagefind.filters()), cached.
+   * Used to populate the facet sidebar: the per-query search().filters come back
+   * empty for these indexes, but the global filter listing is reliable, and
+   * applying a facet then filters the query correctly.
+   */
+  getFilters(lang: string): Promise<PagefindFilterCounts | null> {
+    let p = this.filtersCache.get(lang);
+    if (!p) {
+      p = (async () => {
+        const pf = await this.loadInstance(lang);
+        if (!pf) { return null; }
+        try { return await pf.filters(); } catch { return null; }
+      })();
+      this.filtersCache.set(lang, p);
+    }
+    return p;
   }
 
   /**

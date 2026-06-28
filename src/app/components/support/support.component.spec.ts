@@ -22,6 +22,10 @@ describe('SupportComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SupportComponent);
     component = fixture.componentInstance;
+    // Stub the reload indirection so confirmSafeRefresh's scheduled
+    // setTimeout(() => this.reload(), 600) doesn't crash Karma with
+    // "Some of your tests did a full page reload!".
+    spyOn(component as any, 'reload');
     fixture.detectChanges();
   });
 
@@ -54,6 +58,33 @@ describe('SupportComponent', () => {
       expect(deleteSpy).toHaveBeenCalledTimes(cacheKeys.length);
       expect(component.refreshComplete).toBeTrue();
       expect(component.showRefreshConfirm).toBeFalse();
+    });
+
+    // REGRESSION: clearing caches alone leaves the OLD app JS still
+    // executing in memory. On the next user-initiated reload the SW
+    // refills caches from network with the new data shape, but the
+    // old JS reads the legacy fields and renders blank — the exact
+    // failure that broke mobile Brave after the per-language split.
+    // confirmSafeRefresh must schedule a page reload so the next load
+    // boots the fresh JS.
+    it('REGRESSION: triggers a page reload after clearing caches', async () => {
+      spyOn(indexedDB, 'deleteDatabase').and.callFake(() => {
+        const req: any = {};
+        queueMicrotask(() => req.onsuccess && req.onsuccess());
+        return req;
+      });
+      spyOn(window.caches, 'keys').and.resolveTo([]);
+
+      jasmine.clock().install();
+      try {
+        await component.confirmSafeRefresh();
+        // confirmSafeRefresh schedules `this.reload()` via setTimeout(..., 600).
+        // Advance jasmine's mock clock past the delay and assert reload fires.
+        jasmine.clock().tick(700);
+        expect((component as any).reload).toHaveBeenCalled();
+      } finally {
+        jasmine.clock().uninstall();
+      }
     });
   });
 });

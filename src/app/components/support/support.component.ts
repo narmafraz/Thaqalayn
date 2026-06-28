@@ -41,6 +41,13 @@ export class SupportComponent {
    * re-fetched. Preserves personally authored data — the `thaqalayn-bookmarks`
    * DB (bookmarks, notes, reading progress, badges, plans) and localStorage
    * preferences (language, AI settings, font size) are left untouched.
+   *
+   * After clearing, force-activates any pending SW update and reloads the
+   * page. The reload is essential: clearing caches alone leaves the OLD
+   * app JS still running in memory, which then receives fresh data over
+   * the empty caches and renders it through stale code (the symptom that
+   * motivated the per-language split's "old JS reads ai.summaries[lang],
+   * gets undefined" failure mode reported June 2026).
    */
   async confirmSafeRefresh(): Promise<void> {
     // 1. Clear all service worker caches — app shell, assets, i18n, API data.
@@ -61,15 +68,31 @@ export class SupportComponent {
       });
     }
 
-    // 3. Pull any pending app-shell update (auto-activates + reloads if found).
-    try {
-      await this.swUpdate.checkForUpdate();
-    } catch {
-      // Service worker disabled (e.g. dev) — nothing to do.
+    // 3. Force-activate any pending SW update synchronously so the next
+    //    page-load runs the NEW app JS, not the in-memory old one.
+    if (this.swUpdate.isEnabled) {
+      try {
+        const hasUpdate = await this.swUpdate.checkForUpdate();
+        if (hasUpdate) {
+          await this.swUpdate.activateUpdate();
+        }
+      } catch {
+        // SW errored or disabled — proceed to reload anyway.
+      }
     }
 
     this.showRefreshConfirm = false;
     this.refreshComplete = true;
+
+    // 4. Hard reload after a brief delay so the user sees the "refresh
+    //    complete" confirmation toast before the page reloads. The
+    //    `reload()` indirection makes this testable (tests can stub it).
+    setTimeout(() => this.reload(), 600);
+  }
+
+  /** Indirection so tests can stub the reload without crashing Karma. */
+  protected reload(): void {
+    window.location.reload();
   }
 
   async confirmReset(): Promise<void> {

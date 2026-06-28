@@ -170,27 +170,28 @@
     "showingAll": "Все результаты показаны",
     "placeholder": "Поиск...",
     "filteredBy": "Отфильтровано по",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "Язык поиска",
+    "clearFilters": "Очистить фильтры",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "Книга",
+      "content_type": "Тип",
+      "has_chain": "Иснад",
+      "topic": "Тема",
+      "tag": "Метка"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "С иснадом",
+      "no": "Без иснада"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "Операторы",
+    "tipAllWords": "Несколько слов: результат должен содержать все",
+    "tipPhraseQuotes": "Точная фраза: заключите в \"кавычки\"",
+    "opTopic": "topic:sincerity — просмотр всей темы",
+    "opRef": "ref:2:255 — хадисы, ссылающиеся на аят Корана",
+    "opPhrase": "phrase:\"in the name of\" — точная фраза",
+    "opBook": "book:al-kafi — ограничить одной книгой",
+    "opTagType": "tag:ethics / type:legal_ruling — фильтр по метке или типу",
+    "langBoth": "Ваш язык + арабский"
   },
   "translation": {
     "selectTranslation": "Выбрать перевод",

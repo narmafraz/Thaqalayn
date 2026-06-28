@@ -182,27 +182,28 @@
     "showingAll": "تم عرض جميع النتائج",
     "placeholder": "بحث...",
     "filteredBy": "مصفّى حسب",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "لغة البحث",
+    "clearFilters": "مسح المرشّحات",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "الكتاب",
+      "content_type": "النوع",
+      "has_chain": "السند",
+      "topic": "الموضوع",
+      "tag": "الوسم"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "بسند",
+      "no": "بدون سند"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "أدوات التصفية",
+    "tipAllWords": "عدة كلمات: يجب أن تتضمّن النتائج كلّها",
+    "tipPhraseQuotes": "عبارة حرفية: ضعها بين \"علامتي اقتباس\"",
+    "opTopic": "topic:sincerity — تصفّح موضوعًا كاملًا",
+    "opRef": "ref:2:255 — الأحاديث التي تستشهد بآية قرآنية",
+    "opPhrase": "phrase:\"in the name of\" — عبارة حرفية",
+    "opBook": "book:al-kafi — حصر البحث في كتاب واحد",
+    "opTagType": "tag:ethics / type:legal_ruling — التصفية حسب الوسم أو النوع",
+    "langBoth": "لغتك + العربية"
   },
   "translation": {
     "selectTranslation": "اختيار الترجمة",

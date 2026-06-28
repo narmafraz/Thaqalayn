@@ -170,27 +170,28 @@
     "showingAll": "همه نتایج نمایش داده شد",
     "placeholder": "جستجو...",
     "filteredBy": "فیلتر شده بر اساس",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "زبان جستجو",
+    "clearFilters": "پاک کردن فیلترها",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "کتاب",
+      "content_type": "نوع",
+      "has_chain": "سند",
+      "topic": "موضوع",
+      "tag": "برچسب"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "با سند",
+      "no": "بدون سند"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "عملگرها",
+    "tipAllWords": "چند کلمه: نتایج باید همهٔ آن‌ها را داشته باشند",
+    "tipPhraseQuotes": "عبارت دقیق: آن را در \"گیومه\" بگذارید",
+    "opTopic": "topic:sincerity — مرور کامل یک موضوع",
+    "opRef": "ref:2:255 — احادیث ارجاع‌دهنده به یک آیهٔ قرآن",
+    "opPhrase": "phrase:\"in the name of\" — عبارت دقیق",
+    "opBook": "book:al-kafi — محدود کردن به یک کتاب",
+    "opTagType": "tag:ethics / type:legal_ruling — فیلتر بر اساس برچسب یا نوع",
+    "langBoth": "زبان شما + عربی"
   },
   "translation": {
     "selectTranslation": "انتخاب ترجمه",

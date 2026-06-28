@@ -170,27 +170,28 @@
     "showingAll": "تمام نتائج دکھائے گئے",
     "placeholder": "تلاش...",
     "filteredBy": "فلٹر شدہ بذریعہ",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "تلاش کی زبان",
+    "clearFilters": "فلٹر صاف کریں",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "کتاب",
+      "content_type": "قسم",
+      "has_chain": "سند",
+      "topic": "موضوع",
+      "tag": "ٹیگ"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "سند کے ساتھ",
+      "no": "بغیر سند"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "آپریٹرز",
+    "tipAllWords": "کئی الفاظ: نتائج میں سب شامل ہوں",
+    "tipPhraseQuotes": "بعینہ فقرہ: اسے \"واوین\" میں لکھیں",
+    "opTopic": "topic:sincerity — کسی موضوع پر سب کچھ دیکھیں",
+    "opRef": "ref:2:255 — قرآنی آیت کا حوالہ دینے والی احادیث",
+    "opPhrase": "phrase:\"in the name of\" — بعینہ فقرہ",
+    "opBook": "book:al-kafi — صرف ایک کتاب تک محدود",
+    "opTagType": "tag:ethics / type:legal_ruling — ٹیگ یا قسم سے فلٹر کریں",
+    "langBoth": "آپ کی زبان + عربی"
   },
   "translation": {
     "selectTranslation": "ترجمہ منتخب کریں",

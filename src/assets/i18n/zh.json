@@ -170,27 +170,28 @@
     "showingAll": "已显示所有结果",
     "placeholder": "搜索...",
     "filteredBy": "已筛选",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "搜索语言",
+    "clearFilters": "清除筛选",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "书",
+      "content_type": "类型",
+      "has_chain": "传述链",
+      "topic": "主题",
+      "tag": "标签"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "有传述链",
+      "no": "无传述链"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "运算符",
+    "tipAllWords": "多个词：结果必须全部包含",
+    "tipPhraseQuotes": "精确短语：用\"引号\"括起来",
+    "opTopic": "topic:sincerity — 浏览整个主题",
+    "opRef": "ref:2:255 — 引用某节《古兰经》的圣训",
+    "opPhrase": "phrase:\"in the name of\" — 精确短语",
+    "opBook": "book:al-kafi — 限定单本书",
+    "opTagType": "tag:ethics / type:legal_ruling — 按标签或类型筛选",
+    "langBoth": "你的语言 + 阿拉伯语"
   },
   "translation": {
     "selectTranslation": "选择翻译",

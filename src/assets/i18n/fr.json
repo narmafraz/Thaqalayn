@@ -170,27 +170,28 @@
     "showingAll": "Tous les résultats affichés",
     "placeholder": "Rechercher...",
     "filteredBy": "Filtré par",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "Langue de recherche",
+    "clearFilters": "Effacer les filtres",
     "facet": {
-      "book": "Book",
+      "book": "Livre",
       "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "has_chain": "Chaîne",
+      "topic": "Thème",
+      "tag": "Étiquette"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "Avec chaîne",
+      "no": "Sans chaîne"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "Opérateurs",
+    "tipAllWords": "Plusieurs mots : les résultats doivent tous les contenir",
+    "tipPhraseQuotes": "Expression exacte : mettez-la entre \"guillemets\"",
+    "opTopic": "topic:sincerity — parcourir tout un thème",
+    "opRef": "ref:2:255 — hadiths citant un verset du Coran",
+    "opPhrase": "phrase:\"in the name of\" — expression exacte",
+    "opBook": "book:al-kafi — limiter à un seul livre",
+    "opTagType": "tag:ethics / type:legal_ruling — filtrer par étiquette ou type",
+    "langBoth": "Votre langue + arabe"
   },
   "translation": {
     "selectTranslation": "Sélectionner la traduction",

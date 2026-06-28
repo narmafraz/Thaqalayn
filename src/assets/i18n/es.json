@@ -170,27 +170,28 @@
     "showingAll": "Todos los resultados mostrados",
     "placeholder": "Buscar...",
     "filteredBy": "Filtrado por",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "Idioma de búsqueda",
+    "clearFilters": "Borrar filtros",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "Libro",
+      "content_type": "Tipo",
+      "has_chain": "Cadena",
+      "topic": "Tema",
+      "tag": "Etiqueta"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "Con cadena",
+      "no": "Sin cadena"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "Operadores",
+    "tipAllWords": "Varias palabras: los resultados deben contenerlas todas",
+    "tipPhraseQuotes": "Frase exacta: ponla entre \"comillas\"",
+    "opTopic": "topic:sincerity — explorar todo un tema",
+    "opRef": "ref:2:255 — hadices que citan una aleya del Corán",
+    "opPhrase": "phrase:\"in the name of\" — frase exacta",
+    "opBook": "book:al-kafi — limitar a un solo libro",
+    "opTagType": "tag:ethics / type:legal_ruling — filtrar por etiqueta o tipo",
+    "langBoth": "Tu idioma + árabe"
   },
   "translation": {
     "selectTranslation": "Seleccionar traducción",

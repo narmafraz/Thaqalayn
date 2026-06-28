@@ -170,27 +170,28 @@
     "showingAll": "Semua hasil ditampilkan",
     "placeholder": "Cari...",
     "filteredBy": "Difilter berdasarkan",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "Bahasa pencarian",
+    "clearFilters": "Hapus filter",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
+      "book": "Kitab",
+      "content_type": "Jenis",
+      "has_chain": "Sanad",
+      "topic": "Topik",
       "tag": "Tag"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "Bersanad",
+      "no": "Tanpa sanad"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "Operator",
+    "tipAllWords": "Beberapa kata: hasil harus memuat semuanya",
+    "tipPhraseQuotes": "Frasa persis: apit dengan \"tanda kutip\"",
+    "opTopic": "topic:sincerity — telusuri seluruh topik",
+    "opRef": "ref:2:255 — hadis yang mengutip ayat Al-Qur'an",
+    "opPhrase": "phrase:\"in the name of\" — frasa persis",
+    "opBook": "book:al-kafi — batasi ke satu kitab",
+    "opTagType": "tag:ethics / type:legal_ruling — saring berdasarkan tag atau jenis",
+    "langBoth": "Bahasa Anda + Arab"
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",

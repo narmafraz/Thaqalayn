@@ -219,7 +219,8 @@
     "opRef": "ref:2:255 — verses citing a Qur'an verse",
     "opPhrase": "phrase:\"in the name of\" — exact phrase",
     "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "opTagType": "tag:ethics / type:legal_ruling — filter by tag or type",
+    "langBoth": "Your language + Arabic"
   },
   "translation": {
     "selectTranslation": "Select Translation",

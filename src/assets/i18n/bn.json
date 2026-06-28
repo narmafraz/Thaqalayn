@@ -170,27 +170,28 @@
     "showingAll": "সব ফলাফল দেখানো হয়েছে",
     "placeholder": "অনুসন্ধান...",
     "filteredBy": "ফিল্টার করা হয়েছে",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "অনুসন্ধানের ভাষা",
+    "clearFilters": "ফিল্টার মুছুন",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "কিতাব",
+      "content_type": "ধরন",
+      "has_chain": "সনদ",
+      "topic": "বিষয়",
+      "tag": "ট্যাগ"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "সনদসহ",
+      "no": "সনদ ছাড়া"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "অপারেটর",
+    "tipAllWords": "একাধিক শব্দ: ফলাফলে সবগুলো থাকতে হবে",
+    "tipPhraseQuotes": "হুবহু বাক্যাংশ: \"উদ্ধৃতি\"-তে রাখুন",
+    "opTopic": "topic:sincerity — একটি বিষয়ের সবকিছু দেখুন",
+    "opRef": "ref:2:255 — কুরআনের আয়াত উদ্ধৃতকারী হাদিস",
+    "opPhrase": "phrase:\"in the name of\" — হুবহু বাক্যাংশ",
+    "opBook": "book:al-kafi — একটি কিতাবে সীমাবদ্ধ করুন",
+    "opTagType": "tag:ethics / type:legal_ruling — ট্যাগ বা ধরন অনুযায়ী ফিল্টার",
+    "langBoth": "আপনার ভাষা + আরবি"
   },
   "translation": {
     "selectTranslation": "অনুবাদ নির্বাচন করুন",

@@ -170,27 +170,28 @@
     "showingAll": "Alle Ergebnisse angezeigt",
     "placeholder": "Suchen...",
     "filteredBy": "Gefiltert nach",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "Suchsprache",
+    "clearFilters": "Filter löschen",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "Buch",
+      "content_type": "Typ",
+      "has_chain": "Kette",
+      "topic": "Thema",
+      "tag": "Schlagwort"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "Mit Kette",
+      "no": "Ohne Kette"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "Operatoren",
+    "tipAllWords": "Mehrere Wörter: Ergebnisse müssen alle enthalten",
+    "tipPhraseQuotes": "Exakte Phrase: in \"Anführungszeichen\" setzen",
+    "opTopic": "topic:sincerity — ein ganzes Thema durchsuchen",
+    "opRef": "ref:2:255 — Hadithe, die einen Koranvers zitieren",
+    "opPhrase": "phrase:\"in the name of\" — exakte Phrase",
+    "opBook": "book:al-kafi — auf ein Buch beschränken",
+    "opTagType": "tag:ethics / type:legal_ruling — nach Schlagwort oder Typ filtern",
+    "langBoth": "Deine Sprache + Arabisch"
   },
   "translation": {
     "selectTranslation": "Übersetzung auswählen",

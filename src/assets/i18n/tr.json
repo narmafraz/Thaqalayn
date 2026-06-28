@@ -170,27 +170,28 @@
     "showingAll": "Tüm sonuçlar gösterildi",
     "placeholder": "Ara...",
     "filteredBy": "Filtreleme",
-    "searchLanguage": "Search language",
-    "clearFilters": "Clear filters",
+    "searchLanguage": "Arama dili",
+    "clearFilters": "Filtreleri temizle",
     "facet": {
-      "book": "Book",
-      "content_type": "Type",
-      "has_chain": "Chain",
-      "topic": "Topic",
-      "tag": "Tag"
+      "book": "Kitap",
+      "content_type": "Tür",
+      "has_chain": "Zincir",
+      "topic": "Konu",
+      "tag": "Etiket"
     },
     "chain": {
-      "yes": "With chain",
-      "no": "No chain"
+      "yes": "Zincirli",
+      "no": "Zincirsiz"
     },
-    "tipOperators": "Operators",
-    "tipAllWords": "Multiple words: results must contain all of them",
-    "tipPhraseQuotes": "Exact phrase: wrap it in \"quotes\"",
-    "opTopic": "topic:sincerity — browse everything on a topic",
-    "opRef": "ref:2:255 — verses citing a Qur'an verse",
-    "opPhrase": "phrase:\"in the name of\" — exact phrase",
-    "opBook": "book:al-kafi — limit to one book",
-    "opTagType": "tag:ethics  /  type:legal_ruling — filter by tag or type"
+    "tipOperators": "Operatörler",
+    "tipAllWords": "Birden çok kelime: sonuçlar hepsini içermeli",
+    "tipPhraseQuotes": "Tam ifade: \"tırnak\" içine alın",
+    "opTopic": "topic:sincerity — bir konunun tamamına göz atın",
+    "opRef": "ref:2:255 — bir Kur'an ayetine atıf yapan hadisler",
+    "opPhrase": "phrase:\"in the name of\" — tam ifade",
+    "opBook": "book:al-kafi — tek bir kitapla sınırla",
+    "opTagType": "tag:ethics / type:legal_ruling — etikete veya türe göre filtrele",
+    "langBoth": "Diliniz + Arapça"
   },
   "translation": {
     "selectTranslation": "Çeviri seçin",

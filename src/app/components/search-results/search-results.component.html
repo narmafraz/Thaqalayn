@@ -18,6 +18,7 @@
       <mat-icon>translate</mat-icon>
       <select [value]="(searchLang$ | async)" (change)="setLanguage($any($event.target).value)"
         [attr.aria-label]="'search.searchLanguage' | translate">
+        <option value="both">{{ 'search.langBoth' | translate }}</option>
         <option *ngFor="let l of availableLangs" [value]="l">{{ ('language.' + l) | translate }}</option>
       </select>
     </label>

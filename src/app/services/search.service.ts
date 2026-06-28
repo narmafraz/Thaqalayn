@@ -158,7 +158,7 @@ export class SearchService {
    * `uiFilters` are facet selections from the sidebar (merged with query operators).
    */
   async searchAll(
-    query: string, mode: SearchMode = 'titles', lang = 'en', uiFilters: Record<string, string[]> = {},
+    query: string, mode: SearchMode = 'titles', langs: string[] = ['en'], uiFilters: Record<string, string[]> = {},
   ): Promise<SearchOutcome> {
     const parsed = this.parseQuery(query);
 
@@ -176,17 +176,39 @@ export class SearchService {
     }
 
     if (mode === 'fulltext') {
-      const [titleResults, ft] = await Promise.all([
-        parsed.term ? this.searchTitles(parsed.term, 10) : Promise.resolve([]),
-        this.searchFullText(parsed.term, lang, filters),
-      ]);
-      const titlePaths = new Set(titleResults.map((r) => r.path));
-      const merged = [...titleResults, ...ft.results.filter((r) => !titlePaths.has(r.path))];
-      return { results: merged, facets: ft.facets };
+      // Titles first (in-memory, instant), then each requested language's
+      // full-text results, de-duplicated by verse path.
+      const titleResults = parsed.term ? await this.searchTitles(parsed.term, 10) : [];
+      const ftOutcomes = await Promise.all(langs.map((l) => this.searchFullText(parsed.term, l, filters)));
+
+      const seen = new Set(titleResults.map((r) => r.path));
+      const merged: SearchResult[] = [...titleResults];
+      for (const o of ftOutcomes) {
+        for (const r of o.results) {
+          if (!seen.has(r.path)) { seen.add(r.path); merged.push(r); }
+        }
+      }
+      return { results: merged, facets: this.mergeFacets(ftOutcomes.map((o) => o.facets)) };
     }
 
     // titles mode
     return { results: await this.searchTitles(parsed.term || query), facets: {} };
+  }
+
+  /** Sum facet counts across multiple languages' outcomes (approximate when a
+   *  verse appears in more than one language's results). */
+  private mergeFacets(list: PagefindFilterCounts[]): PagefindFilterCounts {
+    if (list.length <= 1) { return list[0] || {}; }
+    const out: PagefindFilterCounts = {};
+    for (const facets of list) {
+      for (const [filter, values] of Object.entries(facets)) {
+        out[filter] ||= {};
+        for (const [value, count] of Object.entries(values)) {
+          out[filter][value] = (out[filter][value] || 0) + count;
+        }
+      }
+    }
+    return out;
   }
 
   // --- operators ---

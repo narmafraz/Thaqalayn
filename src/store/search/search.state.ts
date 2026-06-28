@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
 import { PagefindFilterCounts } from '@app/services/pagefind.service';
-import { hasArabic } from '@app/services/arabic-normalize';
 import { I18nService } from '@app/services/i18n.service';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
@@ -27,7 +26,7 @@ export interface SearchStateModel {
   defaults: {
     query: '',
     mode: 'fulltext', // content search by default (Pagefind fetches only per-query fragments)
-    searchLang: 'en',
+    searchLang: 'both', // 'both' = the UI language + the original Arabic, merged
     results: [],
     facets: {},
     activeFacets: {},
@@ -73,10 +72,6 @@ export class SearchState {
 
   @Action(InitSearchIndex)
   public async initIndex(ctx: StateContext<SearchStateModel>) {
-    // Default the search language to the active UI language (the picker can change it).
-    if (ctx.getState().searchLang === 'en' && this.i18n.currentLang) {
-      ctx.patchState({ searchLang: this.i18n.currentLang });
-    }
     try {
       await this.searchService.loadTitlesIndex();
       ctx.patchState({ indexReady: true });
@@ -117,7 +112,9 @@ export class SearchState {
     if (query) { ctx.dispatch(new SearchQuery(query)); }
   }
 
-  @Action(SearchQuery)
+  // cancelUncompleted: a newer query cancels an in-flight one, so a slow search
+  // can't resolve late and clobber the latest results with stale/empty data.
+  @Action(SearchQuery, { cancelUncompleted: true })
   public async search(ctx: StateContext<SearchStateModel>, action: SearchQuery) {
     const query = action.query.trim();
     if (!query) {
@@ -128,17 +125,18 @@ export class SearchState {
     const state = ctx.getState();
     const isFullText = state.mode === 'fulltext';
 
-    // Arabic-script queries target the original Arabic text index (which every
-    // verse has), regardless of the selected UI/search language. Computed
-    // per-query (not persisted) so a following Latin-script query reverts to the
-    // chosen language. fa/ur are themselves Arabic-script, so leave those as-is.
-    const effectiveLang = hasArabic(query) && !['ar', 'fa', 'ur'].includes(state.searchLang)
-      ? 'ar' : state.searchLang;
+    // 'both' (default) searches the UI language AND the original Arabic index,
+    // merged — so a query in either the reader's language or Arabic finds
+    // results. A specific picked language narrows to just that index. (fa/ur are
+    // themselves Arabic-script and are searched as their own index.)
+    const langs = state.searchLang === 'both'
+      ? [...new Set([this.i18n.currentLang, 'ar'])]
+      : [state.searchLang];
 
     ctx.patchState({
       query,
       loading: true,
-      fullTextLoading: isFullText && !this.searchService.isFullTextLoaded(effectiveLang),
+      fullTextLoading: isFullText && langs.some((l) => !this.searchService.isFullTextLoaded(l)),
       error: undefined,
     });
 
@@ -146,7 +144,7 @@ export class SearchState {
       await this.searchService.loadTitlesIndex();
       if (!ctx.getState().indexReady) { ctx.patchState({ indexReady: true }); }
 
-      const outcome = await this.searchService.searchAll(query, state.mode, effectiveLang, state.activeFacets);
+      const outcome = await this.searchService.searchAll(query, state.mode, langs, state.activeFacets);
       ctx.patchState({
         results: outcome.results,
         facets: outcome.facets,

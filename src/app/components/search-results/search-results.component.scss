@@ -583,3 +583,72 @@ h1 {
   background: var(--chip-bg, #ece7f6);
   color: var(--accent-color, #673ab7);
 }
+
+/* --- search overhaul: loading skeleton cards --- */
+.skeleton-list { margin-top: 8px; }
+.skeleton-card {
+  padding: 16px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: var(--card-bg, #fff);
+}
+.skeleton-card .skeleton-head { width: 40%; height: 16px; margin-top: 0; }
+
+/* --- search overhaul: first-run empty state --- */
+.search-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--text-color, #333);
+}
+.search-empty-icon {
+  font-size: 56px;
+  width: 56px;
+  height: 56px;
+  color: var(--accent-color, #673ab7);
+  opacity: .7;
+  margin-bottom: 8px;
+}
+.search-empty-title { margin: 0 0 4px; font-size: 22px; font-weight: 600; }
+.search-empty-hint {
+  margin: 0 0 24px;
+  max-width: 540px;
+  color: var(--text-muted, #777);
+  line-height: 1.5;
+}
+.search-tips-card {
+  width: 100%;
+  max-width: 560px;
+  text-align: start;
+  padding: 16px 20px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 10px;
+  background: var(--card-bg, #fafafa);
+}
+.search-tips-heading {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--text-muted, #777);
+}
+.search-tips-heading mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--accent-color, #673ab7);
+}
+.search-tips-list {
+  margin: 0;
+  padding-inline-start: 18px;
+  line-height: 1.7;
+  font-size: 14px;
+}
+.search-tips-list li { margin-bottom: 2px; }

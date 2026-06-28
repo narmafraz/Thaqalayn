@@ -221,7 +221,9 @@
     "opBook": "book:al-kafi — limit to one book",
     "opTagType": "tag:ethics / type:legal_ruling — filter by tag or type",
     "langBoth": "Your language + Arabic",
-    "refineHint": "Showing the top matches — refine your search to narrow it down"
+    "refineHint": "Showing the top matches — refine your search to narrow it down",
+    "startTitle": "Search the collection",
+    "startHint": "Find hadith, verses, summaries and translations — in your language and in the original Arabic."
   },
   "translation": {
     "selectTranslation": "Select Translation",

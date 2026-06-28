@@ -192,7 +192,9 @@
     "opBook": "book:al-kafi — limiter à un seul livre",
     "opTagType": "tag:ethics / type:legal_ruling — filtrer par étiquette ou type",
     "langBoth": "Votre langue + arabe",
-    "refineHint": "Affichage des meilleurs résultats — affinez votre recherche pour la restreindre"
+    "refineHint": "Affichage des meilleurs résultats — affinez votre recherche pour la restreindre",
+    "startTitle": "Rechercher dans la collection",
+    "startHint": "Trouvez des hadiths, des versets, des résumés et des traductions — dans votre langue et en arabe original."
   },
   "translation": {
     "selectTranslation": "Sélectionner la traduction",

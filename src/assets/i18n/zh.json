@@ -192,7 +192,9 @@
     "opBook": "book:al-kafi — 限定单本书",
     "opTagType": "tag:ethics / type:legal_ruling — 按标签或类型筛选",
     "langBoth": "你的语言 + 阿拉伯语",
-    "refineHint": "显示最相关的结果 — 优化搜索以缩小范围"
+    "refineHint": "显示最相关的结果 — 优化搜索以缩小范围",
+    "startTitle": "搜索文集",
+    "startHint": "查找圣训、经文、摘要和译文——以您的语言和阿拉伯语原文。"
   },
   "translation": {
     "selectTranslation": "选择翻译",

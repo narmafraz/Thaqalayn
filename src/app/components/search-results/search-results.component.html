@@ -50,8 +50,13 @@
     <span>{{ 'search.loadingFullText' | translate }}</span>
   </div>
 
-  <div *ngIf="(loading$ | async)" class="loading-container">
-    <mat-spinner diameter="48"></mat-spinner>
+  <!-- Skeleton placeholder cards while a search runs (replaces a bare spinner) -->
+  <div *ngIf="(loading$ | async)" class="results-list skeleton-list" aria-hidden="true">
+    <div class="result-card skeleton-card" *ngFor="let i of skeletonRows">
+      <div class="skeleton-line skeleton-head"></div>
+      <div class="skeleton-line skeleton-snippet"></div>
+      <div class="skeleton-line skeleton-snippet-short"></div>
+    </div>
   </div>
 
   <div *ngIf="(error$ | async) as error" class="error-message">
@@ -59,7 +64,28 @@
     <span>{{ error }}</span>
   </div>
 
-  <ng-container *ngIf="(results$ | async) as results">
+  <!-- First-run empty state: no query yet — show what search can do -->
+  <section class="search-empty" *ngIf="!(query$ | async) && !(loading$ | async) && !(error$ | async)">
+    <mat-icon class="search-empty-icon">travel_explore</mat-icon>
+    <h2 class="search-empty-title">{{ 'search.startTitle' | translate }}</h2>
+    <p class="search-empty-hint">{{ 'search.startHint' | translate }}</p>
+    <div class="search-tips-card">
+      <h3 class="search-tips-heading">
+        <mat-icon>tips_and_updates</mat-icon>{{ 'search.tipOperators' | translate }}
+      </h3>
+      <ul class="search-tips-list">
+        <li>{{ 'search.tipAllWords' | translate }}</li>
+        <li>{{ 'search.tipPhraseQuotes' | translate }}</li>
+        <li>{{ 'search.opTopic' | translate }}</li>
+        <li>{{ 'search.opPhrase' | translate }}</li>
+        <li>{{ 'search.opRef' | translate }}</li>
+        <li>{{ 'search.opBook' | translate }}</li>
+        <li>{{ 'search.opTagType' | translate }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <ng-container *ngIf="!(loading$ | async) && (results$ | async) as results">
     <p *ngIf="(query$ | async) as query" class="results-summary">
       <span *ngIf="results.length > 0">{{ results.length }}{{ (resultsCapped$ | async) ? '+' : '' }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
       <span *ngIf="results.length === 0 && !(loading$ | async)" class="no-results-message">

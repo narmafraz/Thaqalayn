@@ -45,6 +45,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   pathOnlyMode = false; // topic:/ref: results carry only paths -> lazy-load snippets
   displayedCount = 30;
   queryInput = ''; // the in-page search box (kept in sync with the active query)
+  readonly skeletonRows = [0, 1, 2, 3, 4]; // placeholder cards shown while a search runs
 
   // Path-only lazy-load: each card fetches its verse_detail as it scrolls into view.
   resolvedSnippets = new Map<string, string>();

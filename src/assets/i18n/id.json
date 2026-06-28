@@ -192,7 +192,9 @@
     "opBook": "book:al-kafi — batasi ke satu kitab",
     "opTagType": "tag:ethics / type:legal_ruling — saring berdasarkan tag atau jenis",
     "langBoth": "Bahasa Anda + Arab",
-    "refineHint": "Menampilkan hasil teratas — persempit dengan memperjelas pencarian"
+    "refineHint": "Menampilkan hasil teratas — persempit dengan memperjelas pencarian",
+    "startTitle": "Cari dalam koleksi",
+    "startHint": "Temukan hadis, ayat, ringkasan, dan terjemahan — dalam bahasa Anda dan dalam bahasa Arab asli."
   },
   "translation": {
     "selectTranslation": "Pilih terjemahan",

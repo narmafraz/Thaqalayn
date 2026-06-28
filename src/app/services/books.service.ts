@@ -137,6 +137,12 @@ export class BooksService {
   }
 
   private async getOfflinePart(index: string): Promise<Book | null> {
+    // Wait for data_version check to complete — it may have just cleared
+    // the CACHE_STORE because the corpus shipped a new version. Reading
+    // before this resolves can return a stale entry from the previous
+    // deploy. Downloaded books (STORE_NAME) are explicit user-installed
+    // bundles and intentionally NOT cleared by data_version.
+    await this.offlineStorage.dataVersionReady;
     // Check downloaded complete books first
     const fromBook = await this.offlineStorage.getPartFromBook(index);
     if (fromBook) return fromBook;

@@ -19,6 +19,7 @@ describe('BooksService', () => {
     getPartFromBook: jasmine.createSpy('getPartFromBook').and.returnValue(Promise.resolve(null)),
     getCachedResponse: jasmine.createSpy('getCachedResponse').and.returnValue(Promise.resolve(null)),
     cacheResponse: jasmine.createSpy('cacheResponse').and.returnValue(Promise.resolve()),
+    dataVersionReady: Promise.resolve(),
   };
 
   beforeEach(() => {

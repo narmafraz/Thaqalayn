@@ -46,9 +46,16 @@ export class OfflineStorageService {
 
   progress$: Observable<DownloadProgress> = this.progressSubject.asObservable();
 
+  /** Resolves once `checkDataVersion()` has run (cleared cache if needed) on
+   * the first call. Callers that read from CACHE_STORE / STORE_NAME on a
+   * route-load path should `await dataVersionReady` first; otherwise a
+   * stale entry can be returned before the SW-bypassing version check
+   * finishes. See https://… for the bug history. */
+  readonly dataVersionReady: Promise<void>;
+
   constructor(private http: HttpClient) {
     this.openDb();
-    this.checkDataVersion();
+    this.dataVersionReady = this.checkDataVersion();
   }
 
   /** Get list of books available for offline download */
@@ -211,11 +218,20 @@ export class OfflineStorageService {
     return null;
   }
 
-  /** Check if data version has changed and clear cache if so */
+  /** Check if data version has changed and clear cache if so.
+   *
+   * Bypasses the service worker via `fetch(..., { cache: 'no-store' })` +
+   * a cache-busting `?t=` param. The SW's `api-index` data group uses a
+   * 3-second freshness timeout, which on slow mobile networks falls back
+   * to the SW-cached (old) `data_version.json` — making the version
+   * "match" the stored one and skipping invalidation. We need an
+   * authoritative fresh read here, not a SW-mediated one. */
   private async checkDataVersion(): Promise<void> {
     try {
-      const url = environment.apiBaseUrl + 'index/data_version.json';
-      const data = await this.http.get<{ version: string }>(url).toPromise();
+      const url = `${environment.apiBaseUrl}index/data_version.json?t=${Date.now()}`;
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = (await response.json()) as { version?: string };
       if (!data?.version) return;
 
       const db = await this.getDb();

@@ -55,3 +55,15 @@ export function normalizeArabic(text: string): string {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+// Non-global (no /g -> .test() is not stateful) Arabic-script detector,
+// covering Arabic + Supplement + Presentation Forms A/B.
+const RE_HAS_ARABIC = new RegExp(
+  '[' + ([[0x0600, 0x06ff], [0x0750, 0x077f], [0xfb50, 0xfdff], [0xfe70, 0xfeff]] as [number, number][])
+    .map((r) => ch(r[0]) + '-' + ch(r[1])).join('') + ']',
+);
+
+/** True if the text contains any Arabic-script characters. */
+export function hasArabic(text: string): boolean {
+  return !!text && RE_HAS_ARABIC.test(text);
+}

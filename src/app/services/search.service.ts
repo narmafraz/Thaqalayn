@@ -128,7 +128,10 @@ export class SearchService {
     term: string, lang: string, filters: Record<string, string[]> = {}, limit = 1000,
   ): Promise<SearchOutcome> {
     const cleaned = Object.fromEntries(Object.entries(filters).filter(([, v]) => v && v.length));
-    const resp = await this.pagefind.search(lang, term, cleaned, limit);
+    // The Arabic index is normalized (diacritics stripped, letters folded) — apply
+    // the same normalization to the query so it matches.
+    const q = lang === 'ar' ? normalizeArabic(term) : term;
+    const resp = await this.pagefind.search(lang, q, cleaned, limit);
     if (!resp) { return { results: [], facets: {} }; }
 
     const results = resp.results.map((r) => this.pagefindToResult(r.url, r.excerpt));

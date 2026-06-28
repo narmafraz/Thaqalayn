@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { SearchMode, SearchResult, SearchService } from '@app/services/search.service';
 import { PagefindFilterCounts } from '@app/services/pagefind.service';
+import { hasArabic } from '@app/services/arabic-normalize';
 import { I18nService } from '@app/services/i18n.service';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
@@ -25,7 +26,7 @@ export interface SearchStateModel {
   name: 'search',
   defaults: {
     query: '',
-    mode: 'titles',
+    mode: 'fulltext', // content search by default (Pagefind fetches only per-query fragments)
     searchLang: 'en',
     results: [],
     facets: {},
@@ -127,10 +128,17 @@ export class SearchState {
     const state = ctx.getState();
     const isFullText = state.mode === 'fulltext';
 
+    // Arabic-script queries target the original Arabic text index (which every
+    // verse has), regardless of the selected UI/search language. Computed
+    // per-query (not persisted) so a following Latin-script query reverts to the
+    // chosen language. fa/ur are themselves Arabic-script, so leave those as-is.
+    const effectiveLang = hasArabic(query) && !['ar', 'fa', 'ur'].includes(state.searchLang)
+      ? 'ar' : state.searchLang;
+
     ctx.patchState({
       query,
       loading: true,
-      fullTextLoading: isFullText && !this.searchService.isFullTextLoaded(state.searchLang),
+      fullTextLoading: isFullText && !this.searchService.isFullTextLoaded(effectiveLang),
       error: undefined,
     });
 
@@ -138,7 +146,7 @@ export class SearchState {
       await this.searchService.loadTitlesIndex();
       if (!ctx.getState().indexReady) { ctx.patchState({ indexReady: true }); }
 
-      const outcome = await this.searchService.searchAll(query, state.mode, state.searchLang, state.activeFacets);
+      const outcome = await this.searchService.searchAll(query, state.mode, effectiveLang, state.activeFacets);
       ctx.patchState({
         results: outcome.results,
         facets: outcome.facets,

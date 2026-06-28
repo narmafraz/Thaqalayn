@@ -1,12 +1,13 @@
 import { AfterViewChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, inject, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SearchState } from '@store/search/search.state';
-import { ClearFacets, InitSearchIndex, SearchQuery, SetFacet, SetSearchLanguage, SetSearchMode } from '@store/search/search.actions';
+import { ClearFacets, HydrateSearch, InitSearchIndex, SetFacet, SetSearchLanguage, SetSearchMode } from '@store/search/search.actions';
 import { SearchMode, SearchResult } from '@app/services/search.service';
 import { PagefindFilterCounts, PagefindService } from '@app/services/pagefind.service';
 import { VerseLoaderService } from '@app/services/verse-loader.service';
 import { combineLatest, Observable, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 // label = data-derived display text (book/type/topic/tag values); labelKey = an
 // i18n key (group headers, and has_chain values) resolved via the translate pipe.
@@ -52,7 +53,11 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   private verseLoader = inject(VerseLoaderService);
   private el = inject(ElementRef);
 
-  constructor(private store: Store, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {}
+  // URL query-param <-> facet-filter name mappings (so a copied link reproduces the search).
+  private readonly PARAM_TO_FILTER: Record<string, string> = { book: 'book', type: 'content_type', chain: 'has_chain', topic: 'topic', tag: 'tag' };
+  private readonly FILTER_TO_PARAM: Record<string, string> = { book: 'book', content_type: 'type', has_chain: 'chain', topic: 'topic', tag: 'tag' };
+
+  constructor(private store: Store, private route: ActivatedRoute, private router: Router, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.store.dispatch(new InitSearchIndex());
@@ -65,12 +70,22 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
       }),
     );
 
+    // URL -> state. Guarded so our own URL writes (below) don't re-trigger a search.
     this.subscriptions.push(
       this.route.queryParamMap.subscribe((params) => {
-        const q = params.get('q');
-        this.pathOnlyMode = !!q && /^(topic|ref):/i.test(q.trim());
-        if (q) { this.store.dispatch(new SearchQuery(q)); }
+        const desired = this.parseParams(params);
+        this.pathOnlyMode = /^(topic|ref):/i.test(desired.query.trim());
+        if (this.differsFromState(desired)) {
+          this.store.dispatch(new HydrateSearch(desired));
+        }
       }),
+    );
+
+    // state -> URL, so a copied link reproduces the exact search (q + language + mode + facets).
+    this.subscriptions.push(
+      combineLatest([this.query$, this.mode$, this.searchLang$, this.activeFacets$])
+        .pipe(debounceTime(100))
+        .subscribe(() => this.writeUrl()),
     );
 
     this.subscriptions.push(
@@ -144,6 +159,53 @@ export class SearchResultsComponent implements OnInit, OnDestroy, AfterViewCheck
   loadMore(): void {
     this.displayedCount += 30;
     this.cdr.markForCheck();
+  }
+
+  // --- URL <-> state sync ---
+
+  private parseParams(params: ParamMap): { query: string; lang?: string; mode?: SearchMode; facets: Record<string, string[]> } {
+    const facets: Record<string, string[]> = {};
+    for (const [param, filter] of Object.entries(this.PARAM_TO_FILTER)) {
+      const v = params.get(param);
+      if (v) { facets[filter] = v.split(',').map((s) => s.trim()).filter(Boolean); }
+    }
+    const mode = params.get('mode');
+    return {
+      query: params.get('q') || '',
+      lang: params.get('lang') || undefined,
+      mode: mode === 'titles' || mode === 'fulltext' ? mode : undefined,
+      facets,
+    };
+  }
+
+  private differsFromState(d: { query: string; lang?: string; mode?: SearchMode; facets: Record<string, string[]> }): boolean {
+    if (d.query !== this.store.selectSnapshot(SearchState.getQuery)) { return true; }
+    if (d.lang && d.lang !== this.store.selectSnapshot(SearchState.getSearchLang)) { return true; }
+    if (d.mode && d.mode !== this.store.selectSnapshot(SearchState.getMode)) { return true; }
+    const cur = this.store.selectSnapshot(SearchState.getActiveFacets);
+    return JSON.stringify(this.sortFacets(d.facets)) !== JSON.stringify(this.sortFacets(cur));
+  }
+
+  private sortFacets(f: Record<string, string[]>): Record<string, string[]> {
+    const out: Record<string, string[]> = {};
+    for (const k of Object.keys(f).sort()) { out[k] = [...f[k]].sort(); }
+    return out;
+  }
+
+  private writeUrl(): void {
+    const query = this.store.selectSnapshot(SearchState.getQuery);
+    if (!query) { return; } // nothing to reproduce; leave the URL untouched
+    const facets = this.store.selectSnapshot(SearchState.getActiveFacets);
+    const queryParams: Record<string, string | null> = {
+      q: query,
+      lang: this.store.selectSnapshot(SearchState.getSearchLang),
+      mode: this.store.selectSnapshot(SearchState.getMode),
+    };
+    for (const [filter, param] of Object.entries(this.FILTER_TO_PARAM)) {
+      const vals = facets[filter];
+      queryParams[param] = vals && vals.length ? vals.join(',') : null; // null drops the param
+    }
+    this.router.navigate([], { relativeTo: this.route, queryParams, replaceUrl: true });
   }
 
   private buildFacetGroups(facets: PagefindFilterCounts, active: Record<string, string[]>): FacetGroup[] {

@@ -29,6 +29,17 @@ export class ClearFacets {
   public static readonly type = '[Search] Clear facets';
 }
 
+/** Restore a full search from URL params (query + language + mode + facets) in one shot. */
+export class HydrateSearch {
+  public static readonly type = '[Search] Hydrate';
+  constructor(public params: {
+    query?: string;
+    lang?: string;
+    mode?: SearchMode;
+    facets?: Record<string, string[]>;
+  }) { }
+}
+
 export class ClearSearch {
   public static readonly type = '[Search] Clear';
 }

@@ -4,7 +4,7 @@ import { PagefindFilterCounts } from '@app/services/pagefind.service';
 import { I18nService } from '@app/services/i18n.service';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import {
-  ClearFacets, ClearSearch, InitSearchIndex, SearchQuery,
+  ClearFacets, ClearSearch, HydrateSearch, InitSearchIndex, SearchQuery,
   SetFacet, SetSearchLanguage, SetSearchMode,
 } from './search.actions';
 
@@ -154,6 +154,19 @@ export class SearchState {
     } catch {
       ctx.patchState({ loading: false, fullTextLoading: false, error: 'Search failed' });
     }
+  }
+
+  // Restore a full search from the URL (query + language + mode + facets) in one
+  // shot, then run a single search.
+  @Action(HydrateSearch)
+  public hydrate(ctx: StateContext<SearchStateModel>, action: HydrateSearch) {
+    const p = action.params;
+    const patch: Partial<SearchStateModel> = {};
+    if (p.lang) { patch.searchLang = p.lang; }
+    if (p.mode) { patch.mode = p.mode; }
+    if (p.facets) { patch.activeFacets = p.facets; }
+    if (Object.keys(patch).length) { ctx.patchState(patch); }
+    ctx.dispatch(new SearchQuery(p.query || ''));
   }
 
   @Action(ClearSearch)

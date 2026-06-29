@@ -1,39 +1,48 @@
-<ng-container *ngIf="(book$ | async) as book">
+@if ((book$ | async); as book) {
   <app-settings></app-settings>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author"></app-book-titles>
-  <div class="chapter-toolbar" *ngIf="getVerseCount(book) >= 10">
-    <div class="jump-to-verse-inline">
-      <mat-form-field appearance="outline" class="jump-input">
-        <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
-        <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
-          <ng-container *ngIf="isShellFormat; else legacyJump">
-            <ng-container *ngFor="let ref of verseRefs">
-              <mat-option *ngIf="ref.part_type === 'Hadith' || ref.part_type === 'Verse'"
-                          [value]="ref.local_index">
-                {{ translatedPartType(ref.part_type) }} {{ ref.local_index }}
-              </mat-option>
-            </ng-container>
-          </ng-container>
-          <ng-template #legacyJump>
-            <ng-container *ngFor="let verse of book.data.verses; let i = index">
-              <mat-option *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'"
-                          [value]="verse.local_index">
-                {{ translatedPartType(verse.part_type) }} {{ verse.local_index }}
-              </mat-option>
-            </ng-container>
-          </ng-template>
-        </mat-select>
-      </mat-form-field>
+  @if (getVerseCount(book) >= 10) {
+    <div class="chapter-toolbar">
+      <div class="jump-to-verse-inline">
+        <mat-form-field appearance="outline" class="jump-input">
+          <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
+          <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
+            @if (isShellFormat) {
+              @for (ref of verseRefs; track ref) {
+                @if (ref.part_type === 'Hadith' || ref.part_type === 'Verse') {
+                  <mat-option
+                    [value]="ref.local_index">
+                    {{ translatedPartType(ref.part_type) }} {{ ref.local_index }}
+                  </mat-option>
+                }
+              }
+            } @else {
+              @for (verse of book.data.verses; track verse; let i = $index) {
+                @if (verse.part_type === 'Hadith' || verse.part_type === 'Verse') {
+                  <mat-option
+                    [value]="verse.local_index">
+                    {{ translatedPartType(verse.part_type) }} {{ verse.local_index }}
+                  </mat-option>
+                }
+              }
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
     </div>
-  </div>
+  }
   <!-- Shell format: lazy-load verses via verse_refs -->
-  <ng-container *ngIf="isShellFormat">
-    <ng-container *ngFor="let ref of verseRefs; trackBy: trackByRef">
-      <app-book-titles *ngIf="ref.part_type === 'Heading'" [verse]="ref.inline" [headingLevel]="2"></app-book-titles>
-      <ng-container *ngIf="ref.part_type === 'Hadith' || ref.part_type === 'Verse'">
-        <ng-container *ngIf="loadedVerses.get(ref.path!) as verse; else skeleton">
+  @if (isShellFormat) {
+    @for (ref of verseRefs; track trackByRef($index, ref)) {
+      @if (ref.part_type === 'Heading') {
+        <app-book-titles [verse]="ref.inline" [headingLevel]="2"></app-book-titles>
+      }
+      @if (ref.part_type === 'Hadith' || ref.part_type === 'Verse') {
+        @if (loadedVerses.get(ref.path!); as verse) {
           <mat-card appearance="outlined" [attr.data-path]="ref.path" [class.verse-read]="readPaths.has(ref.path || '')">
-            <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ ref.local_index }}</span>
+            @if (!isQuranBook(book.index)) {
+              <span class="hadith-number" aria-hidden="true">#{{ ref.local_index }}</span>
+            }
             <mat-card-title>
               <div class="titles">
                 <a [id]="'h' + ref.local_index" style="visibility: hidden"></a>
@@ -41,134 +50,165 @@
             </mat-card-title>
             <mat-card-content>
               <app-verse-text #vt [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index" [showToggles]="false"></app-verse-text>
-              <div class="ai-badges-inline" *ngIf="(showContentTypeBadges && verse.ai?.content_type) || (showTopicTags && verse.ai?.tags?.length) || verse.ai?.related_quran?.length || hasRelations(verse)">
-                <a class="ai-content-type-chip" *ngIf="showContentTypeBadges && verse.ai?.content_type"
-                   [routerLink]="['/search']"
-                   [queryParams]="{q: 'type:' + verse.ai.content_type}"
-                   queryParamsHandling="merge">
-                  {{ getContentTypeLabel(verse.ai.content_type) }}
-                </a>
-                <ng-container *ngIf="showTopicTags">
-                  <a class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags"
-                     [routerLink]="['/search']"
-                     [queryParams]="{q: 'tag:' + tag}"
-                     queryParamsHandling="merge">
-                    {{ formatLabel(tag) }}
-                  </a>
-                </ng-container>
-                <ng-container *ngIf="verse.ai?.related_quran?.length">
-                  <a class="ai-quran-chip" *ngFor="let qref of verse.ai.related_quran"
-                     [routerLink]="['/books', getQuranRefLink(qref.ref)]"
-                     [fragment]="getQuranRefFragment(qref.ref)"
-                     queryParamsHandling="preserve">
-                    {{ qref.ref }} <span class="ai-quran-rel-suffix">{{ qref.relationship }}</span>
-                  </a>
-                </ng-container>
-                <ng-container *ngIf="verse.relations as relations">
-                  <ng-container *ngFor="let relation of relations | keyvalue">
-                    <span class="ai-relation-type-label">{{ relation.key }}:</span>
-                    <a class="ai-relation-chip" *ngFor="let rLink of relation.value"
-                       [routerLink]="['/books', stripBooksPrefix(rLink)]"
-                       queryParamsHandling="preserve">
-                      {{ formatRelationPath(rLink) }}
+              @if ((showContentTypeBadges && verse.ai?.content_type) || (showTopicTags && verse.ai?.tags?.length) || verse.ai?.related_quran?.length || hasRelations(verse)) {
+                <div class="ai-badges-inline">
+                  @if (showContentTypeBadges && verse.ai?.content_type) {
+                    <a class="ai-content-type-chip"
+                      [routerLink]="['/search']"
+                      [queryParams]="{q: 'type:' + verse.ai.content_type}"
+                      queryParamsHandling="merge">
+                      {{ getContentTypeLabel(verse.ai.content_type) }}
                     </a>
-                  </ng-container>
-                </ng-container>
-              </div>
+                  }
+                  @if (showTopicTags) {
+                    @for (tag of verse.ai?.tags; track tag) {
+                      <a class="ai-tag-chip"
+                        [routerLink]="['/search']"
+                        [queryParams]="{q: 'tag:' + tag}"
+                        queryParamsHandling="merge">
+                        {{ formatLabel(tag) }}
+                      </a>
+                    }
+                  }
+                  @if (verse.ai?.related_quran?.length) {
+                    @for (qref of verse.ai.related_quran; track qref) {
+                      <a class="ai-quran-chip"
+                        [routerLink]="['/books', getQuranRefLink(qref.ref)]"
+                        [fragment]="getQuranRefFragment(qref.ref)"
+                        queryParamsHandling="preserve">
+                        {{ qref.ref }} <span class="ai-quran-rel-suffix">{{ qref.relationship }}</span>
+                      </a>
+                    }
+                  }
+                  @if (verse.relations; as relations) {
+                    @for (relation of relations | keyvalue; track relation) {
+                      <span class="ai-relation-type-label">{{ relation.key }}:</span>
+                      @for (rLink of relation.value; track rLink) {
+                        <a class="ai-relation-chip"
+                          [routerLink]="['/books', stripBooksPrefix(rLink)]"
+                          queryParamsHandling="preserve">
+                          {{ formatRelationPath(rLink) }}
+                        </a>
+                      }
+                    }
+                  }
+                </div>
+              }
             </mat-card-content>
             <mat-card-footer>
-              <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
-                <div class="refLink">
-                  <app-verse-actions
-                    [versePath]="book.index + ':' + verse.local_index"
-                    [verse]="verse"
-                    [bookTitle]="getBookName(crumbs) || book.data.titles?.en || book.index"
-                    [preferredTranslation]="(translation$ | async)"
-                    [isBookmarked]="isVerseBookmarked(book.index, verse)"
-                    [hasNote]="hasNote(book.index, verse)"
-                    [isRead]="isVerseRead(book.index, verse)"
-                    [isGeneratingImage]="generatingImageIndex === verse.local_index"
-                    [detailPath]="book.index + ':' + verse.local_index"
-                    [anchorFragment]="'h' + verse.local_index"
-                    [isQuran]="isQuranBook(book.index)"
-                    [isPlaying]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index)"
-                    [isTafsirExpanded]="expandedTafsir.has(verse.local_index)"
-                    (bookmarkToggle)="toggleVerseBookmark(book.index, verse, crumbs)"
-                    (noteToggle)="toggleNoteEditor(book.index, verse)"
-                    (imageShare)="shareAsImage(book, verse, crumbs)"
-                    (audioToggle)="toggleAudio(book.index, verse.local_index)"
-                    (tafsirToggle)="toggleTafsir(book.index, verse.local_index)"
-                    (readToggle)="toggleVerseRead(book.index, verse)"
-                    (markUpTo)="markReadUpTo(book.index, verse)">
-                  </app-verse-actions>
-                </div>
-                <div class="grading-inline" *ngIf="verse.gradings?.length">
-                  <ng-container *ngFor="let g of verse.gradings">
-                    <span [class]="'grading-chip ' + parseGrading(g).cssClass"
+              @if ((crumbs$ | async); as crumbs) {
+                <div class="ref">
+                  <div class="refLink">
+                    <app-verse-actions
+                      [versePath]="book.index + ':' + verse.local_index"
+                      [verse]="verse"
+                      [bookTitle]="getBookName(crumbs) || book.data.titles?.en || book.index"
+                      [preferredTranslation]="(translation$ | async)"
+                      [isBookmarked]="isVerseBookmarked(book.index, verse)"
+                      [hasNote]="hasNote(book.index, verse)"
+                      [isRead]="isVerseRead(book.index, verse)"
+                      [isGeneratingImage]="generatingImageIndex === verse.local_index"
+                      [detailPath]="book.index + ':' + verse.local_index"
+                      [anchorFragment]="'h' + verse.local_index"
+                      [isQuran]="isQuranBook(book.index)"
+                      [isPlaying]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index)"
+                      [isTafsirExpanded]="expandedTafsir.has(verse.local_index)"
+                      (bookmarkToggle)="toggleVerseBookmark(book.index, verse, crumbs)"
+                      (noteToggle)="toggleNoteEditor(book.index, verse)"
+                      (imageShare)="shareAsImage(book, verse, crumbs)"
+                      (audioToggle)="toggleAudio(book.index, verse.local_index)"
+                      (tafsirToggle)="toggleTafsir(book.index, verse.local_index)"
+                      (readToggle)="toggleVerseRead(book.index, verse)"
+                      (markUpTo)="markReadUpTo(book.index, verse)">
+                    </app-verse-actions>
+                  </div>
+                  @if (verse.gradings?.length) {
+                    <div class="grading-inline">
+                      @for (g of $any(verse.gradings); track g) {
+                        <span [class]="'grading-chip ' + parseGrading(g).cssClass"
                           [matTooltip]="g">
-                      {{ parseGrading(g).term || '?' }}
-                    </span>
-                  </ng-container>
+                          {{ parseGrading(g).term || '?' }}
+                        </span>
+                      }
+                    </div>
+                  }
+                  <button class="metadata-toggle-btn"
+                    (click)="toggleMetadata(verse.local_index)"
+                    [attr.aria-label]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)"
+                    [matTooltip]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)">
+                    <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                  </button>
+                  @if (isMetadataExpanded(verse.local_index)) {
+                    <div class="secondary-metadata">
+                      <div>{{ 'book.reference' | translate }}</div>
+                      <div>{{getBookName(crumbs)}} {{verse.index}}</div>
+                      <div>{{ 'book.inBookReference' | translate }}</div>
+                      <div>{{getInBookReference(crumbs, verse)}}</div>
+                    </div>
+                  }
                 </div>
-                <button class="metadata-toggle-btn"
-                        (click)="toggleMetadata(verse.local_index)"
-                        [attr.aria-label]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)"
-                        [matTooltip]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)">
-                  <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
-                </button>
-                <div class="secondary-metadata" *ngIf="isMetadataExpanded(verse.local_index)">
-                  <div>{{ 'book.reference' | translate }}</div>
-                  <div>{{getBookName(crumbs)}} {{verse.index}}</div>
-                  <div>{{ 'book.inBookReference' | translate }}</div>
-                  <div>{{getInBookReference(crumbs, verse)}}</div>
-                </div>
-              </div>
+              }
             </mat-card-footer>
-            <div class="note-display" *ngIf="hasNote(book.index, verse) && !isEditingNote(book.index, verse)">
-              <mat-icon class="note-icon">sticky_note_2</mat-icon>
-              <p class="note-text">{{ getNoteText(book.index, verse) }}</p>
-            </div>
-            <div class="note-editor" *ngIf="isEditingNote(book.index, verse)">
-              <textarea [(ngModel)]="editingNoteText"
-                        [placeholder]="'annotation.placeholder' | translate"
-                        rows="3"
-                        class="note-textarea"
-                        [attr.aria-label]="'annotation.personalNote' | translate"></textarea>
-              <div class="note-actions">
-                <button mat-raised-button color="primary" (click)="saveNote(book.index, verse)">
-                  <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
-                </button>
-                <button mat-button (click)="editingNotePath = null">
-                  {{ 'annotation.cancel' | translate }}
-                </button>
-                <button mat-button color="warn" *ngIf="hasNote(book.index, verse)" (click)="deleteNote(book.index, verse)">
-                  <mat-icon>delete</mat-icon> {{ 'annotation.delete' | translate }}
-                </button>
+            @if (hasNote(book.index, verse) && !isEditingNote(book.index, verse)) {
+              <div class="note-display">
+                <mat-icon class="note-icon">sticky_note_2</mat-icon>
+                <p class="note-text">{{ getNoteText(book.index, verse) }}</p>
               </div>
-            </div>
-            <div class="tafsir-panel" *ngIf="expandedTafsir.has(verse.local_index)">
-              <div class="tafsir-header">
-                <mat-icon class="tafsir-icon">auto_stories</mat-icon>
-                <span class="tafsir-label">{{ 'book.tafsir' | translate }}</span>
-                <mat-select class="tafsir-select"
-                           [(ngModel)]="selectedTafsirEdition"
-                           (selectionChange)="onTafsirEditionChange(book.index)"
-                           [attr.aria-label]="'book.tafsir' | translate">
-                  <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.id">{{ ed.name_en }} ({{ ed.language }})</mat-option>
-                </mat-select>
+            }
+            @if (isEditingNote(book.index, verse)) {
+              <div class="note-editor">
+                <textarea [(ngModel)]="editingNoteText"
+                  [placeholder]="'annotation.placeholder' | translate"
+                  rows="3"
+                  class="note-textarea"
+                [attr.aria-label]="'annotation.personalNote' | translate"></textarea>
+                <div class="note-actions">
+                  <button mat-raised-button color="primary" (click)="saveNote(book.index, verse)">
+                    <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
+                  </button>
+                  <button mat-button (click)="editingNotePath = null">
+                    {{ 'annotation.cancel' | translate }}
+                  </button>
+                  @if (hasNote(book.index, verse)) {
+                    <button mat-button color="warn" (click)="deleteNote(book.index, verse)">
+                      <mat-icon>delete</mat-icon> {{ 'annotation.delete' | translate }}
+                    </button>
+                  }
+                </div>
               </div>
-              <div class="tafsir-loading" *ngIf="loadingTafsir.has(verse.local_index)">
-                <mat-spinner diameter="20"></mat-spinner>
-                {{ 'book.loadingCommentary' | translate }}
+            }
+            @if (expandedTafsir.has(verse.local_index)) {
+              <div class="tafsir-panel">
+                <div class="tafsir-header">
+                  <mat-icon class="tafsir-icon">auto_stories</mat-icon>
+                  <span class="tafsir-label">{{ 'book.tafsir' | translate }}</span>
+                  <mat-select class="tafsir-select"
+                    [(ngModel)]="selectedTafsirEdition"
+                    (selectionChange)="onTafsirEditionChange(book.index)"
+                    [attr.aria-label]="'book.tafsir' | translate">
+                    @for (ed of tafsirEditions; track ed) {
+                      <mat-option [value]="ed.id">{{ ed.name_en }} ({{ ed.language }})</mat-option>
+                    }
+                  </mat-select>
+                </div>
+                @if (loadingTafsir.has(verse.local_index)) {
+                  <div class="tafsir-loading">
+                    <mat-spinner diameter="20"></mat-spinner>
+                    {{ 'book.loadingCommentary' | translate }}
+                  </div>
+                }
+                @if (!loadingTafsir.has(verse.local_index)) {
+                  <p class="tafsir-text"
+                  [innerHTML]="expandedTafsir.get(verse.local_index)"></p>
+                }
               </div>
-              <p class="tafsir-text" *ngIf="!loadingTafsir.has(verse.local_index)"
-                 [innerHTML]="expandedTafsir.get(verse.local_index)"></p>
-            </div>
+            }
           </mat-card>
-        </ng-container>
-        <ng-template #skeleton>
+        } @else {
           <mat-card appearance="outlined" class="verse-skeleton" [attr.data-path]="ref.path">
-            <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ ref.local_index }}</span>
+            @if (!isQuranBook(book.index)) {
+              <span class="hadith-number" aria-hidden="true">#{{ ref.local_index }}</span>
+            }
             <mat-card-title>
               <div class="titles">
                 <a [id]="'h' + ref.local_index" style="visibility: hidden"></a>
@@ -179,175 +219,211 @@
               <div class="skeleton-line skeleton-translation"></div>
             </mat-card-content>
           </mat-card>
-        </ng-template>
-      </ng-container>
-    </ng-container>
-  </ng-container>
-
+        }
+      }
+    }
+  }
   <!-- Legacy format: inline verses -->
-  <ng-container *ngIf="!isShellFormat">
-  <ng-container *ngFor="let verse of book.data.verses">
-    <app-book-titles *ngIf="verse.part_type === 'Heading'" [verse]="verse" [headingLevel]="2"></app-book-titles>
-    <mat-card appearance="outlined" *ngIf="verse.part_type === 'Hadith' || verse.part_type === 'Verse'"
-              [attr.data-path]="getVersePath(book.index, verse)"
-              [class.verse-read]="readPaths.has(getVersePath(book.index, verse))">
-      <span class="hadith-number" *ngIf="!isQuranBook(book.index)" aria-hidden="true">#{{ verse.local_index }}</span>
-      <mat-card-title>
-        <div class="titles">
-          <a [id]="'h' + verse.local_index" style="visibility: hidden"></a>
-        </div>
-      </mat-card-title>
-      <mat-card-content>
-        <app-verse-text #vt [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index" [showToggles]="false"></app-verse-text>
-        <div class="ai-badges-inline" *ngIf="(showContentTypeBadges && verse.ai?.content_type) || (showTopicTags && verse.ai?.tags?.length) || verse.ai?.related_quran?.length || hasRelations(verse)">
-          <a class="ai-content-type-chip" *ngIf="showContentTypeBadges && verse.ai?.content_type"
-             [routerLink]="['/search']"
-             [queryParams]="{q: 'type:' + verse.ai.content_type}"
-             queryParamsHandling="merge">
-            {{ getContentTypeLabel(verse.ai.content_type) }}
-          </a>
-          <ng-container *ngIf="showTopicTags">
-            <a class="ai-tag-chip" *ngFor="let tag of verse.ai?.tags"
-               [routerLink]="['/search']"
-               [queryParams]="{q: 'tag:' + tag}"
-               queryParamsHandling="merge">
-              {{ formatLabel(tag) }}
-            </a>
-          </ng-container>
-          <ng-container *ngIf="verse.ai?.related_quran?.length">
-            <a class="ai-quran-chip" *ngFor="let qref of verse.ai.related_quran"
-               [routerLink]="['/books', getQuranRefLink(qref.ref)]"
-               [fragment]="getQuranRefFragment(qref.ref)"
-               queryParamsHandling="preserve">
-              {{ qref.ref }} <span class="ai-quran-rel-suffix">{{ qref.relationship }}</span>
-            </a>
-          </ng-container>
-          <ng-container *ngIf="verse.relations as relations">
-            <ng-container *ngFor="let relation of relations | keyvalue">
-              <span class="ai-relation-type-label">{{ relation.key }}:</span>
-              <a class="ai-relation-chip" *ngFor="let rLink of relation.value"
-                 [routerLink]="['/books', stripBooksPrefix(rLink)]"
-                 queryParamsHandling="preserve">
-                {{ formatRelationPath(rLink) }}
-              </a>
-            </ng-container>
-          </ng-container>
-        </div>
-      </mat-card-content>
-      <mat-card-footer>
-        <div class="ref" *ngIf="(crumbs$ | async) as crumbs">
-          <div class="refLink">
-            <app-verse-actions
-              [versePath]="book.index + ':' + verse.local_index"
-              [verse]="verse"
-              [bookTitle]="getBookName(crumbs) || book.data.titles?.en || book.index"
-              [preferredTranslation]="(translation$ | async)"
-              [isBookmarked]="isVerseBookmarked(book.index, verse)"
-              [hasNote]="hasNote(book.index, verse)"
-              [isGeneratingImage]="generatingImageIndex === verse.local_index"
-              [detailPath]="book.index + ':' + verse.local_index"
-              [anchorFragment]="'h' + verse.local_index"
-              [isQuran]="isQuranBook(book.index)"
-              [isPlaying]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index)"
-              [isTafsirExpanded]="expandedTafsir.has(verse.local_index)"
-              (bookmarkToggle)="toggleVerseBookmark(book.index, verse, crumbs)"
-              (noteToggle)="toggleNoteEditor(book.index, verse)"
-              (imageShare)="shareAsImage(book, verse, crumbs)"
-              (audioToggle)="toggleAudio(book.index, verse.local_index)"
-              (tafsirToggle)="toggleTafsir(book.index, verse.local_index)">
-            </app-verse-actions>
-          </div>
-          <!-- Grading badges: always visible -->
-          <div class="grading-inline" *ngIf="verse.gradings?.length">
-            <ng-container *ngFor="let g of verse.gradings">
-              <span [class]="'grading-chip ' + parseGrading(g).cssClass"
-                    [matTooltip]="g">
-                {{ parseGrading(g).term || '?' }}
-              </span>
-            </ng-container>
-          </div>
-          <!-- Expand/collapse toggle for secondary metadata -->
-          <button class="metadata-toggle-btn"
+  @if (!isShellFormat) {
+    @for (verse of book.data.verses; track verse) {
+      @if (verse.part_type === 'Heading') {
+        <app-book-titles [verse]="verse" [headingLevel]="2"></app-book-titles>
+      }
+      @if (verse.part_type === 'Hadith' || verse.part_type === 'Verse') {
+        <mat-card appearance="outlined"
+          [attr.data-path]="getVersePath(book.index, verse)"
+          [class.verse-read]="readPaths.has(getVersePath(book.index, verse))">
+          @if (!isQuranBook(book.index)) {
+            <span class="hadith-number" aria-hidden="true">#{{ verse.local_index }}</span>
+          }
+          <mat-card-title>
+            <div class="titles">
+              <a [id]="'h' + verse.local_index" style="visibility: hidden"></a>
+            </div>
+          </mat-card-title>
+          <mat-card-content>
+            <app-verse-text #vt [verse]="verse" [isQuran]="isQuranBook(book.index)" [verseNumber]="verse.local_index" [showToggles]="false"></app-verse-text>
+            @if ((showContentTypeBadges && verse.ai?.content_type) || (showTopicTags && verse.ai?.tags?.length) || verse.ai?.related_quran?.length || hasRelations(verse)) {
+              <div class="ai-badges-inline">
+                @if (showContentTypeBadges && verse.ai?.content_type) {
+                  <a class="ai-content-type-chip"
+                    [routerLink]="['/search']"
+                    [queryParams]="{q: 'type:' + verse.ai.content_type}"
+                    queryParamsHandling="merge">
+                    {{ getContentTypeLabel(verse.ai.content_type) }}
+                  </a>
+                }
+                @if (showTopicTags) {
+                  @for (tag of verse.ai?.tags; track tag) {
+                    <a class="ai-tag-chip"
+                      [routerLink]="['/search']"
+                      [queryParams]="{q: 'tag:' + tag}"
+                      queryParamsHandling="merge">
+                      {{ formatLabel(tag) }}
+                    </a>
+                  }
+                }
+                @if (verse.ai?.related_quran?.length) {
+                  @for (qref of verse.ai.related_quran; track qref) {
+                    <a class="ai-quran-chip"
+                      [routerLink]="['/books', getQuranRefLink(qref.ref)]"
+                      [fragment]="getQuranRefFragment(qref.ref)"
+                      queryParamsHandling="preserve">
+                      {{ qref.ref }} <span class="ai-quran-rel-suffix">{{ qref.relationship }}</span>
+                    </a>
+                  }
+                }
+                @if (verse.relations; as relations) {
+                  @for (relation of relations | keyvalue; track relation) {
+                    <span class="ai-relation-type-label">{{ relation.key }}:</span>
+                    @for (rLink of relation.value; track rLink) {
+                      <a class="ai-relation-chip"
+                        [routerLink]="['/books', stripBooksPrefix(rLink)]"
+                        queryParamsHandling="preserve">
+                        {{ formatRelationPath(rLink) }}
+                      </a>
+                    }
+                  }
+                }
+              </div>
+            }
+          </mat-card-content>
+          <mat-card-footer>
+            @if ((crumbs$ | async); as crumbs) {
+              <div class="ref">
+                <div class="refLink">
+                  <app-verse-actions
+                    [versePath]="book.index + ':' + verse.local_index"
+                    [verse]="verse"
+                    [bookTitle]="getBookName(crumbs) || book.data.titles?.en || book.index"
+                    [preferredTranslation]="(translation$ | async)"
+                    [isBookmarked]="isVerseBookmarked(book.index, verse)"
+                    [hasNote]="hasNote(book.index, verse)"
+                    [isGeneratingImage]="generatingImageIndex === verse.local_index"
+                    [detailPath]="book.index + ':' + verse.local_index"
+                    [anchorFragment]="'h' + verse.local_index"
+                    [isQuran]="isQuranBook(book.index)"
+                    [isPlaying]="audioService.isPlayingAyah(getQuranSurah(book.index), verse.local_index)"
+                    [isTafsirExpanded]="expandedTafsir.has(verse.local_index)"
+                    (bookmarkToggle)="toggleVerseBookmark(book.index, verse, crumbs)"
+                    (noteToggle)="toggleNoteEditor(book.index, verse)"
+                    (imageShare)="shareAsImage(book, verse, crumbs)"
+                    (audioToggle)="toggleAudio(book.index, verse.local_index)"
+                    (tafsirToggle)="toggleTafsir(book.index, verse.local_index)">
+                  </app-verse-actions>
+                </div>
+                <!-- Grading badges: always visible -->
+                @if (verse.gradings?.length) {
+                  <div class="grading-inline">
+                    @for (g of $any(verse.gradings); track g) {
+                      <span [class]="'grading-chip ' + parseGrading(g).cssClass"
+                        [matTooltip]="g">
+                        {{ parseGrading(g).term || '?' }}
+                      </span>
+                    }
+                  </div>
+                }
+                <!-- Expand/collapse toggle for secondary metadata -->
+                <button class="metadata-toggle-btn"
                   (click)="toggleMetadata(verse.local_index)"
                   [attr.aria-label]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)"
                   [matTooltip]="isMetadataExpanded(verse.local_index) ? ('tooltip.hideDetails' | translate) : ('tooltip.showDetails' | translate)">
-            <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
-          </button>
-          <!-- Collapsible secondary metadata -->
-          <div class="secondary-metadata" *ngIf="isMetadataExpanded(verse.local_index)">
-            <div>{{ 'book.reference' | translate }}</div>
-            <div>{{getBookName(crumbs)}} {{verse.index}}</div>
-            <div>{{ 'book.inBookReference' | translate }}</div>
-            <div>{{getInBookReference(crumbs, verse)}}</div>
-          </div>
-        </div>
-      </mat-card-footer>
-
-      <!-- Note display -->
-      <div class="note-display" *ngIf="hasNote(book.index, verse) && !isEditingNote(book.index, verse)">
-        <mat-icon class="note-icon">sticky_note_2</mat-icon>
-        <p class="note-text">{{ getNoteText(book.index, verse) }}</p>
-      </div>
-
-      <!-- Note editor -->
-      <div class="note-editor" *ngIf="isEditingNote(book.index, verse)">
-        <textarea [(ngModel)]="editingNoteText"
-                  [placeholder]="'annotation.placeholder' | translate"
-                  rows="3"
-                  class="note-textarea"
-                  [attr.aria-label]="'annotation.personalNote' | translate"></textarea>
-        <div class="note-actions">
-          <button mat-raised-button color="primary" (click)="saveNote(book.index, verse)">
-            <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
-          </button>
-          <button mat-button (click)="editingNotePath = null">
-            {{ 'annotation.cancel' | translate }}
-          </button>
-          <button mat-button color="warn" *ngIf="hasNote(book.index, verse)" (click)="deleteNote(book.index, verse)">
-            <mat-icon>delete</mat-icon> {{ 'annotation.delete' | translate }}
-          </button>
-        </div>
-      </div>
-
-      <!-- Tafsir (Quran commentary) -->
-      <div class="tafsir-panel" *ngIf="expandedTafsir.has(verse.local_index)">
-        <div class="tafsir-header">
-          <mat-icon class="tafsir-icon">auto_stories</mat-icon>
-          <span class="tafsir-label">{{ 'book.tafsir' | translate }}</span>
-          <mat-select class="tafsir-select"
-                     [(ngModel)]="selectedTafsirEdition"
-                     (selectionChange)="onTafsirEditionChange(book.index)"
-                     [attr.aria-label]="'book.tafsir' | translate">
-            <mat-option *ngFor="let ed of tafsirEditions" [value]="ed.id">{{ ed.name_en }} ({{ ed.language }})</mat-option>
-          </mat-select>
-        </div>
-        <div class="tafsir-loading" *ngIf="loadingTafsir.has(verse.local_index)">
-          <mat-spinner diameter="20"></mat-spinner>
-          {{ 'book.loadingCommentary' | translate }}
-        </div>
-        <p class="tafsir-text" *ngIf="!loadingTafsir.has(verse.local_index)"
-           [innerHTML]="expandedTafsir.get(verse.local_index)"></p>
-      </div>
-    </mat-card>
-  </ng-container>
-  </ng-container>
-
+                  <mat-icon>{{ isMetadataExpanded(verse.local_index) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+                <!-- Collapsible secondary metadata -->
+                @if (isMetadataExpanded(verse.local_index)) {
+                  <div class="secondary-metadata">
+                    <div>{{ 'book.reference' | translate }}</div>
+                    <div>{{getBookName(crumbs)}} {{verse.index}}</div>
+                    <div>{{ 'book.inBookReference' | translate }}</div>
+                    <div>{{getInBookReference(crumbs, verse)}}</div>
+                  </div>
+                }
+              </div>
+            }
+          </mat-card-footer>
+          <!-- Note display -->
+          @if (hasNote(book.index, verse) && !isEditingNote(book.index, verse)) {
+            <div class="note-display">
+              <mat-icon class="note-icon">sticky_note_2</mat-icon>
+              <p class="note-text">{{ getNoteText(book.index, verse) }}</p>
+            </div>
+          }
+          <!-- Note editor -->
+          @if (isEditingNote(book.index, verse)) {
+            <div class="note-editor">
+              <textarea [(ngModel)]="editingNoteText"
+                [placeholder]="'annotation.placeholder' | translate"
+                rows="3"
+                class="note-textarea"
+              [attr.aria-label]="'annotation.personalNote' | translate"></textarea>
+              <div class="note-actions">
+                <button mat-raised-button color="primary" (click)="saveNote(book.index, verse)">
+                  <mat-icon>save</mat-icon> {{ 'annotation.save' | translate }}
+                </button>
+                <button mat-button (click)="editingNotePath = null">
+                  {{ 'annotation.cancel' | translate }}
+                </button>
+                @if (hasNote(book.index, verse)) {
+                  <button mat-button color="warn" (click)="deleteNote(book.index, verse)">
+                    <mat-icon>delete</mat-icon> {{ 'annotation.delete' | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+          <!-- Tafsir (Quran commentary) -->
+          @if (expandedTafsir.has(verse.local_index)) {
+            <div class="tafsir-panel">
+              <div class="tafsir-header">
+                <mat-icon class="tafsir-icon">auto_stories</mat-icon>
+                <span class="tafsir-label">{{ 'book.tafsir' | translate }}</span>
+                <mat-select class="tafsir-select"
+                  [(ngModel)]="selectedTafsirEdition"
+                  (selectionChange)="onTafsirEditionChange(book.index)"
+                  [attr.aria-label]="'book.tafsir' | translate">
+                  @for (ed of tafsirEditions; track ed) {
+                    <mat-option [value]="ed.id">{{ ed.name_en }} ({{ ed.language }})</mat-option>
+                  }
+                </mat-select>
+              </div>
+              @if (loadingTafsir.has(verse.local_index)) {
+                <div class="tafsir-loading">
+                  <mat-spinner diameter="20"></mat-spinner>
+                  {{ 'book.loadingCommentary' | translate }}
+                </div>
+              }
+              @if (!loadingTafsir.has(verse.local_index)) {
+                <p class="tafsir-text"
+                [innerHTML]="expandedTafsir.get(verse.local_index)"></p>
+              }
+            </div>
+          }
+        </mat-card>
+      }
+    }
+  }
   <!-- Related chapters in other books (RE-15: unread first, faded if read) -->
-  <section class="related-chapters-section" *ngIf="relatedChapters?.length">
-    <h3>{{ 'book.relatedChapters' | translate }}</h3>
-    <div class="related-chapters-list">
-      <a *ngFor="let rc of relatedChapters"
-         class="related-chapter-card"
-         [class.related-chapter-read]="rc.isRead"
-         [routerLink]="['/books', stripBooksPrefix(rc.path)]"
-         queryParamsHandling="preserve"
-         [matTooltip]="rc.isRead ? ('reading.alreadyRead' | translate) : ''">
-        <span class="related-book-name">{{ rc.book }}</span>
-        <span class="related-chapter-title">{{ rc.title }}</span>
-        <span *ngIf="rc.isRead" class="related-chapter-check" aria-hidden="true">✓</span>
-      </a>
-    </div>
-  </section>
-
+  @if (relatedChapters?.length) {
+    <section class="related-chapters-section">
+      <h3>{{ 'book.relatedChapters' | translate }}</h3>
+      <div class="related-chapters-list">
+        @for (rc of relatedChapters; track rc) {
+          <a
+            class="related-chapter-card"
+            [class.related-chapter-read]="rc.isRead"
+            [routerLink]="['/books', stripBooksPrefix(rc.path)]"
+            queryParamsHandling="preserve"
+            [matTooltip]="rc.isRead ? ('reading.alreadyRead' | translate) : ''">
+            <span class="related-book-name">{{ rc.book }}</span>
+            <span class="related-chapter-title">{{ rc.title }}</span>
+            @if (rc.isRead) {
+              <span class="related-chapter-check" aria-hidden="true">✓</span>
+            }
+          </a>
+        }
+      </div>
+    </section>
+  }
   <app-settings></app-settings>
-</ng-container>
+}

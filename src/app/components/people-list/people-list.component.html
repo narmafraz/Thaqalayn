@@ -1,29 +1,30 @@
-<ng-container *ngIf="(error$ | async) as error; else listContent">
+@if ((error$ | async); as error) {
   <app-error-display [message]="error" (retry)="onRetry()"></app-error-display>
-</ng-container>
-
-<ng-template #listContent>
-  <app-skeleton-loader *ngIf="!(narrators$ | async)"
+} @else {
+  @if (!(narrators$ | async)) {
+    <app-skeleton-loader
     [variant]="'people-list'"></app-skeleton-loader>
-
-  <ng-container *ngIf="(narrators$ | async) as narrators">
+  }
+  @if ((narrators$ | async); as narrators) {
     <app-book-titles [titles]="narratorsTitles"></app-book-titles>
-
     <!-- Featured Imams Section (NAR-01) -->
-    <section class="featured-imams" *ngIf="featuredImams.length > 0">
-      <h2 class="featured-imams-title">{{ 'narrator.featuredImams' | translate }}</h2>
-      <div class="imam-cards-scroll">
-        <a *ngFor="let imam of featuredImams"
-           class="imam-card"
-           [routerLink]="'/people/narrators/' + imam.id">
-          <span class="imam-badge-icon" aria-hidden="true">&#9733;</span>
-          <span class="imam-name-en">{{ imam.nameEn }}</span>
-          <span class="imam-name-ar arabic" lang="ar" dir="rtl">{{ imam.nameAr }}</span>
-          <span class="imam-narrations">{{ imam.narrations | number }} {{ 'narrator.narrations' | translate }}</span>
-        </a>
-      </div>
-    </section>
-
+    @if (featuredImams.length > 0) {
+      <section class="featured-imams">
+        <h2 class="featured-imams-title">{{ 'narrator.featuredImams' | translate }}</h2>
+        <div class="imam-cards-scroll">
+          @for (imam of featuredImams; track imam) {
+            <a
+              class="imam-card"
+              [routerLink]="'/people/narrators/' + imam.id">
+              <span class="imam-badge-icon" aria-hidden="true">&#9733;</span>
+              <span class="imam-name-en">{{ imam.nameEn }}</span>
+              <span class="imam-name-ar arabic" lang="ar" dir="rtl">{{ imam.nameAr }}</span>
+              <span class="imam-narrations">{{ imam.narrations | number }} {{ 'narrator.narrations' | translate }}</span>
+            </a>
+          }
+        </div>
+      </section>
+    }
     <!-- ADV-06: Category chips -->
     <div class="category-chips">
       <button class="category-chip" [class.active]="selectedCategory === 'all'" (click)="onCategoryChange('all')">
@@ -36,140 +37,144 @@
         {{ 'narrator.categoryTop' | translate }} ({{ topCount }})
       </button>
     </div>
-
     <div class="content">
       <div class="mat-elevation-z8">
         <div class="filter-row">
           <mat-form-field class="filter-field">
             <input matInput [placeholder]="'search.filter' | translate" [(ngModel)]="filterValue" #filterInput>
-            <button *ngIf="filterValue" matSuffix mat-icon-button [attr.aria-label]="'common.clear' | translate" [matTooltip]="'common.clear' | translate" (click)="filterValue=''; applyAdvancedFilter()">
-              <mat-icon>close</mat-icon>
-            </button>
+            @if (filterValue) {
+              <button matSuffix mat-icon-button [attr.aria-label]="'common.clear' | translate" [matTooltip]="'common.clear' | translate" (click)="filterValue=''; applyAdvancedFilter()">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
           </mat-form-field>
           <button class="filter-toggle-btn" (click)="toggleFilters()" [class.active]="showFilters || hasActiveFilters"
-                  [attr.aria-label]="'narrator.filters' | translate"
-                  [matTooltip]="'narrator.filters' | translate">
+            [attr.aria-label]="'narrator.filters' | translate"
+            [matTooltip]="'narrator.filters' | translate">
             <mat-icon>tune</mat-icon>
           </button>
         </div>
-
         <!-- ADV-05: Advanced filter panel -->
-        <div class="advanced-filters" *ngIf="showFilters">
-          <div class="filter-grid">
-            <div class="filter-group">
-              <label>{{ 'narrator.minNarrations' | translate }}</label>
-              <input type="number" [(ngModel)]="minNarrations" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+        @if (showFilters) {
+          <div class="advanced-filters">
+            <div class="filter-grid">
+              <div class="filter-group">
+                <label>{{ 'narrator.minNarrations' | translate }}</label>
+                <input type="number" [(ngModel)]="minNarrations" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+              </div>
+              <div class="filter-group">
+                <label>{{ 'narrator.maxNarrations' | translate }}</label>
+                <input type="number" [(ngModel)]="maxNarrations" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+              </div>
+              <div class="filter-group">
+                <label>{{ 'narrator.minFrom' | translate }}</label>
+                <input type="number" [(ngModel)]="minFrom" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+              </div>
+              <div class="filter-group">
+                <label>{{ 'narrator.maxFrom' | translate }}</label>
+                <input type="number" [(ngModel)]="maxFrom" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+              </div>
+              <div class="filter-group">
+                <label>{{ 'narrator.minTo' | translate }}</label>
+                <input type="number" [(ngModel)]="minTo" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+              </div>
+              <div class="filter-group">
+                <label>{{ 'narrator.maxTo' | translate }}</label>
+                <input type="number" [(ngModel)]="maxTo" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
+              </div>
             </div>
-            <div class="filter-group">
-              <label>{{ 'narrator.maxNarrations' | translate }}</label>
-              <input type="number" [(ngModel)]="maxNarrations" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
-            </div>
-            <div class="filter-group">
-              <label>{{ 'narrator.minFrom' | translate }}</label>
-              <input type="number" [(ngModel)]="minFrom" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
-            </div>
-            <div class="filter-group">
-              <label>{{ 'narrator.maxFrom' | translate }}</label>
-              <input type="number" [(ngModel)]="maxFrom" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
-            </div>
-            <div class="filter-group">
-              <label>{{ 'narrator.minTo' | translate }}</label>
-              <input type="number" [(ngModel)]="minTo" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
-            </div>
-            <div class="filter-group">
-              <label>{{ 'narrator.maxTo' | translate }}</label>
-              <input type="number" [(ngModel)]="maxTo" (change)="applyAdvancedFilter()" min="0" class="filter-number-input">
-            </div>
+            @if (hasActiveFilters) {
+              <button class="clear-filters-btn" (click)="clearFilters()">
+                <mat-icon>clear_all</mat-icon>
+                {{ 'narrator.clearFilters' | translate }}
+              </button>
+            }
           </div>
-          <button *ngIf="hasActiveFilters" class="clear-filters-btn" (click)="clearFilters()">
-            <mat-icon>clear_all</mat-icon>
-            {{ 'narrator.clearFilters' | translate }}
-          </button>
-        </div>
-
-        <table *ngIf="(displayedColumns$ | async) as displayedColumns" mat-table class="full-width-table" [dataSource]="dataSource" matSort
-          matSortActive="narrations" matSortDirection="desc"
-          aria-label="Elements">
-
-          <ng-container matColumnDef="octrta">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let row">
-              <div class="mobile-card">
-                <div class="mobile-card-names">
-                  <span class="role-badge imam-badge" *ngIf="isImam(row.index)">{{ 'narrator.roleImam' | translate }}</span>
-                  <div class="arabic" lang="ar" dir="rtl">{{row.titles.ar}}</div>
-                  <div class="en-name" *ngIf="row.titles.en">{{row.titles.en}}</div>
+        }
+        @if ((displayedColumns$ | async); as displayedColumns) {
+          <table mat-table class="full-width-table" [dataSource]="dataSource" matSort
+            matSortActive="narrations" matSortDirection="desc"
+            aria-label="Elements">
+            <ng-container matColumnDef="octrta">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row">
+                <div class="mobile-card">
+                  <div class="mobile-card-names">
+                    @if (isImam(row.index)) {
+                      <span class="role-badge imam-badge">{{ 'narrator.roleImam' | translate }}</span>
+                    }
+                    <div class="arabic" lang="ar" dir="rtl">{{row.titles.ar}}</div>
+                    @if (row.titles.en) {
+                      <div class="en-name">{{row.titles.en}}</div>
+                    }
+                  </div>
+                  <div class="mobile-card-stats">
+                    <span class="narration-pill" [ngClass]="getNarrationPillClass(row.narrations)">{{ row.narrations | number }}</span>
+                  </div>
                 </div>
-                <div class="mobile-card-stats">
-                  <span class="narration-pill" [ngClass]="getNarrationPillClass(row.narrations)">{{ row.narrations | number }}</span>
+              </td>
+            </ng-container>
+            <!-- Id Column -->
+            <ng-container matColumnDef="index">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="left-index"
+              [attr.aria-label]="'common.number' | translate">{{ 'common.number' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="left-index">{{row.index}}</td>
+            </ng-container>
+            <!-- Combined Name Column (two-line: Arabic + English) -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header
+              [attr.aria-label]="'common.name' | translate">{{ 'common.name' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="name-cell">
+                <div class="name-two-line">
+                  @if (isImam(row.index)) {
+                    <span class="role-badge imam-badge">{{ 'narrator.roleImam' | translate }}</span>
+                  }
+                  <div class="name-arabic arabic" lang="ar" dir="rtl">{{row.titles.ar}}</div>
+                  @if (row.titles.en) {
+                    <div class="name-english">{{row.titles.en}}</div>
+                  }
                 </div>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- Id Column -->
-          <ng-container matColumnDef="index">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="left-index"
-                [attr.aria-label]="'common.number' | translate">{{ 'common.number' | translate }}</th>
-            <td mat-cell *matCellDef="let row" class="left-index">{{row.index}}</td>
-          </ng-container>
-
-          <!-- Combined Name Column (two-line: Arabic + English) -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header
-                [attr.aria-label]="'common.name' | translate">{{ 'common.name' | translate }}</th>
-            <td mat-cell *matCellDef="let row" class="name-cell">
-              <div class="name-two-line">
-                <span class="role-badge imam-badge" *ngIf="isImam(row.index)">{{ 'narrator.roleImam' | translate }}</span>
-                <div class="name-arabic arabic" lang="ar" dir="rtl">{{row.titles.ar}}</div>
-                <div class="name-english" *ngIf="row.titles.en">{{row.titles.en}}</div>
-              </div>
-            </td>
-          </ng-container>
-
-          <!-- narrations Column with colored pill -->
-          <ng-container matColumnDef="narrations">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
-                [attr.aria-label]="'narrator.narrations' | translate">{{ 'narrator.narrations' | translate }}</th>
-            <td mat-cell *matCellDef="let row" class="center">
-              <span class="narration-pill" [ngClass]="getNarrationPillClass(row.narrations)">{{ row.narrations | number }}</span>
-            </td>
-          </ng-container>
-
-          <!-- narrated_from Column -->
-          <ng-container matColumnDef="narrated_from">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
-                [attr.aria-label]="'narrator.narratedFrom' | translate">{{ 'narrator.narratedFrom' | translate }}</th>
-            <td mat-cell *matCellDef="let row" class="center">{{row.narrated_from}}</td>
-          </ng-container>
-
-          <!-- narrated_to Column -->
-          <ng-container matColumnDef="narrated_to">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
-                [attr.aria-label]="'narrator.narratedTo' | translate">{{ 'narrator.narratedTo' | translate }}</th>
-            <td mat-cell *matCellDef="let row" class="center">{{row.narrated_to}}</td>
-          </ng-container>
-
-          <ng-container matColumnDef="conarrators">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
-                [attr.aria-label]="'narrator.conarratorCount' | translate">{{ 'narrator.conarratorCount' | translate }}</th>
-            <td mat-cell *matCellDef="let row" class="center">{{row.conarrators}}</td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"
+              </td>
+            </ng-container>
+            <!-- narrations Column with colored pill -->
+            <ng-container matColumnDef="narrations">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+              [attr.aria-label]="'narrator.narrations' | translate">{{ 'narrator.narrations' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="center">
+                <span class="narration-pill" [ngClass]="getNarrationPillClass(row.narrations)">{{ row.narrations | number }}</span>
+              </td>
+            </ng-container>
+            <!-- narrated_from Column -->
+            <ng-container matColumnDef="narrated_from">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+              [attr.aria-label]="'narrator.narratedFrom' | translate">{{ 'narrator.narratedFrom' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="center">{{row.narrated_from}}</td>
+            </ng-container>
+            <!-- narrated_to Column -->
+            <ng-container matColumnDef="narrated_to">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+              [attr.aria-label]="'narrator.narratedTo' | translate">{{ 'narrator.narratedTo' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="center">{{row.narrated_to}}</td>
+            </ng-container>
+            <ng-container matColumnDef="conarrators">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header"
+              [attr.aria-label]="'narrator.conarratorCount' | translate">{{ 'narrator.conarratorCount' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="center">{{row.conarrators}}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"
             [ngStyle]="(mqAlias$ | async) === SMALL_SCREEN_ALIAS ? {'display': 'none'} : {}"></tr>
-          <tr mat-row [routerLink]="'/people/narrators/' + row.index" queryParamsHandling="preserve"
+            <tr mat-row [routerLink]="'/people/narrators/' + row.index" queryParamsHandling="preserve"
             *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
+          </table>
+        }
         <mat-paginator [length]="100"
-                [pageSize]="50"
-                [pageSizeOptions]="[25, 50, 100, 200]"
-                showFirstLastButtons
-                [attr.aria-label]="'common.selectPage' | translate">
+          [pageSize]="50"
+          [pageSizeOptions]="[25, 50, 100, 200]"
+          showFirstLastButtons
+          [attr.aria-label]="'common.selectPage' | translate">
         </mat-paginator>
-
-
       </div>
     </div>
-  </ng-container>
-</ng-template>
+  }
+}
+

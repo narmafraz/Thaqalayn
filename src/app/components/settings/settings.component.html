@@ -1,25 +1,33 @@
 <div class="settings">
   <!-- Decorative gear icon removed — the canonical Settings trigger lives
-       in the top app bar; having an inert gear next to the translation
-       dropdown was confusing now that we have a real one. -->
+  in the top app bar; having an inert gear next to the translation
+  dropdown was confusing now that we have a real one. -->
   <app-translation-selection></app-translation-selection>
 
-  <div class="nav-buttons" *ngIf="(nav$ | async) as nav">
-    <a mat-icon-button [attr.aria-label]="'nav.navigatePrevious' | translate"
-      *ngIf="nav.prev" [routerLink]="nav.prev" queryParamsHandling="preserve">
-      <mat-icon [matTooltip]="getPathTitle(nav.prev)">navigate_before</mat-icon>
-    </a>
-    <a mat-icon-button [attr.aria-label]="'nav.navigateParent' | translate"
-      *ngIf="nav.up" [routerLink]="nav.up" queryParamsHandling="preserve">
-      <mat-icon [matTooltip]="getPathTitle(nav.up)">keyboard_arrow_up</mat-icon>
-    </a>
-    <a mat-icon-button [attr.aria-label]="'nav.navigateNext' | translate"
-      *ngIf="nav.next" [routerLink]="nav.next" queryParamsHandling="preserve">
-      <mat-icon [matTooltip]="getPathTitle(nav.next)">navigate_next</mat-icon>
-    </a>
-  </div>
+  @if ((nav$ | async); as nav) {
+    <div class="nav-buttons">
+      @if (nav.prev) {
+        <a mat-icon-button [attr.aria-label]="'nav.navigatePrevious' | translate"
+          [routerLink]="nav.prev" queryParamsHandling="preserve">
+          <mat-icon [matTooltip]="getPathTitle(nav.prev)">navigate_before</mat-icon>
+        </a>
+      }
+      @if (nav.up) {
+        <a mat-icon-button [attr.aria-label]="'nav.navigateParent' | translate"
+          [routerLink]="nav.up" queryParamsHandling="preserve">
+          <mat-icon [matTooltip]="getPathTitle(nav.up)">keyboard_arrow_up</mat-icon>
+        </a>
+      }
+      @if (nav.next) {
+        <a mat-icon-button [attr.aria-label]="'nav.navigateNext' | translate"
+          [routerLink]="nav.next" queryParamsHandling="preserve">
+          <mat-icon [matTooltip]="getPathTitle(nav.next)">navigate_next</mat-icon>
+        </a>
+      }
+    </div>
+  }
 </div>
 
 <!-- AI preferences now live in the global Reading Sheet hosted at the app
-     shell, triggered from the top app bar's View icon. The trigger button
-     that used to live here was removed in step 3 of the redesign. -->
+shell, triggered from the top app bar's View icon. The trigger button
+that used to live here was removed in step 3 of the redesign. -->

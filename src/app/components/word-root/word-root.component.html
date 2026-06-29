@@ -1,14 +1,18 @@
 <div class="word-root-page">
-  <div *ngIf="loading" class="loading-state">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
 
-  <div *ngIf="notFound" class="not-found-state">
-    <p>No root page found for <code>{{ slug }}</code>.</p>
-    <a routerLink="/words">← Browse words</a>
-  </div>
+  @if (notFound) {
+    <div class="not-found-state">
+      <p>No root page found for <code>{{ slug }}</code>.</p>
+      <a routerLink="/words">← Browse words</a>
+    </div>
+  }
 
-  <ng-container *ngIf="root && !loading">
+  @if (root && !loading) {
     <header class="root-header">
       <h1 class="root-title" lang="ar" dir="rtl">
         <!-- Display: keep "_" as-is for weak radicals (per D057). -->
@@ -20,21 +24,26 @@
         <strong>{{ root.total_frequency | number }}</strong> corpus occurrences
       </p>
     </header>
-
     <section class="root-lemmas">
       <h2>Lemmas derived from this root</h2>
       <p class="hint">Sorted by descending corpus frequency.</p>
       <ul class="lemma-list">
-        <li *ngFor="let lemma of root.lemmas">
-          <a [routerLink]="['/words/lemmas', lemma.slug]" class="lemma-link" lang="ar" dir="rtl">
-            <span class="lemma-arabic">{{ lemma.slug }}</span>
-            <span *ngIf="lemma.pos" class="lemma-pos">{{ lemma.pos }}</span>
-            <span class="lemma-freq" *ngIf="lemma.frequency">
-              {{ lemma.frequency | number }}×
-            </span>
-          </a>
-        </li>
+        @for (lemma of root.lemmas; track lemma) {
+          <li>
+            <a [routerLink]="['/words/lemmas', lemma.slug]" class="lemma-link" lang="ar" dir="rtl">
+              <span class="lemma-arabic">{{ lemma.slug }}</span>
+              @if (lemma.pos) {
+                <span class="lemma-pos">{{ lemma.pos }}</span>
+              }
+              @if (lemma.frequency) {
+                <span class="lemma-freq">
+                  {{ lemma.frequency | number }}×
+                </span>
+              }
+            </a>
+          </li>
+        }
       </ul>
     </section>
-  </ng-container>
+  }
 </div>

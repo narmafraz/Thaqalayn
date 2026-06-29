@@ -1,84 +1,84 @@
 <div id="site" [class.embed-mode]="isEmbed$ | async">
-  <ng-container *ngIf="!(isEmbed$ | async)">
+  @if (!(isEmbed$ | async)) {
     <a class="skip-link" href="#main-content">{{ 'app.skipToContent' | translate }}</a>
     <header id="header" [class.header-compact]="headerCompact">
-        <div class="bannerTop">
-          <div class="header-left" routerLink="/">
-            <img src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
-          </div>
-
-          <!-- Desktop: all controls visible -->
-          <div class="header-desktop-controls">
-            <app-search-bar *ngIf="!(onSearchPage$ | async)" class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
-
-            <div class="font-controls" (click)="$event.stopPropagation()" *ngIf="fontSize$ | async as fontSize">
+      <div class="bannerTop">
+        <div class="header-left" routerLink="/">
+          <img src="../assets/just-logo_small.png" alt="Thaqalayn logo"> {{ 'app.title' | translate }}
+        </div>
+        <!-- Desktop: all controls visible -->
+        <div class="header-desktop-controls">
+          @if (!(onSearchPage$ | async)) {
+            <app-search-bar class="header-search" (click)="$event.stopPropagation()"></app-search-bar>
+          }
+          @if (fontSize$ | async; as fontSize) {
+            <div class="font-controls" (click)="$event.stopPropagation()">
               <button (click)="decreaseFontSize()" [attr.aria-label]="'settings.decreaseFont' | translate" [matTooltip]="'settings.decreaseFont' | translate" [disabled]="fontSize <= 75">A-</button>
               <button (click)="resetFontSize()" [attr.aria-label]="'settings.resetFont' | translate" [matTooltip]="'settings.resetFont' | translate">A</button>
               <button (click)="increaseFontSize()" [attr.aria-label]="'settings.increaseFont' | translate" [matTooltip]="'settings.increaseFont' | translate" [disabled]="fontSize >= 150">A+</button>
             </div>
-
-            <button class="theme-toggle" (click)="toggleTheme(); $event.stopPropagation()" [attr.aria-label]="'settings.toggleDarkMode' | translate" [matTooltip]="'settings.toggleDarkMode' | translate">
-              <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
-            </button>
-
-            <button class="shortcuts-btn" (click)="toggleHelp(); $event.stopPropagation()" [attr.aria-label]="'settings.showKeyboardShortcuts' | translate" [matTooltip]="'settings.showKeyboardShortcuts' | translate">
-              <mat-icon>keyboard</mat-icon>
-            </button>
-
-            <button class="reading-sheet-trigger" (click)="toggleReadingSheet(); $event.stopPropagation()"
-                    [class.active]="readingSheetOpen$ | async"
-                    [attr.aria-label]="'settings.title' | translate"
-                    [matTooltip]="'settings.title' | translate">
-              <mat-icon>settings</mat-icon>
-              <span class="reading-sheet-trigger-label">{{ 'settings.title' | translate }}</span>
-            </button>
-
-            <mat-select
-              class="lang-picker"
-              [value]="currentLang$ | async"
-              (selectionChange)="onLanguageChange($event.value)"
-              (click)="$event.stopPropagation()"
-              [attr.aria-label]="'language.picker' | translate">
-              <mat-option *ngFor="let lang of languages" [value]="lang.code">{{ lang.name }}</mat-option>
-            </mat-select>
-          </div>
-
-          <!-- Mobile: search icon + single Settings trigger (hamburger
-               retired — its nav links and settings now live inside
-               the consolidated Reading Sheet) -->
-          <div class="header-mobile-controls">
-            <button class="mobile-search-btn" (click)="toggleMobileSearch(); $event.stopPropagation()"
-                    [attr.aria-label]="'search.search' | translate">
-              <mat-icon>{{ mobileSearchOpen ? 'close' : 'search' }}</mat-icon>
-            </button>
-            <button class="mobile-reading-sheet-btn" (click)="toggleReadingSheet(); $event.stopPropagation()"
-                    [attr.aria-label]="'settings.title' | translate">
-              <mat-icon>settings</mat-icon>
-            </button>
-          </div>
+          }
+          <button class="theme-toggle" (click)="toggleTheme(); $event.stopPropagation()" [attr.aria-label]="'settings.toggleDarkMode' | translate" [matTooltip]="'settings.toggleDarkMode' | translate">
+            <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
+          </button>
+          <button class="shortcuts-btn" (click)="toggleHelp(); $event.stopPropagation()" [attr.aria-label]="'settings.showKeyboardShortcuts' | translate" [matTooltip]="'settings.showKeyboardShortcuts' | translate">
+            <mat-icon>keyboard</mat-icon>
+          </button>
+          <button class="reading-sheet-trigger" (click)="toggleReadingSheet(); $event.stopPropagation()"
+            [class.active]="readingSheetOpen$ | async"
+            [attr.aria-label]="'settings.title' | translate"
+            [matTooltip]="'settings.title' | translate">
+            <mat-icon>settings</mat-icon>
+            <span class="reading-sheet-trigger-label">{{ 'settings.title' | translate }}</span>
+          </button>
+          <mat-select
+            class="lang-picker"
+            [value]="currentLang$ | async"
+            (selectionChange)="onLanguageChange($event.value)"
+            (click)="$event.stopPropagation()"
+            [attr.aria-label]="'language.picker' | translate">
+            @for (lang of languages; track lang) {
+              <mat-option [value]="lang.code">{{ lang.name }}</mat-option>
+            }
+          </mat-select>
         </div>
-
-        <nav class="crumbs" [attr.aria-label]="'app.breadcrumbAria' | translate"><app-breadcrumbs></app-breadcrumbs></nav>
-    </header>
-
-    <!-- Mobile search overlay -->
-    <div class="mobile-search-overlay" *ngIf="mobileSearchOpen" (click)="mobileSearchOpen = false">
-      <div class="mobile-search-panel" (click)="$event.stopPropagation()">
-        <app-search-bar class="mobile-overlay-search"></app-search-bar>
+        <!-- Mobile: search icon + single Settings trigger (hamburger
+        retired — its nav links and settings now live inside
+        the consolidated Reading Sheet) -->
+        <div class="header-mobile-controls">
+          <button class="mobile-search-btn" (click)="toggleMobileSearch(); $event.stopPropagation()"
+            [attr.aria-label]="'search.search' | translate">
+            <mat-icon>{{ mobileSearchOpen ? 'close' : 'search' }}</mat-icon>
+          </button>
+          <button class="mobile-reading-sheet-btn" (click)="toggleReadingSheet(); $event.stopPropagation()"
+            [attr.aria-label]="'settings.title' | translate">
+            <mat-icon>settings</mat-icon>
+          </button>
+        </div>
       </div>
-    </div>
-
+      <nav class="crumbs" [attr.aria-label]="'app.breadcrumbAria' | translate"><app-breadcrumbs></app-breadcrumbs></nav>
+    </header>
+    <!-- Mobile search overlay -->
+    @if (mobileSearchOpen) {
+      <div class="mobile-search-overlay" (click)="mobileSearchOpen = false">
+        <div class="mobile-search-panel" (click)="$event.stopPropagation()">
+          <app-search-bar class="mobile-overlay-search"></app-search-bar>
+        </div>
+      </div>
+    }
     <!-- Mobile hamburger retired in favour of the single Settings
-         trigger above; the Reading Sheet hosts all nav + settings. -->
-  </ng-container>
+    trigger above; the Reading Sheet hosts all nav + settings. -->
+  }
   <!-- Sticky reading toolbar (chain / diacritics / WBW) — book routes only -->
-  <app-reading-toolbar *ngIf="(activeSection$ | async) === 'books'"></app-reading-toolbar>
+  @if ((activeSection$ | async) === 'books') {
+    <app-reading-toolbar></app-reading-toolbar>
+  }
   <!-- RE-12: in-app reminder banner (streak-at-risk / goal-pending) -->
   <app-reading-banner></app-reading-banner>
   <main id="main-content" class="main">
     <router-outlet></router-outlet>
   </main>
-  <ng-container *ngIf="!(isEmbed$ | async)">
+  @if (!(isEmbed$ | async)) {
     <app-install-prompt></app-install-prompt>
     <footer id="footer">
       <a href="https://x.com/ProjThaqalayn" target="_blank">{{ 'nav.news' | translate }}</a> |
@@ -89,35 +89,39 @@
       <a routerLink="/support">{{ 'nav.support' | translate }}</a> |
       <a routerLink="/about">{{ 'nav.about' | translate }}</a>
     </footer>
-    <nav class="bottom-nav" [attr.aria-label]="'app.mainNavAria' | translate" *ngIf="activeSection$ | async as section">
-      <a routerLink="/" class="bottom-nav-item" [class.active]="section === 'home'" queryParamsHandling="preserve">
-        <mat-icon>home</mat-icon>
-        <span>{{ 'nav.home' | translate }}</span>
-      </a>
-      <a routerLink="/books" class="bottom-nav-item" [class.active]="section === 'books'" queryParamsHandling="preserve">
-        <mat-icon>menu_book</mat-icon>
-        <span>{{ 'nav.books' | translate }}</span>
-      </a>
-      <a routerLink="/topics" class="bottom-nav-item" [class.active]="section === 'topics'" queryParamsHandling="preserve">
-        <mat-icon>category</mat-icon>
-        <span>{{ 'nav.topics' | translate }}</span>
-      </a>
-      <a routerLink="/bookmarks" class="bottom-nav-item" [class.active]="section === 'bookmarks'" queryParamsHandling="preserve">
-        <mat-icon>bookmark</mat-icon>
-        <span>{{ 'nav.bookmarks' | translate }}</span>
-      </a>
-      <a routerLink="/people/narrators" class="bottom-nav-item" [class.active]="section === 'narrators'" queryParamsHandling="preserve">
-        <mat-icon>people</mat-icon>
-        <span>{{ 'nav.narrators' | translate }}</span>
-      </a>
-    </nav>
-  </ng-container>
+    @if (activeSection$ | async; as section) {
+      <nav class="bottom-nav" [attr.aria-label]="'app.mainNavAria' | translate">
+        <a routerLink="/" class="bottom-nav-item" [class.active]="section === 'home'" queryParamsHandling="preserve">
+          <mat-icon>home</mat-icon>
+          <span>{{ 'nav.home' | translate }}</span>
+        </a>
+        <a routerLink="/books" class="bottom-nav-item" [class.active]="section === 'books'" queryParamsHandling="preserve">
+          <mat-icon>menu_book</mat-icon>
+          <span>{{ 'nav.books' | translate }}</span>
+        </a>
+        <a routerLink="/topics" class="bottom-nav-item" [class.active]="section === 'topics'" queryParamsHandling="preserve">
+          <mat-icon>category</mat-icon>
+          <span>{{ 'nav.topics' | translate }}</span>
+        </a>
+        <a routerLink="/bookmarks" class="bottom-nav-item" [class.active]="section === 'bookmarks'" queryParamsHandling="preserve">
+          <mat-icon>bookmark</mat-icon>
+          <span>{{ 'nav.bookmarks' | translate }}</span>
+        </a>
+        <a routerLink="/people/narrators" class="bottom-nav-item" [class.active]="section === 'narrators'" queryParamsHandling="preserve">
+          <mat-icon>people</mat-icon>
+          <span>{{ 'nav.narrators' | translate }}</span>
+        </a>
+      </nav>
+    }
+  }
 </div>
 
-<button mat-fab class="back-to-top" *ngIf="showBackToTop"
-        (click)="scrollToTop()" [matTooltip]="'nav.backToTop' | translate">
-  <mat-icon>arrow_upward</mat-icon>
-</button>
+@if (showBackToTop) {
+  <button mat-fab class="back-to-top"
+    (click)="scrollToTop()" [matTooltip]="'nav.backToTop' | translate">
+    <mat-icon>arrow_upward</mat-icon>
+  </button>
+}
 
 <!-- Global Reading Sheet — slide-out panel for AI prefs + (step 4) view toggles -->
 <app-reading-sheet></app-reading-sheet>
@@ -126,19 +130,21 @@
 <app-milestone-toaster></app-milestone-toaster>
 
 <!-- Keyboard shortcuts help overlay -->
-<div class="keyboard-help-overlay" *ngIf="helpVisible$ | async" (click)="dismissHelp()">
-  <div class="keyboard-help-panel" (click)="$event.stopPropagation()">
-    <h3>{{ 'settings.keyboardShortcuts' | translate }}</h3>
-    <ul class="shortcut-list">
-      <li><span>{{ 'settings.shortcutNextChapter' | translate }}</span> <kbd>j</kbd></li>
-      <li><span>{{ 'settings.shortcutPrevChapter' | translate }}</span> <kbd>k</kbd></li>
-      <li><span>{{ 'settings.shortcutParent' | translate }}</span> <kbd>u</kbd></li>
-      <li><span>{{ 'settings.shortcutSearch' | translate }}</span> <kbd>/</kbd></li>
-      <li><span>{{ 'settings.shortcutBookmark' | translate }}</span> <kbd>b</kbd></li>
-      <li><span>{{ 'settings.shortcutDarkMode' | translate }}</span> <kbd>d</kbd></li>
-      <li><span>{{ 'settings.shortcutHelp' | translate }}</span> <kbd>?</kbd></li>
-      <li><span>{{ 'settings.shortcutClose' | translate }}</span> <kbd>Esc</kbd></li>
-    </ul>
-    <div class="keyboard-help-dismiss">{{ 'settings.pressEscToClose' | translate }}</div>
+@if (helpVisible$ | async) {
+  <div class="keyboard-help-overlay" (click)="dismissHelp()">
+    <div class="keyboard-help-panel" (click)="$event.stopPropagation()">
+      <h3>{{ 'settings.keyboardShortcuts' | translate }}</h3>
+      <ul class="shortcut-list">
+        <li><span>{{ 'settings.shortcutNextChapter' | translate }}</span> <kbd>j</kbd></li>
+        <li><span>{{ 'settings.shortcutPrevChapter' | translate }}</span> <kbd>k</kbd></li>
+        <li><span>{{ 'settings.shortcutParent' | translate }}</span> <kbd>u</kbd></li>
+        <li><span>{{ 'settings.shortcutSearch' | translate }}</span> <kbd>/</kbd></li>
+        <li><span>{{ 'settings.shortcutBookmark' | translate }}</span> <kbd>b</kbd></li>
+        <li><span>{{ 'settings.shortcutDarkMode' | translate }}</span> <kbd>d</kbd></li>
+        <li><span>{{ 'settings.shortcutHelp' | translate }}</span> <kbd>?</kbd></li>
+        <li><span>{{ 'settings.shortcutClose' | translate }}</span> <kbd>Esc</kbd></li>
+      </ul>
+      <div class="keyboard-help-dismiss">{{ 'settings.pressEscToClose' | translate }}</div>
+    </div>
   </div>
-</div>
+}

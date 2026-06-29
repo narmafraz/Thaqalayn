@@ -2,50 +2,64 @@
   <mat-form-field class="search-field" appearance="outline">
     <mat-icon matPrefix>search</mat-icon>
     <input matInput
-           [(ngModel)]="searchQuery"
-           (ngModelChange)="onSearchChange()"
-           [placeholder]="'search.searchBooksAndChapters' | translate"
-           [attr.aria-label]="'search.searchBooksAndChapters' | translate">
-    <button *ngIf="searchQuery"
-            matSuffix
-            mat-icon-button
-            [attr.aria-label]="'search.clearSearch' | translate"
-            [matTooltip]="'search.clearSearch' | translate"
-            (click)="clearSearch()">
-      <mat-icon>close</mat-icon>
-    </button>
+      [(ngModel)]="searchQuery"
+      (ngModelChange)="onSearchChange()"
+      [placeholder]="'search.searchBooksAndChapters' | translate"
+      [attr.aria-label]="'search.searchBooksAndChapters' | translate">
+    @if (searchQuery) {
+      <button
+        matSuffix
+        mat-icon-button
+        [attr.aria-label]="'search.clearSearch' | translate"
+        [matTooltip]="'search.clearSearch' | translate"
+        (click)="clearSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
   </mat-form-field>
 
   <div class="tree-wrapper" role="tree" [attr.aria-label]="'common.bookNavigation' | translate">
-    <div *ngFor="let node of visibleNodes"
-         class="tree-node"
-         role="treeitem"
-         [attr.aria-expanded]="node.expandable ? isExpanded(node) : null"
-         [attr.aria-level]="node.level + 1"
-         [style.padding-left.px]="node.level * 24">
+    @for (node of visibleNodes; track node) {
+      <div
+        class="tree-node"
+        role="treeitem"
+        [attr.aria-expanded]="node.expandable ? isExpanded(node) : null"
+        [attr.aria-level]="node.level + 1"
+        [style.padding-left.px]="node.level * 24">
+        @if (node.expandable) {
+          <button
+            class="toggle-btn"
+            mat-icon-button
+            (click)="toggle(node)"
+            [attr.aria-label]="getToggleLabel(node)"
+            [matTooltip]="getToggleLabel(node)">
+            <mat-icon>{{ isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
+          </button>
+        }
+        @if (!node.expandable) {
+          <span class="toggle-spacer"></span>
+        }
+        <a class="node-content"
+          [routerLink]="['/books', node.path.substring(7)]"
+          queryParamsHandling="preserve"
+          (click)="navigate(node); $event.preventDefault()">
+          @if (node.partType) {
+            <span class="part-type">{{ node.partType }}</span>
+          }
+          @if (node.titleEn) {
+            <span class="title-en" [innerHTML]="node.titleEn"></span>
+          }
+          @if (node.titleAr) {
+            <span class="title-ar arabic" dir="rtl" lang="ar" [innerHTML]="node.titleAr"></span>
+          }
+        </a>
+      </div>
+    }
 
-      <button *ngIf="node.expandable"
-              class="toggle-btn"
-              mat-icon-button
-              (click)="toggle(node)"
-              [attr.aria-label]="getToggleLabel(node)"
-              [matTooltip]="getToggleLabel(node)">
-        <mat-icon>{{ isExpanded(node) ? 'expand_more' : 'chevron_right' }}</mat-icon>
-      </button>
-      <span *ngIf="!node.expandable" class="toggle-spacer"></span>
-
-      <a class="node-content"
-         [routerLink]="['/books', node.path.substring(7)]"
-         queryParamsHandling="preserve"
-         (click)="navigate(node); $event.preventDefault()">
-        <span *ngIf="node.partType" class="part-type">{{ node.partType }}</span>
-        <span *ngIf="node.titleEn" class="title-en" [innerHTML]="node.titleEn"></span>
-        <span *ngIf="node.titleAr" class="title-ar arabic" dir="rtl" lang="ar" [innerHTML]="node.titleAr"></span>
-      </a>
-    </div>
-
-    <div *ngIf="visibleNodes.length === 0 && searchQuery" class="no-results">
-      {{ 'search.noResultsFor' | translate }} "{{ searchQuery }}"
-    </div>
+    @if (visibleNodes.length === 0 && searchQuery) {
+      <div class="no-results">
+        {{ 'search.noResultsFor' | translate }} "{{ searchQuery }}"
+      </div>
+    }
   </div>
 </div>

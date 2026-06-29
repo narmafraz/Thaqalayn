@@ -7,42 +7,55 @@
     <p>{{ 'download.offlineDescription' | translate }}</p>
 
     <div class="book-list">
-      <div class="book-item" *ngFor="let bookId of availableBooks">
-        <div class="book-info">
-          <mat-icon *ngIf="isDownloaded(bookId)" class="downloaded-icon">cloud_done</mat-icon>
-          <mat-icon *ngIf="!isDownloaded(bookId)" class="not-downloaded-icon">cloud_download</mat-icon>
-          <span class="book-name">{{ formatBookName(bookId) }}</span>
+      @for (bookId of availableBooks; track bookId) {
+        <div class="book-item">
+          <div class="book-info">
+            @if (isDownloaded(bookId)) {
+              <mat-icon class="downloaded-icon">cloud_done</mat-icon>
+            }
+            @if (!isDownloaded(bookId)) {
+              <mat-icon class="not-downloaded-icon">cloud_download</mat-icon>
+            }
+            <span class="book-name">{{ formatBookName(bookId) }}</span>
+          </div>
+          <div class="book-actions">
+            @if (isDownloading(bookId)) {
+              <mat-progress-spinner
+                diameter="24"
+                mode="indeterminate">
+              </mat-progress-spinner>
+            }
+            @if (!isDownloaded(bookId) && !isDownloading(bookId)) {
+              <button
+                mat-raised-button
+                color="primary"
+                (click)="downloadBook(bookId)">
+                {{ 'download.downloadForOffline' | translate }}
+              </button>
+            }
+            @if (isDownloaded(bookId)) {
+              <span class="size-label">
+                {{ formatSize(downloadedBooks[0]?.sizeBytes || 0) }}
+              </span>
+            }
+            @if (isDownloaded(bookId)) {
+              <button
+                mat-button
+                color="warn"
+                (click)="removeBook(bookId)">
+                {{ 'download.remove' | translate }}
+              </button>
+            }
+          </div>
         </div>
-        <div class="book-actions">
-          <mat-progress-spinner
-            *ngIf="isDownloading(bookId)"
-            diameter="24"
-            mode="indeterminate">
-          </mat-progress-spinner>
-          <button
-            *ngIf="!isDownloaded(bookId) && !isDownloading(bookId)"
-            mat-raised-button
-            color="primary"
-            (click)="downloadBook(bookId)">
-            {{ 'download.downloadForOffline' | translate }}
-          </button>
-          <span *ngIf="isDownloaded(bookId)" class="size-label">
-            {{ formatSize(downloadedBooks[0]?.sizeBytes || 0) }}
-          </span>
-          <button
-            *ngIf="isDownloaded(bookId)"
-            mat-button
-            color="warn"
-            (click)="removeBook(bookId)">
-            {{ 'download.remove' | translate }}
-          </button>
-        </div>
-      </div>
+      }
     </div>
 
-    <p *ngIf="progress.status === 'error'" class="error-text">
-      {{ progress.error }}
-    </p>
+    @if (progress.status === 'error') {
+      <p class="error-text">
+        {{ progress.error }}
+      </p>
+    }
   </section>
 
   <!-- Data Packages Section -->
@@ -51,25 +64,29 @@
     <p>{{ 'download.dataPackagesDescription' | translate }}</p>
 
     <div class="package-list">
-      <div class="package-item" *ngFor="let pkg of dataPackages">
-        <div class="package-info">
-          <mat-icon class="package-icon">file_download</mat-icon>
-          <div>
-            <span class="package-name">{{ pkg.name }}</span>
-            <span class="package-meta">{{ pkg.format }} &middot; {{ pkg.size }}</span>
+      @for (pkg of dataPackages; track pkg) {
+        <div class="package-item">
+          <div class="package-info">
+            <mat-icon class="package-icon">file_download</mat-icon>
+            <div>
+              <span class="package-name">{{ pkg.name }}</span>
+              <span class="package-meta">{{ pkg.format }} &middot; {{ pkg.size }}</span>
+            </div>
+          </div>
+          <div class="package-actions">
+            <a [href]="pkg.url" target="_blank" mat-raised-button color="primary" download>
+              <mat-icon>download</mat-icon> {{ 'download.downloadForOffline' | translate }}
+            </a>
+            @if (pkg.csvExport) {
+              <button mat-button (click)="exportAsCsv(pkg.id)"
+                [disabled]="csvExporting === pkg.id">
+                <mat-icon>table_chart</mat-icon>
+                {{ csvExporting === pkg.id ? ('download.exporting' | translate) : ('download.exportCsv' | translate) }}
+              </button>
+            }
           </div>
         </div>
-        <div class="package-actions">
-          <a [href]="pkg.url" target="_blank" mat-raised-button color="primary" download>
-            <mat-icon>download</mat-icon> {{ 'download.downloadForOffline' | translate }}
-          </a>
-          <button mat-button (click)="exportAsCsv(pkg.id)" *ngIf="pkg.csvExport"
-                  [disabled]="csvExporting === pkg.id">
-            <mat-icon>table_chart</mat-icon>
-            {{ csvExporting === pkg.id ? ('download.exporting' | translate) : ('download.exportCsv' | translate) }}
-          </button>
-        </div>
-      </div>
+      }
     </div>
   </section>
 

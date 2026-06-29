@@ -12,183 +12,232 @@
       [placeholder]="'search.searchBooksAndChapters' | translate"
       [attr.aria-label]="'search.search' | translate"
       autocomplete="off" autocapitalize="off" spellcheck="false" />
-    <button *ngIf="queryInput" type="button" class="search-page-clear"
-      (click)="clearBox()" [attr.aria-label]="'search.clearSearch' | translate"
-      [matTooltip]="'search.clearSearch' | translate">
-      <mat-icon>close</mat-icon>
-    </button>
+    @if (queryInput) {
+      <button type="button" class="search-page-clear"
+        (click)="clearBox()" [attr.aria-label]="'search.clearSearch' | translate"
+        [matTooltip]="'search.clearSearch' | translate">
+        <mat-icon>close</mat-icon>
+      </button>
+    }
     <button type="submit" class="search-page-submit" [attr.aria-label]="'search.search' | translate">
       <mat-icon>arrow_forward</mat-icon>
     </button>
   </form>
 
   <div class="search-controls">
-    <div class="search-mode-toggle" *ngIf="(mode$ | async) as mode">
-      <button class="mode-btn" [class.active]="mode === 'titles'" (click)="setMode('titles')">
-        <mat-icon>title</mat-icon>
-        {{ 'search.modeTitles' | translate }}
-      </button>
-      <button class="mode-btn" [class.active]="mode === 'fulltext'" (click)="setMode('fulltext')">
-        <mat-icon>article</mat-icon>
-        {{ 'search.modeFullText' | translate }}
-      </button>
-    </div>
+    @if ((mode$ | async); as mode) {
+      <div class="search-mode-toggle">
+        <button class="mode-btn" [class.active]="mode === 'titles'" (click)="setMode('titles')">
+          <mat-icon>title</mat-icon>
+          {{ 'search.modeTitles' | translate }}
+        </button>
+        <button class="mode-btn" [class.active]="mode === 'fulltext'" (click)="setMode('fulltext')">
+          <mat-icon>article</mat-icon>
+          {{ 'search.modeFullText' | translate }}
+        </button>
+      </div>
+    }
 
     <!-- Search-language picker (full-text only) -->
-    <label class="search-lang-picker" *ngIf="(mode$ | async) === 'fulltext' && availableLangs.length">
-      <mat-icon>translate</mat-icon>
-      <select [value]="(searchLang$ | async)" (change)="setLanguage($any($event.target).value)"
-        [attr.aria-label]="'search.searchLanguage' | translate">
-        <option value="both">{{ 'search.langBoth' | translate }}</option>
-        <option *ngFor="let l of availableLangs" [value]="l">{{ ('language.' + l) | translate }}</option>
-      </select>
-    </label>
+    @if ((mode$ | async) === 'fulltext' && availableLangs.length) {
+      <label class="search-lang-picker">
+        <mat-icon>translate</mat-icon>
+        <select [value]="(searchLang$ | async)" (change)="setLanguage($any($event.target).value)"
+          [attr.aria-label]="'search.searchLanguage' | translate">
+          <option value="both">{{ 'search.langBoth' | translate }}</option>
+          @for (l of availableLangs; track l) {
+            <option [value]="l">{{ ('language.' + l) | translate }}</option>
+          }
+        </select>
+      </label>
+    }
   </div>
 
-  <div *ngIf="(fullTextLoading$ | async)" class="fulltext-loading-banner">
-    <mat-spinner diameter="16"></mat-spinner>
-    <span>{{ 'search.loadingFullText' | translate }}</span>
-  </div>
+  @if ((fullTextLoading$ | async)) {
+    <div class="fulltext-loading-banner">
+      <mat-spinner diameter="16"></mat-spinner>
+      <span>{{ 'search.loadingFullText' | translate }}</span>
+    </div>
+  }
 
   <!-- Skeleton placeholder cards while a search runs (replaces a bare spinner) -->
-  <div *ngIf="(loading$ | async)" class="results-list skeleton-list" aria-hidden="true">
-    <div class="result-card skeleton-card" *ngFor="let i of skeletonRows">
-      <div class="skeleton-line skeleton-head"></div>
-      <div class="skeleton-line skeleton-snippet"></div>
-      <div class="skeleton-line skeleton-snippet-short"></div>
+  @if ((loading$ | async)) {
+    <div class="results-list skeleton-list" aria-hidden="true">
+      @for (i of skeletonRows; track i) {
+        <div class="result-card skeleton-card">
+          <div class="skeleton-line skeleton-head"></div>
+          <div class="skeleton-line skeleton-snippet"></div>
+          <div class="skeleton-line skeleton-snippet-short"></div>
+        </div>
+      }
     </div>
-  </div>
+  }
 
-  <div *ngIf="(error$ | async) as error" class="error-message">
-    <mat-icon>error_outline</mat-icon>
-    <span>{{ error }}</span>
-  </div>
+  @if ((error$ | async); as error) {
+    <div class="error-message">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+  }
 
   <!-- First-run empty state: no query yet — show what search can do -->
-  <section class="search-empty" *ngIf="!(query$ | async) && !(loading$ | async) && !(error$ | async)">
-    <mat-icon class="search-empty-icon">travel_explore</mat-icon>
-    <h2 class="search-empty-title">{{ 'search.startTitle' | translate }}</h2>
-    <p class="search-empty-hint">{{ 'search.startHint' | translate }}</p>
-    <div class="search-tips-card">
-      <h3 class="search-tips-heading">
-        <mat-icon>tips_and_updates</mat-icon>{{ 'search.tipOperators' | translate }}
-      </h3>
-      <ul class="search-tips-list">
-        <li>{{ 'search.tipAllWords' | translate }}</li>
-        <li>{{ 'search.tipPhraseQuotes' | translate }}</li>
-        <li>{{ 'search.opTopic' | translate }}</li>
-        <li>{{ 'search.opPhrase' | translate }}</li>
-        <li>{{ 'search.opRef' | translate }}</li>
-        <li>{{ 'search.opBook' | translate }}</li>
-        <li>{{ 'search.opTagType' | translate }}</li>
-      </ul>
-    </div>
-  </section>
+  @if (!(query$ | async) && !(loading$ | async) && !(error$ | async)) {
+    <section class="search-empty">
+      <mat-icon class="search-empty-icon">travel_explore</mat-icon>
+      <h2 class="search-empty-title">{{ 'search.startTitle' | translate }}</h2>
+      <p class="search-empty-hint">{{ 'search.startHint' | translate }}</p>
+      <div class="search-tips-card">
+        <h3 class="search-tips-heading">
+          <mat-icon>tips_and_updates</mat-icon>{{ 'search.tipOperators' | translate }}
+        </h3>
+        <ul class="search-tips-list">
+          <li>{{ 'search.tipAllWords' | translate }}</li>
+          <li>{{ 'search.tipPhraseQuotes' | translate }}</li>
+          <li>{{ 'search.opTopic' | translate }}</li>
+          <li>{{ 'search.opPhrase' | translate }}</li>
+          <li>{{ 'search.opRef' | translate }}</li>
+          <li>{{ 'search.opBook' | translate }}</li>
+          <li>{{ 'search.opTagType' | translate }}</li>
+        </ul>
+      </div>
+    </section>
+  }
 
-  <ng-container *ngIf="!(loading$ | async) && (results$ | async) as results">
-    <p *ngIf="(query$ | async) as query" class="results-summary">
-      <span *ngIf="results.length > 0">{{ results.length }}{{ (resultsCapped$ | async) ? '+' : '' }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
-      <span *ngIf="results.length === 0 && !(loading$ | async)" class="no-results-message">
-        <mat-icon class="no-results-icon">search_off</mat-icon>
-        {{ 'search.noResultsFor' | translate }} "{{ query }}"
-        <span class="no-results-hint">{{ 'search.tryDifferent' | translate }}</span>
-      </span>
-    </p>
-
+  @if (!(loading$ | async) && (results$ | async); as results) {
+    @if ((query$ | async); as query) {
+      <p class="results-summary">
+        @if (results.length > 0) {
+          <span>{{ results.length }}{{ (resultsCapped$ | async) ? '+' : '' }} {{ 'search.resultsFor' | translate }} "{{ query }}"</span>
+        }
+        @if (results.length === 0 && !(loading$ | async)) {
+          <span class="no-results-message">
+            <mat-icon class="no-results-icon">search_off</mat-icon>
+            {{ 'search.noResultsFor' | translate }} "{{ query }}"
+            <span class="no-results-hint">{{ 'search.tryDifferent' | translate }}</span>
+          </span>
+        }
+      </p>
+    }
     <div class="results-layout">
       <!-- Facet sidebar (full-text only; driven by Pagefind facet counts) -->
-      <aside class="facet-sidebar" *ngIf="facetGroups.length">
-        <div class="facet-sidebar-header">
-          <span class="facet-sidebar-title">
-            <mat-icon>filter_list</mat-icon>{{ 'search.filter' | translate }}
-          </span>
-          <button *ngIf="hasActiveFacets" class="facet-clear" (click)="clearFacets()"
-            [attr.aria-label]="'search.clearFilters' | translate"
-            [matTooltip]="'search.clearFilters' | translate">
-            <mat-icon>clear_all</mat-icon>
-          </button>
-        </div>
-        <div class="facet-group" *ngFor="let group of facetGroups">
-          <h3 class="facet-group-label">{{ group.labelKey | translate }}</h3>
-          <button *ngFor="let v of group.values"
-            class="facet-chip" [class.active]="v.active"
-            (click)="toggleFacet(group.filter, v.value, v.active)">
-            <span class="facet-chip-label">{{ v.labelKey ? (v.labelKey | translate) : v.label }}</span>
-            <span class="chip-count">{{ v.count }}</span>
-          </button>
-        </div>
-      </aside>
-
+      @if (facetGroups.length) {
+        <aside class="facet-sidebar">
+          <div class="facet-sidebar-header">
+            <span class="facet-sidebar-title">
+              <mat-icon>filter_list</mat-icon>{{ 'search.filter' | translate }}
+            </span>
+            @if (hasActiveFacets) {
+              <button class="facet-clear" (click)="clearFacets()"
+                [attr.aria-label]="'search.clearFilters' | translate"
+                [matTooltip]="'search.clearFilters' | translate">
+                <mat-icon>clear_all</mat-icon>
+              </button>
+            }
+          </div>
+          @for (group of facetGroups; track group) {
+            <div class="facet-group">
+              <h3 class="facet-group-label">{{ group.labelKey | translate }}</h3>
+              @for (v of group.values; track v) {
+                <button
+                  class="facet-chip" [class.active]="v.active"
+                  (click)="toggleFacet(group.filter, v.value, v.active)">
+                  <span class="facet-chip-label">{{ v.labelKey ? (v.labelKey | translate) : v.label }}</span>
+                  <span class="chip-count">{{ v.count }}</span>
+                </button>
+              }
+            </div>
+          }
+        </aside>
+      }
       <div class="results-main">
-        <div *ngIf="results.length > 0" class="results-toolbar">
-          <p class="showing-count">
-            {{ 'search.showing' | translate }} {{ displayedResults.length }} {{ 'search.of' | translate }} {{ results.length }} {{ 'search.results' | translate }}
-          </p>
-          <label class="sort-control" *ngIf="!pathOnlyMode">
-            <mat-icon>sort</mat-icon>
-            <select [value]="sortMode" (change)="setSort($any($event.target).value)"
-              [attr.aria-label]="'search.sortBy' | translate">
-              <option value="relevance">{{ 'search.sortRelevance' | translate }}</option>
-              <option value="book">{{ 'search.sortBook' | translate }}</option>
-            </select>
-          </label>
-        </div>
-
+        @if (results.length > 0) {
+          <div class="results-toolbar">
+            <p class="showing-count">
+              {{ 'search.showing' | translate }} {{ displayedResults.length }} {{ 'search.of' | translate }} {{ results.length }} {{ 'search.results' | translate }}
+            </p>
+            @if (!pathOnlyMode) {
+              <label class="sort-control">
+                <mat-icon>sort</mat-icon>
+                <select [value]="sortMode" (change)="setSort($any($event.target).value)"
+                  [attr.aria-label]="'search.sortBy' | translate">
+                  <option value="relevance">{{ 'search.sortRelevance' | translate }}</option>
+                  <option value="book">{{ 'search.sortBook' | translate }}</option>
+                </select>
+              </label>
+            }
+          </div>
+        }
         <div class="results-list">
-          <mat-card
-            *ngFor="let result of displayedResults"
-            appearance="outlined"
-            class="result-card"
-            [class.hadith-result]="result.kind === 'hadith' || result.kind === 'verse'"
-            [attr.data-topic-path]="pathOnlyMode ? result.path : null"
-            [routerLink]="['/books', getBookPath(result)]"
-            queryParamsHandling="preserve">
-            <mat-card-content>
-              <div class="result-header">
-                <span class="result-book">{{ result.bookName }}</span>
-                <span class="result-ref" *ngIf="reference(result.path)">{{ reference(result.path) }}</span>
-                <span class="result-flex"></span>
-                <span *ngIf="(searchLang$ | async) === 'both' && result.lang" class="result-lang-tag">{{ result.lang | uppercase }}</span>
-                <span *ngIf="result.kind !== 'title'" class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
-              </div>
-              <div class="result-title" *ngIf="result.title">{{ result.title }}</div>
-              <div class="result-title-ar arabic" lang="ar" *ngIf="result.titleAr">{{ result.titleAr }}</div>
-
-              <!-- Highlighted Pagefind excerpt (innerHTML keeps <mark>; Angular sanitizes) -->
-              <div class="result-snippet" *ngIf="result.excerpt; else lazyOrPlain" [innerHTML]="result.excerpt"
-                [attr.dir]="isRtl(result.excerpt) ? 'rtl' : 'ltr'"></div>
-              <ng-template #lazyOrPlain>
-                <ng-container *ngIf="pathOnlyMode; else plainSnippet">
-                  <div class="result-snippet" *ngIf="resolvedSnippets.get(result.path) as snippet; else skel"
-                    [attr.dir]="isRtl(snippet) ? 'rtl' : 'ltr'">{{ snippet }}</div>
-                  <ng-template #skel>
-                    <div class="skeleton-line skeleton-snippet"></div>
-                    <div class="skeleton-line skeleton-snippet-short"></div>
-                  </ng-template>
-                </ng-container>
-                <ng-template #plainSnippet>
-                  <div class="result-snippet" *ngIf="result.snippet" [attr.dir]="isRtl(result.snippet) ? 'rtl' : 'ltr'">{{ result.snippet }}</div>
-                </ng-template>
-              </ng-template>
-
-            </mat-card-content>
-          </mat-card>
+          @for (result of displayedResults; track result) {
+            <mat-card
+              appearance="outlined"
+              class="result-card"
+              [class.hadith-result]="result.kind === 'hadith' || result.kind === 'verse'"
+              [attr.data-topic-path]="pathOnlyMode ? result.path : null"
+              [routerLink]="['/books', getBookPath(result)]"
+              queryParamsHandling="preserve">
+              <mat-card-content>
+                <div class="result-header">
+                  <span class="result-book">{{ result.bookName }}</span>
+                  @if (reference(result.path)) {
+                    <span class="result-ref">{{ reference(result.path) }}</span>
+                  }
+                  <span class="result-flex"></span>
+                  @if ((searchLang$ | async) === 'both' && result.lang) {
+                    <span class="result-lang-tag">{{ result.lang | uppercase }}</span>
+                  }
+                  @if (result.kind !== 'title') {
+                    <span class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
+                  }
+                </div>
+                @if (result.title) {
+                  <div class="result-title">{{ result.title }}</div>
+                }
+                @if (result.titleAr) {
+                  <div class="result-title-ar arabic" lang="ar">{{ result.titleAr }}</div>
+                }
+                <!-- Highlighted Pagefind excerpt (innerHTML keeps <mark>; Angular sanitizes) -->
+                @if (result.excerpt) {
+                  <div class="result-snippet" [innerHTML]="result.excerpt"
+                  [attr.dir]="isRtl(result.excerpt) ? 'rtl' : 'ltr'"></div>
+                } @else {
+                  @if (pathOnlyMode) {
+                    @if (resolvedSnippets.get(result.path); as snippet) {
+                      <div class="result-snippet"
+                      [attr.dir]="isRtl(snippet) ? 'rtl' : 'ltr'">{{ snippet }}</div>
+                    } @else {
+                      <div class="skeleton-line skeleton-snippet"></div>
+                      <div class="skeleton-line skeleton-snippet-short"></div>
+                    }
+                  } @else {
+                    @if (result.snippet) {
+                      <div class="result-snippet" [attr.dir]="isRtl(result.snippet) ? 'rtl' : 'ltr'">{{ result.snippet }}</div>
+                    }
+                  }
+                }
+              </mat-card-content>
+            </mat-card>
+          }
         </div>
-
-        <div class="load-more-container" *ngIf="hasMoreResults">
-          <button class="load-more-btn" (click)="loadMore()">
-            <mat-icon>expand_more</mat-icon>
-            {{ 'search.loadMore' | translate }}
-          </button>
-        </div>
-
-        <p *ngIf="results.length > 0 && !hasMoreResults && !(resultsCapped$ | async)" class="showing-all">
-          {{ 'search.showingAll' | translate }} ({{ results.length }})
-        </p>
-        <p *ngIf="results.length > 0 && !hasMoreResults && (resultsCapped$ | async)" class="showing-all">
-          {{ 'search.refineHint' | translate }}
-        </p>
+        @if (hasMoreResults) {
+          <div class="load-more-container">
+            <button class="load-more-btn" (click)="loadMore()">
+              <mat-icon>expand_more</mat-icon>
+              {{ 'search.loadMore' | translate }}
+            </button>
+          </div>
+        }
+        @if (results.length > 0 && !hasMoreResults && !(resultsCapped$ | async)) {
+          <p class="showing-all">
+            {{ 'search.showingAll' | translate }} ({{ results.length }})
+          </p>
+        }
+        @if (results.length > 0 && !hasMoreResults && (resultsCapped$ | async)) {
+          <p class="showing-all">
+            {{ 'search.refineHint' | translate }}
+          </p>
+        }
       </div>
     </div>
-  </ng-container>
+  }
 </div>

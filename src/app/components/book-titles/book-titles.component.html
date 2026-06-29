@@ -1,20 +1,42 @@
-<div *ngIf="titles || verse" class="content description mat-elevation-z2">
-  <div class="textrow titlerow" *ngIf="titles" [ngSwitch]="headingLevel">
-    <ng-container *ngSwitchCase="1">
-      <h1 *ngIf="titles.ar" class="arabic" lang="ar" [innerHTML]="titles.ar"></h1>
-      <h1 *ngIf="titles.en" [innerHTML]="titles.en"></h1>
-    </ng-container>
-    <ng-container *ngSwitchCase="2">
-      <h2 *ngIf="titles.ar" class="arabic" lang="ar" [innerHTML]="titles.ar"></h2>
-      <h2 *ngIf="titles.en" [innerHTML]="titles.en"></h2>
-    </ng-container>
+@if (titles || verse) {
+  <div class="content description mat-elevation-z2">
+    @if (titles) {
+      <div class="textrow titlerow">
+        @switch (headingLevel) {
+          @case (1) {
+            @if (titles.ar) {
+              <h1 class="arabic" lang="ar" [innerHTML]="titles.ar"></h1>
+            }
+            @if (titles.en) {
+              <h1 [innerHTML]="titles.en"></h1>
+            }
+          }
+          @case (2) {
+            @if (titles.ar) {
+              <h2 class="arabic" lang="ar" [innerHTML]="titles.ar"></h2>
+            }
+            @if (titles.en) {
+              <h2 [innerHTML]="titles.en"></h2>
+            }
+          }
+        }
+      </div>
+    }
+    @if (author?.en) {
+      <div class="author-line">
+        <span class="author-en">{{ author.en }}</span>
+        @if (author.ar) {
+          <span class="author-ar arabic" lang="ar"> - {{ author.ar }}</span>
+        }
+      </div>
+    }
+    @if (verse) {
+      <div>
+        <app-verse-text [verse]="verse"></app-verse-text>
+      </div>
+    }
+    @if (descriptions) {
+      <p [innerHTML]="descriptions.en"></p>
+    }
   </div>
-  <div class="author-line" *ngIf="author?.en">
-    <span class="author-en">{{ author.en }}</span>
-    <span class="author-ar arabic" lang="ar" *ngIf="author.ar"> - {{ author.ar }}</span>
-  </div>
-  <div *ngIf="verse">
-    <app-verse-text [verse]="verse"></app-verse-text>
-  </div>
-  <p *ngIf="descriptions" [innerHTML]="descriptions.en"></p>
-</div>
+}

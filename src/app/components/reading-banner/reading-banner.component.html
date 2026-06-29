@@ -1,26 +1,28 @@
-<div *ngIf="banner" class="reading-banner"
-     [class.banner-streak]="banner.kind === 'streak-at-risk'"
-     [class.banner-goal]="banner.kind === 'goal-pending'"
-     role="status" aria-live="polite">
-  <span class="banner-icon" aria-hidden="true">{{ iconFor(banner.kind) }}</span>
-  <div class="banner-body">
-    <div class="banner-title">{{ titleKey(banner.kind) | translate }}</div>
-    <div class="banner-subtitle">
-      <ng-container *ngIf="banner.kind === 'streak-at-risk'">
-        {{ 'reading.banner.streakAtRisk.subtitleWithCount' | translate }} {{ banner.count }}.
-      </ng-container>
-      <ng-container *ngIf="banner.kind === 'goal-pending'">
-        {{ banner.count }} {{ 'reading.banner.goalPending.left' | translate }}
-      </ng-container>
+@if (banner) {
+  <div class="reading-banner"
+    [class.banner-streak]="banner.kind === 'streak-at-risk'"
+    [class.banner-goal]="banner.kind === 'goal-pending'"
+    role="status" aria-live="polite">
+    <span class="banner-icon" aria-hidden="true">{{ iconFor(banner.kind) }}</span>
+    <div class="banner-body">
+      <div class="banner-title">{{ titleKey(banner.kind) | translate }}</div>
+      <div class="banner-subtitle">
+        @if (banner.kind === 'streak-at-risk') {
+          {{ 'reading.banner.streakAtRisk.subtitleWithCount' | translate }} {{ banner.count }}.
+        }
+        @if (banner.kind === 'goal-pending') {
+          {{ banner.count }} {{ 'reading.banner.goalPending.left' | translate }}
+        }
+      </div>
     </div>
+    <a class="banner-cta" [routerLink]="ctaLink()" queryParamsHandling="preserve" (click)="dismiss()">
+      {{ 'reading.banner.open' | translate }}
+      <mat-icon>arrow_forward</mat-icon>
+    </a>
+    <button class="banner-dismiss" (click)="dismiss($event)"
+      [attr.aria-label]="'reading.banner.dismiss' | translate"
+      [matTooltip]="'reading.banner.dismiss' | translate">
+      <mat-icon>close</mat-icon>
+    </button>
   </div>
-  <a class="banner-cta" [routerLink]="ctaLink()" queryParamsHandling="preserve" (click)="dismiss()">
-    {{ 'reading.banner.open' | translate }}
-    <mat-icon>arrow_forward</mat-icon>
-  </a>
-  <button class="banner-dismiss" (click)="dismiss($event)"
-          [attr.aria-label]="'reading.banner.dismiss' | translate"
-          [matTooltip]="'reading.banner.dismiss' | translate">
-    <mat-icon>close</mat-icon>
-  </button>
-</div>
+}

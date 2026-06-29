@@ -53,7 +53,7 @@ export class IndexState implements NgxsOnInit {
   @Selector()
   static getBookForLanguage(state: IndexStateModel) {
     return (language: string): IndexedTitles => {
-      return state.books[language];
+      return state?.books?.[language];
     };
   }
 

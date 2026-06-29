@@ -1,14 +1,16 @@
-<div class="reading-sheet-backdrop" *ngIf="open$ | async" (click)="close()" aria-hidden="true"></div>
+@if (open$ | async) {
+  <div class="reading-sheet-backdrop" (click)="close()" aria-hidden="true"></div>
+}
 <aside class="reading-sheet-panel" [class.open]="open$ | async"
-       role="dialog" aria-modal="true"
-       [attr.aria-label]="'settings.title' | translate"
-       [attr.aria-hidden]="!(open$ | async)">
+  role="dialog" aria-modal="true"
+  [attr.aria-label]="'settings.title' | translate"
+  [attr.aria-hidden]="!(open$ | async)">
   <header class="reading-sheet-header">
     <mat-icon>settings</mat-icon>
     <span class="reading-sheet-title">{{ 'settings.title' | translate }}</span>
     <button class="reading-sheet-close" (click)="close()"
-            [attr.aria-label]="'settings.close' | translate"
-            [matTooltip]="'settings.close' | translate">
+      [attr.aria-label]="'settings.close' | translate"
+      [matTooltip]="'settings.close' | translate">
       <mat-icon>close</mat-icon>
     </button>
   </header>
@@ -19,25 +21,27 @@
       <div class="reading-sheet-row">
         <span class="reading-sheet-row-label">{{ 'settings.toggleDarkMode' | translate }}</span>
         <button class="reading-sheet-icon-btn" (click)="toggleTheme()"
-                [attr.aria-label]="'settings.toggleDarkMode' | translate"
-                [matTooltip]="'settings.toggleDarkMode' | translate">
+          [attr.aria-label]="'settings.toggleDarkMode' | translate"
+          [matTooltip]="'settings.toggleDarkMode' | translate">
           <mat-icon>{{ (theme$ | async) === 'dark' ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
       </div>
-      <div class="reading-sheet-row" *ngIf="fontSize$ | async as fontSize">
-        <span class="reading-sheet-row-label">{{ 'settings.fontSize' | translate }}</span>
-        <div class="reading-sheet-font-controls">
-          <button (click)="decreaseFontSize()" [disabled]="fontSize <= 75"
-                  [attr.aria-label]="'settings.decreaseFont' | translate"
-                  [matTooltip]="'settings.decreaseFont' | translate">A-</button>
-          <button (click)="resetFontSize()"
-                  [attr.aria-label]="'settings.resetFont' | translate"
-                  [matTooltip]="'settings.resetFont' | translate">A</button>
-          <button (click)="increaseFontSize()" [disabled]="fontSize >= 150"
-                  [attr.aria-label]="'settings.increaseFont' | translate"
-                  [matTooltip]="'settings.increaseFont' | translate">A+</button>
+      @if (fontSize$ | async; as fontSize) {
+        <div class="reading-sheet-row">
+          <span class="reading-sheet-row-label">{{ 'settings.fontSize' | translate }}</span>
+          <div class="reading-sheet-font-controls">
+            <button (click)="decreaseFontSize()" [disabled]="fontSize <= 75"
+              [attr.aria-label]="'settings.decreaseFont' | translate"
+            [matTooltip]="'settings.decreaseFont' | translate">A-</button>
+            <button (click)="resetFontSize()"
+              [attr.aria-label]="'settings.resetFont' | translate"
+            [matTooltip]="'settings.resetFont' | translate">A</button>
+            <button (click)="increaseFontSize()" [disabled]="fontSize >= 150"
+              [attr.aria-label]="'settings.increaseFont' | translate"
+            [matTooltip]="'settings.increaseFont' | translate">A+</button>
+          </div>
         </div>
-      </div>
+      }
     </section>
 
     <!-- Language -->
@@ -46,116 +50,126 @@
       <div class="reading-sheet-row">
         <span class="reading-sheet-row-label">{{ 'language.picker' | translate }}</span>
         <select class="reading-sheet-select"
-                [value]="currentLang$ | async"
-                (change)="onUiLanguageChange($any($event.target).value)"
-                [attr.aria-label]="'language.picker' | translate">
-          <option *ngFor="let lang of uiLanguages" [value]="lang.code">{{ lang.name }}</option>
+          [value]="currentLang$ | async"
+          (change)="onUiLanguageChange($any($event.target).value)"
+          [attr.aria-label]="'language.picker' | translate">
+          @for (lang of uiLanguages; track lang) {
+            <option [value]="lang.code">{{ lang.name }}</option>
+          }
         </select>
       </div>
-      <div class="reading-sheet-row" *ngIf="preferences$ | async as prefs">
-        <span class="reading-sheet-row-label">{{ 'settings.ai.wordByWordLang' | translate }}</span>
-        <select class="reading-sheet-select"
-                [ngModel]="prefs.wordByWordDefaultLang"
-                (ngModelChange)="onWordByWordLangChange($event)"
-                [attr.aria-label]="'settings.ai.wordByWordLang' | translate">
-          <option value="en">English</option>
-          <option value="ur">اردو</option>
-          <option value="tr">Türkçe</option>
-          <option value="fa">فارسی</option>
-          <option value="id">Indonesia</option>
-          <option value="bn">বাংলা</option>
-          <option value="es">Español</option>
-          <option value="fr">Français</option>
-          <option value="de">Deutsch</option>
-          <option value="ru">Русский</option>
-          <option value="zh">中文</option>
-        </select>
-      </div>
+      @if (preferences$ | async; as prefs) {
+        <div class="reading-sheet-row">
+          <span class="reading-sheet-row-label">{{ 'settings.ai.wordByWordLang' | translate }}</span>
+          <select class="reading-sheet-select"
+            [ngModel]="prefs.wordByWordDefaultLang"
+            (ngModelChange)="onWordByWordLangChange($event)"
+            [attr.aria-label]="'settings.ai.wordByWordLang' | translate">
+            <option value="en">English</option>
+            <option value="ur">اردو</option>
+            <option value="tr">Türkçe</option>
+            <option value="fa">فارسی</option>
+            <option value="id">Indonesia</option>
+            <option value="bn">বাংলা</option>
+            <option value="es">Español</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="ru">Русский</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
+      }
     </section>
 
     <!-- Translation (current chapter) -->
     <section class="reading-sheet-section">
       <h3 class="reading-sheet-section-title">{{ 'translation.selectTranslation' | translate }}</h3>
       <!-- Mirrors the per-chapter translation dropdown in the page so
-           users can switch translation without scrolling back to the
-           top. Dropdown is data-driven; empty on non-book routes. -->
+      users can switch translation without scrolling back to the
+      top. Dropdown is data-driven; empty on non-book routes. -->
       <app-translation-selection></app-translation-selection>
     </section>
 
     <!-- AI Features -->
-    <section class="reading-sheet-section" *ngIf="preferences$ | async as prefs">
-      <h3 class="reading-sheet-section-title">{{ 'settings.ai.title' | translate }}</h3>
-      <label class="reading-sheet-pref" for="rs-pref-chain">
-        <input type="checkbox" id="rs-pref-chain" [checked]="prefs.showChainDiagram"
-               (change)="onPrefChange('showChainDiagram', $any($event.target).checked)">
-        <span>{{ 'narrator.chainDiagram' | translate }}</span>
-      </label>
-      <label class="reading-sheet-pref" for="rs-pref-wbw">
-        <input type="checkbox" id="rs-pref-wbw" [checked]="prefs.showWordByWord"
-               (change)="onPrefChange('showWordByWord', $any($event.target).checked)">
-        <span>{{ 'book.wordByWordAnalysis' | translate }}</span>
-      </label>
-      <label class="reading-sheet-pref" for="rs-pref-diacritized">
-        <input type="checkbox" id="rs-pref-diacritized" [checked]="prefs.showDiacritizedByDefault"
-               (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">
-        <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
-      </label>
-      <label class="reading-sheet-pref" for="rs-pref-badges">
-        <input type="checkbox" id="rs-pref-badges" [checked]="prefs.showContentTypeBadges"
-               (change)="onPrefChange('showContentTypeBadges', $any($event.target).checked)">
-        <span>{{ 'settings.ai.showBadges' | translate }}</span>
-      </label>
-      <label class="reading-sheet-pref" for="rs-pref-topics">
-        <input type="checkbox" id="rs-pref-topics" [checked]="prefs.showTopicTags"
-               (change)="onPrefChange('showTopicTags', $any($event.target).checked)">
-        <span>{{ 'settings.ai.showTopics' | translate }}</span>
-      </label>
-      <label class="reading-sheet-pref" for="rs-pref-disclaimer">
-        <input type="checkbox" id="rs-pref-disclaimer" [checked]="prefs.showAiTranslationDisclaimer"
-               (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
-        <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
-      </label>
-    </section>
+    @if (preferences$ | async; as prefs) {
+      <section class="reading-sheet-section">
+        <h3 class="reading-sheet-section-title">{{ 'settings.ai.title' | translate }}</h3>
+        <label class="reading-sheet-pref" for="rs-pref-chain">
+          <input type="checkbox" id="rs-pref-chain" [checked]="prefs.showChainDiagram"
+            (change)="onPrefChange('showChainDiagram', $any($event.target).checked)">
+          <span>{{ 'narrator.chainDiagram' | translate }}</span>
+        </label>
+        <label class="reading-sheet-pref" for="rs-pref-wbw">
+          <input type="checkbox" id="rs-pref-wbw" [checked]="prefs.showWordByWord"
+            (change)="onPrefChange('showWordByWord', $any($event.target).checked)">
+          <span>{{ 'book.wordByWordAnalysis' | translate }}</span>
+        </label>
+        <label class="reading-sheet-pref" for="rs-pref-diacritized">
+          <input type="checkbox" id="rs-pref-diacritized" [checked]="prefs.showDiacritizedByDefault"
+            (change)="onPrefChange('showDiacritizedByDefault', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showDiacritized' | translate }}</span>
+        </label>
+        <label class="reading-sheet-pref" for="rs-pref-badges">
+          <input type="checkbox" id="rs-pref-badges" [checked]="prefs.showContentTypeBadges"
+            (change)="onPrefChange('showContentTypeBadges', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showBadges' | translate }}</span>
+        </label>
+        <label class="reading-sheet-pref" for="rs-pref-topics">
+          <input type="checkbox" id="rs-pref-topics" [checked]="prefs.showTopicTags"
+            (change)="onPrefChange('showTopicTags', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showTopics' | translate }}</span>
+        </label>
+        <label class="reading-sheet-pref" for="rs-pref-disclaimer">
+          <input type="checkbox" id="rs-pref-disclaimer" [checked]="prefs.showAiTranslationDisclaimer"
+            (change)="onPrefChange('showAiTranslationDisclaimer', $any($event.target).checked)">
+          <span>{{ 'settings.ai.showDisclaimer' | translate }}</span>
+        </label>
+      </section>
+    }
 
     <!-- Reading progress (RE-05 / RE-09 / RE-17) -->
-    <section class="reading-sheet-section" *ngIf="preferences$ | async as prefs">
-      <h3 class="reading-sheet-section-title">{{ 'reading.progress' | translate }}</h3>
-      <label class="reading-sheet-pref reading-sheet-pref-with-hint" for="rs-pref-mute-read">
-        <input type="checkbox" id="rs-pref-mute-read" [checked]="prefs.muteReadVerses"
-               (change)="onPrefChange('muteReadVerses', $any($event.target).checked)">
-        <span class="reading-sheet-pref-text">
-          <span>{{ 'reading.muteReadVerses' | translate }}</span>
-          <span class="reading-sheet-pref-hint">{{ 'reading.muteReadVersesHint' | translate }}</span>
-        </span>
-      </label>
-      <label class="reading-sheet-pref reading-sheet-pref-with-hint" for="rs-pref-mute-banner">
-        <!-- Inverted semantics: the stored flag is `muteReadingBanner` (default
-             false). Showing the banner is the default-on UX — the checkbox
-             reads "Show reminder banner". -->
-        <input type="checkbox" id="rs-pref-mute-banner" [checked]="!prefs.muteReadingBanner"
-               (change)="onPrefChange('muteReadingBanner', !$any($event.target).checked)">
-        <span class="reading-sheet-pref-text">
-          <span>{{ 'reading.banner.toggleLabel' | translate }}</span>
-          <span class="reading-sheet-pref-hint">{{ 'reading.banner.toggleHint' | translate }}</span>
-        </span>
-      </label>
-      <button class="reading-sheet-danger" (click)="resetAllProgress()">
-        <mat-icon>restart_alt</mat-icon>
-        <span>{{ 'reading.resetAll' | translate }}</span>
-      </button>
-    </section>
+    @if (preferences$ | async; as prefs) {
+      <section class="reading-sheet-section">
+        <h3 class="reading-sheet-section-title">{{ 'reading.progress' | translate }}</h3>
+        <label class="reading-sheet-pref reading-sheet-pref-with-hint" for="rs-pref-mute-read">
+          <input type="checkbox" id="rs-pref-mute-read" [checked]="prefs.muteReadVerses"
+            (change)="onPrefChange('muteReadVerses', $any($event.target).checked)">
+          <span class="reading-sheet-pref-text">
+            <span>{{ 'reading.muteReadVerses' | translate }}</span>
+            <span class="reading-sheet-pref-hint">{{ 'reading.muteReadVersesHint' | translate }}</span>
+          </span>
+        </label>
+        <label class="reading-sheet-pref reading-sheet-pref-with-hint" for="rs-pref-mute-banner">
+          <!-- Inverted semantics: the stored flag is `muteReadingBanner` (default
+          false). Showing the banner is the default-on UX — the checkbox
+          reads "Show reminder banner". -->
+          <input type="checkbox" id="rs-pref-mute-banner" [checked]="!prefs.muteReadingBanner"
+            (change)="onPrefChange('muteReadingBanner', !$any($event.target).checked)">
+          <span class="reading-sheet-pref-text">
+            <span>{{ 'reading.banner.toggleLabel' | translate }}</span>
+            <span class="reading-sheet-pref-hint">{{ 'reading.banner.toggleHint' | translate }}</span>
+          </span>
+        </label>
+        <button class="reading-sheet-danger" (click)="resetAllProgress()">
+          <mat-icon>restart_alt</mat-icon>
+          <span>{{ 'reading.resetAll' | translate }}</span>
+        </button>
+      </section>
+    }
 
     <!-- Navigate -->
     <section class="reading-sheet-section">
       <h3 class="reading-sheet-section-title">{{ 'nav.navigate' | translate }}</h3>
-      <a *ngFor="let link of navLinks"
-         class="reading-sheet-nav-link"
-         [routerLink]="link.route"
-         (click)="close()"
-         queryParamsHandling="preserve">
-        <mat-icon>{{ link.icon }}</mat-icon>
-        <span>{{ link.labelKey | translate }}</span>
-      </a>
+      @for (link of navLinks; track link) {
+        <a
+          class="reading-sheet-nav-link"
+          [routerLink]="link.route"
+          (click)="close()"
+          queryParamsHandling="preserve">
+          <mat-icon>{{ link.icon }}</mat-icon>
+          <span>{{ link.labelKey | translate }}</span>
+        </a>
+      }
     </section>
   </div>
 </aside>

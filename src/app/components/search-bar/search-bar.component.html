@@ -19,90 +19,111 @@
       aria-autocomplete="list"
       aria-controls="search-results-listbox"
       autocomplete="off">
-    <button
-      *ngIf="searchValue"
-      class="clear-btn"
-      (mousedown)="clearSearch()"
-      [attr.aria-label]="'search.clearSearch' | translate"
-      [matTooltip]="'search.clearSearch' | translate">
-      <mat-icon>close</mat-icon>
-    </button>
-    <button
-      *ngIf="!searchValue"
-      class="search-tips-btn"
-      (mousedown)="showTips = !showTips"
-      [attr.aria-label]="'search.tipsTitle' | translate"
-      [matTooltip]="'search.tipsTitle' | translate">
-      <mat-icon>help_outline</mat-icon>
-    </button>
-  </div>
-
-  <div class="search-tips-panel" *ngIf="showTips" (mousedown)="$event.stopPropagation()">
-    <h4>{{ 'search.tipsTitle' | translate }}</h4>
-    <ul>
-      <li>{{ 'search.tipModes' | translate }}</li>
-      <li>{{ 'search.tipMultipleWords' | translate }}</li>
-      <li>{{ 'search.tipArabic' | translate }}</li>
-      <li>{{ 'search.tipFuzzy' | translate }}</li>
-      <li>{{ 'search.tipMinChars' | translate }}</li>
-      <li>{{ 'search.tipEnter' | translate }}</li>
-    </ul>
-    <h4>{{ 'search.tipOperators' | translate }}</h4>
-    <ul class="search-tips-operators">
-      <li>{{ 'search.tipAllWords' | translate }}</li>
-      <li>{{ 'search.tipPhraseQuotes' | translate }}</li>
-      <li><code>{{ 'search.opTopic' | translate }}</code></li>
-      <li><code>{{ 'search.opRef' | translate }}</code></li>
-      <li><code>{{ 'search.opPhrase' | translate }}</code></li>
-      <li><code>{{ 'search.opBook' | translate }}</code></li>
-      <li><code>{{ 'search.opTagType' | translate }}</code></li>
-    </ul>
-    <button class="tips-close-btn" (mousedown)="showTips = false">{{ 'search.tipsClose' | translate }}</button>
-  </div>
-
-  <!-- Recent searches: shown on focus when the box is empty -->
-  <div class="search-recent-panel" *ngIf="showRecent && !showDropdown && recentSearches.length"
-       (mousedown)="$event.stopPropagation()">
-    <div class="recent-header">
-      <span class="recent-title">{{ 'search.recentSearches' | translate }}</span>
-      <button class="recent-clear-btn" (mousedown)="clearRecent($event)">{{ 'search.clearRecent' | translate }}</button>
+      @if (searchValue) {
+        <button
+          class="clear-btn"
+          (mousedown)="clearSearch()"
+          [attr.aria-label]="'search.clearSearch' | translate"
+          [matTooltip]="'search.clearSearch' | translate">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+      @if (!searchValue) {
+        <button
+          class="search-tips-btn"
+          (mousedown)="showTips = !showTips"
+          [attr.aria-label]="'search.tipsTitle' | translate"
+          [matTooltip]="'search.tipsTitle' | translate">
+          <mat-icon>help_outline</mat-icon>
+        </button>
+      }
     </div>
-    <div class="recent-item" *ngFor="let term of recentSearches" (mousedown)="runRecent(term)">
-      <mat-icon class="recent-icon">history</mat-icon>
-      <span class="recent-term">{{ term }}</span>
-      <button class="recent-remove-btn" (mousedown)="removeRecent(term, $event)"
-              [attr.aria-label]="'search.clearSearch' | translate">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-  </div>
 
-  <div class="search-dropdown" *ngIf="showDropdown" role="listbox" id="search-results-listbox">
-    <div *ngIf="(loading$ | async)" class="dropdown-loading">
-      <mat-spinner diameter="20"></mat-spinner>
-    </div>
-    <ng-container *ngIf="(results$ | async) as results">
-      <div
-        *ngFor="let result of results | slice:0:8; let i = index"
-        class="dropdown-item"
-        [class.active]="i === activeResultIndex"
-        role="option"
-        [id]="'search-result-' + i"
-        [attr.aria-selected]="i === activeResultIndex"
-        (mousedown)="selectResult(result)">
-        <div class="result-title">
-          {{ result.title || result.titleAr }}
-          <span *ngIf="result.kind !== 'title'" class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
+    @if (showTips) {
+      <div class="search-tips-panel" (mousedown)="$event.stopPropagation()">
+        <h4>{{ 'search.tipsTitle' | translate }}</h4>
+        <ul>
+          <li>{{ 'search.tipModes' | translate }}</li>
+          <li>{{ 'search.tipMultipleWords' | translate }}</li>
+          <li>{{ 'search.tipArabic' | translate }}</li>
+          <li>{{ 'search.tipFuzzy' | translate }}</li>
+          <li>{{ 'search.tipMinChars' | translate }}</li>
+          <li>{{ 'search.tipEnter' | translate }}</li>
+        </ul>
+        <h4>{{ 'search.tipOperators' | translate }}</h4>
+        <ul class="search-tips-operators">
+          <li>{{ 'search.tipAllWords' | translate }}</li>
+          <li>{{ 'search.tipPhraseQuotes' | translate }}</li>
+          <li><code>{{ 'search.opTopic' | translate }}</code></li>
+          <li><code>{{ 'search.opRef' | translate }}</code></li>
+          <li><code>{{ 'search.opPhrase' | translate }}</code></li>
+          <li><code>{{ 'search.opBook' | translate }}</code></li>
+          <li><code>{{ 'search.opTagType' | translate }}</code></li>
+        </ul>
+        <button class="tips-close-btn" (mousedown)="showTips = false">{{ 'search.tipsClose' | translate }}</button>
+      </div>
+    }
+
+    <!-- Recent searches: shown on focus when the box is empty -->
+    @if (showRecent && !showDropdown && recentSearches.length) {
+      <div class="search-recent-panel"
+        (mousedown)="$event.stopPropagation()">
+        <div class="recent-header">
+          <span class="recent-title">{{ 'search.recentSearches' | translate }}</span>
+          <button class="recent-clear-btn" (mousedown)="clearRecent($event)">{{ 'search.clearRecent' | translate }}</button>
         </div>
-        <div class="result-snippet" *ngIf="result.snippet">{{ result.snippet }}</div>
-        <div class="result-meta">{{ result.bookName }}</div>
+        @for (term of recentSearches; track term) {
+          <div class="recent-item" (mousedown)="runRecent(term)">
+            <mat-icon class="recent-icon">history</mat-icon>
+            <span class="recent-term">{{ term }}</span>
+            <button class="recent-remove-btn" (mousedown)="removeRecent(term, $event)"
+              [attr.aria-label]="'search.clearSearch' | translate">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
       </div>
-      <div *ngIf="results.length === 0 && !(loading$ | async)" class="dropdown-empty">
-        {{ 'search.noResults' | translate }}
+    }
+
+    @if (showDropdown) {
+      <div class="search-dropdown" role="listbox" id="search-results-listbox">
+        @if ((loading$ | async)) {
+          <div class="dropdown-loading">
+            <mat-spinner diameter="20"></mat-spinner>
+          </div>
+        }
+        @if ((results$ | async); as results) {
+          @for (result of results | slice:0:8; track result; let i = $index) {
+            <div
+              class="dropdown-item"
+              [class.active]="i === activeResultIndex"
+              role="option"
+              [id]="'search-result-' + i"
+              [attr.aria-selected]="i === activeResultIndex"
+              (mousedown)="selectResult(result)">
+              <div class="result-title">
+                {{ result.title || result.titleAr }}
+                @if (result.kind !== 'title') {
+                  <span class="result-kind-badge">{{ 'search.' + result.kind | translate }}</span>
+                }
+              </div>
+              @if (result.snippet) {
+                <div class="result-snippet">{{ result.snippet }}</div>
+              }
+              <div class="result-meta">{{ result.bookName }}</div>
+            </div>
+          }
+          @if (results.length === 0 && !(loading$ | async)) {
+            <div class="dropdown-empty">
+              {{ 'search.noResults' | translate }}
+            </div>
+          }
+          @if (results.length > 8) {
+            <div class="dropdown-more" (mousedown)="onSearchSubmit()">
+              {{ 'search.search' | translate }}...
+            </div>
+          }
+        }
       </div>
-      <div *ngIf="results.length > 8" class="dropdown-more" (mousedown)="onSearchSubmit()">
-        {{ 'search.search' | translate }}...
-      </div>
-    </ng-container>
+    }
   </div>
-</div>

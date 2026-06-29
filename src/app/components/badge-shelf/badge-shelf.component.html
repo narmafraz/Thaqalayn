@@ -4,29 +4,35 @@
     <span class="badge-count">{{ earnedCount }} / {{ totalCount }}</span>
   </div>
 
-  <div *ngFor="let group of groups" class="badge-group">
-    <h3 class="badge-group-title">{{ ('badges.category.' + group.category) | translate }}</h3>
-    <div class="badge-grid">
-      <div *ngFor="let b of group.rows; trackBy: trackById"
-           appHoloTilt
-           class="badge-card"
-           [class.badge-earned]="b.earnedAt"
-           [class.badge-cat-milestone]="b.category === 'milestone'"
-           [class.badge-cat-streak]="b.category === 'streak'"
-           [class.badge-cat-book]="b.category === 'book'"
-           [class.badge-cat-breadth]="b.category === 'breadth'"
-           [class.badge-cat-habit]="b.category === 'habit'"
-           [matTooltip]="(b.descKey | translate) + (b.earnedAt ? ' — ' + ('badges.earnedOn' | translate) + ' ' + (b.earnedAt | date:'mediumDate') : '')">
-        <div class="badge-card-inner">
-          <div class="badge-card-shine" aria-hidden="true"></div>
-          <div class="badge-card-glare" aria-hidden="true"></div>
-          <div class="badge-card-content">
-            <span class="badge-icon" aria-hidden="true">{{ b.icon }}</span>
-            <span class="badge-label">{{ b.labelKey | translate }}</span>
+  @for (group of groups; track group) {
+    <div class="badge-group">
+      <h3 class="badge-group-title">{{ ('badges.category.' + group.category) | translate }}</h3>
+      <div class="badge-grid">
+        @for (b of group.rows; track trackById($index, b)) {
+          <div
+            appHoloTilt
+            class="badge-card"
+            [class.badge-earned]="b.earnedAt"
+            [class.badge-cat-milestone]="b.category === 'milestone'"
+            [class.badge-cat-streak]="b.category === 'streak'"
+            [class.badge-cat-book]="b.category === 'book'"
+            [class.badge-cat-breadth]="b.category === 'breadth'"
+            [class.badge-cat-habit]="b.category === 'habit'"
+            [matTooltip]="(b.descKey | translate) + (b.earnedAt ? ' — ' + ('badges.earnedOn' | translate) + ' ' + (b.earnedAt | date:'mediumDate') : '')">
+            <div class="badge-card-inner">
+              <div class="badge-card-shine" aria-hidden="true"></div>
+              <div class="badge-card-glare" aria-hidden="true"></div>
+              <div class="badge-card-content">
+                <span class="badge-icon" aria-hidden="true">{{ b.icon }}</span>
+                <span class="badge-label">{{ b.labelKey | translate }}</span>
+              </div>
+              @if (!b.earnedAt) {
+                <span class="badge-locked" aria-hidden="true">🔒</span>
+              }
+            </div>
           </div>
-          <span *ngIf="!b.earnedAt" class="badge-locked" aria-hidden="true">🔒</span>
-        </div>
+        }
       </div>
     </div>
-  </div>
+  }
 </section>

@@ -1,142 +1,147 @@
-<ng-container *ngIf="(book$ | async) as book">
+@if ((book$ | async); as book) {
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author$ | async"></app-book-titles>
-
   <!-- RE-04: Per-book / sub-tree progress strip + RE-17 reset action -->
-  <div *ngIf="bookProgress && bookProgress.total > 0" class="book-progress-strip">
-    <div class="book-progress-body"
-         [attr.aria-label]="bookProgress.percent + '% — ' + bookProgress.read + ' / ' + bookProgress.total"
-         [matTooltip]="bookProgress.read + ' / ' + bookProgress.total">
-      <div class="book-progress-text">
-        <span class="book-progress-percent">{{ bookProgress.percent }}%</span>
-        <span class="book-progress-count">{{ bookProgress.read }} / {{ bookProgress.total }}</span>
+  @if (bookProgress && bookProgress.total > 0) {
+    <div class="book-progress-strip">
+      <div class="book-progress-body"
+        [attr.aria-label]="bookProgress.percent + '% — ' + bookProgress.read + ' / ' + bookProgress.total"
+        [matTooltip]="bookProgress.read + ' / ' + bookProgress.total">
+        <div class="book-progress-text">
+          <span class="book-progress-percent">{{ bookProgress.percent }}%</span>
+          <span class="book-progress-count">{{ bookProgress.read }} / {{ bookProgress.total }}</span>
+        </div>
+        <div class="book-progress-bar">
+          <div class="book-progress-fill" [style.width.%]="bookProgress.fraction * 100"></div>
+        </div>
       </div>
-      <div class="book-progress-bar">
-        <div class="book-progress-fill" [style.width.%]="bookProgress.fraction * 100"></div>
+      @if (bookProgress.read > 0) {
+        <button class="book-progress-reset" (click)="resetProgress()"
+          [attr.aria-label]="'reading.resetProgress' | translate"
+          [matTooltip]="'reading.resetProgress' | translate">
+          <mat-icon>restart_alt</mat-icon>
+        </button>
+      }
+    </div>
+  }
+  <!-- RE-07: Hide fully-read chapters filter chip (per-page, intentionally
+  not persisted — flips back when navigating to a different chapter list) -->
+  @if (chapterProgressMap.size > 0) {
+    <div class="chapter-list-toolbar">
+      <button class="filter-chip" [class.active]="unreadOnly" (click)="toggleUnreadOnly()"
+        [attr.aria-pressed]="unreadOnly">
+        <mat-icon>{{ unreadOnly ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+        <span>{{ 'reading.hideCompleted' | translate }}</span>
+      </button>
+    </div>
+  }
+  <div class="content">
+    <div class="mat-elevation-z8">
+      @if ((displayedColumns$ | async); as displayedColumns) {
+        <table mat-table class="full-width-table" matSort aria-label="Elements">
+          <ng-container matColumnDef="octrta">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let row" dir="rtl">
+              <div class="textrow titlerow">
+                <!-- <div>{{row.part_type}} {{row.local_index}}</div> -->
+                <div class="arabic" lang="ar" [innerHTML]="row.titles.ar"></div>
+                <div [innerHTML]="row.titles.en"></div>
+                @if (progressForRow(row); as p) {
+                  @if (p.total > 0) {
+                    <div class="row-progress-mobile" dir="ltr">
+                      <span class="row-progress-text">{{ p.read }} / {{ p.total }}</span>
+                      <div class="row-progress-bar">
+                        <div class="row-progress-fill" [style.width.%]="p.fraction * 100"></div>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </td>
+          </ng-container>
+          <!-- RE-07: Per-row progress ring. The big number is the verse COUNT
+          (not percent) so users can mentally sum chapters → book → volume;
+          the SVG arc shows the fraction visually; tooltip carries
+          "{read} / {total} ({percent}%)". -->
+          <ng-container matColumnDef="progress">
+            <th mat-header-cell *matHeaderCellDef class="center-header">{{ 'reading.progress' | translate }}</th>
+            <td mat-cell *matCellDef="let row" class="center">
+              @if (progressForRow(row); as p) {
+                @if (p.total > 0) {
+                  <div class="row-progress-ring"
+                    [class.row-progress-complete]="p.read >= p.total"
+                    [class.row-progress-empty]="p.read === 0"
+                    [attr.aria-label]="p.read + ' / ' + p.total + ' (' + p.percent + '%)'"
+                    [matTooltip]="p.read + ' / ' + p.total + ' (' + p.percent + '%)'">
+                    <svg viewBox="0 0 36 36" class="row-progress-svg" aria-hidden="true">
+                      <path class="row-progress-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path class="row-progress-arc"
+                        [attr.stroke-dasharray]="(p.fraction * 100) + ', 100'"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <text x="18" y="20.5" class="row-progress-svg-text" text-anchor="middle">{{ p.read }}</text>
+                      </svg>
+                    </div>
+                  }
+                } @else {
+                }
+              </td>
+            </ng-container>
+            <!-- Id Column -->
+            <ng-container matColumnDef="index">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="left-index">{{ 'common.number' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="left-index">{{row.index}}</td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="badges">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row">
+                @if (row.reveal_type === 'Meccan') {
+                  <img class="badge" [title]="row.reveal_type" [alt]="row.reveal_type" src="../assets/kaaba-mecca.svg">
+                }
+                @if (row.reveal_type === 'Medinan') {
+                  <img class="badge" [title]="row.reveal_type" [alt]="row.reveal_type" src="../assets/medina.svg">
+                }
+                @if (row.sajda_type === 'recommended') {
+                  <img class="badge" [title]="row.sajda_type + ' sajda'" [alt]="row.sajda_type + ' sajda'" src="../assets/prostration-rec.svg">
+                }
+                @if (row.sajda_type === 'obligatory') {
+                  <img class="badge" [title]="row.sajda_type + ' sajda'" [alt]="row.sajda_type + ' sajda'" src="../assets/prostration.svg">
+                }
+              </td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name.en">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'common.name' | translate }}</th>
+              <td mat-cell *matCellDef="let row" [innerHTML]="row.titles.en"></td>
+            </ng-container>
+            <!-- Name Column -->
+            <ng-container matColumnDef="name.ar">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+              <td mat-cell *matCellDef="let row" class="arabic" dir="rtl" lang="ar" [innerHTML]="row.titles.ar"></td>
+            </ng-container>
+            <!-- verse_start_index Column -->
+            <ng-container matColumnDef="verse_start_index">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header right-index">{{ 'common.start' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="center right-index">{{row.verse_start_index + 1}}</td>
+            </ng-container>
+            <ng-container matColumnDef="verse_to_index">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let row" class="center">{{ 'common.to' | translate }}</td>
+            </ng-container>
+            <ng-container matColumnDef="verse_end_index">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'common.end' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="center">{{row.verse_start_index + row.verse_count}}</td>
+            </ng-container>
+            <!-- verse_count Column -->
+            <ng-container matColumnDef="verse_count">
+              <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'common.count' | translate }}</th>
+              <td mat-cell *matCellDef="let row" class="center">{{row.verse_count}}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" [ngStyle]="(mqAlias$ | async) === SMALL_SCREEN_ALIAS ? {'display': 'none'} : {}"></tr>
+            <tr mat-row [routerLink]="row.path" queryParamsHandling="preserve"
+              [class.row-hidden]="isRowHiddenByFilter(row)"
+            *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        }
       </div>
     </div>
-    <button *ngIf="bookProgress.read > 0" class="book-progress-reset" (click)="resetProgress()"
-            [attr.aria-label]="'reading.resetProgress' | translate"
-            [matTooltip]="'reading.resetProgress' | translate">
-      <mat-icon>restart_alt</mat-icon>
-    </button>
-  </div>
-
-  <!-- RE-07: Hide fully-read chapters filter chip (per-page, intentionally
-       not persisted — flips back when navigating to a different chapter list) -->
-  <div *ngIf="chapterProgressMap.size > 0" class="chapter-list-toolbar">
-    <button class="filter-chip" [class.active]="unreadOnly" (click)="toggleUnreadOnly()"
-            [attr.aria-pressed]="unreadOnly">
-      <mat-icon>{{ unreadOnly ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
-      <span>{{ 'reading.hideCompleted' | translate }}</span>
-    </button>
-  </div>
-
-<div class="content">
-  <div class="mat-elevation-z8">
-    <table *ngIf="(displayedColumns$ | async) as displayedColumns" mat-table class="full-width-table" matSort aria-label="Elements">
-
-      <ng-container matColumnDef="octrta">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let row" dir="rtl">
-          <div class="textrow titlerow">
-            <!-- <div>{{row.part_type}} {{row.local_index}}</div> -->
-            <div class="arabic" lang="ar" [innerHTML]="row.titles.ar"></div>
-            <div [innerHTML]="row.titles.en"></div>
-            <ng-container *ngIf="progressForRow(row) as p">
-              <div *ngIf="p.total > 0" class="row-progress-mobile" dir="ltr">
-                <span class="row-progress-text">{{ p.read }} / {{ p.total }}</span>
-                <div class="row-progress-bar">
-                  <div class="row-progress-fill" [style.width.%]="p.fraction * 100"></div>
-                </div>
-              </div>
-            </ng-container>
-          </div>
-        </td>
-      </ng-container>
-
-      <!-- RE-07: Per-row progress ring. The big number is the verse COUNT
-           (not percent) so users can mentally sum chapters → book → volume;
-           the SVG arc shows the fraction visually; tooltip carries
-           "{read} / {total} ({percent}%)". -->
-      <ng-container matColumnDef="progress">
-        <th mat-header-cell *matHeaderCellDef class="center-header">{{ 'reading.progress' | translate }}</th>
-        <td mat-cell *matCellDef="let row" class="center">
-          <ng-container *ngIf="progressForRow(row) as p; else noProgressData">
-            <div *ngIf="p.total > 0" class="row-progress-ring"
-                 [class.row-progress-complete]="p.read >= p.total"
-                 [class.row-progress-empty]="p.read === 0"
-                 [attr.aria-label]="p.read + ' / ' + p.total + ' (' + p.percent + '%)'"
-                 [matTooltip]="p.read + ' / ' + p.total + ' (' + p.percent + '%)'">
-              <svg viewBox="0 0 36 36" class="row-progress-svg" aria-hidden="true">
-                <path class="row-progress-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path class="row-progress-arc"
-                      [attr.stroke-dasharray]="(p.fraction * 100) + ', 100'"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <text x="18" y="20.5" class="row-progress-svg-text" text-anchor="middle">{{ p.read }}</text>
-              </svg>
-            </div>
-          </ng-container>
-          <ng-template #noProgressData></ng-template>
-        </td>
-      </ng-container>
-
-      <!-- Id Column -->
-      <ng-container matColumnDef="index">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="left-index">{{ 'common.number' | translate }}</th>
-        <td mat-cell *matCellDef="let row" class="left-index">{{row.index}}</td>
-      </ng-container>
-
-      <!-- Name Column -->
-      <ng-container matColumnDef="badges">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let row">
-          <img *ngIf="row.reveal_type === 'Meccan'" class="badge" [title]="row.reveal_type" [alt]="row.reveal_type" src="../assets/kaaba-mecca.svg">
-          <img *ngIf="row.reveal_type === 'Medinan'" class="badge" [title]="row.reveal_type" [alt]="row.reveal_type" src="../assets/medina.svg">
-          <img *ngIf="row.sajda_type === 'recommended'" class="badge" [title]="row.sajda_type + ' sajda'" [alt]="row.sajda_type + ' sajda'" src="../assets/prostration-rec.svg">
-          <img *ngIf="row.sajda_type === 'obligatory'" class="badge" [title]="row.sajda_type + ' sajda'" [alt]="row.sajda_type + ' sajda'" src="../assets/prostration.svg">
-        </td>
-      </ng-container>
-
-      <!-- Name Column -->
-      <ng-container matColumnDef="name.en">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ 'common.name' | translate }}</th>
-        <td mat-cell *matCellDef="let row" [innerHTML]="row.titles.en"></td>
-      </ng-container>
-
-      <!-- Name Column -->
-      <ng-container matColumnDef="name.ar">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
-        <td mat-cell *matCellDef="let row" class="arabic" dir="rtl" lang="ar" [innerHTML]="row.titles.ar"></td>
-      </ng-container>
-
-      <!-- verse_start_index Column -->
-      <ng-container matColumnDef="verse_start_index">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header right-index">{{ 'common.start' | translate }}</th>
-        <td mat-cell *matCellDef="let row" class="center right-index">{{row.verse_start_index + 1}}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="verse_to_index">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let row" class="center">{{ 'common.to' | translate }}</td>
-      </ng-container>
-
-      <ng-container matColumnDef="verse_end_index">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'common.end' | translate }}</th>
-        <td mat-cell *matCellDef="let row" class="center">{{row.verse_start_index + row.verse_count}}</td>
-      </ng-container>
-
-      <!-- verse_count Column -->
-      <ng-container matColumnDef="verse_count">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header class="center-header">{{ 'common.count' | translate }}</th>
-        <td mat-cell *matCellDef="let row" class="center">{{row.verse_count}}</td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" [ngStyle]="(mqAlias$ | async) === SMALL_SCREEN_ALIAS ? {'display': 'none'} : {}"></tr>
-      <tr mat-row [routerLink]="row.path" queryParamsHandling="preserve"
-          [class.row-hidden]="isRowHiddenByFilter(row)"
-          *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-
-  </div>
-</div>
-</ng-container>
+  }

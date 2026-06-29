@@ -3,32 +3,34 @@
   <p>{{ 'support.intro' | translate }}</p>
   <h2>{{ 'support.siteIssue' | translate }}</h2>
   <p>{{ 'support.siteIssueDesc' | translate }} <a href="https://github.com/narmafraz/Thaqalayn/issues" target="_blank">https://github.com/narmafraz/Thaqalayn/issues</a> <br>
-     {{ 'support.createNewIssue' | translate }}</p>
-  <h2>{{ 'support.dataIssue' | translate }}</h2>
-  <p>{{ 'support.siteIssueDesc' | translate }} <a href="https://github.com/narmafraz/ThaqalaynDataGenerator/issues" target="_blank">https://github.com/narmafraz/ThaqalaynDataGenerator/issues</a> <br>
-    {{ 'support.createNewIssue' | translate }}</p>
+{{ 'support.createNewIssue' | translate }}</p>
+<h2>{{ 'support.dataIssue' | translate }}</h2>
+<p>{{ 'support.siteIssueDesc' | translate }} <a href="https://github.com/narmafraz/ThaqalaynDataGenerator/issues" target="_blank">https://github.com/narmafraz/ThaqalaynDataGenerator/issues</a> <br>
+{{ 'support.createNewIssue' | translate }}</p>
 
-  <h2>{{ 'support.troubleshooting' | translate }}</h2>
-  <p>{{ 'support.troubleshootingDesc' | translate }}</p>
+<h2>{{ 'support.troubleshooting' | translate }}</h2>
+<p>{{ 'support.troubleshootingDesc' | translate }}</p>
 
-  <!-- Action buttons (hidden while any dialog/success state is showing) -->
-  <div *ngIf="!showResetConfirm && !resetComplete && !showRefreshConfirm && !refreshComplete"
-       class="support-actions">
+<!-- Action buttons (hidden while any dialog/success state is showing) -->
+@if (!showResetConfirm && !resetComplete && !showRefreshConfirm && !refreshComplete) {
+  <div
+    class="support-actions">
     <button class="refresh-button" (click)="promptRefresh()">
       <mat-icon>refresh</mat-icon>
       {{ 'support.refreshData' | translate }}
     </button>
     <p class="action-hint">{{ 'support.refreshDataDesc' | translate }}</p>
-
     <button class="reset-button" (click)="promptReset()">
       <mat-icon>restart_alt</mat-icon>
       {{ 'support.resetSiteData' | translate }}
     </button>
     <p class="action-hint">{{ 'support.resetSiteDataDesc' | translate }}</p>
   </div>
+}
 
-  <!-- Safe refresh confirmation -->
-  <div *ngIf="showRefreshConfirm" class="reset-confirm refresh-confirm">
+<!-- Safe refresh confirmation -->
+@if (showRefreshConfirm) {
+  <div class="reset-confirm refresh-confirm">
     <mat-icon class="info-icon">refresh</mat-icon>
     <h3>{{ 'support.refreshConfirmTitle' | translate }}</h3>
     <p>{{ 'support.refreshConfirmDesc' | translate }}</p>
@@ -48,9 +50,11 @@
       </button>
     </div>
   </div>
+}
 
-  <!-- Safe refresh success -->
-  <div *ngIf="refreshComplete" class="reset-success">
+<!-- Safe refresh success -->
+@if (refreshComplete) {
+  <div class="reset-success">
     <mat-icon>check_circle</mat-icon>
     <p>{{ 'support.refreshSuccess' | translate }}</p>
     <button class="reload-button" (click)="reloadPage()">
@@ -58,9 +62,11 @@
       {{ 'support.resetReload' | translate }}
     </button>
   </div>
+}
 
-  <!-- Confirmation dialog -->
-  <div *ngIf="showResetConfirm" class="reset-confirm">
+<!-- Confirmation dialog -->
+@if (showResetConfirm) {
+  <div class="reset-confirm">
     <mat-icon class="warning-icon">warning</mat-icon>
     <h3>{{ 'support.resetConfirmTitle' | translate }}</h3>
     <p>{{ 'support.resetConfirmDesc' | translate }}</p>
@@ -80,9 +86,11 @@
       </button>
     </div>
   </div>
+}
 
-  <!-- Success message -->
-  <div *ngIf="resetComplete" class="reset-success">
+<!-- Success message -->
+@if (resetComplete) {
+  <div class="reset-success">
     <mat-icon>check_circle</mat-icon>
     <p>{{ 'support.resetSuccess' | translate }}</p>
     <button class="reload-button" (click)="reloadPage()">
@@ -90,4 +98,5 @@
       {{ 'support.resetReload' | translate }}
     </button>
   </div>
+}
 </div>

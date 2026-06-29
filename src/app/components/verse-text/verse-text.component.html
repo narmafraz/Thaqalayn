@@ -1,192 +1,152 @@
 <div class="textrow" [class.comparing]="(translation2$ | async)">
   <!-- AI feature toggles -->
-  <div class="ai-toggles" *ngIf="showToggles && (hasAiText || hasWordAnalysis || hasNarratorChain)">
-    <button *ngIf="hasNarratorChain" class="ai-toggle-btn" (click)="toggleChainDiagram()"
-            [class.active]="showChainDiagram"
-            [attr.aria-label]="showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
-            matTooltip="{{ 'narrator.chainDiagram' | translate }}">
-      <mat-icon>{{ showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
-    </button>
-    <button *ngIf="hasAiText" class="ai-toggle-btn" (click)="toggleDiacritics()"
-            [class.active]="showDiacritics"
-            [attr.aria-label]="showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
-            matTooltip="{{ 'settings.ai.showDiacritizedText' | translate }}">
-      <mat-icon>{{ showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
-    </button>
-    <button *ngIf="hasWordByWord" class="ai-toggle-btn" (click)="toggleWordAnalysis()"
-            [class.active]="showWordAnalysis"
-            [attr.aria-label]="showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
-            matTooltip="{{ 'settings.ai.showWordAnalysis' | translate }}">
-      <mat-icon>{{ showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
-    </button>
-    <span class="ai-diacritics-badge" *ngIf="showDiacritics && verse.ai?.diacritics_status">
-      {{ verse.ai.diacritics_status }}
-    </span>
-  </div>
+  @if (showToggles && (hasAiText || hasWordAnalysis || hasNarratorChain)) {
+    <div class="ai-toggles">
+      @if (hasNarratorChain) {
+        <button class="ai-toggle-btn" (click)="toggleChainDiagram()"
+          [class.active]="showChainDiagram"
+          [attr.aria-label]="showChainDiagram ? ('settings.ai.hideChainDiagram' | translate) : ('settings.ai.showChainDiagram' | translate)"
+          matTooltip="{{ 'narrator.chainDiagram' | translate }}">
+          <mat-icon>{{ showChainDiagram ? 'view_headline' : 'account_tree' }}</mat-icon>
+        </button>
+      }
+      @if (hasAiText) {
+        <button class="ai-toggle-btn" (click)="toggleDiacritics()"
+          [class.active]="showDiacritics"
+          [attr.aria-label]="showDiacritics ? ('settings.ai.showOriginalText' | translate) : ('settings.ai.showDiacritizedText' | translate)"
+          matTooltip="{{ 'settings.ai.showDiacritizedText' | translate }}">
+          <mat-icon>{{ showDiacritics ? 'text_format' : 'spellcheck' }}</mat-icon>
+        </button>
+      }
+      @if (hasWordByWord) {
+        <button class="ai-toggle-btn" (click)="toggleWordAnalysis()"
+          [class.active]="showWordAnalysis"
+          [attr.aria-label]="showWordAnalysis ? ('settings.ai.hideWordAnalysis' | translate) : ('settings.ai.showWordAnalysis' | translate)"
+          matTooltip="{{ 'settings.ai.showWordAnalysis' | translate }}">
+          <mat-icon>{{ showWordAnalysis ? 'view_stream' : 'grid_view' }}</mat-icon>
+        </button>
+      }
+      @if (showDiacritics && verse.ai?.diacritics_status) {
+        <span class="ai-diacritics-badge">
+          {{ verse.ai.diacritics_status }}
+        </span>
+      }
+    </div>
+  }
 
   <!-- Chain Diagram View -->
-  <div class="chain-diagram" *ngIf="showChainDiagram && verse?.narrator_chain?.parts">
-    <div class="chain-node" *ngFor="let part of getNarratorParts(); let last = last">
-      <a *ngIf="part.path" [routerLink]="part.path" queryParamsHandling="preserve" class="narrator-node">
-        <span class="narrator-text">{{ part.text }}</span>
-      </a>
-      <span *ngIf="!part.path" class="narrator-node plain">{{ part.text }}</span>
-      <div class="chain-arrow" *ngIf="!last">
-        <mat-icon>arrow_downward</mat-icon>
-      </div>
+  @if (showChainDiagram && verse?.narrator_chain?.parts) {
+    <div class="chain-diagram">
+      @for (part of getNarratorParts(); track part; let last = $last) {
+        <div class="chain-node">
+          @if (part.path) {
+            <a [routerLink]="part.path" queryParamsHandling="preserve" class="narrator-node">
+              <span class="narrator-text">{{ part.text }}</span>
+            </a>
+          }
+          @if (!part.path) {
+            <span class="narrator-node plain">{{ part.text }}</span>
+          }
+          @if (!last) {
+            <div class="chain-arrow">
+              <mat-icon>arrow_downward</mat-icon>
+            </div>
+          }
+        </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- ===== ARABIC TEXT SECTION ===== -->
 
   <!-- Word-by-word analysis (replaces Arabic text when active AND data supports it) -->
-  <div *ngIf="showWordAnalysis" class="word-analysis-grid" dir="rtl" lang="ar">
-    <div class="word-analysis-lang-select">
-      <select [(ngModel)]="wordAnalysisLang" [attr.aria-label]="'book.wordTranslationLanguage' | translate" class="word-lang-select">
-        <option value="en">English</option>
-        <option value="ur">اردو</option>
-        <option value="tr">Türkçe</option>
-        <option value="fa">فارسی</option>
-        <option value="id">Indonesia</option>
-        <option value="bn">বাংলা</option>
-        <option value="es">Español</option>
-        <option value="fr">Français</option>
-        <option value="de">Deutsch</option>
-        <option value="ru">Русский</option>
-        <option value="zh">中文</option>
-      </select>
-    </div>
-    <div class="word-cards">
-      <div *ngFor="let entry of wordTokens; let i = index; trackBy: trackWordToken"
-           class="word-card"
-           [class.active]="activeWordIndex === i"
-           (click)="setActiveWord(i, $event); $event.stopPropagation()"
-           role="button"
-           tabindex="0"
-           (keydown.enter)="setActiveWord(i, $event)"
-           (keydown.space)="setActiveWord(i, $event)"
-           [attr.aria-expanded]="activeWordIndex === i"
-           [attr.aria-label]="cardPos(entry) ? (entry.word + ' - ' + getPosLabel(cardPos(entry))) : entry.word">
-        <span class="word-arabic">{{ entry.word }}</span>
-        <!-- Inline translation: v3 word_analysis when present, otherwise
-             the surface JSON's Path B translation in the active language.
-             title shows the full text when CSS ellipsis truncates it. -->
-        <span class="word-translation" dir="ltr" *ngIf="cardTranslation(entry) as t" [title]="t">
-          {{ t }}
-        </span>
-        <!-- POS intentionally not shown on the card itself — it lives
-             in the popup only. Reading flow is cleaner without per-word
-             grammar labels in the way. -->
+  @if (showWordAnalysis) {
+    <div class="word-analysis-grid" dir="rtl" lang="ar">
+      <div class="word-analysis-lang-select">
+        <select [(ngModel)]="wordAnalysisLang" [attr.aria-label]="'book.wordTranslationLanguage' | translate" class="word-lang-select">
+          <option value="en">English</option>
+          <option value="ur">اردو</option>
+          <option value="tr">Türkçe</option>
+          <option value="fa">فارسی</option>
+          <option value="id">Indonesia</option>
+          <option value="bn">বাংলা</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="ru">Русский</option>
+          <option value="zh">中文</option>
+        </select>
       </div>
-    </div>
-    <!-- Word detail popup -->
-    <div class="word-popup" *ngIf="wordPopup"
-         [style.left.px]="wordPopup.x"
-         [style.top.px]="wordPopup.y"
-         role="dialog"
-         [attr.aria-label]="'book.wordDetails' | translate">
-      <div class="word-popup-arabic" lang="ar" dir="rtl">{{ wordPopup.entry.word }}</div>
-      <div class="word-popup-pos" *ngIf="popupPos">
-        <span class="word-popup-pos-badge" [style.background-color]="getPosColor(popupPos)">
-          {{ getPosLabel(popupPos) }}
-        </span>
+      <div class="word-cards">
+        @for (entry of wordTokens; track trackWordToken(i, entry); let i = $index) {
+          <div
+            class="word-card"
+            [class.active]="activeWordIndex === i"
+            (click)="setActiveWord(i, $event); $event.stopPropagation()"
+            role="button"
+            tabindex="0"
+            (keydown.enter)="setActiveWord(i, $event)"
+            (keydown.space)="setActiveWord(i, $event)"
+            [attr.aria-expanded]="activeWordIndex === i"
+            [attr.aria-label]="cardPos(entry) ? (entry.word + ' - ' + getPosLabel(cardPos(entry))) : entry.word">
+            <span class="word-arabic">{{ entry.word }}</span>
+            <!-- Inline translation: v3 word_analysis when present, otherwise
+            the surface JSON's Path B translation in the active language.
+            title shows the full text when CSS ellipsis truncates it. -->
+            @if (cardTranslation(entry); as t) {
+              <span class="word-translation" dir="ltr" [title]="t">
+                {{ t }}
+              </span>
+            }
+            <!-- POS intentionally not shown on the card itself — it lives
+            in the popup only. Reading flow is cleaner without per-word
+            grammar labels in the way. -->
+          </div>
+        }
       </div>
-      <div class="word-popup-translation" *ngIf="popupTranslation">
-        <span class="word-popup-lang-label">{{ getWordLangLabel(wordAnalysisLang) }}</span>
-        <span class="word-popup-trans-text">{{ popupTranslation }}</span>
-      </div>
-      <a class="word-popup-link" *ngIf="wordPopup"
-         [routerLink]="['/words', wordHref(wordPopup.entry.word)]">
-        Full word page →
-      </a>
-      <button class="word-popup-close" (click)="closeWordPopup()" [attr.aria-label]="'common.close' | translate" tabindex="0">&times;</button>
+      <!-- Word detail popup -->
+      @if (wordPopup) {
+        <div class="word-popup"
+          [style.left.px]="wordPopup.x"
+          [style.top.px]="wordPopup.y"
+          role="dialog"
+          [attr.aria-label]="'book.wordDetails' | translate">
+          <div class="word-popup-arabic" lang="ar" dir="rtl">{{ wordPopup.entry.word }}</div>
+          @if (popupPos) {
+            <div class="word-popup-pos">
+              <span class="word-popup-pos-badge" [style.background-color]="getPosColor(popupPos)">
+                {{ getPosLabel(popupPos) }}
+              </span>
+            </div>
+          }
+          @if (popupTranslation) {
+            <div class="word-popup-translation">
+              <span class="word-popup-lang-label">{{ getWordLangLabel(wordAnalysisLang) }}</span>
+              <span class="word-popup-trans-text">{{ popupTranslation }}</span>
+            </div>
+          }
+          @if (wordPopup) {
+            <a class="word-popup-link"
+              [routerLink]="['/words', wordHref(wordPopup.entry.word)]">
+              Full word page →
+            </a>
+          }
+          <button class="word-popup-close" (click)="closeWordPopup()" [attr.aria-label]="'common.close' | translate" tabindex="0">&times;</button>
+        </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- Standard Arabic text (hidden when word-by-word is actively rendering).
-       Important: must still render when the user has WBW preference on but
-       this verse lacks WBW data (no chunks with arabic_text, no v3
-       word_analysis) — otherwise the verse is completely blank. -->
-  <ng-container *ngIf="!showWordAnalysis">
+  Important: must still render when the user has WBW preference on but
+  this verse lacks WBW data (no chunks with arabic_text, no v3
+  word_analysis) — otherwise the verse is completely blank. -->
+  @if (!showWordAnalysis) {
     <!-- Chunked view: when chunks exist and diacritics is ON -->
-    <ng-container *ngIf="hasChunks && showDiacritics; else fallbackArabic">
+    @if (hasChunks && showDiacritics) {
       <!-- Narrator hover card (shared) -->
-      <app-narrator-hover-card
-        *ngIf="hoveredNarrator"
-        [narrator]="hoveredNarrator.narrator"
-        [narratorId]="hoveredNarrator.id"
-        [positionX]="hoveredNarrator.x"
-        [positionY]="hoveredNarrator.y"
-        (mouseenter)="keepNarratorCard()"
-        (mouseleave)="hideNarratorCard()">
-      </app-narrator-hover-card>
-
-      <!-- Narrator chain links when no isnad chunk contains them -->
-      <div lang="ar" *ngIf="hasNarratorChain && !hasIsnadChunk">
-        <p class="verseText arabic" dir="rtl">
-          <ng-container *ngFor="let npart of verse.narrator_chain.parts" [ngSwitch]="npart.kind">
-            <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve"
-               (mouseenter)="showNarratorCard($event, npart.path)"
-               (mouseleave)="hideNarratorCard()"
-               (touchstart)="onNarratorTouchStart($event, npart.path)"
-               (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
-            <ng-container *ngSwitchDefault>{{npart.text}}</ng-container>
-          </ng-container>
-        </p>
-      </div>
-
-      <div class="chunked-view" [class.chunked-ai-translation]="!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')">
-        <ng-container *ngFor="let chunk of chunks">
-          <div class="chunk-block" [class]="'chunk-type-' + chunk.chunk_type">
-            <div class="chunk-label">{{ chunk.chunk_type }}</div>
-            <div class="chunk-arabic-col" lang="ar">
-              <ng-container *ngIf="isFirstIsnadChunk(chunk); else plainChunkArabic">
-                <p class="chunk-arabic arabic" dir="rtl">
-                  <ng-container *ngFor="let npart of verse.narrator_chain.parts" [ngSwitch]="npart.kind">
-                    <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve"
-                       (mouseenter)="showNarratorCard($event, npart.path)"
-                       (mouseleave)="hideNarratorCard()"
-                       (touchstart)="onNarratorTouchStart($event, npart.path)"
-                       (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
-                    <ng-container *ngSwitchDefault>{{npart.text}}</ng-container>
-                  </ng-container>
-                </p>
-              </ng-container>
-              <ng-template #plainChunkArabic>
-                <p class="chunk-arabic arabic" dir="rtl"
-                   *ngIf="hasKeyPhrases; else noHighlightChunk"
-                   [innerHTML]="highlightPhrases(getChunkArabicText(chunk))"></p>
-                <ng-template #noHighlightChunk>
-                  <p class="chunk-arabic arabic" dir="rtl">{{ getChunkArabicText(chunk) }}</p>
-                </ng-template>
-              </ng-template>
-            </div>
-            <!-- Per-chunk translation (only when NOT comparing and chunks have translation data) -->
-            <div class="chunk-translation-col"
-                 *ngIf="!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')">
-              <p class="chunk-translation"
-                 *ngIf="getChunkTranslation(chunk, (translation$ | async) || '') as t">{{ t }}</p>
-            </div>
-          </div>
-        </ng-container>
-      </div>
-    </ng-container>
-
-    <!-- Fallback Arabic: no chunks, or diacritics OFF -->
-    <ng-template #fallbackArabic>
-      <div lang="ar">
-        <p class="verseText arabic" *ngIf="verse.narrator_chain">
-          <ng-container *ngFor="let npart of verse.narrator_chain.parts" [ngSwitch]="npart.kind">
-            <a *ngSwitchCase="'narrator'" [routerLink]="npart.path" queryParamsHandling="preserve"
-               (mouseenter)="showNarratorCard($event, npart.path)"
-               (mouseleave)="hideNarratorCard()"
-               (touchstart)="onNarratorTouchStart($event, npart.path)"
-               (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
-            <ng-container *ngSwitchDefault>{{npart.text}}</ng-container>
-          </ng-container>
-        </p>
+      @if (hoveredNarrator) {
         <app-narrator-hover-card
-          *ngIf="hoveredNarrator"
           [narrator]="hoveredNarrator.narrator"
           [narratorId]="hoveredNarrator.id"
           [positionX]="hoveredNarrator.x"
@@ -194,24 +154,126 @@
           (mouseenter)="keepNarratorCard()"
           (mouseleave)="hideNarratorCard()">
         </app-narrator-hover-card>
-        <ng-container *ngIf="showDiacritics && hasAiText; else originalText">
-          <p *ngIf="hasKeyPhrases; else plainDiacritics" class="verseText arabic" dir="rtl" [innerHTML]="highlightPhrases(diacritizedText)"></p>
-          <ng-template #plainDiacritics>
-            <p class="verseText arabic" dir="rtl">{{ diacritizedText }}</p>
-          </ng-template>
-        </ng-container>
-        <ng-template #originalText>
-          <ng-container *ngIf="hasKeyPhrases; else noHighlight">
-            <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="highlightPhrases(txt)"></p>
-          </ng-container>
-          <ng-template #noHighlight>
-            <p *ngFor="let txt of verse.text" class="verseText arabic" dir="rtl" [innerHTML]="txt"></p>
-          </ng-template>
-        </ng-template>
-        <span class="quran-verse-number" *ngIf="isQuran && verseNumber" dir="rtl" lang="ar">&#xFD3E;{{ verseNumber }}&#xFD3F;</span>
+      }
+      <!-- Narrator chain links when no isnad chunk contains them -->
+      @if (hasNarratorChain && !hasIsnadChunk) {
+        <div lang="ar">
+          <p class="verseText arabic" dir="rtl">
+            @for (npart of verse.narrator_chain.parts; track npart) {
+              @switch (npart.kind) {
+                @case ('narrator') {
+                  <a [routerLink]="npart.path" queryParamsHandling="preserve"
+                    (mouseenter)="showNarratorCard($event, npart.path)"
+                    (mouseleave)="hideNarratorCard()"
+                    (touchstart)="onNarratorTouchStart($event, npart.path)"
+                  (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
+                }
+                @default {
+                  {{npart.text}}
+                }
+              }
+            }
+          </p>
+        </div>
+      }
+      <div class="chunked-view" [class.chunked-ai-translation]="!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')">
+        @for (chunk of chunks; track chunk) {
+          <div class="chunk-block" [class]="'chunk-type-' + chunk.chunk_type">
+            <div class="chunk-label">{{ chunk.chunk_type }}</div>
+            <div class="chunk-arabic-col" lang="ar">
+              @if (isFirstIsnadChunk(chunk)) {
+                <p class="chunk-arabic arabic" dir="rtl">
+                  @for (npart of verse.narrator_chain.parts; track npart) {
+                    @switch (npart.kind) {
+                      @case ('narrator') {
+                        <a [routerLink]="npart.path" queryParamsHandling="preserve"
+                          (mouseenter)="showNarratorCard($event, npart.path)"
+                          (mouseleave)="hideNarratorCard()"
+                          (touchstart)="onNarratorTouchStart($event, npart.path)"
+                        (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
+                      }
+                      @default {
+                        {{npart.text}}
+                      }
+                    }
+                  }
+                </p>
+              } @else {
+                @if (hasKeyPhrases) {
+                  <p class="chunk-arabic arabic" dir="rtl"
+                  [innerHTML]="highlightPhrases(getChunkArabicText(chunk))"></p>
+                } @else {
+                  <p class="chunk-arabic arabic" dir="rtl">{{ getChunkArabicText(chunk) }}</p>
+                }
+              }
+            </div>
+            <!-- Per-chunk translation (only when NOT comparing and chunks have translation data) -->
+            @if (!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')) {
+              <div class="chunk-translation-col"
+                >
+                @if (getChunkTranslation(chunk, (translation$ | async) || ''); as t) {
+                  <p class="chunk-translation"
+                  >{{ t }}</p>
+                }
+              </div>
+            }
+          </div>
+        }
       </div>
-    </ng-template>
-  </ng-container>
+    } @else {
+      <div lang="ar">
+        @if (verse.narrator_chain) {
+          <p class="verseText arabic">
+            @for (npart of verse.narrator_chain.parts; track npart) {
+              @switch (npart.kind) {
+                @case ('narrator') {
+                  <a [routerLink]="npart.path" queryParamsHandling="preserve"
+                    (mouseenter)="showNarratorCard($event, npart.path)"
+                    (mouseleave)="hideNarratorCard()"
+                    (touchstart)="onNarratorTouchStart($event, npart.path)"
+                  (touchend)="onNarratorTouchEnd()">{{npart.text}}</a>
+                }
+                @default {
+                  {{npart.text}}
+                }
+              }
+            }
+          </p>
+        }
+        @if (hoveredNarrator) {
+          <app-narrator-hover-card
+            [narrator]="hoveredNarrator.narrator"
+            [narratorId]="hoveredNarrator.id"
+            [positionX]="hoveredNarrator.x"
+            [positionY]="hoveredNarrator.y"
+            (mouseenter)="keepNarratorCard()"
+            (mouseleave)="hideNarratorCard()">
+          </app-narrator-hover-card>
+        }
+        @if (showDiacritics && hasAiText) {
+          @if (hasKeyPhrases) {
+            <p class="verseText arabic" dir="rtl" [innerHTML]="highlightPhrases(diacritizedText)"></p>
+          } @else {
+            <p class="verseText arabic" dir="rtl">{{ diacritizedText }}</p>
+          }
+        } @else {
+          @if (hasKeyPhrases) {
+            @for (txt of verse.text; track txt) {
+              <p class="verseText arabic" dir="rtl" [innerHTML]="highlightPhrases(txt)"></p>
+            }
+          } @else {
+            @for (txt of verse.text; track txt) {
+              <p class="verseText arabic" dir="rtl" [innerHTML]="txt"></p>
+            }
+          }
+        }
+        @if (isQuran && verseNumber) {
+          <span class="quran-verse-number" dir="rtl" lang="ar">&#xFD3E;{{ verseNumber }}&#xFD3F;</span>
+        }
+      </div>
+    }
+    <!-- Fallback Arabic: no chunks, or diacritics OFF -->
+  }
 
   <!-- ===== TRANSLATION SECTION ===== -->
   <!-- Wrapper keeps translations + AI extras together in the flex layout -->
@@ -219,41 +281,63 @@
     <!-- Primary translation: hidden when chunked+AI inline (already shown per-chunk) -->
     <!-- Secondary translation (compare): always shown when present -->
     <div [class.side-by-side]="(translation2$ | async)">
-      <div class="translation-col"
-           *ngIf="!(!(translation2$ | async) && !showWordAnalysis && hasChunks && showDiacritics && chunksHaveTranslation((translation$ | async) || ''))">
-        <p *ngFor="let trt of getTranslationText(verse, (translation$ | async))" [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
-        <div class="translation-fallback" *ngIf="isMissingTranslation((translation$ | async))">
-          <p class="fallback-message">
-            {{ 'translation.notAvailable' | translate }}
-            <span *ngIf="getAvailableTranslationIds().length">
-              {{ 'translation.availableIn' | translate }}:
-              <ng-container *ngFor="let tid of getAvailableTranslationIds(); let isLast = last">
-                <a [routerLink]="[]" [queryParams]="{translation: tid}" queryParamsHandling="merge"
-                   class="fallback-lang-link">{{ getTranslationLangName(tid) }}</a><span *ngIf="!isLast">, </span>
-              </ng-container>
-            </span>
-          </p>
-        </div>
+      @if (!(!(translation2$ | async) && !showWordAnalysis && hasChunks && showDiacritics && chunksHaveTranslation((translation$ | async) || ''))) {
+        <div class="translation-col"
+          >
+          @for (trt of getTranslationText(verse, (translation$ | async)); track trt) {
+            <p [class]="'translation ' + (translationClass$ | async)" [innerHTML]="trt"></p>
+          }
+          @if (isMissingTranslation((translation$ | async))) {
+            <div class="translation-fallback">
+              <p class="fallback-message">
+                {{ 'translation.notAvailable' | translate }}
+                @if (getAvailableTranslationIds().length) {
+                  <span>
+                    {{ 'translation.availableIn' | translate }}:
+                    @for (tid of getAvailableTranslationIds(); track tid; let isLast = $last) {
+                      <a [routerLink]="[]" [queryParams]="{translation: tid}" queryParamsHandling="merge"
+                      class="fallback-lang-link">{{ getTranslationLangName(tid) }}</a>@if (!isLast) {
+                      <span>, </span>
+                    }
+                  }
+                </span>
+              }
+            </p>
+          </div>
+        }
       </div>
-      <!-- Secondary translation (compare mode) — always visible when comparing -->
-      <div class="translation-col translation-col-2" *ngIf="(translation2$ | async) as t2">
-        <p *ngFor="let trt of getTranslationText(verse, t2)" [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
+    }
+    <!-- Secondary translation (compare mode) — always visible when comparing -->
+    @if ((translation2$ | async); as t2) {
+      <div class="translation-col translation-col-2">
+        @for (trt of getTranslationText(verse, t2); track trt) {
+          <p [class]="'translation ' + (translationClass2$ | async)" [innerHTML]="trt"></p>
+        }
       </div>
-    </div>
-
-    <!-- AI translation extras — below translations, inside the same flex item -->
-    <div class="ai-translation-extra" *ngIf="getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en') as aiT">
-      <div class="ai-summary-inline" *ngIf="aiT.summary">
-        <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
-        <span class="ai-summary-text">{{ aiT.summary }}</span>
-      </div>
-      <div class="ai-key-terms-inline" *ngIf="aiT.key_terms && (aiT.key_terms | keyvalue)?.length">
-        <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
-        <span class="key-term-chip" *ngFor="let term of aiT.key_terms | keyvalue">
-          <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
-          <span class="key-term-gloss">{{ term.value }}</span>
-        </span>
-      </div>
-    </div>
+    }
   </div>
+
+  <!-- AI translation extras — below translations, inside the same flex item -->
+  @if (getAiTranslationForLang((translation$ | async)?.split('.')[0] || 'en'); as aiT) {
+    <div class="ai-translation-extra">
+      @if (aiT.summary) {
+        <div class="ai-summary-inline">
+          <span class="ai-summary-label">{{ 'ai.summary' | translate }}:</span>
+          <span class="ai-summary-text">{{ aiT.summary }}</span>
+        </div>
+      }
+      @if (aiT.key_terms && (aiT.key_terms | keyvalue)?.length) {
+        <div class="ai-key-terms-inline">
+          <span class="ai-terms-label">{{ 'ai.keyTerms' | translate }}:</span>
+          @for (term of aiT.key_terms | keyvalue; track term) {
+            <span class="key-term-chip">
+              <span class="key-term-arabic" lang="ar" dir="rtl">{{ term.key }}</span>
+              <span class="key-term-gloss">{{ term.value }}</span>
+            </span>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
 </div>

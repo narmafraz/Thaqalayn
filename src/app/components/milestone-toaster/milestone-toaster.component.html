@@ -1,26 +1,32 @@
 <div class="toaster" aria-live="polite" aria-atomic="false">
-  <div *ngFor="let t of toasts; trackBy: trackById"
-       class="toast"
-       [class.toast-book-complete]="t.kind === 'book-complete'"
-       [class.toast-chapter-complete]="t.kind === 'chapter-complete'"
-       [class.toast-cumulative]="t.kind === 'cumulative'"
-       [class.toast-badge-earned]="t.kind === 'badge-earned'"
-       (pointerenter)="onHoverEnter(t.id)"
-       (pointerleave)="onHoverLeave(t.id)"
-       (focusin)="onHoverEnter(t.id)"
-       (focusout)="onHoverLeave(t.id)"
-       role="status">
-    <span class="toast-icon" aria-hidden="true">{{ t.icon || iconFor(t.kind) }}</span>
-    <div class="toast-body">
-      <div class="toast-title">{{ t.title }}</div>
-      <div *ngIf="t.body" class="toast-subtitle">{{ t.body }}</div>
+  @for (t of toasts; track trackById($index, t)) {
+    <div
+      class="toast"
+      [class.toast-book-complete]="t.kind === 'book-complete'"
+      [class.toast-chapter-complete]="t.kind === 'chapter-complete'"
+      [class.toast-cumulative]="t.kind === 'cumulative'"
+      [class.toast-badge-earned]="t.kind === 'badge-earned'"
+      (pointerenter)="onHoverEnter(t.id)"
+      (pointerleave)="onHoverLeave(t.id)"
+      (focusin)="onHoverEnter(t.id)"
+      (focusout)="onHoverLeave(t.id)"
+      role="status">
+      <span class="toast-icon" aria-hidden="true">{{ t.icon || iconFor(t.kind) }}</span>
+      <div class="toast-body">
+        <div class="toast-title">{{ t.title }}</div>
+        @if (t.body) {
+          <div class="toast-subtitle">{{ t.body }}</div>
+        }
+      </div>
+      @if (t.routerLink) {
+        <a class="toast-link" [routerLink]="t.routerLink" queryParamsHandling="preserve"
+          (click)="dismiss(t.id)" aria-label="Open">
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+      }
+      <button class="toast-dismiss" (click)="dismiss(t.id, $event)" aria-label="Dismiss">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
-    <a *ngIf="t.routerLink" class="toast-link" [routerLink]="t.routerLink" queryParamsHandling="preserve"
-       (click)="dismiss(t.id)" aria-label="Open">
-      <mat-icon>arrow_forward</mat-icon>
-    </a>
-    <button class="toast-dismiss" (click)="dismiss(t.id, $event)" aria-label="Dismiss">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
+  }
 </div>

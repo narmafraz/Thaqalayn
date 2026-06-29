@@ -1,215 +1,268 @@
-<ng-container *ngIf="(error$ | async) as error; else content">
+@if ((error$ | async); as error) {
   <app-error-display [message]="error" (retry)="onRetry()"></app-error-display>
-</ng-container>
-
-<ng-template #content>
-  <app-skeleton-loader *ngIf="!(book$ | async)"
+} @else {
+  @if (!(book$ | async)) {
+    <app-skeleton-loader
     [variant]="'chapter-list'"></app-skeleton-loader>
-
+  }
   <!-- Loading indicator during navigation transitions -->
-  <div class="loading-bar" *ngIf="(loading$ | async) && (book$ | async)">
-    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-  </div>
-
-  <ng-container *ngIf="(book$ | async) as book" [ngSwitch]="book.kind">
-    <ng-container *ngSwitchCase="'chapter_list'">
-      <ng-container *ngIf="book.index === 'books'">
-        <!-- RE-10: active reading-plan ribbons -->
-        <section *ngIf="planStates.length > 0" class="plan-ribbons">
-          <a *ngFor="let s of planStates"
-             [routerLink]="planTodayLink(s)"
-             queryParamsHandling="preserve"
-             class="plan-ribbon"
-             [class.plan-ribbon-done]="s.todayDone">
-            <span class="plan-ribbon-icon" aria-hidden="true">{{ s.todayDone ? '✅' : '📖' }}</span>
-            <div class="plan-ribbon-body">
-              <div class="plan-ribbon-title">
-                {{ s.plan.titleEn }} — {{ 'reading.plans.dayOf' | translate }} {{ s.currentDay }} / {{ s.plan.totalDays }}
-              </div>
-              <div class="plan-ribbon-subtitle">
-                <ng-container *ngIf="!s.todayDone">{{ s.today.titleEn }} · {{ s.todayRead }} / {{ s.today.verseCount }}</ng-container>
-                <ng-container *ngIf="s.todayDone">{{ 'reading.plans.todayDone' | translate }}</ng-container>
-              </div>
-              <div class="plan-ribbon-bar">
-                <div class="plan-ribbon-fill" [style.width.%]="planTodayPercent(s)"></div>
-              </div>
+  @if ((loading$ | async) && (book$ | async)) {
+    <div class="loading-bar">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+  }
+  @if ((book$ | async); as book) {
+    @switch (book.kind) {
+      @case ('chapter_list') {
+        @if (book.index === 'books') {
+          <!-- RE-10: active reading-plan ribbons -->
+          @if (planStates.length > 0) {
+            <section class="plan-ribbons">
+              @for (s of planStates; track s) {
+                <a
+                  [routerLink]="planTodayLink(s)"
+                  queryParamsHandling="preserve"
+                  class="plan-ribbon"
+                  [class.plan-ribbon-done]="s.todayDone">
+                  <span class="plan-ribbon-icon" aria-hidden="true">{{ s.todayDone ? '✅' : '📖' }}</span>
+                  <div class="plan-ribbon-body">
+                    <div class="plan-ribbon-title">
+                      {{ s.plan.titleEn }} — {{ 'reading.plans.dayOf' | translate }} {{ s.currentDay }} / {{ s.plan.totalDays }}
+                    </div>
+                    <div class="plan-ribbon-subtitle">
+                      @if (!s.todayDone) {
+                        {{ s.today.titleEn }} · {{ s.todayRead }} / {{ s.today.verseCount }}
+                      }
+                      @if (s.todayDone) {
+                        {{ 'reading.plans.todayDone' | translate }}
+                      }
+                    </div>
+                    <div class="plan-ribbon-bar">
+                      <div class="plan-ribbon-fill" [style.width.%]="planTodayPercent(s)"></div>
+                    </div>
+                  </div>
+                  <mat-icon class="plan-ribbon-cta" aria-hidden="true">arrow_forward</mat-icon>
+                </a>
+              }
+            </section>
+          }
+          <!-- RE-08 / RE-09: streak chip + daily goal ring (visible only after the user has read something) -->
+          @if (streak.current > 0 || goalTarget > 0) {
+            <div class="homepage-stats-row">
+              @if (streak.current > 0) {
+                <a routerLink="/bookmarks" queryParamsHandling="preserve" class="homepage-streak-chip"
+                  [class.streak-in-danger]="!streak.includesToday"
+                  [attr.aria-label]="'reading.streak' | translate">
+                  <span class="streak-flame" aria-hidden="true">🔥</span>
+                  <span class="streak-count">{{ streak.current }}</span>
+                  <span class="streak-text">{{ 'reading.streak' | translate }}</span>
+                </a>
+              }
+              @if (goalTarget > 0) {
+                <a routerLink="/bookmarks" queryParamsHandling="preserve" class="homepage-goal-ring"
+                  [class.goal-met]="goalFraction >= 1"
+                  [attr.aria-label]="goalToday + ' / ' + goalTarget">
+                  <svg viewBox="0 0 36 36" class="goal-ring-svg" aria-hidden="true">
+                    <path class="goal-ring-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path class="goal-ring-arc" [attr.stroke-dasharray]="(goalFraction * 100) + ', 100'"
+                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <text x="18" y="20" class="goal-ring-text" text-anchor="middle">{{ goalToday }}/{{ goalTarget }}</text>
+                  </svg>
+                  <span class="goal-ring-label">{{ 'reading.goal' | translate }}</span>
+                </a>
+              }
             </div>
-            <mat-icon class="plan-ribbon-cta" aria-hidden="true">arrow_forward</mat-icon>
-          </a>
-        </section>
-
-        <!-- RE-08 / RE-09: streak chip + daily goal ring (visible only after the user has read something) -->
-        <div *ngIf="streak.current > 0 || goalTarget > 0" class="homepage-stats-row">
-          <a routerLink="/bookmarks" queryParamsHandling="preserve" class="homepage-streak-chip"
-             *ngIf="streak.current > 0"
-             [class.streak-in-danger]="!streak.includesToday"
-             [attr.aria-label]="'reading.streak' | translate">
-            <span class="streak-flame" aria-hidden="true">🔥</span>
-            <span class="streak-count">{{ streak.current }}</span>
-            <span class="streak-text">{{ 'reading.streak' | translate }}</span>
-          </a>
-          <a routerLink="/bookmarks" queryParamsHandling="preserve" class="homepage-goal-ring"
-             *ngIf="goalTarget > 0"
-             [class.goal-met]="goalFraction >= 1"
-             [attr.aria-label]="goalToday + ' / ' + goalTarget">
-            <svg viewBox="0 0 36 36" class="goal-ring-svg" aria-hidden="true">
-              <path class="goal-ring-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-              <path class="goal-ring-arc" [attr.stroke-dasharray]="(goalFraction * 100) + ', 100'"
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-              <text x="18" y="20" class="goal-ring-text" text-anchor="middle">{{ goalToday }}/{{ goalTarget }}</text>
-            </svg>
-            <span class="goal-ring-label">{{ 'reading.goal' | translate }}</span>
-          </a>
-        </div>
-
-        <!-- Random Quran + Hadith cards -->
-        <div class="random-verse-row">
-          <div *ngIf="(randomQuran$ | async) as qv" class="random-verse-card mat-elevation-z2">
-            <div class="random-verse-label">
-              <mat-icon>menu_book</mat-icon>
-              <span class="verse-of-the-day-tag">{{ 'reading.verseOfTheDay' | translate }}</span>
-              <span class="random-verse-book-label">· {{ qv.bookLabel }}</span>
-              <button class="random-verse-shuffle" (click)="shuffleQuran($event)"
-                      [attr.aria-label]="'reading.shuffleAgain' | translate"
-                      [matTooltip]="'reading.shuffleAgain' | translate">
-                <mat-icon>refresh</mat-icon>
-              </button>
-            </div>
-            <div class="random-verse-body">
-              <div class="random-verse-arabic" lang="ar" dir="rtl">{{ qv.arabicText }}</div>
-              <div class="random-verse-translation" *ngIf="qv.translationText">{{ qv.translationText }}</div>
-            </div>
-            <a class="random-verse-ref" [routerLink]="qv.path" queryParamsHandling="preserve">
-              {{ qv.reference }} →
-            </a>
+          }
+          <!-- Random Quran + Hadith cards -->
+          <div class="random-verse-row">
+            @if ((randomQuran$ | async); as qv) {
+              <div class="random-verse-card mat-elevation-z2">
+                <div class="random-verse-label">
+                  <mat-icon>menu_book</mat-icon>
+                  <span class="verse-of-the-day-tag">{{ 'reading.verseOfTheDay' | translate }}</span>
+                  <span class="random-verse-book-label">· {{ qv.bookLabel }}</span>
+                  <button class="random-verse-shuffle" (click)="shuffleQuran($event)"
+                    [attr.aria-label]="'reading.shuffleAgain' | translate"
+                    [matTooltip]="'reading.shuffleAgain' | translate">
+                    <mat-icon>refresh</mat-icon>
+                  </button>
+                </div>
+                <div class="random-verse-body">
+                  <div class="random-verse-arabic" lang="ar" dir="rtl">{{ qv.arabicText }}</div>
+                  @if (qv.translationText) {
+                    <div class="random-verse-translation">{{ qv.translationText }}</div>
+                  }
+                </div>
+                <a class="random-verse-ref" [routerLink]="qv.path" queryParamsHandling="preserve">
+                  {{ qv.reference }} →
+                </a>
+              </div>
+            }
+            @if ((randomHadith$ | async); as hv) {
+              <div class="random-verse-card mat-elevation-z2">
+                <div class="random-verse-label">
+                  <mat-icon>auto_stories</mat-icon>
+                  <span>{{ hv.bookLabel }}</span>
+                  <button class="random-verse-shuffle" (click)="shuffleHadith($event)" [attr.aria-label]="'book.shuffleHadith' | translate">
+                    <mat-icon>refresh</mat-icon>
+                  </button>
+                </div>
+                <div class="random-verse-body">
+                  <div class="random-verse-arabic" lang="ar" dir="rtl">{{ hv.arabicText }}</div>
+                  @if (hv.translationText) {
+                    <div class="random-verse-translation">{{ hv.translationText }}</div>
+                  }
+                </div>
+                <a class="random-verse-ref" [routerLink]="hv.path" queryParamsHandling="preserve">
+                  {{ hv.reference }} →
+                </a>
+              </div>
+            }
           </div>
-          <div *ngIf="(randomHadith$ | async) as hv" class="random-verse-card mat-elevation-z2">
-            <div class="random-verse-label">
-              <mat-icon>auto_stories</mat-icon>
-              <span>{{ hv.bookLabel }}</span>
-              <button class="random-verse-shuffle" (click)="shuffleHadith($event)" [attr.aria-label]="'book.shuffleHadith' | translate">
-                <mat-icon>refresh</mat-icon>
-              </button>
-            </div>
-            <div class="random-verse-body">
-              <div class="random-verse-arabic" lang="ar" dir="rtl">{{ hv.arabicText }}</div>
-              <div class="random-verse-translation" *ngIf="hv.translationText">{{ hv.translationText }}</div>
-            </div>
-            <a class="random-verse-ref" [routerLink]="hv.path" queryParamsHandling="preserve">
-              {{ hv.reference }} →
-            </a>
-          </div>
-        </div>
-        <!-- Continue Reading -->
-        <div *ngIf="readingProgress.length > 0" class="continue-reading-card mat-elevation-z2">
-          <div class="continue-reading-label">
-            <mat-icon>history</mat-icon>
-            <span>{{ 'bookmark.continueReading' | translate }}</span>
-          </div>
-          <div class="continue-reading-list">
-            <a *ngFor="let rp of readingProgress"
-               [routerLink]="getProgressRouterLink(rp)"
-               queryParamsHandling="preserve"
-               class="continue-reading-item">
-              <mat-icon>menu_book</mat-icon>
-              <div class="continue-reading-info">
-                <span class="continue-reading-book">{{ formatBookName(rp.bookId) }}</span>
-                <span class="continue-reading-title">{{ rp.lastTitle }}</span>
+          <!-- Continue Reading -->
+          @if (readingProgress.length > 0) {
+            <div class="continue-reading-card mat-elevation-z2">
+              <div class="continue-reading-label">
+                <mat-icon>history</mat-icon>
+                <span>{{ 'bookmark.continueReading' | translate }}</span>
               </div>
-              <button class="continue-reading-dismiss" (click)="$event.preventDefault(); $event.stopPropagation(); clearProgress(rp.bookId)"
+              <div class="continue-reading-list">
+                @for (rp of readingProgress; track rp) {
+                  <a
+                    [routerLink]="getProgressRouterLink(rp)"
+                    queryParamsHandling="preserve"
+                    class="continue-reading-item">
+                    <mat-icon>menu_book</mat-icon>
+                    <div class="continue-reading-info">
+                      <span class="continue-reading-book">{{ formatBookName(rp.bookId) }}</span>
+                      <span class="continue-reading-title">{{ rp.lastTitle }}</span>
+                    </div>
+                    <button class="continue-reading-dismiss" (click)="$event.preventDefault(); $event.stopPropagation(); clearProgress(rp.bookId)"
                       [attr.aria-label]="'bookmark.clearProgress' | translate">
-                <mat-icon>close</mat-icon>
-              </button>
-            </a>
-          </div>
-        </div>
-
-        <app-book-tree></app-book-tree>
-
-        <!-- RE-14: Spaced-repetition revisit suggestions -->
-        <section *ngIf="revisitCandidates.length > 0" class="revisit-panel">
-          <h2>{{ 'reading.revisitTitle' | translate }}</h2>
-          <p class="revisit-subtitle">{{ 'reading.revisitSubtitle' | translate }}</p>
-          <ul class="revisit-list">
-            <li *ngFor="let c of revisitCandidates" class="revisit-item">
-              <a [routerLink]="bookmarkRouterLink(c.bookmark.path)" queryParamsHandling="preserve" class="revisit-link">
-                <mat-icon>bookmark</mat-icon>
-                <div class="revisit-meta">
-                  <span class="revisit-title">{{ c.bookmark.title }}</span>
-                  <span class="revisit-since">{{ c.daysSinceLastSeen }} {{ 'reading.daysAgo' | translate }}</span>
-                </div>
-              </a>
-            </li>
-          </ul>
-        </section>
-
-        <!-- RE-18: Per-book reading progress for books the user has started -->
-        <section *ngIf="startedBookCards.length > 0" class="started-books-panel">
-          <h2>{{ 'reading.startedBooks' | translate }}</h2>
-          <div class="started-books-grid">
-            <a *ngFor="let card of startedBookCards"
-               [routerLink]="card.continueRouterLink"
-               queryParamsHandling="preserve"
-               class="started-book-card"
-               [attr.aria-label]="card.titleEn + ': ' + card.progress.versesRead + ' / ' + card.progress.total + ' (' + card.progress.percent + '%)'">
-              <div class="started-book-header">
-                <mat-icon>{{ card.icon }}</mat-icon>
-                <div class="started-book-titles">
-                  <span class="started-book-title">{{ card.titleEn }}</span>
-                  <span *ngIf="card.titleAr" class="started-book-title-ar" lang="ar" dir="rtl">{{ card.titleAr }}</span>
-                </div>
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </a>
+                }
               </div>
-              <div class="started-book-progress-row">
-                <div class="started-book-progress-bar"
-                     [matTooltip]="card.progress.versesRead + ' / ' + card.progress.total + ' (' + card.progress.percent + '%)'">
-                  <div class="started-book-progress-fill" [style.width.%]="card.progress.fraction * 100"></div>
-                </div>
-                <span class="started-book-progress-text">
-                  {{ card.progress.versesRead }} / {{ card.progress.total }}
-                </span>
+            </div>
+          }
+          <app-book-tree></app-book-tree>
+          <!-- RE-14: Spaced-repetition revisit suggestions -->
+          @if (revisitCandidates.length > 0) {
+            <section class="revisit-panel">
+              <h2>{{ 'reading.revisitTitle' | translate }}</h2>
+              <p class="revisit-subtitle">{{ 'reading.revisitSubtitle' | translate }}</p>
+              <ul class="revisit-list">
+                @for (c of revisitCandidates; track c) {
+                  <li class="revisit-item">
+                    <a [routerLink]="bookmarkRouterLink(c.bookmark.path)" queryParamsHandling="preserve" class="revisit-link">
+                      <mat-icon>bookmark</mat-icon>
+                      <div class="revisit-meta">
+                        <span class="revisit-title">{{ c.bookmark.title }}</span>
+                        <span class="revisit-since">{{ c.daysSinceLastSeen }} {{ 'reading.daysAgo' | translate }}</span>
+                      </div>
+                    </a>
+                  </li>
+                }
+              </ul>
+            </section>
+          }
+          <!-- RE-18: Per-book reading progress for books the user has started -->
+          @if (startedBookCards.length > 0) {
+            <section class="started-books-panel">
+              <h2>{{ 'reading.startedBooks' | translate }}</h2>
+              <div class="started-books-grid">
+                @for (card of startedBookCards; track card) {
+                  <a
+                    [routerLink]="card.continueRouterLink"
+                    queryParamsHandling="preserve"
+                    class="started-book-card"
+                    [attr.aria-label]="card.titleEn + ': ' + card.progress.versesRead + ' / ' + card.progress.total + ' (' + card.progress.percent + '%)'">
+                    <div class="started-book-header">
+                      <mat-icon>{{ card.icon }}</mat-icon>
+                      <div class="started-book-titles">
+                        <span class="started-book-title">{{ card.titleEn }}</span>
+                        @if (card.titleAr) {
+                          <span class="started-book-title-ar" lang="ar" dir="rtl">{{ card.titleAr }}</span>
+                        }
+                      </div>
+                    </div>
+                    <div class="started-book-progress-row">
+                      <div class="started-book-progress-bar"
+                        [matTooltip]="card.progress.versesRead + ' / ' + card.progress.total + ' (' + card.progress.percent + '%)'">
+                        <div class="started-book-progress-fill" [style.width.%]="card.progress.fraction * 100"></div>
+                      </div>
+                      <span class="started-book-progress-text">
+                        {{ card.progress.versesRead }} / {{ card.progress.total }}
+                      </span>
+                    </div>
+                    <div class="started-book-continue">
+                      <mat-icon>arrow_forward</mat-icon>
+                      <span class="started-book-continue-label">{{ card.continueLabel }}</span>
+                    </div>
+                  </a>
+                }
               </div>
-              <div class="started-book-continue">
-                <mat-icon>arrow_forward</mat-icon>
-                <span class="started-book-continue-label">{{ card.continueLabel }}</span>
+            </section>
+          }
+          @if (exploreCards.length > 0) {
+            <div class="homepage-quick-links">
+              <h2>{{ 'nav.explore' | translate }}</h2>
+              <div class="quick-links">
+                @for (card of exploreCards; track card) {
+                  <a
+                    [routerLink]="card.routerLink"
+                    queryParamsHandling="preserve"
+                    class="quick-link-card"
+                    [class.featured]="card.featured">
+                    <mat-icon>{{ card.icon }}</mat-icon>
+                    <span class="quick-link-title">{{ card.titleEn }}</span>
+                    @if (card.titleAr) {
+                      <span class="quick-link-title-ar" lang="ar">{{ card.titleAr }}</span>
+                    }
+                    @if (card.author) {
+                      <span class="quick-link-author">{{ card.author.en }}
+                        @if (card.author.ar) {
+                          <span lang="ar" class="quick-link-author-ar"> - {{ card.author.ar }}</span>
+                        }
+                      </span>
+                    }
+                    @if (card.descKey) {
+                      <span class="quick-link-desc">{{ card.descKey | translate }}</span>
+                    }
+                    @if (bookProgress(card.slug); as bp) {
+                      @if (bp.versesRead > 0 && bp.total > 0) {
+                        <div class="quick-link-progress"
+                          [attr.aria-label]="bp.versesRead + ' / ' + bp.total + ' (' + bp.percent + '%)'"
+                          [matTooltip]="bp.versesRead + ' / ' + bp.total + ' (' + bp.percent + '%)'">
+                          <div class="quick-link-progress-fill" [style.width.%]="bp.fraction * 100"></div>
+                          <span class="quick-link-progress-text">{{ bp.versesRead }} / {{ bp.total }}</span>
+                        </div>
+                      }
+                    }
+                  </a>
+                }
               </div>
-            </a>
-          </div>
-        </section>
+            </div>
+          }
+        }
+        @if (book.index !== 'books') {
+          <app-chapter-list [book$]="book$"></app-chapter-list>
+        }
+      }
+      @case ('verse_list') {
+        <app-chapter-content [book$]="book$"></app-chapter-content>
+      }
+      @case ('verse_detail') {
+        <app-verse-detail [book$]="book$"></app-verse-detail>
+      }
+      <!-- <app-verse-content *ngSwitchCase="'verse_content'" [book$]="book$"></app-verse-content> -->
+      @default {
+        <p>
+          {{ 'book.unknownBookPart' | translate }}
+        </p>
+      }
+    }
+  }
+}
 
-        <div class="homepage-quick-links" *ngIf="exploreCards.length > 0">
-          <h2>{{ 'nav.explore' | translate }}</h2>
-          <div class="quick-links">
-            <a *ngFor="let card of exploreCards"
-               [routerLink]="card.routerLink"
-               queryParamsHandling="preserve"
-               class="quick-link-card"
-               [class.featured]="card.featured">
-              <mat-icon>{{ card.icon }}</mat-icon>
-              <span class="quick-link-title">{{ card.titleEn }}</span>
-              <span class="quick-link-title-ar" lang="ar" *ngIf="card.titleAr">{{ card.titleAr }}</span>
-              <span class="quick-link-author" *ngIf="card.author">{{ card.author.en }}
-                <span lang="ar" class="quick-link-author-ar" *ngIf="card.author.ar"> - {{ card.author.ar }}</span>
-              </span>
-              <span class="quick-link-desc" *ngIf="card.descKey">{{ card.descKey | translate }}</span>
-              <ng-container *ngIf="bookProgress(card.slug) as bp">
-                <div *ngIf="bp.versesRead > 0 && bp.total > 0" class="quick-link-progress"
-                     [attr.aria-label]="bp.versesRead + ' / ' + bp.total + ' (' + bp.percent + '%)'"
-                     [matTooltip]="bp.versesRead + ' / ' + bp.total + ' (' + bp.percent + '%)'">
-                  <div class="quick-link-progress-fill" [style.width.%]="bp.fraction * 100"></div>
-                  <span class="quick-link-progress-text">{{ bp.versesRead }} / {{ bp.total }}</span>
-                </div>
-              </ng-container>
-            </a>
-          </div>
-        </div>
-      </ng-container>
-      <app-chapter-list *ngIf="book.index !== 'books'" [book$]="book$"></app-chapter-list>
-    </ng-container>
-    <app-chapter-content *ngSwitchCase="'verse_list'" [book$]="book$"></app-chapter-content>
-    <app-verse-detail *ngSwitchCase="'verse_detail'" [book$]="book$"></app-verse-detail>
-    <!-- <app-verse-content *ngSwitchCase="'verse_content'" [book$]="book$"></app-verse-content> -->
-    <p *ngSwitchDefault>
-      {{ 'book.unknownBookPart' | translate }}
-    </p>
-  </ng-container>
-</ng-template>

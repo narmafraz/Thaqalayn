@@ -41,15 +41,13 @@ test.describe('Narrator Profile Performance', () => {
     await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
 
-    const showAllBtn = page.locator('button', { hasText: /Show all/ });
-    const btnCount = await showAllBtn.count();
-    if (btnCount > 0) {
-      // Click the first "Show all" button
-      await showAllBtn.first().click();
-
-      // Should now show a "Show less" button
-      const showLessBtn = page.locator('button', { hasText: /Show less/ });
-      await expect(showLessBtn.first()).toBeVisible();
+    const showAllBtn = page.locator('button').filter({ hasText: /Show all/ }).first();
+    if (await showAllBtn.count() > 0) {
+      // Expansion is one-way: clicking "Show all N" reveals the full list and
+      // removes that button (there is no "Show less" toggle in the design).
+      const label = (await showAllBtn.textContent())!.trim();
+      await showAllBtn.click();
+      await expect(page.locator('button').filter({ hasText: label })).toHaveCount(0);
     }
   });
 });

@@ -102,6 +102,16 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   private pendingReadFlush: ReturnType<typeof setTimeout> | null = null;
   private pendingReadPaths = new Set<string>();
 
+  // Deep-link / fragment scrolling. The single setTimeout scroll was unreliable
+  // for two reasons: (1) the sticky header + reading toolbar overlay the
+  // viewport top, so a raw scrollToAnchor lands the target *under* the chrome
+  // and the neighbour appears at the readable top; (2) verses lazy-load into
+  // skeletons, so the layout above the target keeps shifting after the one-shot
+  // scroll. We fix both by setting a viewport offset and re-aligning until the
+  // target's on-screen position stabilises (or the user takes over scrolling).
+  private fragmentScrollTimer: ReturnType<typeof setTimeout> | null = null;
+  private fragmentScrollAbort: (() => void) | null = null;
+
   private destroyRef = inject(DestroyRef);
   private platformId = inject(PLATFORM_ID);
 
@@ -158,13 +168,16 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     });
     this.fragment$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(fragment => {
-      setTimeout(() => {
-          this.viewportScroller.scrollToAnchor(fragment);
-      });
+      this.scrollToFragment(fragment);
     });
   }
 
   ngOnInit(): void {
+    // Offset anchor scrolling by the sticky chrome height up front, so even the
+    // router's own anchorScrolling pass (which runs before our loop) lands clear
+    // of the header.
+    this.applyScrollOffset();
+
     this.i18nService.currentLang$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(lang => {
       this.currentLang = lang;
     });
@@ -254,6 +267,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
     this.destroyObserver();
     this.destroyReadObserver();
+    this.cancelFragmentScroll();
     this.flushPendingReadsNow();
     const host = this.el.nativeElement;
     host.removeEventListener('touchstart', this.onTouchStart);
@@ -456,6 +470,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   /** Shared scroll-to-anchor + highlight-pulse + URL-fragment update for a hadith index. */
   private scrollToHadith(index: number): void {
     const anchor = 'h' + index;
+    this.applyScrollOffset();
     this.viewportScroller.scrollToAnchor(anchor);
 
     // Highlight the target verse card
@@ -468,11 +483,147 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       }
     }
 
-    // Update URL fragment
+    // Update URL fragment. The fragment change re-triggers scrollToFragment(),
+    // which keeps re-aligning the target as any lazy content above it settles.
     this.router.navigate([], {
       fragment: anchor,
       queryParamsHandling: 'preserve',
     });
+  }
+
+  /**
+   * Offset programmatic anchor scrolling by the combined height of the sticky
+   * header + reading toolbar (measured live, so it adapts to compact/mobile
+   * layouts) plus a small gap. Shared by the router's anchorScrolling and our
+   * own scrollToAnchor calls, since both read this single ViewportScroller.
+   */
+  private applyScrollOffset(): void {
+    if (isPlatformServer(this.platformId) || typeof document === 'undefined') return;
+    const header = document.querySelector('#header') as HTMLElement | null;
+    const toolbar = document.querySelector('.reading-toolbar') as HTMLElement | null;
+    const chrome = (header?.offsetHeight ?? 0) + (toolbar?.offsetHeight ?? 0);
+    this.viewportScroller.setOffset([0, chrome + 12]);
+  }
+
+  /**
+   * Scroll to a `#hN` fragment robustly. A one-shot scroll loses the target
+   * when lazy-loaded cards above it grow from skeleton to full height, so we
+   * re-scroll on a short interval until the target's on-screen position holds
+   * steady (layout settled) or we hit the time budget. Aborts the moment the
+   * user scrolls/types so we never fight them.
+   */
+  private scrollToFragment(fragment: string): void {
+    if (isPlatformServer(this.platformId) || typeof window === 'undefined') return;
+    this.cancelFragmentScroll();
+    if (!fragment) return;
+
+    const target = parseInt(fragment.replace(/^h/, ''), 10);
+
+    // Eager-load every verse at/above the target so the layout above it reaches
+    // its final height. Otherwise lazy cards above grow from skeletons after we
+    // settle and shove the target up out of view (the "lands on the next one"
+    // bug). Verses below the target stay lazy.
+    if (!Number.isNaN(target)) this.eagerLoadUpToTarget(target);
+
+    // Any user-driven scroll/zoom/key cancels the auto-correction. Programmatic
+    // scrollToAnchor fires 'scroll' but never these, so they signal real intent.
+    const abort = () => this.cancelFragmentScroll();
+    const opts: AddEventListenerOptions = { passive: true };
+    window.addEventListener('wheel', abort, opts);
+    window.addEventListener('touchmove', abort, opts);
+    window.addEventListener('keydown', abort, opts);
+    this.fragmentScrollAbort = () => {
+      window.removeEventListener('wheel', abort, opts);
+      window.removeEventListener('touchmove', abort, opts);
+      window.removeEventListener('keydown', abort, opts);
+    };
+
+    let lastTop = Number.NaN;
+    let stableTicks = 0;
+    let ticks = 0;
+    const tick = (): void => {
+      this.fragmentScrollTimer = null;
+      const el = document.getElementById(fragment);
+      if (el) {
+        this.applyScrollOffset();
+        this.viewportScroller.scrollToAnchor(fragment);
+        const top = el.getBoundingClientRect().top;
+        if (Math.abs(top - lastTop) < 1.5) stableTicks++;
+        else stableTicks = 0;
+        lastTop = top;
+      }
+      ticks++;
+      // Only allow an early stop once everything above the target has loaded
+      // (so no late growth can shift it) AND the position has held steady.
+      // Otherwise keep correcting until the ~4s budget runs out.
+      const settled = el !== null && stableTicks >= 4 && this.aboveTargetLoaded(target);
+      if (!settled && ticks < 40) {
+        this.fragmentScrollTimer = setTimeout(tick, 100);
+      } else {
+        this.cancelFragmentScroll();
+      }
+    };
+    // Defer the first pass so the skeleton/card DOM has rendered.
+    this.fragmentScrollTimer = setTimeout(tick, 0);
+  }
+
+  /**
+   * Only the verses immediately above the target can shift it once it's pinned:
+   * the IntersectionObserver only loads within its rootMargin of the viewport,
+   * so verses far above stay skeletons and never move. Pre-load just that window
+   * (plus the target) — NOT the whole chapter above a deep anchor, which would
+   * fetch hundreds of files and burn bandwidth.
+   */
+  private static readonly FRAGMENT_PRELOAD_ABOVE = 8;
+
+  /** Index of the Hadith/Verse ref whose local_index === target, or -1. */
+  private targetRefPos(target: number): number {
+    return this.verseRefs.findIndex(
+      r => (r.part_type === 'Hadith' || r.part_type === 'Verse') && r.local_index === target,
+    );
+  }
+
+  /** Eager-load the target and the small window of verses just above it. */
+  private eagerLoadUpToTarget(target: number): void {
+    if (!this.isShellFormat) return;
+    const pos = this.targetRefPos(target);
+    if (pos < 0) return;
+    const from = Math.max(0, pos - ChapterContentComponent.FRAGMENT_PRELOAD_ABOVE);
+    for (let i = from; i <= pos; i++) {
+      const ref = this.verseRefs[i];
+      if (ref.path && !this.loadedVerses.has(ref.path)) {
+        this.verseLoader.loadVerse(ref.path).subscribe(v => {
+          if (v) {
+            this.loadedVerses.set(ref.path!, v);
+            this.cdr.markForCheck();
+          }
+        });
+      }
+    }
+  }
+
+  /** True once the preload window just above `target` has loaded (legacy is always inline). */
+  private aboveTargetLoaded(target: number): boolean {
+    if (!this.isShellFormat || Number.isNaN(target)) return true;
+    const pos = this.targetRefPos(target);
+    if (pos < 0) return true;
+    const from = Math.max(0, pos - ChapterContentComponent.FRAGMENT_PRELOAD_ABOVE);
+    for (let i = from; i < pos; i++) {
+      const ref = this.verseRefs[i];
+      if (ref.path && !this.loadedVerses.has(ref.path)) return false;
+    }
+    return true;
+  }
+
+  private cancelFragmentScroll(): void {
+    if (this.fragmentScrollTimer !== null) {
+      clearTimeout(this.fragmentScrollTimer);
+      this.fragmentScrollTimer = null;
+    }
+    if (this.fragmentScrollAbort) {
+      this.fragmentScrollAbort();
+      this.fragmentScrollAbort = null;
+    }
   }
 
   toggleMetadata(index: number): void {

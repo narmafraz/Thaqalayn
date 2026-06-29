@@ -246,4 +246,26 @@ describe('ChapterContentComponent', () => {
       expect(spy).toHaveBeenCalledWith('h3');
     });
   });
+
+  describe('deep-link fragment scrolling (anchor offset fix)', () => {
+    it('offsets anchor scrolling by the sticky chrome height plus a gap', () => {
+      const spy = spyOn((component as any).viewportScroller, 'setOffset');
+      component['applyScrollOffset']();
+      expect(spy).toHaveBeenCalled();
+      const offset = spy.calls.mostRecent().args[0] as [number, number];
+      expect(offset[1]).toBeGreaterThanOrEqual(12);
+    });
+
+    it('ignores an empty fragment (schedules nothing)', () => {
+      component['scrollToFragment']('');
+      expect(component['fragmentScrollTimer']).toBeNull();
+    });
+
+    it('schedules a stabilising re-scroll for a real fragment, then cancels cleanly', () => {
+      component['scrollToFragment']('h1');
+      expect(component['fragmentScrollTimer']).not.toBeNull();
+      component['cancelFragmentScroll']();
+      expect(component['fragmentScrollTimer']).toBeNull();
+    });
+  });
 });

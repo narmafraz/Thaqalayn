@@ -36,15 +36,14 @@ test.describe('Breadcrumb Navigation', () => {
     await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Click the Home breadcrumb
-    const homeLink = page.locator('.crumb-holder a[routerLink="/"]');
+    // Click the Home breadcrumb (first crumb link; href is "/?lang=...").
+    const homeLink = page.locator('.crumb-holder a').first();
     await homeLink.click();
     await page.waitForLoadState('networkidle');
 
-    // Should be back at the books list
+    // Should be back at the books landing (a book tree, not a table).
     await expect(page).toHaveURL(/books/);
-    const table = page.locator('table.full-width-table');
-    await expect(table).toBeVisible();
+    await expect(page.locator('app-book-tree')).toBeVisible();
   });
 
   test('should show breadcrumbs for Al-Kafi chapter pages', async ({ page }) => {
@@ -54,8 +53,8 @@ test.describe('Breadcrumb Navigation', () => {
     const crumbHolder = page.locator('.crumb-holder');
     await expect(crumbHolder).toContainText('Home');
 
-    // Wait for breadcrumb trail to load with separator
-    await expect(crumbHolder).toContainText('»', { timeout: 10000 });
+    // Wait for breadcrumb trail to load (separators are chevron_right icons).
+    await expect(crumbHolder.locator('.crumb-separator').first()).toBeVisible({ timeout: 10000 });
     await expect(crumbHolder).toContainText('Al-Kafi');
 
     // Should have multiple crumb links (Home + Al-Kafi + Volume + Book + Chapter)

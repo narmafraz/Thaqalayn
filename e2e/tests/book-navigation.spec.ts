@@ -5,10 +5,12 @@ test.describe('Book Navigation', () => {
     await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Click on Al-Kafi row in the book list table
-    const alKafiRow = page.locator('tr[mat-row]', { hasText: 'Al-Kafi' });
-    await expect(alKafiRow).toBeVisible();
-    await alKafiRow.click();
+    // The homepage lists books as a tree/explore links (not a table).
+    // Click the Al-Kafi book link (href "/books/al-kafi?..."; the ":..." verse
+    // links won't match the "?" boundary).
+    const alKafiLink = page.locator('a[href^="/books/al-kafi?"]').first();
+    await expect(alKafiLink).toBeVisible();
+    await alKafiLink.click();
 
     // Should navigate to al-kafi page showing volumes
     await page.waitForLoadState('networkidle');
@@ -56,10 +58,11 @@ test.describe('Book Navigation', () => {
     await page.goto('/books?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Click on Quran row
-    const quranRow = page.locator('tr[mat-row]', { hasText: 'Quran' });
-    await expect(quranRow).toBeVisible();
-    await quranRow.click();
+    // Click the Quran book link (href "/books/quran?..."; excludes the
+    // "/books/quran:.." verse-of-the-day links via the "?" boundary).
+    const quranLink = page.locator('a[href^="/books/quran?"]').first();
+    await expect(quranLink).toBeVisible();
+    await quranLink.click();
 
     await page.waitForLoadState('networkidle');
     await expect(page).toHaveURL(/quran/);

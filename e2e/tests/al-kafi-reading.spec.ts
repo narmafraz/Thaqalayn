@@ -40,11 +40,15 @@ test.describe('Al-Kafi Reading', () => {
     await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Reference section should be visible
-    const refs = page.locator('.ref');
-    await expect(refs.first()).toBeVisible();
-    await expect(refs.first()).toContainText('Reference');
-    await expect(refs.first()).toContainText('In-book Reference');
+    // Each hadith card shows its number (e.g. "#1") in the corner...
+    const firstCard = page.locator('mat-card').first();
+    await expect(firstCard).toBeVisible({ timeout: 15000 });
+    await expect(firstCard.locator('.hadith-number').first()).toContainText('#');
+
+    // ...and the reference details live in the collapsible metadata section.
+    await firstCard.locator('.metadata-toggle-btn').first().click();
+    const meta = firstCard.locator('.secondary-metadata');
+    await expect(meta).toContainText('In-book Reference');
   });
 
   test('should display Arabic hadith text', async ({ page }) => {
@@ -62,9 +66,11 @@ test.describe('Al-Kafi Reading', () => {
     await page.goto('/books/al-kafi:1:1:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    const translation = page.locator('.translation');
-    await expect(translation.first()).toBeVisible();
-    const text = await translation.first().textContent();
+    // Translations render in the AI chunked view (.chunk-translation) or the
+    // plain translation wrapper, depending on whether the hadith has AI content.
+    const translation = page.locator('.chunk-translation, .translation-wrapper').first();
+    await expect(translation).toBeVisible({ timeout: 15000 });
+    const text = await translation.textContent();
     expect(text).toBeTruthy();
     expect(text!.length).toBeGreaterThan(5);
   });

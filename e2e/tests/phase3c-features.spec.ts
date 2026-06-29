@@ -353,7 +353,7 @@ test.describe('Hadith Detail Page - Phase 3C Integration', () => {
     const content = page.locator('mat-card, .hadith-card, .verse-detail-container');
     await content.first().waitFor({ state: 'visible', timeout: 15000 });
 
-    const hadithNav = page.locator('.hadith-nav, nav[aria-label*="navigation"]');
+    const hadithNav = page.locator('.hadith-nav, nav[aria-label="Hadith navigation"]').first();
     if (await hadithNav.isVisible()) {
       // Should have a next button (first hadith has no prev)
       const nextBtn = hadithNav.locator('.nav-next, a:has-text("Next")');

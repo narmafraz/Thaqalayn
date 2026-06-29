@@ -29,7 +29,7 @@ ng build --configuration=production  # Production build
 # On Windows without Chrome installed, set CHROME_BIN to Brave:
 CHROME_BIN="/c/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe" npx ng test --watch=false --browsers=ChromeHeadless
 
-# E2E tests (Playwright) — 187 tests across 16 spec files
+# E2E tests (Playwright) — 299 tests across 36 spec files
 # IMPORTANT: Must run from within the Thaqalayn directory, not from root
 npx playwright test                    # Run all E2E tests (headless)
 npx playwright test --headed           # Run with visible browser
@@ -40,7 +40,8 @@ npx playwright test --reporter=html    # Generate HTML report
 
 **Testing gotchas:**
 - `ng test` requires a Chromium-based browser. If Chrome is not installed, set `CHROME_BIN` to Brave or Edge.
-- Playwright tests target the **production** site (`https://thaqalayn.netlify.app/`) by default (see `playwright.config.ts`). To test locally, change `baseURL`.
+- Playwright tests target the **production** site (`https://thaqalayn.netlify.app/`) by default (see `playwright.config.ts`), overridable via `BASE_URL` env var (e.g. `BASE_URL=http://localhost:4200 npx playwright test`).
+- **The E2E suite is written for the local dev server, not production.** Most specs deep-link directly to verse/chapter URLs (e.g. `page.goto('/books/al-kafi:1:1:1:1')`). The dev server serves `index.html` for these (SPA fallback) so the client router resolves them. **Production does NOT**: only ~14 routes are prerendered, and every other route serves a 240-byte meta-refresh redirect to `/books`, so a cold deep-link load lands on the `/books` dashboard and content selectors never appear. Result: a full run against production fails ~190/299 (verified 2026-06-29) while the same specs pass ~17/20 against `localhost:4200`. This is a hosting/prerender artifact, independent of the app build. **Run E2E against `localhost:4200` (dev server + local data server on :8888), not production**, unless you are specifically testing the prerender/SPA-fallback layer.
 - Running `npx playwright test` from the root `scripture/` directory fails with "two different versions of @playwright/test" error. Always `cd` into `Thaqalayn/` first.
 - Playwright uses only Chromium by default (single project in config). Add Firefox/WebKit projects to `playwright.config.ts` for cross-browser testing.
 

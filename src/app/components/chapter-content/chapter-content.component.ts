@@ -57,6 +57,17 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   // Jump to verse state
   jumpTarget: number | null = null;
 
+  /**
+   * RE-17: local_index of the first unread Hadith/Verse in this chapter, or
+   * null. Drives the "jump to first unread" FAB. Only set when the chapter is
+   * partially read (≥1 read AND ≥1 unread) — a fresh chapter's first-unread is
+   * just the top (useless) and a fully-read chapter has nothing to jump to.
+   * Recomputed whenever read-state or the loaded chapter changes.
+   */
+  firstUnreadIndex: number | null = null;
+  /** Ordered (index, path) for every Hadith/Verse in the chapter — the basis for firstUnreadIndex. */
+  private orderedVersePaths: Array<{ index: number; path: string }> = [];
+
   // Metadata density: collapsed by default, expand per verse
   expandedMetadata = new Set<number>();
 
@@ -207,6 +218,9 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
           this.setupReadObserver();
         }
       }
+
+      // Build the ordered Hadith/Verse path list (basis for "first unread").
+      this.buildOrderedVersePaths(book);
 
       // Load bookmark, annotation, and read states for all verses
       this.loadBookmarkStates(book);
@@ -427,7 +441,21 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   jumpToVerse(): void {
     if (!this.jumpTarget) return;
-    const anchor = 'h' + this.jumpTarget;
+    this.scrollToHadith(this.jumpTarget);
+  }
+
+  /**
+   * RE-17: scroll to the first unread Hadith/Verse and pulse-highlight it.
+   * Wired to the floating "jump to first unread" button.
+   */
+  jumpToFirstUnread(): void {
+    if (this.firstUnreadIndex === null) return;
+    this.scrollToHadith(this.firstUnreadIndex);
+  }
+
+  /** Shared scroll-to-anchor + highlight-pulse + URL-fragment update for a hadith index. */
+  private scrollToHadith(index: number): void {
+    const anchor = 'h' + index;
     this.viewportScroller.scrollToAnchor(anchor);
 
     // Highlight the target verse card
@@ -624,7 +652,47 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     const reads = await this.bookmarkService.getReadVersesForBook(bookId);
     this.readPaths.clear();
     for (const r of reads) this.readPaths.add(r.path);
+    this.recomputeFirstUnread();
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Snapshot the chapter's Hadith/Verse paths in display order. Headings are
+   * skipped. Works for both shell (verse_refs) and legacy (inline verses).
+   */
+  private buildOrderedVersePaths(book: ChapterContent): void {
+    const ordered: Array<{ index: number; path: string }> = [];
+    if (this.isShellFormat) {
+      for (const ref of this.verseRefs) {
+        if (ref.part_type !== 'Hadith' && ref.part_type !== 'Verse') continue;
+        if (!ref.path) continue;
+        ordered.push({ index: ref.local_index, path: ref.path });
+      }
+    } else {
+      for (const verse of book.data.verses || []) {
+        if (verse.part_type !== 'Hadith' && verse.part_type !== 'Verse') continue;
+        ordered.push({ index: verse.local_index, path: this.getVersePath(book.index, verse) });
+      }
+    }
+    this.orderedVersePaths = ordered;
+  }
+
+  /**
+   * Set `firstUnreadIndex` to the first unread Hadith/Verse — but only when the
+   * chapter is partially read. If nothing is read the jump target would be the
+   * top (pointless), and if everything is read there's nothing to jump to.
+   */
+  private recomputeFirstUnread(): void {
+    let firstUnread: number | null = null;
+    let anyRead = false;
+    for (const { index, path } of this.orderedVersePaths) {
+      if (this.readPaths.has(path)) {
+        anyRead = true;
+      } else if (firstUnread === null) {
+        firstUnread = index;
+      }
+    }
+    this.firstUnreadIndex = anyRead ? firstUnread : null;
   }
 
   isVerseRead(bookIndex: string, verse: Verse): boolean {
@@ -640,6 +708,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       await this.bookmarkService.markRead(path, 'manual');
       this.readPaths.add(path);
     }
+    this.recomputeFirstUnread();
     this.cdr.markForCheck();
   }
 
@@ -657,6 +726,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     if (paths.length === 0) return;
     await this.bookmarkService.markReadBulk(paths, 'manual');
     for (const p of paths) this.readPaths.add(p);
+    this.recomputeFirstUnread();
     this.cdr.markForCheck();
   }
 
@@ -747,6 +817,7 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     this.pendingReadPaths.clear();
     this.bookmarkService.markReadBulk(paths, 'auto').then(() => {
       for (const p of paths) this.readPaths.add(p);
+      this.recomputeFirstUnread();
       this.cdr.markForCheck();
     });
   }

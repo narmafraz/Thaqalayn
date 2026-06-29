@@ -90,6 +90,23 @@ mat-mdc-card.highlight-pulse {
   border-color: var(--link-color, #673ab7) !important;
 }
 
+// RE-17: "jump to first unread" FAB. Stacks directly above the global
+// back-to-top FAB (which is bottom: 80px) so the two never overlap.
+.jump-to-unread {
+  position: fixed;
+  bottom: 144px; // back-to-top (80px) + FAB height (~56px) + gap
+  right: 16px;
+  z-index: 100;
+  opacity: 0.85;
+  transition: opacity 0.3s;
+  &:hover { opacity: 1; }
+}
+
+:host-context([dir="rtl"]) .jump-to-unread {
+  right: auto;
+  left: 16px;
+}
+
 mat-mdc-card {
   position: relative;
   background-color: var(--card-bg, rgba(255, 255, 255, 0.5));

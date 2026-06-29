@@ -14,6 +14,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ChapterContentComponent } from './chapter-content.component';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
 import { ChapterContent, Verse } from '@app/models';
+import { BookmarkService } from '@app/services/bookmark.service';
 
 describe('ChapterContentComponent', () => {
   let component: ChapterContentComponent;
@@ -161,5 +162,88 @@ describe('ChapterContentComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     const actions = compiled.querySelector('app-verse-actions');
     expect(actions).toBeTruthy();
+  });
+
+  describe('first-unread jump target (RE-17)', () => {
+    const shellBook: ChapterContent = {
+      ...mockBook,
+      data: {
+        ...mockBook.data,
+        verses: undefined as any,
+        verse_refs: [
+          { local_index: 1, part_type: 'Hadith', path: '/books/al-kafi:1:1:1:1' },
+          { local_index: 0, part_type: 'Heading', inline: { text: ['A heading'] } as any },
+          { local_index: 2, part_type: 'Hadith', path: '/books/al-kafi:1:1:1:2' },
+          { local_index: 3, part_type: 'Hadith', path: '/books/al-kafi:1:1:1:3' },
+        ],
+      },
+    };
+
+    beforeEach(() => {
+      bookSubject.next(shellBook);
+      fixture.detectChanges();
+    });
+
+    it('is null when nothing is read (jumping would just go to the top)', () => {
+      component.readPaths.clear();
+      component['recomputeFirstUnread']();
+      expect(component.firstUnreadIndex).toBeNull();
+    });
+
+    it('points at the first unread hadith once the chapter is partially read', () => {
+      component.readPaths = new Set(['/books/al-kafi:1:1:1:1']);
+      component['recomputeFirstUnread']();
+      expect(component.firstUnreadIndex).toBe(2);
+    });
+
+    it('skips headings and read verses to find the next unread', () => {
+      component.readPaths = new Set([
+        '/books/al-kafi:1:1:1:1',
+        '/books/al-kafi:1:1:1:2',
+      ]);
+      component['recomputeFirstUnread']();
+      expect(component.firstUnreadIndex).toBe(3);
+    });
+
+    it('is null when every hadith is read (nothing left to jump to)', () => {
+      component.readPaths = new Set([
+        '/books/al-kafi:1:1:1:1',
+        '/books/al-kafi:1:1:1:2',
+        '/books/al-kafi:1:1:1:3',
+      ]);
+      component['recomputeFirstUnread']();
+      expect(component.firstUnreadIndex).toBeNull();
+    });
+
+    it('hides the jump FAB when no verse is read', async () => {
+      const bookmarks = TestBed.inject(BookmarkService);
+      spyOn(bookmarks, 'getReadVersesForBook').and.resolveTo([]);
+      bookSubject.next(shellBook);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect((fixture.nativeElement as HTMLElement).querySelector('.jump-to-unread')).toBeNull();
+    });
+
+    it('renders the jump FAB once a verse is read', async () => {
+      const bookmarks = TestBed.inject(BookmarkService);
+      spyOn(bookmarks, 'getReadVersesForBook').and.resolveTo([
+        { path: '/books/al-kafi:1:1:1:1' } as any,
+      ]);
+      bookSubject.next(shellBook);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      expect(component.firstUnreadIndex).toBe(2);
+      expect((fixture.nativeElement as HTMLElement).querySelector('.jump-to-unread')).toBeTruthy();
+    });
+
+    it('jumpToFirstUnread scrolls to the unread anchor', () => {
+      const scroller = (component as any).viewportScroller;
+      const spy = spyOn(scroller, 'scrollToAnchor');
+      component.firstUnreadIndex = 3;
+      component.jumpToFirstUnread();
+      expect(spy).toHaveBeenCalledWith('h3');
+    });
   });
 });

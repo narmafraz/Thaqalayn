@@ -426,4 +426,15 @@
     </section>
   }
   <app-settings></app-settings>
+
+  <!-- RE-17: jump to the first unread hadith/verse (shown only when the
+  chapter is partially read; stacks above the global back-to-top FAB). -->
+  @if (firstUnreadIndex !== null) {
+    <button mat-fab class="jump-to-unread"
+      (click)="jumpToFirstUnread()"
+      [matTooltip]="'nav.jumpToUnread' | translate"
+      [attr.aria-label]="'nav.jumpToUnread' | translate">
+      <mat-icon>keyboard_double_arrow_down</mat-icon>
+    </button>
+  }
 }

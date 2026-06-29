@@ -210,31 +210,25 @@ test.describe('AI Settings Reactivity', () => {
     if (await arabicText.count() === 0) return;
     const originalText = await arabicText.first().textContent();
 
-    // Open AI settings panel
-    const settingsBtn = page.locator('.ai-settings-btn').first();
-    await settingsBtn.click();
+    // Display settings now live in the reading sheet.
+    await page.locator('.reading-sheet-trigger').first().click();
+    await page.waitForTimeout(400);
+
+    // Toggle the "Show diacritized text" control.
+    const diacriticsToggle = page.locator('mat-slide-toggle, mat-checkbox, label')
+      .filter({ hasText: /diacritized/i }).first();
+    await expect(diacriticsToggle).toBeVisible();
+    await diacriticsToggle.click();
+    await page.waitForTimeout(500);
+
+    // Close the reading sheet.
+    await page.locator('.reading-sheet-close').first().click().catch(() => {});
     await page.waitForTimeout(300);
 
-    // Check the diacritics checkbox (1st .ai-pref label)
-    const diacriticsCheckbox = page.locator('.ai-pref input[type="checkbox"]').nth(0);
-    await expect(diacriticsCheckbox).toBeVisible();
-
-    // Only proceed if diacritics is currently unchecked (default)
-    if (!(await diacriticsCheckbox.isChecked())) {
-      await diacriticsCheckbox.check();
-      await page.waitForTimeout(500);
-
-      // Close settings
-      const closeBtn = page.locator('.ai-settings-close');
-      await closeBtn.click();
-      await page.waitForTimeout(300);
-
-      // Text may have changed (diacritized version has more tashkeel marks)
-      const newText = await arabicText.first().textContent();
-      // The text content should still be Arabic (not empty or broken)
-      expect(newText).toBeTruthy();
-      expect(newText!.length).toBeGreaterThan(0);
-    }
+    // Text may change (diacritized has more tashkeel) but must stay non-empty Arabic.
+    const newText = await arabicText.first().textContent();
+    expect(newText).toBeTruthy();
+    expect(newText!.length).toBeGreaterThan(0);
   });
 });
 

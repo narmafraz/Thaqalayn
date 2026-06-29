@@ -7,7 +7,7 @@ test.describe('Search Regression Tests', () => {
 
     // Wait for results to appear (index loading can take a few seconds)
     const resultsText = page.locator('.results-summary');
-    await expect(resultsText).toContainText(/\d+ results for/, { timeout: 15000 });
+    await expect(resultsText).toContainText(/[\d,]+\+? results for/, { timeout: 15000 });
 
     // Should have at least one result card
     const resultCards = page.locator('.result-card');
@@ -22,7 +22,7 @@ test.describe('Search Regression Tests', () => {
     await page.waitForLoadState('networkidle');
 
     const resultsText = page.locator('.results-summary');
-    await expect(resultsText).toContainText(/\d+ results for/, { timeout: 15000 });
+    await expect(resultsText).toContainText(/[\d,]+\+? results for/, { timeout: 15000 });
 
     const resultCards = page.locator('.result-card');
     await expect(resultCards.first()).toBeVisible({ timeout: 5000 });
@@ -48,13 +48,13 @@ test.describe('Search Regression Tests', () => {
     await page.waitForLoadState('networkidle');
 
     const resultsText = page.locator('.results-summary');
-    await expect(resultsText).toContainText(/\d+ results for/, { timeout: 15000 });
+    await expect(resultsText).toContainText(/[\d,]+\+? results for/, { timeout: 15000 });
 
     // First result card should have a title and book name
     const firstCard = page.locator('.result-card').first();
     await expect(firstCard).toBeVisible();
 
-    const title = firstCard.locator('.result-title');
+    const title = firstCard.locator('.result-header');
     await expect(title).not.toBeEmpty();
 
     const bookName = firstCard.locator('.result-book');
@@ -66,13 +66,14 @@ test.describe('Search Regression Tests', () => {
     await page.waitForLoadState('networkidle');
 
     const resultsText = page.locator('.results-summary');
-    await expect(resultsText).toContainText(/\d+ results for/, { timeout: 15000 });
+    await expect(resultsText).toContainText(/[\d,]+\+? results for/, { timeout: 15000 });
 
-    // Extract total result count from "N results for" text
+    // Extract total result count from "N results for" text. The count is
+    // shown with thousands separators and a "+" when capped (e.g. "100+").
     const summaryText = await resultsText.textContent();
-    const match = summaryText?.match(/(\d+) results for/);
+    const match = summaryText?.match(/([\d,]+)\+? results for/);
     expect(match).toBeTruthy();
-    const totalResults = parseInt(match![1], 10);
+    const totalResults = parseInt(match![1].replace(/,/g, ''), 10);
 
     // A broad query like "allah" should return well over 30 results
     expect(totalResults).toBeGreaterThan(30);

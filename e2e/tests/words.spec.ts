@@ -126,18 +126,9 @@ test.describe('Word-by-word lazy-load in hadith view', () => {
     const verseText = page.locator('app-verse-text').first();
     await expect(verseText).toBeVisible({ timeout: 15000 });
 
-    // The word-by-word toggle button (matIcon grid_view / view_stream).
-    // It should be present even on v4 hadiths (no inlined word_analysis).
-    const wordToggle = verseText.locator('button.ai-toggle-btn[matTooltip*="word"]').first();
-    if (await wordToggle.count() === 0) {
-      // Selector fallback — match by mat-icon content.
-      const fallback = verseText.locator('button.ai-toggle-btn:has(mat-icon:text("grid_view"))').first();
-      if (await fallback.count()) {
-        await fallback.click();
-      }
-    } else {
-      await wordToggle.click();
-    }
+    // The word-by-word toggle lives in the reading toolbar (outside the verse
+    // text). It lazy-loads word data on click, even for v4 hadiths.
+    await page.locator('button[aria-label="Show word-by-word analysis"]').first().click();
 
     // Word cards should render inside the grid
     await expect(page.locator('.word-analysis-grid .word-card').first()).toBeVisible({ timeout: 5000 });

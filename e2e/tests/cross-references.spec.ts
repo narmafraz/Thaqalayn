@@ -10,13 +10,10 @@ test.describe('Cross-References', () => {
     const cards = page.locator('mat-card');
     await expect(cards.first()).toBeVisible({ timeout: 15000 });
 
-    // Look for a Mentions or Mentioned In section in the references
-    const mentionsSection = page.locator('.related strong');
+    // Cross-references render as inline AI chips; the relation label (e.g.
+    // "Mentions:", "Mentioned In:") sits above the linked chips.
+    const mentionsSection = page.locator('.ai-relation-type-label', { hasText: /Mentions|Mentioned In/ });
     await expect(mentionsSection.first()).toBeVisible({ timeout: 10000 });
-
-    // Verify the cross-reference text contains "Mentions" or "Mentioned In"
-    const mentionsText = await mentionsSection.first().textContent();
-    expect(mentionsText).toMatch(/Mentions|Mentioned In/);
   });
 
   test('should have clickable cross-reference links to other books', async ({ page }) => {
@@ -27,7 +24,7 @@ test.describe('Cross-References', () => {
     await expect(cards.first()).toBeVisible({ timeout: 15000 });
 
     // Cross-reference links should contain /books/ paths
-    const crossRefLinks = page.locator('.related a[href*="books"]');
+    const crossRefLinks = page.locator('.ai-quran-chip, .ai-relation-chip');
     const count = await crossRefLinks.count();
     expect(count).toBeGreaterThanOrEqual(1);
   });
@@ -40,7 +37,7 @@ test.describe('Cross-References', () => {
     await expect(cards.first()).toBeVisible({ timeout: 15000 });
 
     // Find a cross-reference link
-    const crossRefLinks = page.locator('.related a[href*="books"]');
+    const crossRefLinks = page.locator('.ai-quran-chip, .ai-relation-chip');
     const count = await crossRefLinks.count();
 
     if (count > 0) {
@@ -62,8 +59,8 @@ test.describe('Cross-References', () => {
     const cards = page.locator('mat-card');
     await expect(cards.first()).toBeVisible();
 
-    // Look for Mentioned In sections in verse references
-    const mentionedIn = page.locator('.related strong', { hasText: 'Mentioned In' });
+    // Look for "Mentioned In" relation labels in the verse references.
+    const mentionedIn = page.locator('.ai-relation-type-label', { hasText: 'Mentioned In' });
     const count = await mentionedIn.count();
     expect(count).toBeGreaterThanOrEqual(1);
   });

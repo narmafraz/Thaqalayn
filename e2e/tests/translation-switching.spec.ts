@@ -6,7 +6,7 @@ test.describe('Translation Switching', () => {
     await page.waitForLoadState('networkidle');
 
     // Translation selection component should be visible
-    const translationSelect = page.locator('mat-form-field', { hasText: 'Choose translation' });
+    const translationSelect = page.locator('mat-form-field', { hasText: 'Select Translation' });
     await expect(translationSelect.first()).toBeVisible();
   });
 
@@ -85,7 +85,7 @@ test.describe('Translation Switching', () => {
         await page.waitForLoadState('networkidle');
 
         // Translation selector should still be visible on the new page
-        const newSelect = page.locator('mat-form-field', { hasText: 'Choose translation' });
+        const newSelect = page.locator('mat-form-field', { hasText: 'Select Translation' });
         await expect(newSelect.first()).toBeVisible();
       }
     } else {

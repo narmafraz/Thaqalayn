@@ -1,4 +1,18 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+
+// SeoService emits a single ld+json script. Pages with breadcrumbs wrap their
+// entities in an `@graph` array (e.g. [Book, BreadcrumbList]); pages without
+// emit a flat object. Resolve the entity of the requested @type from either.
+async function getJsonLdEntity(page: Page, type: string): Promise<any> {
+  const txt = await page.locator('script[type="application/ld+json"]').first().textContent();
+  expect(txt).toBeTruthy();
+  const data = JSON.parse(txt!);
+  expect(data['@context']).toBe('https://schema.org');
+  const entities = Array.isArray(data['@graph']) ? data['@graph'] : [data];
+  const entity = entities.find((e: any) => e['@type'] === type);
+  expect(entity, `JSON-LD should contain a ${type} entity`).toBeTruthy();
+  return entity;
+}
 
 test.describe('SEO - Legacy Hash URL Redirects', () => {
   test('should redirect old hash URL /#/books/quran:1 to /books/quran:1', async ({ page }) => {
@@ -104,13 +118,8 @@ test.describe('SEO - JSON-LD Structured Data', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
-    const jsonLdText = await page.locator('script[type="application/ld+json"]').textContent();
-    expect(jsonLdText).toBeTruthy();
-
-    const jsonLd = JSON.parse(jsonLdText!);
-    expect(jsonLd['@context']).toBe('https://schema.org');
-    expect(jsonLd['@type']).toBe('WebSite');
-    expect(jsonLd.name).toBeTruthy();
+    const entity = await getJsonLdEntity(page, 'WebSite');
+    expect(entity.name).toBeTruthy();
   });
 
   test('should have JSON-LD with Book type on Quran page', async ({ page }) => {
@@ -118,13 +127,8 @@ test.describe('SEO - JSON-LD Structured Data', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
-    const jsonLdText = await page.locator('script[type="application/ld+json"]').textContent();
-    expect(jsonLdText).toBeTruthy();
-
-    const jsonLd = JSON.parse(jsonLdText!);
-    expect(jsonLd['@context']).toBe('https://schema.org');
-    expect(jsonLd['@type']).toBe('Book');
-    expect(jsonLd.url).toContain('/books/quran:1');
+    const entity = await getJsonLdEntity(page, 'Book');
+    expect(entity.url).toContain('/books/quran:1');
   });
 
   test('should have JSON-LD with Person type on narrator page', async ({ page }) => {
@@ -132,13 +136,8 @@ test.describe('SEO - JSON-LD Structured Data', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
-    const jsonLdText = await page.locator('script[type="application/ld+json"]').textContent();
-    expect(jsonLdText).toBeTruthy();
-
-    const jsonLd = JSON.parse(jsonLdText!);
-    expect(jsonLd['@context']).toBe('https://schema.org');
-    expect(jsonLd['@type']).toBe('Person');
-    expect(jsonLd.url).toContain('/people/narrators/4');
+    const entity = await getJsonLdEntity(page, 'Person');
+    expect(entity.url).toContain('/people/narrators/4');
   });
 
   test('should have JSON-LD with CollectionPage type on narrator list', async ({ page }) => {
@@ -146,11 +145,6 @@ test.describe('SEO - JSON-LD Structured Data', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
-    const jsonLdText = await page.locator('script[type="application/ld+json"]').textContent();
-    expect(jsonLdText).toBeTruthy();
-
-    const jsonLd = JSON.parse(jsonLdText!);
-    expect(jsonLd['@context']).toBe('https://schema.org');
-    expect(jsonLd['@type']).toBe('CollectionPage');
+    await getJsonLdEntity(page, 'CollectionPage');
   });
 });

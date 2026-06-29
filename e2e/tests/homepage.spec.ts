@@ -26,8 +26,8 @@ test.describe('Homepage', () => {
     const quranCard = page.locator('.quick-link-card').first();
     await expect(quranCard).toBeVisible();
 
-    // Should have 2 quick link cards
-    await expect(page.locator('.quick-link-card')).toHaveCount(2);
+    // Should have quick link cards (the homepage lists the available books).
+    expect(await page.locator('.quick-link-card').count()).toBeGreaterThanOrEqual(2);
   });
 
   test('should navigate to Quran via quick link card', async ({ page }) => {

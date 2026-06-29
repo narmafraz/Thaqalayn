@@ -48,10 +48,11 @@ test.describe('Quran Reading', () => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Each verse card should have a reference section
-    const refs = page.locator('.ref');
-    await expect(refs.first()).toBeVisible();
-    await expect(refs.first()).toContainText('Reference');
+    // Reference details live in the collapsible metadata section of each card.
+    const firstCard = page.locator('mat-card').first();
+    await expect(firstCard).toBeVisible({ timeout: 15000 });
+    await firstCard.locator('.metadata-toggle-btn').first().click();
+    await expect(firstCard.locator('.secondary-metadata')).toContainText('Reference');
   });
 
   test('should display a different surah correctly', async ({ page }) => {

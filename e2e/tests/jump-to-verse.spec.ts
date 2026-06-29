@@ -6,7 +6,7 @@ test.describe('Jump to Verse', () => {
     await page.goto('/books/quran:2?lang=en');
     await page.waitForLoadState('networkidle');
 
-    const jumpBar = page.locator('.jump-to-verse');
+    const jumpBar = page.locator('.jump-to-verse-inline');
     await expect(jumpBar).toBeVisible();
   });
 
@@ -15,7 +15,7 @@ test.describe('Jump to Verse', () => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    const jumpBar = page.locator('.jump-to-verse');
+    const jumpBar = page.locator('.jump-to-verse-inline');
     await expect(jumpBar).not.toBeVisible();
   });
 
@@ -23,9 +23,14 @@ test.describe('Jump to Verse', () => {
     await page.goto('/books/quran:2?lang=en');
     await page.waitForLoadState('networkidle');
 
-    const jumpInput = page.locator('.jump-to-verse input[type="number"]');
-    await jumpInput.fill('100');
-    await jumpInput.press('Enter');
+    // The jump control is a mat-select dropdown of verse/hadith numbers.
+    // Open it via keyboard to avoid the sticky toolbar intercepting a click.
+    const jumpSelect = page.locator('.jump-to-verse-inline mat-select');
+    await jumpSelect.scrollIntoViewIfNeeded();
+    await jumpSelect.focus();
+    await jumpSelect.press('Enter');
+    await page.getByRole('option', { name: 'Verse 100', exact: true }).scrollIntoViewIfNeeded();
+    await page.getByRole('option', { name: 'Verse 100', exact: true }).click();
 
     // Wait for scroll and fragment update
     await page.waitForTimeout(1000);
@@ -45,7 +50,7 @@ test.describe('Jump to Verse', () => {
     await page.waitForLoadState('networkidle');
 
     // Check if the chapter has enough verses for the bar to appear
-    const jumpBar = page.locator('.jump-to-verse');
+    const jumpBar = page.locator('.jump-to-verse-inline');
     const verseCards = page.locator('mat-card');
     const count = await verseCards.count();
 

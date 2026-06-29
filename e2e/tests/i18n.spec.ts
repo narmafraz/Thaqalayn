@@ -296,7 +296,7 @@ test.describe('ExpandLanguagePipe', () => {
     await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 10000 });
 
     // The translation selector should show language names
-    const translationSelector = page.locator('app-translation-selection');
+    const translationSelector = page.locator('app-translation-selection').first();
     if (await translationSelector.isVisible()) {
       const text = await translationSelector.textContent();
       // Should show "English" instead of just "en"

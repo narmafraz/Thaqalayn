@@ -16,25 +16,20 @@ test.describe('Verse Card Metadata Density', () => {
     await expect(bookmarkBtn).toBeVisible();
   });
 
-  test('should show overflow menu with secondary actions', async ({ page }) => {
+  test('should surface secondary actions inline (no overflow menu)', async ({ page }) => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
     const firstCard = page.locator('mat-card').first();
-    const moreBtn = firstCard.locator('.more-actions-btn');
-    await expect(moreBtn).toBeVisible();
+    await expect(firstCard).toBeVisible({ timeout: 15000 });
 
-    // Click the more button to open menu
-    await moreBtn.click();
+    // The card surfaces its actions inline as icon buttons rather than behind
+    // an overflow menu (link, bookmark, read, note, share image, audio, ...).
+    const actionButtons = firstCard.locator('.action-icon-btn, .verse-detail-link, .bookmark-icon-btn');
+    expect(await actionButtons.count()).toBeGreaterThanOrEqual(3);
 
-    // Menu should appear with items
-    const menu = page.locator('.mat-mdc-menu-panel');
-    await expect(menu).toBeVisible();
-
-    // Should have menu items for link, note, share image
-    const menuItems = menu.locator('button[mat-menu-item], a[mat-menu-item]');
-    const count = await menuItems.count();
-    expect(count).toBeGreaterThanOrEqual(3);
+    // There is no "more actions" overflow trigger in the current design.
+    await expect(firstCard.locator('.more-actions-btn')).toHaveCount(0);
   });
 
   test('should hide secondary metadata by default and show on expand', async ({ page }) => {

@@ -25,13 +25,13 @@ test.describe('SEO - Legacy Hash URL Redirects', () => {
     expect(url).toContain('/books/al-kafi:1:1:1');
   });
 
-  test('should redirect old hash URL /#/people/narrators/1 to /people/narrators/1', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+  test('should redirect old hash URL /#/people/narrators/4 to /people/narrators/4', async ({ page }) => {
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
 
     const url = page.url();
     expect(url).not.toContain('#/');
-    expect(url).toContain('/people/narrators/1');
+    expect(url).toContain('/people/narrators/4');
   });
 });
 
@@ -75,7 +75,7 @@ test.describe('SEO - Meta Tags', () => {
   });
 
   test('should have Open Graph tags on narrator page', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -84,7 +84,7 @@ test.describe('SEO - Meta Tags', () => {
 
     expect(ogTitle).toBeTruthy();
     expect(ogUrl).toBeTruthy();
-    expect(ogUrl).toContain('/people/narrators/1');
+    expect(ogUrl).toContain('/people/narrators/4');
   });
 
   test('should have canonical URL on pages', async ({ page }) => {
@@ -128,7 +128,7 @@ test.describe('SEO - JSON-LD Structured Data', () => {
   });
 
   test('should have JSON-LD with Person type on narrator page', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 
@@ -138,7 +138,7 @@ test.describe('SEO - JSON-LD Structured Data', () => {
     const jsonLd = JSON.parse(jsonLdText!);
     expect(jsonLd['@context']).toBe('https://schema.org');
     expect(jsonLd['@type']).toBe('Person');
-    expect(jsonLd.url).toContain('/people/narrators/1');
+    expect(jsonLd.url).toContain('/people/narrators/4');
   });
 
   test('should have JSON-LD with CollectionPage type on narrator list', async ({ page }) => {

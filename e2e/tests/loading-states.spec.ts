@@ -27,7 +27,7 @@ test.describe('Loading States', () => {
       await new Promise(r => setTimeout(r, 2000));
       await route.continue();
     });
-    await page.goto('/people/narrators/1');
+    await page.goto('/people/narrators/4');
     const skeleton = page.locator('app-skeleton-loader');
     await expect(skeleton).toBeVisible({ timeout: 1000 });
   });

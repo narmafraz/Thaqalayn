@@ -130,7 +130,7 @@ test.describe('Verification Badges', () => {
 
 test.describe('Narrator Biography Display', () => {
   test('should display narrator name in Arabic', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -141,7 +141,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display transliteration when biography data is present', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -155,7 +155,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display biography section when biography data is present', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -168,7 +168,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display era field in biography', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -183,7 +183,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display reliability badge with color coding', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -205,7 +205,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display birth/death dates when available', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -230,7 +230,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display teachers and students lists when available', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -251,7 +251,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display biography summary text when available', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -266,7 +266,7 @@ test.describe('Narrator Biography Display', () => {
   });
 
   test('should display biography source attribution', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -366,7 +366,7 @@ test.describe('Hadith Detail Page - Phase 3C Integration', () => {
 
 test.describe('Narrator Page - Phase 3C Accessibility', () => {
   test('should have no accessibility issues in biography section', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -384,7 +384,7 @@ test.describe('Narrator Page - Phase 3C Accessibility', () => {
   });
 
   test('should have proper lang="ar" attributes on Arabic content', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 

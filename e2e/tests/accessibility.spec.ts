@@ -257,7 +257,7 @@ test.describe('Accessibility - Narrator List Page', () => {
 
 test.describe('Accessibility - Narrator Detail Page', () => {
   test('should have no critical accessibility violations', async ({ page }) => {
-    await page.goto('/people/narrators/1');
+    await page.goto('/people/narrators/4');
     await page.waitForLoadState('networkidle');
     await page.locator('h1, h2').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -279,7 +279,7 @@ test.describe('Accessibility - Narrator Detail Page', () => {
   });
 
   test('should have breadcrumb navigation back to narrator list', async ({ page }) => {
-    await page.goto('/people/narrators/1');
+    await page.goto('/people/narrators/4');
     await page.waitForLoadState('networkidle');
     await page.locator('.crumb-holder, nav').first().waitFor({ state: 'visible', timeout: 10000 });
 
@@ -289,7 +289,7 @@ test.describe('Accessibility - Narrator Detail Page', () => {
   });
 
   test('should have linked narrator names in co-narrator chains', async ({ page }) => {
-    await page.goto('/people/narrators/1');
+    await page.goto('/people/narrators/4');
     await page.waitForLoadState('networkidle');
     await page.locator('h2').first().waitFor({ state: 'visible', timeout: 10000 });
 

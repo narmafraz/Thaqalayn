@@ -69,7 +69,7 @@ test.describe('No Console Errors', () => {
       }
     });
 
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(2000);
 

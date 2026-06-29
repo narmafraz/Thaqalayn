@@ -47,7 +47,7 @@ test.describe('Narrator Pages', () => {
   });
 
   test('should navigate to individual narrator page', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
 
     // Narrator page should display with Arabic name
@@ -58,7 +58,7 @@ test.describe('Narrator Pages', () => {
   });
 
   test('should show narrated ahadith section on narrator page', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
 
     const section = page.locator('h2', { hasText: 'Narrated Ahadith' });
@@ -66,7 +66,7 @@ test.describe('Narrator Pages', () => {
   });
 
   test('should show co-narrators section on narrator page', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
 
     const section = page.locator('h2', { hasText: 'Co-Narrators' });
@@ -74,7 +74,7 @@ test.describe('Narrator Pages', () => {
   });
 
   test('should show breadcrumbs on narrator page', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
 
     const crumbHolder = page.locator('.crumb-holder');

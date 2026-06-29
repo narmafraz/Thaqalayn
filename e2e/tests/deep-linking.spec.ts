@@ -25,7 +25,7 @@ test.describe('Deep Linking', () => {
   });
 
   test('should load narrator page directly via URL', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
 
     const title = page.locator('h1.arabic');

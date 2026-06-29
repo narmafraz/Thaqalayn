@@ -45,7 +45,7 @@ test.describe('Internationalization (i18n)', () => {
   });
 
   test('should have lang="ar" on narrator page Arabic names', async ({ page }) => {
-    await page.goto('/people/narrators/1?lang=en');
+    await page.goto('/people/narrators/4?lang=en');
     await page.waitForLoadState('networkidle');
     await page.locator('h1').first().waitFor({ state: 'visible', timeout: 10000 });
 

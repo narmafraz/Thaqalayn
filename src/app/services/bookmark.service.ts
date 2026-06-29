@@ -137,6 +137,25 @@ export class BookmarkService {
   earnedBadges$: Observable<EarnedBadge[]> = this.earnedBadgesSubject.asObservable();
   enrolledPlans$: Observable<EnrolledPlan[]> = this.enrolledPlansSubject.asObservable();
 
+  /**
+   * Flips true once `loadAll()` has hydrated every subject from Dexie. The
+   * subjects start empty and hydrate sequentially, so until this is set the
+   * streams are in a partially-loaded, inconsistent state (e.g. readVerses
+   * populated while earnedBadges is still empty). Consumers that diff the
+   * streams to detect "new" events — the BadgeService toaster especially —
+   * gate on this so they don't mistake the load-time backfill for live
+   * activity. See `ready` for the awaitable form (used by tests).
+   */
+  private loaded = false;
+  private resolveReady!: () => void;
+  /** Resolves once initial hydration from Dexie completes. */
+  readonly ready: Promise<void> = new Promise<void>(r => (this.resolveReady = r));
+
+  /** True once initial hydration from Dexie has completed. */
+  isLoaded(): boolean {
+    return this.loaded;
+  }
+
   constructor() {
     this.db = new ThaqalaynDb();
     this.loadAll();
@@ -593,6 +612,8 @@ export class BookmarkService {
     await this.refreshGoalConfig();
     await this.refreshEarnedBadges();
     await this.refreshEnrolledPlans();
+    this.loaded = true;
+    this.resolveReady();
   }
 
   private async refreshEarnedBadges(): Promise<void> {

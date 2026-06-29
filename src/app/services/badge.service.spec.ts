@@ -100,6 +100,7 @@ describe('BadgeService', () => {
 
   it('does not re-earn an already-earned badge', async () => {
     svc.start();
+    await bookmarks.ready;
     await bookmarks.earnBadge('first-steps');
     const events: string[] = [];
     svc.onNewlyEarned(b => events.push(b.id));
@@ -111,6 +112,24 @@ describe('BadgeService', () => {
 
     // first-steps shouldn't be in the events buffer — it was already earned
     expect(events.filter(id => id === 'first-steps').length).toBe(0);
+  });
+
+  it('reconciles silently while unhydrated: persists matches but does not toast', async () => {
+    // Simulate the boot window where readVerses$ has hydrated but the earned
+    // set / overall load has not. The badge must be persisted (so the shelf is
+    // correct) but must NOT be announced (so the user isn't re-spammed on load).
+    spyOn(bookmarks, 'isLoaded').and.returnValue(false);
+    const events: string[] = [];
+    svc.onNewlyEarned(b => events.push(b.id));
+
+    svc.start();
+    const paths = Array.from({ length: 10 }, (_, i) => `/books/other-book:1:${i + 1}`);
+    await bookmarks.markReadBulk(paths);
+    await tick();
+
+    const ids = (await bookmarks.getEarnedBadges()).map(e => e.badgeId);
+    expect(ids).toContain('first-steps'); // persisted
+    expect(events).not.toContain('first-steps'); // but not toasted
   });
 
   it('a broken predicate is swallowed without halting the loop', async () => {
@@ -136,6 +155,7 @@ describe('BadgeService', () => {
 
   it('newlyEarned listener registered after the earn still receives buffered events', async () => {
     svc.start();
+    await bookmarks.ready;
     const paths = Array.from({ length: 10 }, (_, i) => `/books/other-book:1:${i + 1}`);
     await bookmarks.markReadBulk(paths);
     await tick();

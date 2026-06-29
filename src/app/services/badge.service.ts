@@ -100,6 +100,16 @@ export class BadgeService {
   }
 
   private async evaluate(ctx: BadgeContext, earnedIds: Set<string>): Promise<void> {
+    // Until BookmarkService has finished hydrating from Dexie, the streams are
+    // in a partially-loaded state — at boot `readVerses$` fills before
+    // `earnedBadges$`, so this pass sees the full read history against an empty
+    // earned set and EVERY already-earned badge looks brand-new. We still
+    // persist matches in this window (earnBadge is idempotent), but we don't
+    // toast them — otherwise the user gets re-spammed with their whole
+    // collection on every page load. Genuine crossings happen after hydration
+    // and toast normally.
+    const baseline = !this.bookmarks.isLoaded();
+
     for (const badge of this.catalogue) {
       if (earnedIds.has(badge.id)) continue;
       let isEarned = false;
@@ -112,7 +122,7 @@ export class BadgeService {
       if (!isEarned) continue;
 
       const wasNew = await this.bookmarks.earnBadge(badge.id);
-      if (wasNew) {
+      if (wasNew && !baseline) {
         this.dispatchNewlyEarned(badge);
       }
     }

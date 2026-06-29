@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Thaqalayn is an Angular 19 web application for hosting and displaying Islamic Hadith collections, specifically the Four Books (Al-Kutub Al-Arb'ah) and other primary Hadith sources. The application provides a hierarchical navigation system through books, chapters, and individual Hadiths (verses) with multi-language support and translations.
+Thaqalayn is an Angular 21 web application for hosting and displaying Islamic Hadith collections, specifically the Four Books (Al-Kutub Al-Arb'ah) and other primary Hadith sources. The application provides a hierarchical navigation system through books, chapters, and individual Hadiths (verses) with multi-language support and translations.
 
 ## Development Commands
 
@@ -12,8 +12,8 @@ Thaqalayn is an Angular 19 web application for hosting and displaying Islamic Ha
 
 ### Running the Application
 ```bash
-npm start                # Development server with legacy OpenSSL provider (required)
-ng serve                 # Alternative (may fail without NODE_OPTIONS set)
+npm start                # Development server (ng serve)
+ng serve                 # Equivalent
 ```
 Navigate to `http://localhost:4200/`. The dev server expects a local API at `http://localhost:8888/`.
 
@@ -25,7 +25,7 @@ ng build --configuration=production  # Production build
 
 ### Testing
 ```bash
-# Unit tests (Karma/Jasmine) — 367 tests across 28 spec files
+# Unit tests (Karma/Jasmine) — 798 tests across 54 spec files
 # On Windows without Chrome installed, set CHROME_BIN to Brave:
 CHROME_BIN="/c/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe" npx ng test --watch=false --browsers=ChromeHeadless
 
@@ -129,8 +129,10 @@ Components are organized by feature in `src/app/components/`:
 
 ## Important Notes
 
-### OpenSSL Legacy Provider
-The `npm start` script includes `NODE_OPTIONS=--openssl-legacy-provider` to support older Angular/webpack dependencies. This is required for the dev server to run.
+### Angular 21 / zoneless testing (`src/test.ts`)
+The app is on **Angular 21** but still uses **zone.js** (`provideZoneChangeDetection()` in `main.ts`) and **Karma/Jasmine** (not the new Vitest default). Angular 21 makes zoneless the default; a CLI regression (angular-cli#32047, fixed in #32049) only re-registers zone change detection in the *generated* Karma entry — not our custom `src/test.ts`. So `src/test.ts` explicitly provides `provideZoneChangeDetection()` via a small `@NgModule` passed to `initTestEnvironment`. **Do not remove it** — without it, tests run zoneless (autoDetect + OnPush enforcement) and throw spurious `NG0100 ExpressionChangedAfterItHasBeenCheckedError` on the common `component.prop = x; fixture.detectChanges()` pattern. NG0100 is dev-mode only, so production builds are unaffected.
+
+Templates use Angular control-flow (`@if`/`@for`), not `*ngIf`/`*ngFor`. `@for` requires a strict iterable; union-typed fields like `gradings` (`Record<string,string> | string[]`) need `$any(...)` in the loop expression.
 
 ### Known Issues from README
 1. Column headings alignment with hadith index/count numbers

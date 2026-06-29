@@ -1,2 +1,8 @@
-# Netlify SPA fallback - serve index.html for all routes
-/*    /index.html    200
+# Netlify SPA fallback — serve the client-render shell for all non-prerendered routes.
+# Use index.csr.html (a real <app-root> shell), NOT index.html: the latter is the
+# prerendered "/" route, which is a meta-refresh redirect to /books, so using it as
+# the fallback sends every cold deep-link (first-time visitors, shared links,
+# incognito) to /books and loses the requested page. The CSR shell lets the Angular
+# router read the deep URL and resolve it. Prerendered routes still win (Netlify
+# serves the actual static file before this fallback).
+/*    /index.csr.html    200

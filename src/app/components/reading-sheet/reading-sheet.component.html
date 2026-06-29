@@ -4,7 +4,8 @@
 <aside class="reading-sheet-panel" [class.open]="open$ | async"
   role="dialog" aria-modal="true"
   [attr.aria-label]="'settings.title' | translate"
-  [attr.aria-hidden]="!(open$ | async)">
+  [attr.aria-hidden]="!(open$ | async)"
+  [attr.inert]="(open$ | async) ? null : ''">
   <header class="reading-sheet-header">
     <mat-icon>settings</mat-icon>
     <span class="reading-sheet-title">{{ 'settings.title' | translate }}</span>

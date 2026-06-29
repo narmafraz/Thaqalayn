@@ -328,7 +328,7 @@
                 mat-button
                 class="show-all-conarrators-btn"
                 (click)="showAllConarrators = true">
-                {{ 'narrator.showAllConarrators' | translate }} ({{ uniqueConarratorCount }})
+                {{ 'narrator.showAllConarrators' | translate:{ count: uniqueConarratorCount } }}
               </button>
             }
           </div>

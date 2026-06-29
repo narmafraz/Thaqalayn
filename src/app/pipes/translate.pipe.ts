@@ -20,12 +20,13 @@ export class TranslatePipe implements PipeTransform, OnDestroy {
     });
   }
 
-  transform(key: string): string {
-    if (key === this.cachedKey && this.cachedValue !== key) {
+  transform(key: string, params?: Record<string, string | number>): string {
+    const cacheKey = params ? `${key} ${JSON.stringify(params)}` : key;
+    if (cacheKey === this.cachedKey && this.cachedValue !== cacheKey) {
       return this.cachedValue;
     }
-    this.cachedKey = key;
-    this.cachedValue = this.i18n.get(key);
+    this.cachedKey = cacheKey;
+    this.cachedValue = this.i18n.get(key, params);
     return this.cachedValue;
   }
 

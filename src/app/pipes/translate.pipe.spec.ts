@@ -30,8 +30,15 @@ describe('TranslatePipe', () => {
   it('should call i18n.get with the key', () => {
     i18nSpy.get.and.returnValue('Home');
     const result = pipe.transform('nav.home');
-    expect(i18nSpy.get).toHaveBeenCalledWith('nav.home');
+    expect(i18nSpy.get).toHaveBeenCalledWith('nav.home', undefined);
     expect(result).toBe('Home');
+  });
+
+  it('should forward interpolation params to i18n.get', () => {
+    i18nSpy.get.and.returnValue('Show all 5 co-narrators');
+    const result = pipe.transform('narrator.showAllConarrators', { count: 5 });
+    expect(i18nSpy.get).toHaveBeenCalledWith('narrator.showAllConarrators', { count: 5 });
+    expect(result).toBe('Show all 5 co-narrators');
   });
 
   it('should cache the result for repeated calls with the same key', () => {

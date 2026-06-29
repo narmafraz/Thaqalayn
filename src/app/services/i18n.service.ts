@@ -38,7 +38,7 @@ export class I18nService {
     this.loadStrings(initialLang);
   }
 
-  get(key: string): string {
+  get(key: string, params?: Record<string, string | number>): string {
     const parts = key.split('.');
     let current: unknown = this.strings;
     for (const part of parts) {
@@ -48,7 +48,15 @@ export class I18nService {
         return key;
       }
     }
-    return typeof current === 'string' ? current : key;
+    let value = typeof current === 'string' ? current : key;
+    if (params) {
+      // Interpolate {{token}} placeholders (translations author them in the
+      // grammatically correct position per language).
+      for (const [k, v] of Object.entries(params)) {
+        value = value.split(`{{${k}}}`).join(String(v));
+      }
+    }
+    return value;
   }
 
   /**

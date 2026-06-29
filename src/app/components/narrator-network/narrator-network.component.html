@@ -6,7 +6,7 @@
       <svg
         class="network-svg"
         [attr.viewBox]="'0 0 ' + VIEW_BOX + ' ' + VIEW_BOX"
-        role="img"
+        role="group"
         [attr.aria-label]="('narrator.networkTitle' | translate) + ' — ' + centerName">
         <!-- Edges first, so nodes render on top -->
         @for (n of nodes; track trackById($index, n)) {

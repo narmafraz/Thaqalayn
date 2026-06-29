@@ -92,7 +92,7 @@ test.describe('Reading-engagement flows', () => {
     await selectBookmarksTab(page, /plans/i);
 
     // Click "Start" on the Quran-in-30-days catalogue entry
-    const startBtn = page.locator('.plan-catalogue-row').filter({ hasText: '30 Days' }).getByRole('button', { name: /start/i });
+    const startBtn = page.locator('.plan-catalogue-row').filter({ hasText: '30 Days' }).getByRole('button', { name: /start/i }).first();
     await startBtn.click();
     await page.waitForTimeout(500);
 

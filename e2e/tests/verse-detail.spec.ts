@@ -183,7 +183,8 @@ test.describe('Verse Detail Pages', () => {
       const narratorLink = page.locator('a[href*="/people/narrators/"]').first();
       if (await narratorLink.count() > 0) {
         await narratorLink.hover();
-        const hoverCard = page.locator('app-narrator-hover-card');
+        // The host element is 0x0; the visible panel is the inner .narrator-hover-card.
+        const hoverCard = page.locator('.narrator-hover-card');
         await expect(hoverCard).toBeVisible({ timeout: 5000 });
 
         // Card should contain narrator name (Arabic) and a "View profile" link
@@ -200,10 +201,15 @@ test.describe('Verse Detail Pages', () => {
       const narratorLink = page.locator('a[href*="/people/narrators/"]').first();
       if (await narratorLink.count() > 0) {
         const href = await narratorLink.getAttribute('href');
-        await narratorLink.click();
-        await page.waitForLoadState('networkidle');
+        // Activate via keyboard: hovering the link pops the narrator
+        // hover-card over it, which intercepts a pointer click. Focus + Enter
+        // avoids the pointer entirely and still triggers navigation.
+        await narratorLink.focus();
+        await narratorLink.press('Enter');
 
-        // Should navigate to the narrator page
+        // Wait for the SPA route change to complete (networkidle can resolve
+        // before the client-side navigation finishes).
+        await page.waitForURL(/\/people\/narrators\//, { timeout: 10000 });
         expect(page.url()).toContain('/people/narrators/');
       }
     });
@@ -216,7 +222,8 @@ test.describe('Verse Detail Pages', () => {
       const narratorLink = page.locator('a[href*="/people/narrators/"]').first();
       if (await narratorLink.count() > 0) {
         await narratorLink.hover();
-        const hoverCard = page.locator('app-narrator-hover-card');
+        // The host element is 0x0; the visible panel is the inner .narrator-hover-card.
+        const hoverCard = page.locator('.narrator-hover-card');
         await expect(hoverCard).toBeVisible({ timeout: 5000 });
       }
     });

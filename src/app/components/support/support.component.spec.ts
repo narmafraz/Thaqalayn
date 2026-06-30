@@ -43,6 +43,22 @@ describe('SupportComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  describe('browser cache instructions', () => {
+    it('toggles the instructions panel without clearing any data', () => {
+      const cachesSpy = spyOn(window.caches, 'keys');
+      expect(component.showBrowserCache).toBeFalse();
+
+      component.promptBrowserCache();
+      expect(component.showBrowserCache).toBeTrue();
+
+      component.cancelBrowserCache();
+      expect(component.showBrowserCache).toBeFalse();
+
+      // Showing instructions must never touch storage — it is informational only.
+      expect(cachesSpy).not.toHaveBeenCalled();
+    });
+  });
+
   describe('safe refresh', () => {
     it('clears only the thaqalayn-offline DB and never personal data', async () => {
       const deleted: string[] = [];

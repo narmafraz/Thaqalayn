@@ -11,8 +11,15 @@
 <h2>{{ 'support.troubleshooting' | translate }}</h2>
 <p>{{ 'support.troubleshootingDesc' | translate }}</p>
 
-<!-- Action buttons (hidden while any dialog/success state is showing) -->
-@if (!showResetConfirm && !resetComplete && !showRefreshConfirm && !refreshComplete) {
+<h3 class="which-option">{{ 'support.whichOption' | translate }}</h3>
+<ol class="option-guide">
+  <li><strong>{{ 'support.guideRefreshTitle' | translate }}</strong> — {{ 'support.guideRefreshDesc' | translate }}</li>
+  <li><strong>{{ 'support.guideBrowserTitle' | translate }}</strong> — {{ 'support.guideBrowserDesc' | translate }}</li>
+  <li><strong>{{ 'support.guideResetTitle' | translate }}</strong> — {{ 'support.guideResetDesc' | translate }}</li>
+</ol>
+
+<!-- Action buttons (hidden while any dialog/success/info panel is showing) -->
+@if (!showResetConfirm && !resetComplete && !showRefreshConfirm && !refreshComplete && !showBrowserCache) {
   <div
     class="support-actions">
     <button class="refresh-button" (click)="promptRefresh()">
@@ -20,11 +27,37 @@
       {{ 'support.refreshData' | translate }}
     </button>
     <p class="action-hint">{{ 'support.refreshDataDesc' | translate }}</p>
+    <button class="browser-cache-button" (click)="promptBrowserCache()">
+      <mat-icon>cached</mat-icon>
+      {{ 'support.clearBrowserCache' | translate }}
+    </button>
+    <p class="action-hint">{{ 'support.clearBrowserCacheDesc' | translate }}</p>
     <button class="reset-button" (click)="promptReset()">
       <mat-icon>restart_alt</mat-icon>
       {{ 'support.resetSiteData' | translate }}
     </button>
     <p class="action-hint">{{ 'support.resetSiteDataDesc' | translate }}</p>
+  </div>
+}
+
+<!-- Browser cache instructions (no programmatic action possible) -->
+@if (showBrowserCache) {
+  <div class="reset-confirm browser-cache-info">
+    <mat-icon class="info-icon">cached</mat-icon>
+    <h3>{{ 'support.browserCacheTitle' | translate }}</h3>
+    <p>{{ 'support.browserCacheIntro' | translate }}</p>
+    <ul>
+      <li>{{ 'support.browserCacheChrome' | translate }}</li>
+      <li>{{ 'support.browserCacheAndroid' | translate }}</li>
+      <li>{{ 'support.browserCacheIos' | translate }}</li>
+      <li>{{ 'support.browserCacheFirefox' | translate }}</li>
+    </ul>
+    <p>{{ 'support.browserCacheTip' | translate }}</p>
+    <div class="reset-actions">
+      <button class="cancel-button" (click)="cancelBrowserCache()">
+        {{ 'support.browserCacheClose' | translate }}
+      </button>
+    </div>
   </div>
 }
 

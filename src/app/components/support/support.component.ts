@@ -15,7 +15,21 @@ export class SupportComponent {
   showRefreshConfirm = false;
   refreshComplete = false;
 
+  // Browser-cache instructions panel. There is deliberately no "confirm"
+  // action: the browser's HTTP disk cache is outside any web page's reach
+  // (no JS API can evict it), so this option can only show the user how to
+  // clear it manually per browser.
+  showBrowserCache = false;
+
   constructor(private swUpdate: SwUpdate) { }
+
+  promptBrowserCache(): void {
+    this.showBrowserCache = true;
+  }
+
+  cancelBrowserCache(): void {
+    this.showBrowserCache = false;
+  }
 
   promptReset(): void {
     this.showResetConfirm = true;

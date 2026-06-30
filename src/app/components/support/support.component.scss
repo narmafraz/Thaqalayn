@@ -47,6 +47,50 @@
   }
 }
 
+// Escalation guide ("which option should I use?")
+.which-option {
+  margin: 16px 0 4px;
+  font-size: 16px;
+}
+
+.option-guide {
+  color: #555;
+  padding-left: 20px;
+  margin: 0 0 16px;
+
+  li {
+    margin-bottom: 8px;
+  }
+}
+
+// Neutral/informational palette — distinct from refresh (teal) and reset (red),
+// signalling "instructions" rather than a destructive or one-click action.
+.browser-cache-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 2px solid #5c6bc0;
+  border-radius: 8px;
+  background: transparent;
+  color: #3949ab;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: #5c6bc0;
+    color: white;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .reset-button {
   display: inline-flex;
   align-items: center;
@@ -127,6 +171,21 @@
   background: #00897b;
 
   &:hover { background: #00695c; }
+}
+
+// Browser-cache instructions reuse the .reset-confirm box with an info palette.
+.browser-cache-info {
+  border-color: #5c6bc0;
+  background: #e8eaf6;
+
+  .info-icon {
+    color: #3949ab;
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+  }
+
+  h3 { color: #283593; }
 }
 
 .reset-actions {
@@ -247,6 +306,23 @@
 
     &:hover { color: white; }
   }
+
+  .browser-cache-button {
+    color: #9fa8da;
+    border-color: #5c6bc0;
+
+    &:hover { color: white; }
+  }
+
+  .browser-cache-info {
+    background: #1a237e;
+    border-color: #5c6bc0;
+
+    h3 { color: #9fa8da; }
+    p, li { color: #ccc; }
+  }
+
+  .option-guide { color: #ccc; }
 
   .action-hint { color: #999; }
 

@@ -1,7 +1,8 @@
 @if ((error$ | async); as error) {
   <app-error-display [message]="error" (retry)="onRetry()"></app-error-display>
 } @else {
-  @if (!(narrators$ | async)) {
+  <!-- Loading Skeleton (enriched list is empty until the index loads) -->
+  @if (!(narrators$ | async)?.length) {
     <app-skeleton-loader
     [variant]="'people-list'"></app-skeleton-loader>
   }

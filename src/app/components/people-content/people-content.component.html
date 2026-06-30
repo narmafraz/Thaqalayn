@@ -392,8 +392,8 @@
       </section>
     </div>
   }
-  <!-- Loading Skeleton -->
-  @if ((narrator$ | async) === null) {
+  <!-- Loading Skeleton (selector emits undefined while the narrator loads) -->
+  @if (!(narrator$ | async)) {
     <app-skeleton-loader
     [variant]="'narrator'"></app-skeleton-loader>
   }

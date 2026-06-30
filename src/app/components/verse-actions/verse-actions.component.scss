@@ -9,6 +9,18 @@
   margin-right: 4px;
 }
 
+// 44x44 minimum touch target (WCAG 2.5.5 / mobile). The icon stays ~24px;
+// only the tappable box expands via min-size + flex centering.
+.verse-detail-link,
+.bookmark-icon-btn,
+.action-icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .verse-detail-link {
   color: var(--link-color, #673ab7);
   opacity: 0.6;

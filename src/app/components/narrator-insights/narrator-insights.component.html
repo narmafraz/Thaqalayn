@@ -1,0 +1,307 @@
+<section class="narrator-insights" [class.open]="expanded">
+  <button
+    type="button"
+    class="ni-header"
+    (click)="toggle()"
+    [attr.aria-expanded]="expanded"
+    aria-controls="ni-body">
+    <mat-icon class="ni-icon">hub</mat-icon>
+    <span class="ni-title">Narrator insights</span>
+    <span class="ni-hint">analysis of the isnad chains in this chapter</span>
+    <mat-icon class="ni-chevron">{{ expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+  </button>
+
+  @if (expanded) {
+    <div class="ni-body" id="ni-body">
+      @if (loading) {
+        <p class="ni-status">Analysing narrator chains…</p>
+      } @else if (!data) {
+        <p class="ni-status">No narrator-chain data is available for this chapter.</p>
+      } @else {
+        <p class="ni-summary">
+          {{ data.analyzed_count }} of {{ data.hadith_count }} hadith have a
+          traceable chain.
+          @if (data.no_chain_count) {
+            <span class="ni-muted">({{ data.no_chain_count }} without a chain)</span>
+          }
+        </p>
+
+        <!-- #1 Independent transmission paths -->
+        <div class="ni-card">
+          <h4>Independent transmission paths</h4>
+          <p class="ni-lead">
+            <strong>{{ data.independent_paths }}</strong>
+            independent {{ data.independent_paths === 1 ? 'path' : 'paths' }}
+            <span class="ni-muted">(source-Imams &amp; collective references excluded)</span>
+          </p>
+          @if (data.clusters.length) {
+            <ul class="ni-clusters">
+              @for (c of data.clusters; track $index) {
+                <li class="ni-cluster">
+                  <div class="ni-cluster-head">
+                    <span class="ni-cluster-size">{{ c.size }}</span>
+                    <span class="ni-muted">hadith</span>
+                    @if (c.shared_ids.length) {
+                      <span class="ni-muted">via</span>
+                      @for (sid of c.shared_ids; track sid) {
+                        <a [routerLink]="narratorLink(sid)" class="ni-chip">{{ label(sid) }}</a>
+                      }
+                    } @else {
+                      <span class="ni-muted">— standalone chain</span>
+                    }
+                  </div>
+                  <div class="ni-hadith-links" aria-label="Hadith in this group">
+                    @for (li of c.local_indices; track li) {
+                      <a class="ni-hnum"
+                        [routerLink]="chapterRoute"
+                        [fragment]="hadithFragment(li)"
+                        queryParamsHandling="preserve"
+                        [title]="'Go to hadith ' + li">{{ li }}</a>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+            <p class="ni-foot ni-muted">
+              The largest group covers {{ dominantPct }}% of traceable hadith.
+            </p>
+          }
+        </div>
+
+        <!-- Reusable list of hadith-number links (tap a count to reveal) -->
+        <ng-template #hlinks let-ids="ids">
+          <div class="ni-hadith-links">
+            @for (li of ids; track li) {
+              <a class="ni-hnum"
+                [routerLink]="chapterRoute"
+                [fragment]="hadithFragment(li)"
+                queryParamsHandling="preserve"
+                [title]="'Go to hadith ' + li">{{ li }}</a>
+            }
+          </div>
+        </ng-template>
+
+        <!-- Reusable horizontal bar chart with a shared numeric axis -->
+        <ng-template #barChartTpl let-chart="chart" let-axis="axis" let-keyp="keyp">
+          <div class="ni-bc">
+            @for (r of chart.rows; track r.id) {
+              <div class="ni-bc-row">
+                <a class="ni-bc-name" [routerLink]="narratorLink(r.id)" [title]="label(r.id)">{{ label(r.id) }}</a>
+                <div class="ni-bc-track">
+                  @for (t of chart.ticks; track t) {
+                    <span class="ni-bc-grid" [style.left.%]="pctOf(t, chart.scaleMax)"></span>
+                  }
+                  <span class="ni-bc-fill" [style.width.%]="pctOf(r.count, chart.scaleMax)"></span>
+                </div>
+                <button type="button" class="ni-bc-val ni-count-btn"
+                  (click)="toggleHadith(keyp + r.id)"
+                  [class.open]="isHadithExpanded(keyp + r.id)"
+                  [attr.aria-expanded]="isHadithExpanded(keyp + r.id)"
+                  [title]="'Show the ' + r.count + ' hadith'">{{ r.count }}</button>
+              </div>
+              @if (isHadithExpanded(keyp + r.id)) {
+                <ng-container *ngTemplateOutlet="hlinks; context: { ids: r.hadith }"></ng-container>
+              }
+            }
+            <div class="ni-bc-row ni-bc-axisrow" aria-hidden="true">
+              <span class="ni-bc-name"></span>
+              <div class="ni-bc-track">
+                @for (t of chart.ticks; track t) {
+                  <span class="ni-bc-tick" [style.left.%]="pctOf(t, chart.scaleMax)">{{ t }}</span>
+                }
+              </div>
+              <span class="ni-bc-val"></span>
+            </div>
+            <p class="ni-bc-axis-title ni-muted">{{ axis }} · tap a count to list them</p>
+          </div>
+        </ng-template>
+
+        <!-- #4 Source / Imam distribution -->
+        @if (data.sources.length) {
+          <div class="ni-card">
+            <h4>Where these reports originate</h4>
+            <ng-container *ngTemplateOutlet="barChartTpl; context: { chart: sourcesChart, axis: 'hadith narrated from this authority', keyp: 'src:' }"></ng-container>
+          </div>
+        }
+
+        <!-- #2 Prolific narrators -->
+        @if (data.prolific.length) {
+          <div class="ni-card">
+            <h4>Most frequent transmitters</h4>
+            <ng-container *ngTemplateOutlet="barChartTpl; context: { chart: prolificChart, axis: 'hadith containing this transmitter', keyp: 'prl:' }"></ng-container>
+          </div>
+        }
+
+        <!-- #3 Binding spine -->
+        @if (data.spine.length) {
+          <div class="ni-card">
+            <h4>Backbone of the dominant path</h4>
+            <p class="ni-muted ni-foot">These transmitters bind the largest group together.</p>
+            <div class="ni-chips">
+              @for (s of data.spine; track s.id) {
+                <a [routerLink]="narratorLink(s.id)" class="ni-chip">
+                  {{ label(s.id) }} <span class="ni-chip-count">{{ s.hadith.length }}</span>
+                </a>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- #5 Chain length distribution -->
+        @if (lengthBars.length) {
+          <div class="ni-card">
+            <h4>Chain lengths</h4>
+            <p class="ni-lead ni-muted">
+              {{ $any(data.chain_lengths).min }}–{{ $any(data.chain_lengths).max }} narrators
+              (median {{ $any(data.chain_lengths).median }})
+            </p>
+            <div class="ni-hist2">
+              <div class="ni-hist2-yaxis" aria-hidden="true">
+                @for (t of histTicks; track t) {
+                  <span class="ni-hist2-ytick" [style.bottom.%]="pctOf(t, histScaleMax)">{{ t }}</span>
+                }
+              </div>
+              <div class="ni-hist2-plot">
+                @for (t of histTicks; track t) {
+                  <span class="ni-hist2-grid" [style.bottom.%]="pctOf(t, histScaleMax)"></span>
+                }
+                <div class="ni-hist2-cols">
+                  @for (b of lengthBars; track b.len) {
+                    <div class="ni-hist2-col">
+                      <span class="ni-hist2-bar"
+                        [style.height.%]="pctOf(b.count, histScaleMax)"
+                        [title]="b.count + ' hadith with ' + b.len + ' narrators'">
+                        <span class="ni-hist2-val">{{ b.count }}</span>
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+              <span class="ni-hist2-corner" aria-hidden="true"></span>
+              <div class="ni-hist2-xaxis" aria-hidden="true">
+                @for (b of lengthBars; track b.len) {
+                  <span class="ni-hist2-xlabel">{{ b.len }}</span>
+                }
+              </div>
+            </div>
+            <p class="ni-hist2-xtitle ni-muted">narrators in chain →</p>
+          </div>
+        }
+
+        <!-- #7 Corroboration -->
+        @if (data.corroboration.length) {
+          <div class="ni-card">
+            <h4>Corroborated reports</h4>
+            <p class="ni-muted ni-foot">Sources reached through multiple independent paths.</p>
+            <ul class="ni-corr">
+              @for (c of data.corroboration; track c.id) {
+                <li>
+                  <a [routerLink]="narratorLink(c.id)" class="ni-name">{{ label(c.id) }}</a>
+                  <span class="ni-muted">{{ c.independent_paths }} independent paths ·</span>
+                  <button type="button" class="ni-count-link"
+                    (click)="toggleHadith('corr:' + c.id)"
+                    [class.open]="isHadithExpanded('corr:' + c.id)"
+                    [attr.aria-expanded]="isHadithExpanded('corr:' + c.id)">{{ c.hadith.length }} hadith</button>
+                  @if (isHadithExpanded('corr:' + c.id)) {
+                    <ng-container *ngTemplateOutlet="hlinks; context: { ids: c.hadith }"></ng-container>
+                  }
+                </li>
+              }
+            </ul>
+          </div>
+        }
+
+        <!-- #6 Grading mix -->
+        @if (gradingScholars.length) {
+          <div class="ni-card">
+            <h4>Grading mix</h4>
+            @for (sch of gradingScholars; track sch) {
+              <div class="ni-grading-row">
+                <span class="ni-name">{{ sch }}</span>
+                <span class="ni-chips">
+                  @for (e of gradingEntries(sch); track e.grade) {
+                    <button type="button" class="ni-chip ni-chip-btn"
+                      (click)="toggleHadith('grade:' + sch + ':' + e.grade)"
+                      [class.open]="isHadithExpanded('grade:' + sch + ':' + e.grade)"
+                      [attr.aria-expanded]="isHadithExpanded('grade:' + sch + ':' + e.grade)">
+                      {{ e.grade }} <span class="ni-chip-count">{{ e.count }}</span></button>
+                  }
+                </span>
+              </div>
+              @for (e of gradingEntries(sch); track e.grade) {
+                @if (isHadithExpanded('grade:' + sch + ':' + e.grade)) {
+                  <ng-container *ngTemplateOutlet="hlinks; context: { ids: e.hadith }"></ng-container>
+                }
+              }
+            }
+          </div>
+        }
+
+        <!-- #8 Ambiguity flags -->
+        @if (data.ambiguity.chains_with_ambiguous) {
+          <div class="ni-card">
+            <h4>Ambiguous links</h4>
+            <p class="ni-lead">
+              {{ data.ambiguity.chains_with_ambiguous }} of {{ data.analyzed_count }} chains
+              contain at least one ambiguous or collective reference.
+            </p>
+            @if (data.ambiguity.narrators.length) {
+              <div class="ni-chips">
+                @for (a of data.ambiguity.narrators; track a.id) {
+                  <button type="button" class="ni-chip ni-chip-btn"
+                    (click)="toggleHadith('amb:' + a.id)"
+                    [class.open]="isHadithExpanded('amb:' + a.id)"
+                    [attr.aria-expanded]="isHadithExpanded('amb:' + a.id)">
+                    {{ label(a.id) }} <span class="ni-chip-count">{{ a.hadith.length }}</span></button>
+                }
+              </div>
+              @for (a of data.ambiguity.narrators; track a.id) {
+                @if (isHadithExpanded('amb:' + a.id)) {
+                  <ng-container *ngTemplateOutlet="hlinks; context: { ids: a.hadith }"></ng-container>
+                }
+              }
+            }
+          </div>
+        }
+
+        <!-- #9 Isnad graph -->
+        @if (graphNodes.length > 1) {
+          <div class="ni-card">
+            <h4>Narrator network</h4>
+            <p class="ni-muted ni-foot">Transmitters as nodes; links show who narrated to whom. Node size = frequency. Tap a node to identify it.</p>
+            <svg class="ni-graph" [attr.viewBox]="'0 0 ' + graphSize + ' ' + graphSize" role="img"
+                 aria-label="Narrator co-occurrence network for this chapter">
+              @for (e of graphEdges; track $index) {
+                <line [attr.x1]="e.x1" [attr.y1]="e.y1" [attr.x2]="e.x2" [attr.y2]="e.y2"
+                      class="ni-edge" [class.active]="isEdgeActive(e)" [class.muted]="isEdgeMuted(e)"
+                      [attr.stroke-width]="e.w"></line>
+              }
+              @for (nd of graphNodes; track nd.id) {
+                <g class="ni-node" [class.muted]="isNodeMuted(nd.id)" [class.selected]="selectedNodeId === nd.id"
+                   (click)="selectNode(nd.id)" (keydown.enter)="selectNode(nd.id)"
+                   tabindex="0" role="button" [attr.aria-label]="label(nd.id) + ', ' + nd.count + ' chains'">
+                  <circle class="ni-node-hit" [attr.cx]="nd.x" [attr.cy]="nd.y" [attr.r]="nd.r + 10"></circle>
+                  <circle class="ni-node-dot" [attr.cx]="nd.x" [attr.cy]="nd.y" [attr.r]="nd.r"></circle>
+                  <title>{{ label(nd.id) }} ({{ nd.count }})</title>
+                </g>
+              }
+            </svg>
+            <div class="ni-graph-caption" aria-live="polite">
+              @if (selectedNode) {
+                <a [routerLink]="narratorLink(selectedNode.id)" class="ni-name">{{ label(selectedNode.id) }}</a>
+                <span class="ni-muted">appears in {{ selectedNode.count }} {{ selectedNode.count === 1 ? 'chain' : 'chains' }}</span>
+              } @else {
+                <span class="ni-muted">Tap a node to see the narrator's name.</span>
+              }
+            </div>
+          </div>
+        }
+
+        <p class="ni-disclaimer ni-muted">
+          Computed automatically from narrator-chain data; identifications of
+          ambiguous or collective references may be imperfect.
+        </p>
+      }
+    </div>
+  }
+</section>

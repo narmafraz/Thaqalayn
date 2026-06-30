@@ -28,6 +28,7 @@ import { BreadcrumbsComponent } from './components/breadcrumbs/breadcrumbs.compo
 import { BookDispatcherComponent } from './components/book-dispatcher/book-dispatcher.component';
 import { ChapterContentComponent } from './components/chapter-content/chapter-content.component';
 import { ChapterListComponent } from './components/chapter-list/chapter-list.component';
+import { NarratorInsightsComponent } from './components/narrator-insights/narrator-insights.component';
 import { VerseContentComponent } from './components/verse-content/verse-content.component';
 import { VerseDetailComponent } from './components/verse-detail/verse-detail.component';
 import { BookTreeComponent } from './components/book-tree/book-tree.component';
@@ -52,6 +53,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     BookDispatcherComponent,
     ChapterListComponent,
     ChapterContentComponent,
+    NarratorInsightsComponent,
     VerseContentComponent,
     VerseDetailComponent,
     BookTreeComponent,

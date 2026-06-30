@@ -132,6 +132,88 @@ export interface VerseDetail {
   data: VerseDetailData;
 }
 
+// --- Narrator (isnad) analysis sidecar --------------------------------------
+// Precomputed per chapter by the generator (`{chapter}.narrators.json`,
+// kind === 'narrator_analysis'). Fetched on demand by the opt-in
+// "Narrator insights" panel — nothing loads until the reader expands it.
+
+// Narrators are referenced by id throughout; their display names live once in
+// the `narrators` lookup map (id -> [en, ar]) to avoid repeating a name many
+// times within a file. The component resolves ids against that map.
+
+export interface NarratorCluster {
+  size: number;
+  local_indices: number[];
+  shared_ids: number[];
+}
+
+/** Graph node: id + how many chains it appears in (drives node size). */
+export interface NarratorFreq {
+  id: number;
+  count: number;
+  pct?: number;
+}
+
+/** A narrator plus the local_indices of the hadith it pertains to (for links). */
+export interface NarratorHadithRef {
+  id: number;
+  hadith: number[];
+  pct?: number;
+}
+
+export interface ChainLengthStats {
+  min: number;
+  max: number;
+  mean: number;
+  median: number;
+  histogram: Record<string, number>;
+}
+
+export interface NarratorCorroboration {
+  id: number;
+  hadith: number[];
+  independent_paths: number;
+}
+
+export interface NarratorGraphEdge {
+  a: number;
+  b: number;
+  weight: number;
+}
+
+export interface NarratorGraph {
+  nodes: NarratorFreq[];
+  edges: NarratorGraphEdge[];
+}
+
+/** id (as string key) -> [name_en | null, name_ar | null] */
+export type NarratorNameMap = Record<string, [string | null, string | null]>;
+
+export interface NarratorAnalysisData {
+  hadith_count: number;
+  analyzed_count: number;
+  no_chain_count: number;
+  ai_coverage: number;
+  cluster_basis: string;
+  independent_paths: number;
+  clusters: NarratorCluster[];
+  prolific: NarratorHadithRef[];
+  spine: NarratorHadithRef[];
+  sources: NarratorHadithRef[];
+  chain_lengths: ChainLengthStats | Record<string, never>;
+  gradings: Record<string, Record<string, number[]>>;
+  corroboration: NarratorCorroboration[];
+  ambiguity: { chains_with_ambiguous: number; narrators: NarratorHadithRef[] };
+  graph: NarratorGraph;
+  narrators: NarratorNameMap;
+}
+
+export interface NarratorAnalysis {
+  kind: 'narrator_analysis';
+  index: string;
+  data: NarratorAnalysisData;
+}
+
 export type Book = ChapterList | ChapterContent | VerseContent | VerseDetail;
 
 export function getVerseTranslations(book: Book): string[] {

@@ -31,6 +31,9 @@
       </div>
     </div>
   }
+  @if (getVerseCount(book) >= 2) {
+    <app-narrator-insights [index]="book.index"></app-narrator-insights>
+  }
   <!-- Shell format: lazy-load verses via verse_refs -->
   @if (isShellFormat) {
     @for (ref of verseRefs; track trackByRef($index, ref)) {

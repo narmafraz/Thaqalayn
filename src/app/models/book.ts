@@ -40,6 +40,16 @@ export interface Verse {
   text: string[];
   sajda_type: string;
   translations: Record<string, string[]>;
+  /**
+   * Scraped (non-AI) translations re-segmented to the AI chunk boundaries.
+   * Keyed by the same translation ID as `translations` (e.g. "en.qarai"),
+   * each array is positionally index-aligned to `ai.chunks` — one entry per
+   * chunk. An empty string / null means that chunk has no corresponding
+   * scraped text (e.g. a translation that omits the isnad). Populated at
+   * build time by merge_chunk_alignment() from the DataSources alignment
+   * artifact; absent for verses that haven't been aligned (block fallback).
+   */
+  chunk_translations?: Record<string, (string | null)[]>;
   part_type: string;
   relations: Record<string, string[]>;
   narrator_chain: NarratorChain;

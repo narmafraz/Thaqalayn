@@ -186,8 +186,32 @@ describe('VerseTextComponent', () => {
     const chunk = mockAi.chunks![0];
     expect(component.getChunkTranslation(chunk, 'en.ai')).toBe('A number of our companions');
     expect(component.getChunkTranslation(chunk, 'fr.ai')).toBe('');
-    // Non-AI translation IDs should return empty
+    // Non-AI translation IDs return empty when no alignment is present
     expect(component.getChunkTranslation(chunk, 'en.qarai')).toBe('');
+  });
+
+  it('should get chunk translation for scraped IDs from verse.chunk_translations', () => {
+    // Scraped translation re-segmented to the chunk boundaries, index-aligned
+    // to ai.chunks. getChunkTranslation resolves the chunk index by identity.
+    component.verse = {
+      ...mockVerse,
+      ai: mockAi,
+      chunk_translations: {
+        'en.qarai': ['A group of our associates', 'The Imam stated'],
+      },
+    };
+    expect(component.getChunkTranslation(mockAi.chunks![0], 'en.qarai'))
+      .toBe('A group of our associates');
+    expect(component.getChunkTranslation(mockAi.chunks![1], 'en.qarai'))
+      .toBe('The Imam stated');
+    // A chunk with an empty aligned slot falls back to empty string
+    component.verse = {
+      ...mockVerse,
+      ai: mockAi,
+      chunk_translations: { 'en.sarwar': ['', 'Body only'] },
+    };
+    expect(component.getChunkTranslation(mockAi.chunks![0], 'en.sarwar')).toBe('');
+    expect(component.getChunkTranslation(mockAi.chunks![1], 'en.sarwar')).toBe('Body only');
   });
 
   it('should handle word selection', () => {
@@ -481,6 +505,31 @@ describe('VerseTextComponent', () => {
     // No chunks
     component.verse = { ...mockVerse, ai: undefined } as any;
     expect(component.chunksHaveTranslation('en.ai')).toBe(false);
+  });
+
+  it('should report chunksHaveTranslation true for aligned scraped IDs', () => {
+    // Non-AI id lights up the interleaved view when verse.chunk_translations
+    // has a non-empty aligned entry for it.
+    component.verse = {
+      ...mockVerse,
+      ai: mockAi,
+      chunk_translations: { 'en.qarai': ['A group of our associates', 'The Imam stated'] },
+    };
+    expect(component.chunksHaveTranslation('en.qarai')).toBe(true);
+    // All-empty alignment (e.g. every chunk unmatched) does not
+    component.verse = {
+      ...mockVerse,
+      ai: mockAi,
+      chunk_translations: { 'en.qarai': ['', ''] },
+    };
+    expect(component.chunksHaveTranslation('en.qarai')).toBe(false);
+    // A different scraped id with no alignment stays false
+    component.verse = {
+      ...mockVerse,
+      ai: mockAi,
+      chunk_translations: { 'en.qarai': ['x', 'y'] },
+    };
+    expect(component.chunksHaveTranslation('en.sarwar')).toBe(false);
   });
 
   // FB-03: Word click popup tests

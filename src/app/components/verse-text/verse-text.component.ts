@@ -560,17 +560,30 @@ export class VerseTextComponent implements OnInit, OnDestroy {
       if (lang) {
         return (chunk.translations as Record<string, string>)?.[lang] || '';
       }
+      return '';
     }
-    return '';
+    // Scraped (non-AI) translation: read the per-chunk segmentation produced
+    // by the alignment pass. It's positionally aligned to `ai.chunks`, so
+    // resolve this chunk's index by identity (chunk refs are stable — the
+    // grouped word-by-word view may not be 1:1 with chunks, so we can't rely
+    // on a template $index).
+    const index = this.chunks.indexOf(chunk);
+    if (index < 0) return '';
+    return this.verse?.chunk_translations?.[translationId]?.[index] || '';
   }
 
-  /** Check if chunks have translation data for the given translation ID. */
+  /** Check if chunks have translation data for the given translation ID.
+   *  AI translations carry per-chunk text on `chunk.translations`; scraped
+   *  translations carry it on `verse.chunk_translations[id]` (index-aligned). */
   chunksHaveTranslation(translationId: string): boolean {
     if (!translationId || !this.chunks?.length) return false;
-    if (!isAiTranslation(translationId)) return false;
-    const lang = getAiLang(translationId);
-    if (!lang) return false;
-    return this.chunks.some(c => !!(c.translations as Record<string, string>)?.[lang]);
+    if (isAiTranslation(translationId)) {
+      const lang = getAiLang(translationId);
+      if (!lang) return false;
+      return this.chunks.some(c => !!(c.translations as Record<string, string>)?.[lang]);
+    }
+    const aligned = this.verse?.chunk_translations?.[translationId];
+    return !!aligned && aligned.some(t => !!t);
   }
 
   /** Check if this chunk is the first isnad chunk and should render narrator_chain.parts[].

@@ -111,7 +111,7 @@
               @if (!(translation2$ | async) && chunksHaveTranslation((translation$ | async) || '')) {
                 <div class="chunk-translation-col">
                   @if (getChunkTranslation(group.chunk, (translation$ | async) || ''); as t) {
-                    <p class="chunk-translation">{{ t }}</p>
+                    <p class="chunk-translation" [innerHTML]="t"></p>
                   }
                 </div>
               }
@@ -256,7 +256,7 @@
                 >
                 @if (getChunkTranslation(chunk, (translation$ | async) || ''); as t) {
                   <p class="chunk-translation"
-                  >{{ t }}</p>
+                  [innerHTML]="t"></p>
                 }
               </div>
             }

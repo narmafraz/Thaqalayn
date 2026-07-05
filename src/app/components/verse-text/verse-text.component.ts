@@ -13,6 +13,14 @@ import { PeopleState } from '@store/people/people.state';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+/** A chunk paired with its word tokens, for the chunked word-by-word view.
+ *  `index` is the token's position in the flat `wordTokens` array, so the
+ *  active-word/popup state stays consistent with the non-chunked layout. */
+export interface ChunkWordGroup {
+  chunk: Chunk;
+  words: { entry: WordAnalysisEntry; index: number }[];
+}
+
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: 'app-verse-text',
@@ -356,22 +364,78 @@ export class VerseTextComponent implements OnInit, OnDestroy {
     if (!sources.length) return [];
     const out: WordAnalysisEntry[] = [];
     for (const text of sources) {
-      // Split on whitespace; strip leading/trailing Arabic punctuation
-      // (، . ؟ ؛ ! : ()).
-      for (const raw of text.split(/\s+/)) {
-        const token = raw.replace(/^[،.؟؛!:()«»\-]+|[،.؟؛!:()«»\-]+$/g, '');
-        if (!token) continue;
-        // Cast through `unknown` because the v3 schema requires the
-        // full translation/pos shape we don't have yet — UI guards
-        // with *ngIf on entry.pos and entry.translation[lang].
-        out.push({
-          word: token,
-          pos: '' as any,
-          translation: {} as any,
-        } as unknown as WordAnalysisEntry);
+      for (const token of this.tokenizeArabic(text)) {
+        out.push(this.makeWordStub(token));
       }
     }
     return out;
+  }
+
+  /** Whitespace-tokenize Arabic text, stripping leading/trailing
+   *  punctuation (، . ؟ ؛ ! : () «» -). Shared by the flat word-token
+   *  builder and the per-chunk grouping so both agree on token counts. */
+  private tokenizeArabic(text: string): string[] {
+    const out: string[] = [];
+    for (const raw of (text || '').split(/\s+/)) {
+      const token = raw.replace(/^[،.؟؛!:()«»\-]+|[،.؟؛!:()«»\-]+$/g, '');
+      if (token) out.push(token);
+    }
+    return out;
+  }
+
+  /** Build an empty word-analysis stub. Cast through `unknown` because the
+   *  v3 schema requires the full translation/pos shape we don't have yet —
+   *  surface data lazy-loads from ThaqalaynWords to fill it in. */
+  private makeWordStub(word: string): WordAnalysisEntry {
+    return { word, pos: '' as any, translation: {} as any } as unknown as WordAnalysisEntry;
+  }
+
+  private _chunkGroupsVerse: Verse | undefined;
+  private _chunkGroupsCache: ChunkWordGroup[] = [];
+
+  /** Word tokens grouped by their parent chunk, so the word-by-word view
+   *  can mirror the chunked Arabic layout (isnad / body / etc.) instead of
+   *  rendering one flat block. Word indices are into the flat `wordTokens`
+   *  array so active-word / popup state stays consistent between layouts.
+   *  Memoized on the verse input for the same reason as `wordTokens`. */
+  get chunkWordGroups(): ChunkWordGroup[] {
+    if (this._chunkGroupsVerse === this.verse) return this._chunkGroupsCache;
+    this._chunkGroupsVerse = this.verse;
+    this._chunkGroupsCache = this.computeChunkWordGroups();
+    return this._chunkGroupsCache;
+  }
+
+  private computeChunkWordGroups(): ChunkWordGroup[] {
+    const chunks = this.verse?.ai?.chunks;
+    if (!chunks?.length) return [];
+    const tokens = this.wordTokens;
+    const groups: ChunkWordGroup[] = [];
+    if (this.hasWordAnalysis) {
+      // v3: chunk.word_start/word_end index directly into word_analysis,
+      // which is exactly `tokens` here.
+      for (const chunk of chunks) {
+        const words: { entry: WordAnalysisEntry; index: number }[] = [];
+        const end = Math.min(chunk.word_end, tokens.length);
+        for (let i = Math.max(0, chunk.word_start); i < end; i++) {
+          words.push({ entry: tokens[i], index: i });
+        }
+        groups.push({ chunk, words });
+      }
+    } else {
+      // Fallback: `tokens` was built by concatenating each chunk's
+      // tokenized arabic_text in chunk order (see computeWordTokens), so
+      // walk a cursor through it, re-tokenizing per chunk to get counts.
+      let cursor = 0;
+      for (const chunk of chunks) {
+        const count = this.tokenizeArabic(chunk.arabic_text || '').length;
+        const words: { entry: WordAnalysisEntry; index: number }[] = [];
+        for (let k = 0; k < count && cursor < tokens.length; k++, cursor++) {
+          words.push({ entry: tokens[cursor], index: cursor });
+        }
+        groups.push({ chunk, words });
+      }
+    }
+    return groups;
   }
 
   /** trackBy for *ngFor over word cards. Stable identity by index +

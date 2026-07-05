@@ -409,6 +409,20 @@
   padding: 0 15px;
 }
 
+// Word-by-word rendered inside chunk rows: the word cards sit where the
+// chunk's Arabic text would be, preserving the isnad / body / etc. layout.
+// The parent .word-analysis-grid already supplies horizontal padding, so
+// drop the .chunked-view padding here to avoid doubling it up.
+.word-chunked-view {
+  padding: 0;
+
+  .chunk-arabic-col .word-cards {
+    // RTL container → flex-start begins at the right edge, matching how
+    // the plain chunk Arabic text is right-aligned.
+    justify-content: flex-start;
+  }
+}
+
 .chunk-block {
   margin-bottom: 8px;
   padding: 8px 12px;

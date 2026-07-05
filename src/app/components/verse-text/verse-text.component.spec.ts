@@ -217,6 +217,51 @@ describe('VerseTextComponent', () => {
     expect(component.chunks[0].chunk_type).toBe('isnad');
   });
 
+  it('groups word tokens by chunk using word_analysis indices (v3)', () => {
+    component.verse = { ...mockVerse, ai: mockAi };
+    const groups = component.chunkWordGroups;
+    expect(groups.length).toBe(2);
+    // chunk[0]: word_start 0, word_end 1 -> one word (بِسْمِ) at global index 0
+    expect(groups[0].chunk.chunk_type).toBe('isnad');
+    expect(groups[0].words.map(w => w.entry.word)).toEqual(['بِسْمِ']);
+    expect(groups[0].words.map(w => w.index)).toEqual([0]);
+    // chunk[1]: word_start 1, word_end 2 -> one word (اللَّهِ) at global index 1
+    expect(groups[1].chunk.chunk_type).toBe('body');
+    expect(groups[1].words.map(w => w.entry.word)).toEqual(['اللَّهِ']);
+    expect(groups[1].words.map(w => w.index)).toEqual([1]);
+  });
+
+  it('groups word tokens by tokenizing chunk arabic_text when word_analysis is absent', () => {
+    // v4 lean: no word_analysis, so tokens come from each chunk's
+    // arabic_text; grouping must keep sequential global indices that line
+    // up with the flat wordTokens array.
+    const aiNoWa: AiContent = {
+      diacritics_status: 'validated',
+      content_type: 'creedal',
+      tags: ['theology'],
+      isnad_matn: { has_chain: true, narrators: [] },
+      chunks: [
+        { chunk_type: 'isnad', arabic_text: 'عدة من أصحابنا', word_start: 0, word_end: 3, translations: {} },
+        { chunk_type: 'body', arabic_text: 'قال الإمام', word_start: 3, word_end: 5, translations: {} },
+      ],
+    };
+    component.verse = { ...mockVerse, ai: aiNoWa };
+    expect(component.hasWordAnalysis).toBe(false);
+    const groups = component.chunkWordGroups;
+    expect(groups.length).toBe(2);
+    expect(groups[0].words.map(w => w.entry.word)).toEqual(['عدة', 'من', 'أصحابنا']);
+    expect(groups[0].words.map(w => w.index)).toEqual([0, 1, 2]);
+    expect(groups[1].words.map(w => w.entry.word)).toEqual(['قال', 'الإمام']);
+    expect(groups[1].words.map(w => w.index)).toEqual([3, 4]);
+    // Indices must map into the flat wordTokens list used by the popup.
+    expect(component.wordTokens.map(e => e.word)).toEqual(['عدة', 'من', 'أصحابنا', 'قال', 'الإمام']);
+  });
+
+  it('returns no chunk word groups when the verse has no chunks', () => {
+    component.verse = mockVerse;
+    expect(component.chunkWordGroups).toEqual([]);
+  });
+
   it('should reconstruct diacritized text from word_analysis when diacritized_text is absent', () => {
     const aiWithoutDiacText = { ...mockAi };
     delete aiWithoutDiacText.diacritized_text;

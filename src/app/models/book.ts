@@ -45,9 +45,13 @@ export interface Verse {
    * Keyed by the same translation ID as `translations` (e.g. "en.qarai"),
    * each array is positionally index-aligned to `ai.chunks` — one entry per
    * chunk. An empty string / null means that chunk has no corresponding
-   * scraped text (e.g. a translation that omits the isnad). Populated at
-   * build time by merge_chunk_alignment() from the DataSources alignment
-   * artifact; absent for verses that haven't been aligned (block fallback).
+   * scraped text (e.g. a translation that omits the isnad).
+   *
+   * For aligned verses this is NOT stored on the base file — it lives in the
+   * per-language sister (`{path}.{lang}.json` under `chunk_translations`) and
+   * BooksService.mergeSister folds it in at load time, also reconstructing the
+   * flat `translations[id]` (base drops the flat text to avoid duplication).
+   * Absent for verses that haven't been aligned (block fallback).
    */
   chunk_translations?: Record<string, (string | null)[]>;
   part_type: string;
@@ -151,9 +155,17 @@ export interface VerseDetail {
 // the `narrators` lookup map (id -> [en, ar]) to avoid repeating a name many
 // times within a file. The component resolves ids against that map.
 
+/** One hadith in a cluster: its local index + full ordered isnad (narrator ids). */
+export interface NarratorClusterMember {
+  li: number;
+  chain: number[];
+}
+
 export interface NarratorCluster {
-  size: number;
-  local_indices: number[];
+  /** Members (one per hadith) with their full ordered chains. Group size is
+   *  `members.length`; the hadith numbers are `members[].li`. */
+  members: NarratorClusterMember[];
+  /** Precomputed, count-ranked top shared transmitters for the group header. */
   shared_ids: number[];
 }
 
@@ -216,6 +228,9 @@ export interface NarratorAnalysisData {
   ambiguity: { chains_with_ambiguous: number; narrators: NarratorHadithRef[] };
   graph: NarratorGraph;
   narrators: NarratorNameMap;
+  /** Role class for non-transmitter ids (`'source'` | `'placeholder'`), used to
+   *  style excluded links in a chain. Transmitters are omitted (the default). */
+  narrator_roles?: Record<string, 'source' | 'placeholder'>;
 }
 
 export interface NarratorAnalysis {

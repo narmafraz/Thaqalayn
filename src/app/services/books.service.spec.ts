@@ -454,6 +454,28 @@ describe('BooksService', () => {
         expect((chunks[0]['translations'] as Record<string, string>)['en']).toBe('foo-en');
       }));
 
+      it('merges scraped chunk_translations from the sister and reconstructs flat text', fakeAsync(() => {
+        // Aligned verse: base dropped the flat scraped text; the en sister
+        // carries the re-segmented parts. mergeSister folds them into
+        // verse.chunk_translations and rebuilds verse.translations[id].
+        let receivedBook: Book | undefined;
+        service.getPart('al-kafi:1:1:1:1').subscribe(b => receivedBook = b);
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.json`).flush(detailWithSplitAi());
+        tick(0);
+        httpMock.expectOne(`${API_BASE}books/al-kafi/1/1/1/1.en.json`).flush({
+          lang: 'en',
+          path: '/books/al-kafi:1:1:1:1',
+          ai: { summary: 'EN summary' },
+          chunk_translations: { 'en.hubeali': ['The saying.'] },
+        });
+        tick(0);
+        const verse = (receivedBook as VerseDetail).data.verse;
+        expect(verse.chunk_translations!['en.hubeali']).toEqual(['The saying.']);
+        // flat text reconstructed for the block view / compare mode
+        expect(verse.translations['en.hubeali']).toEqual(['The saying.']);
+      }));
+
       it('returns base verse unchanged when sister 404s', fakeAsync(() => {
         let receivedBook: Book | undefined;
         service.getPart('al-kafi:1:1:1:1').subscribe(b => receivedBook = b);

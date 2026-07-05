@@ -6,19 +6,26 @@ import { AiPreferencesService } from './ai-preferences.service';
 import { RouterState } from '@store/router/router.state';
 import { Store } from '@ngxs/store';
 import { environment } from '@env/environment';
-import { Observable, combineLatest, from, of } from 'rxjs';
+import { Observable, combineLatest, forkJoin, from, of } from 'rxjs';
 import { catchError, map, retry, switchMap, take, tap, timeout } from 'rxjs/operators';
 
 interface SisterFile {
   lang: string;
   path: string;
-  ai: {
+  ai?: {
     summary?: string;
     seo_question?: string;
     chunks?: (string | null)[];
     word_analysis?: (string | null)[];
     key_terms?: { [arTerm: string]: string };
   };
+  /**
+   * Scraped (non-AI) translations for this language, re-segmented to the AI
+   * chunk boundaries, keyed by translation ID (e.g. "en.hubeali"). The base
+   * verse no longer carries these for aligned verses — mergeSister folds them
+   * into verse.chunk_translations and reconstructs verse.translations[id].
+   */
+  chunk_translations?: { [translationId: string]: (string | null)[] };
 }
 
 @Injectable({
@@ -64,20 +71,33 @@ export class BooksService {
           // legacy/inline-shape, or no AI content: nothing to merge
           return of(book);
         }
-        // Effective AI lang composes two inputs that both drive the view:
-        // the active translation (if it's an AI one), else the wordByWord
-        // preference. Either changing should refetch a different sister.
+        // Which language sisters do we need? The union of:
+        //  - effectiveAiLang (AI content for the active AI translation / WBW pref)
+        //  - the active translation's language (its scraped text may live in the
+        //    sister now that base drops it for aligned verses)
+        //  - the compare translation's language (same reason)
+        // so the block view + compare mode both find their text.
         return combineLatest([
           this.aiPrefs.preferences$.pipe(map(p => p.wordByWordDefaultLang)),
           this.store.select(RouterState.getTranslation),
+          this.store.select(RouterState.getTranslation2),
         ]).pipe(
-          map(([w, t]) => effectiveAiLang(t, w)),
           take(1),
-          switchMap(lang => {
-            const sisterUrl = `${BooksService.bookpartsUrl}/${index.replace(/:/g, '/')}.${lang}.json`;
-            return this.http.get<SisterFile>(sisterUrl).pipe(
-              catchError(() => of(null as SisterFile | null)),
-              map(sister => this.mergeSister(book as VerseDetail, sister, lang)),
+          switchMap(([w, t1, t2]) => {
+            const langs = new Set<string>([effectiveAiLang(t1, w)]);
+            for (const l of [this.langOf(t1), this.langOf(t2)]) if (l) langs.add(l);
+            const langList = [...langs];
+            return forkJoin(langList.map(lang => {
+              const url = `${BooksService.bookpartsUrl}/${index.replace(/:/g, '/')}.${lang}.json`;
+              return this.http.get<SisterFile>(url).pipe(
+                catchError(() => of(null as SisterFile | null)),
+                map(sister => [lang, sister] as const),
+              );
+            })).pipe(
+              map(pairs => pairs.reduce(
+                (acc, [lang, sister]) => this.mergeSister(acc, sister, lang),
+                book as VerseDetail,
+              )),
             );
           }),
         );
@@ -85,43 +105,70 @@ export class BooksService {
     );
   }
 
+  /** Language code of a translation ID (e.g. "en.hubeali" -> "en"). */
+  private langOf(id?: string): string | undefined {
+    return id && id.includes('.') ? id.split('.')[0] : undefined;
+  }
+
   private mergeSister(book: VerseDetail, sister: SisterFile | null, lang: string): VerseDetail {
     if (!sister) return book;
     const verse = book.data.verse;
-    if (!verse?.ai) return book;
-    const mergedVerse: Verse = { ...verse, ai: { ...verse.ai } };
-    const ai = mergedVerse.ai as Record<string, unknown>;
-    if (sister.ai.summary !== undefined) {
-      ai['summaries'] = { ...((ai['summaries'] as object) || {}), [lang]: sister.ai.summary };
+    if (!verse) return book;
+    const mergedVerse: Verse = { ...verse };
+
+    // AI content (summaries / seo / key_terms / per-chunk + per-word translations).
+    if (sister.ai && verse.ai) {
+      mergedVerse.ai = { ...verse.ai };
+      const ai = mergedVerse.ai as Record<string, unknown>;
+      if (sister.ai.summary !== undefined) {
+        ai['summaries'] = { ...((ai['summaries'] as object) || {}), [lang]: sister.ai.summary };
+      }
+      if (sister.ai.seo_question !== undefined) {
+        ai['seo_questions'] = { ...((ai['seo_questions'] as object) || {}), [lang]: sister.ai.seo_question };
+      }
+      if (sister.ai.key_terms !== undefined) {
+        ai['key_terms'] = { ...((ai['key_terms'] as object) || {}), [lang]: sister.ai.key_terms };
+      }
+      if (sister.ai.chunks && Array.isArray(ai['chunks'])) {
+        const baseChunks = ai['chunks'] as Array<Record<string, unknown>>;
+        ai['chunks'] = baseChunks.map((chunk, i) => {
+          const sisterTrans = sister.ai!.chunks?.[i];
+          if (typeof sisterTrans !== 'string') return chunk;
+          return {
+            ...chunk,
+            translations: { ...((chunk['translations'] as object) || {}), [lang]: sisterTrans },
+          };
+        });
+      }
+      if (sister.ai.word_analysis && Array.isArray(ai['word_analysis'])) {
+        const baseWords = ai['word_analysis'] as Array<Record<string, unknown>>;
+        ai['word_analysis'] = baseWords.map((entry, i) => {
+          const sisterTrans = sister.ai!.word_analysis?.[i];
+          if (typeof sisterTrans !== 'string') return entry;
+          return {
+            ...entry,
+            translation: { ...((entry['translation'] as object) || {}), [lang]: sisterTrans },
+          };
+        });
+      }
     }
-    if (sister.ai.seo_question !== undefined) {
-      ai['seo_questions'] = { ...((ai['seo_questions'] as object) || {}), [lang]: sister.ai.seo_question };
+
+    // Scraped translations re-segmented to chunks: fold into
+    // verse.chunk_translations and reconstruct the flat verse.translations[id]
+    // (base drops the flat text for aligned verses; the block view + compare
+    // mode read it from here).
+    if (sister.chunk_translations) {
+      const ct: Record<string, (string | null)[]> = { ...(mergedVerse.chunk_translations || {}) };
+      const translations: Record<string, string[]> = { ...(mergedVerse.translations || {}) };
+      for (const [id, parts] of Object.entries(sister.chunk_translations)) {
+        ct[id] = parts;
+        const flat = parts.filter((p): p is string => !!(p && p.trim())).join(' ');
+        if (flat) translations[id] = [flat];
+      }
+      mergedVerse.chunk_translations = ct;
+      mergedVerse.translations = translations;
     }
-    if (sister.ai.key_terms !== undefined) {
-      ai['key_terms'] = { ...((ai['key_terms'] as object) || {}), [lang]: sister.ai.key_terms };
-    }
-    if (sister.ai.chunks && Array.isArray(ai['chunks'])) {
-      const baseChunks = ai['chunks'] as Array<Record<string, unknown>>;
-      ai['chunks'] = baseChunks.map((chunk, i) => {
-        const sisterTrans = sister.ai.chunks?.[i];
-        if (typeof sisterTrans !== 'string') return chunk;
-        return {
-          ...chunk,
-          translations: { ...((chunk['translations'] as object) || {}), [lang]: sisterTrans },
-        };
-      });
-    }
-    if (sister.ai.word_analysis && Array.isArray(ai['word_analysis'])) {
-      const baseWords = ai['word_analysis'] as Array<Record<string, unknown>>;
-      ai['word_analysis'] = baseWords.map((entry, i) => {
-        const sisterTrans = sister.ai.word_analysis?.[i];
-        if (typeof sisterTrans !== 'string') return entry;
-        return {
-          ...entry,
-          translation: { ...((entry['translation'] as object) || {}), [lang]: sisterTrans },
-        };
-      });
-    }
+
     return { ...book, data: { ...book.data, verse: mergedVerse } };
   }
 

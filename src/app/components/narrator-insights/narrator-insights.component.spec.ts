@@ -15,8 +15,21 @@ function sampleData(): NarratorAnalysisData {
     cluster_basis: 'exclude_imams_placeholders',
     independent_paths: 2,
     clusters: [
-      { size: 3, local_indices: [1, 2, 3], shared_ids: [10] },
-      { size: 2, local_indices: [4, 5], shared_ids: [] },
+      {
+        members: [
+          { li: 1, chain: [10, 11, 99] },
+          { li: 2, chain: [10, 99] },
+          { li: 3, chain: [10, 6, 99] },
+        ],
+        shared_ids: [10],
+      },
+      {
+        members: [
+          { li: 4, chain: [20] },
+          { li: 5, chain: [21] },
+        ],
+        shared_ids: [],
+      },
     ],
     prolific: [{ id: 10, hadith: [1, 2, 3], pct: 0.6 }],
     spine: [{ id: 10, hadith: [1, 2, 3], pct: 1 }],
@@ -32,9 +45,12 @@ function sampleData(): NarratorAnalysisData {
     narrators: {
       '10': ['A', 'ا'],
       '11': ['B', 'ب'],
+      '20': ['D', 'د'],
+      '21': ['E', 'ه'],
       '99': ['Imam', 'إمام'],
       '6': ['companions', 'أصحاب'],
     },
+    narrator_roles: { '99': 'source', '6': 'placeholder' },
   };
 }
 
@@ -97,6 +113,31 @@ describe('NarratorInsightsComponent', () => {
     fixture.detectChanges();
     component.toggle();
     expect(component.dominantPct).toBe(60); // 3 of 5
+  });
+
+  it('flags transmitters shared across a cluster, excluding sources/placeholders', () => {
+    const doc: NarratorAnalysis = { kind: 'narrator_analysis', index: component.index, data: sampleData() };
+    svc.get.and.returnValue(of(doc));
+    fixture.detectChanges();
+    component.toggle();
+    // id 10 appears in all three members of cluster 0 -> shared
+    expect(component.isShared(0, 10)).toBeTrue();
+    // id 11 only appears once -> not shared
+    expect(component.isShared(0, 11)).toBeFalse();
+    // source (99) recurs but is excluded from the shared highlight
+    expect(component.isShared(0, 99)).toBeFalse();
+    // singleton members share nothing
+    expect(component.isShared(1, 20)).toBeFalse();
+  });
+
+  it('exposes role classes for excluded narrators, null for transmitters', () => {
+    const doc: NarratorAnalysis = { kind: 'narrator_analysis', index: component.index, data: sampleData() };
+    svc.get.and.returnValue(of(doc));
+    fixture.detectChanges();
+    component.toggle();
+    expect(component.roleOf(99)).toBe('source');
+    expect(component.roleOf(6)).toBe('placeholder');
+    expect(component.roleOf(10)).toBeNull();
   });
 
   it('derives chain-length histogram bars sorted ascending', () => {

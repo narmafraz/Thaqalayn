@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject } from '@angular/core';
 import {
   NarratorAnalysisData,
+  NarratorCluster,
   NarratorFreq,
   NarratorGraph,
   NarratorHadithRef,
@@ -68,6 +69,9 @@ export class NarratorInsightsComponent implements OnChanges {
   selectedNodeId: number | null = null;
   /** Keys (e.g. `prolific:35`) whose hadith-link list is expanded. */
   private expandedHadith = new Set<string>();
+  /** Per-cluster set of transmitter ids shared across ≥2 of its members
+   *  (excludes source-Imams/placeholders); index-aligned with `data.clusters`. */
+  private sharedSets: Set<number>[] = [];
 
   private svc = inject(NarratorAnalysisService);
   private cdr = inject(ChangeDetectorRef);
@@ -82,6 +86,7 @@ export class NarratorInsightsComponent implements OnChanges {
     this.graphEdges = [];
     this.selectedNodeId = null;
     this.expandedHadith.clear();
+    this.sharedSets = [];
   }
 
   toggle(): void {
@@ -97,7 +102,10 @@ export class NarratorInsightsComponent implements OnChanges {
       this.loading = false;
       this.loaded = true;
       this.data = doc?.data ?? null;
-      if (this.data) this.buildGraph(this.data.graph);
+      if (this.data) {
+        this.buildGraph(this.data.graph);
+        this.buildSharedSets(this.data.clusters);
+      }
       this.cdr.markForCheck();
     });
   }
@@ -118,7 +126,40 @@ export class NarratorInsightsComponent implements OnChanges {
   /** Largest cluster size as a % of analyzed hadith — the "dominance" stat. */
   get dominantPct(): number {
     if (!this.data || !this.data.analyzed_count || !this.data.clusters.length) return 0;
-    return Math.round((this.data.clusters[0].size / this.data.analyzed_count) * 100);
+    return Math.round((this.data.clusters[0].members.length / this.data.analyzed_count) * 100);
+  }
+
+  // --- Cluster member chains --------------------------------------------- //
+  /**
+   * Precompute, per cluster, the set of transmitter ids that recur across ≥2 of
+   * its members' chains (source-Imams/placeholders excluded — those get their
+   * own style, not the "shared" highlight). Index-aligned with `data.clusters`.
+   */
+  private buildSharedSets(clusters: NarratorCluster[]): void {
+    this.sharedSets = clusters.map(c => {
+      const counts = new Map<number, number>();
+      for (const m of c.members) {
+        const seen = new Set<number>();
+        for (const nid of m.chain) {
+          if (seen.has(nid) || this.roleOf(nid)) continue;
+          seen.add(nid);
+          counts.set(nid, (counts.get(nid) ?? 0) + 1);
+        }
+      }
+      const shared = new Set<number>();
+      for (const [nid, n] of counts) if (n >= 2) shared.add(nid);
+      return shared;
+    });
+  }
+
+  /** Role class for a narrator id, or null for a plain transmitter. */
+  roleOf(id: number): 'source' | 'placeholder' | null {
+    return this.data?.narrator_roles?.[id] ?? null;
+  }
+
+  /** True when this transmitter recurs across the given cluster's members. */
+  isShared(clusterIndex: number, id: number): boolean {
+    return this.sharedSets[clusterIndex]?.has(id) ?? false;
   }
 
   // --- Hadith links ------------------------------------------------------ //

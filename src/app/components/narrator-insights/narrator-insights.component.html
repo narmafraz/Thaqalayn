@@ -35,34 +35,54 @@
             <span class="ni-muted">(source-Imams &amp; collective references excluded)</span>
           </p>
           @if (data.clusters.length) {
-            <ul class="ni-clusters">
-              @for (c of data.clusters; track $index) {
+            <ol class="ni-clusters">
+              @for (c of data.clusters; track $index; let ci = $index) {
                 <li class="ni-cluster">
                   <div class="ni-cluster-head">
-                    <span class="ni-cluster-size">{{ c.size }}</span>
+                    <span class="ni-cluster-badge">Group {{ ci + 1 }}</span>
+                    <span class="ni-cluster-size">{{ c.members.length }}</span>
                     <span class="ni-muted">hadith</span>
                     @if (c.shared_ids.length) {
-                      <span class="ni-muted">via</span>
+                      <span class="ni-muted">· share</span>
                       @for (sid of c.shared_ids; track sid) {
-                        <a [routerLink]="narratorLink(sid)" class="ni-chip">{{ label(sid) }}</a>
+                        <a [routerLink]="narratorLink(sid)" class="ni-chip ni-chip-shared">{{ label(sid) }}</a>
                       }
                     } @else {
-                      <span class="ni-muted">— standalone chain</span>
+                      <span class="ni-muted">· standalone chain</span>
                     }
                   </div>
-                  <div class="ni-hadith-links" aria-label="Hadith in this group">
-                    @for (li of c.local_indices; track li) {
-                      <a class="ni-hnum"
-                        [routerLink]="chapterRoute"
-                        [fragment]="hadithFragment(li)"
-                        queryParamsHandling="preserve"
-                        [title]="'Go to hadith ' + li">{{ li }}</a>
+                  <ol class="ni-members" aria-label="Hadith in this group, with their chains">
+                    @for (m of c.members; track m.li) {
+                      <li class="ni-member">
+                        <a class="ni-hnum"
+                          [routerLink]="chapterRoute"
+                          [fragment]="hadithFragment(m.li)"
+                          queryParamsHandling="preserve"
+                          [title]="'Go to hadith ' + m.li">#{{ m.li }}</a>
+                        @if (m.chain.length) {
+                          <span class="ni-chain">
+                            @for (nid of m.chain; track $index) {
+                              <a class="ni-chain-node"
+                                [class.shared]="isShared(ci, nid)"
+                                [class.source]="roleOf(nid) === 'source'"
+                                [class.placeholder]="roleOf(nid) === 'placeholder'"
+                                [routerLink]="narratorLink(nid)"
+                                [title]="label(nid)">{{ label(nid) }}</a>
+                            }
+                          </span>
+                        } @else {
+                          <span class="ni-muted">no traceable chain</span>
+                        }
+                      </li>
                     }
-                  </div>
+                  </ol>
                 </li>
               }
-            </ul>
-            <p class="ni-foot ni-muted">
+            </ol>
+            <p class="ni-foot ni-muted ni-legend">
+              <span class="ni-chain-node shared ni-legend-chip">shared</span> recurs across the group ·
+              <span class="ni-chain-node source ni-legend-chip">source</span> authority quoted ·
+              <span class="ni-chain-node placeholder ni-legend-chip">vague ref</span> collective / relative.
               The largest group covers {{ dominantPct }}% of traceable hadith.
             </p>
           }

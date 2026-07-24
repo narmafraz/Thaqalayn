@@ -117,6 +117,13 @@
 .ni-cluster { padding: 8px 0; }
 .ni-cluster + .ni-cluster { border-top: 1px dashed var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08)); }
 .ni-cluster-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; line-height: 1.7; }
+.ni-cluster-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #673ab7;
+}
 .ni-hadith-links { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0 4px; }
 .ni-hnum {
   display: inline-flex;
@@ -133,6 +140,95 @@
   font-variant-numeric: tabular-nums;
   text-decoration: none;
   &:hover { background: rgba(103, 58, 183, 0.18); }
+}
+
+/* Chip variant used in the group header to preview the shared transmitters. */
+.ni-chip-shared {
+  background: rgba(103, 58, 183, 0.16);
+  font-weight: 600;
+}
+
+/* Per-hadith member rows: indented into a subtly-tinted, left-ruled block so it
+   reads unmistakably as "inside" the group. Each row is a jump link followed by
+   that hadith's full isnad. Colours use the app theme vars for dark-mode parity. */
+.ni-members {
+  list-style: none;
+  margin: 6px 0 2px;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid rgba(103, 58, 183, 0.4);
+  background: var(--table-stripe, rgba(0, 0, 0, 0.02));
+  border-radius: 0 8px 8px 0;
+}
+.ni-member {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 8px;
+  padding: 5px 8px 5px 0;
+  line-height: 1.7;
+
+  & + & { border-top: 1px dotted var(--border-color, rgba(0, 0, 0, 0.06)); }
+  .ni-hnum { align-self: center; flex: 0 0 auto; }
+}
+
+/* The chain of narrator chips for one hadith, separated by a ligature caret. */
+.ni-chain {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 4px;
+  min-width: 0;
+}
+.ni-chain-node {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.8rem;
+  color: var(--text-secondary, #4a4a4a);
+  background: var(--table-hover, rgba(0, 0, 0, 0.05));
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover { border-color: var(--border-color, rgba(0, 0, 0, 0.2)); }
+
+  /* Recurs across the group — the reason these hadith cluster together. */
+  &.shared {
+    background: rgba(103, 58, 183, 0.18);
+    border-color: rgba(103, 58, 183, 0.5);
+    color: #7e57c2;
+    font-weight: 600;
+  }
+  /* Source-Imam the report is narrated *from* (excluded from clustering). */
+  &.source {
+    background: rgba(0, 137, 123, 0.14);
+    border-color: rgba(0, 137, 123, 0.45);
+    color: #26a69a;
+    font-style: italic;
+  }
+  /* Collective/relative placeholder ("a number of our companions", "his father"). */
+  &.placeholder {
+    background: transparent;
+    border: 1px dashed var(--text-muted, rgba(0, 0, 0, 0.28));
+    color: var(--text-muted, #8a8a8a);
+    font-style: italic;
+  }
+}
+/* Caret separator between chain nodes (not before the first). */
+.ni-chain-node:not(:first-child)::before {
+  content: '\203A'; /* › */
+  margin: 0 5px 0 -1px;
+  color: var(--text-muted, rgba(0, 0, 0, 0.4));
+  font-weight: 400;
+}
+
+/* Legend under the cluster list. Chips here are inert samples. */
+.ni-legend { display: block; margin-top: 8px; line-height: 2; }
+.ni-legend-chip {
+  pointer-events: none;
+  font-size: 0.72rem;
+  padding: 0 6px;
 }
 
 /* ---- Horizontal bar charts (sources, prolific) ---- */

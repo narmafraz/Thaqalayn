@@ -416,10 +416,26 @@
 .word-chunked-view {
   padding: 0;
 
-  .chunk-arabic-col .word-cards {
-    // RTL container → flex-start begins at the right edge, matching how
-    // the plain chunk Arabic text is right-aligned.
-    justify-content: flex-start;
+  // The parent .word-analysis-grid sets dir="rtl" so the flat word cards
+  // flow right-to-left. That RTL direction also reverses the .chunk-block
+  // CSS grid, dropping the Arabic column (grid-column 2) on the LEFT and the
+  // translation (grid-column 1) on the RIGHT — the mirror image of the
+  // non-WBW chunked view. Force the grid back to LTR so the columns land on
+  // the correct sides (Arabic right, translation left).
+  .chunk-block {
+    direction: ltr;
+  }
+
+  // ...but keep the Arabic word cards themselves flowing right-to-left
+  // within their column.
+  .chunk-arabic-col {
+    direction: rtl;
+
+    .word-cards {
+      // RTL container → flex-start begins at the right edge, matching how
+      // the plain chunk Arabic text is right-aligned.
+      justify-content: flex-start;
+    }
   }
 }
 

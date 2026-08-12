@@ -1,0 +1,63 @@
+@if ((nav$ | async); as nav) {
+  @if (nav.prev || nav.up || nav.next) {
+    @if (variant === 'compact') {
+      <nav class="chapter-nav-compact" [attr.aria-label]="'nav.hadithNavigation' | translate">
+        @if (nav.prev) {
+          <a mat-icon-button
+            [attr.aria-label]="'nav.navigatePrevious' | translate"
+            [matTooltip]="'nav.navigatePrevious' | translate"
+            [routerLink]="nav.prev" queryParamsHandling="preserve">
+            <mat-icon class="mirror-rtl">navigate_before</mat-icon>
+          </a>
+        }
+        @if (nav.up) {
+          <a mat-icon-button
+            [attr.aria-label]="'nav.navigateParent' | translate"
+            [matTooltip]="'nav.navigateParent' | translate"
+            [routerLink]="nav.up" queryParamsHandling="preserve">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+          </a>
+        }
+        @if (nav.next) {
+          <a mat-icon-button
+            [attr.aria-label]="'nav.navigateNext' | translate"
+            [matTooltip]="'nav.navigateNext' | translate"
+            [routerLink]="nav.next" queryParamsHandling="preserve">
+            <mat-icon class="mirror-rtl">navigate_next</mat-icon>
+          </a>
+        }
+      </nav>
+    } @else {
+      <nav class="chapter-nav-pager" [attr.aria-label]="'nav.hadithNavigation' | translate">
+        @if (nav.prev) {
+          <a mat-stroked-button class="pager-btn pager-prev"
+            [attr.aria-label]="'nav.navigatePrevious' | translate"
+            [routerLink]="nav.prev" queryParamsHandling="preserve">
+            <mat-icon class="mirror-rtl">navigate_before</mat-icon>
+            <span class="pager-label">{{ 'nav.previous' | translate }}</span>
+          </a>
+        } @else {
+          <span class="pager-spacer" aria-hidden="true"></span>
+        }
+        @if (nav.up) {
+          <a mat-icon-button class="pager-up"
+            [attr.aria-label]="'nav.navigateParent' | translate"
+            [matTooltip]="'nav.navigateParent' | translate"
+            [routerLink]="nav.up" queryParamsHandling="preserve">
+            <mat-icon>list</mat-icon>
+          </a>
+        }
+        @if (nav.next) {
+          <a mat-stroked-button class="pager-btn pager-next"
+            [attr.aria-label]="'nav.navigateNext' | translate"
+            [routerLink]="nav.next" queryParamsHandling="preserve">
+            <span class="pager-label">{{ 'nav.next' | translate }}</span>
+            <mat-icon class="mirror-rtl" iconPositionEnd>navigate_next</mat-icon>
+          </a>
+        } @else {
+          <span class="pager-spacer" aria-hidden="true"></span>
+        }
+      </nav>
+    }
+  }
+}

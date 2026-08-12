@@ -1,0 +1,66 @@
+// Compact variant: icon-only prev/up/next row, lives inside the sticky
+// chapter toolbar next to the jump-to-verse dropdown.
+.chapter-nav-compact {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+
+  a {
+    color: var(--text-secondary, #666);
+
+    &:hover {
+      color: var(--link-color, #5F9999);
+    }
+  }
+}
+
+// Pager variant: labeled prev/next buttons at the end of the chapter,
+// where "continue to the next chapter" is the natural action.
+.chapter-nav-pager {
+  display: flex;
+  align-items: center;
+  // Centered (not space-between) so the Next button never sits under the
+  // fixed back-to-top FAB in the bottom-right corner.
+  justify-content: center;
+  gap: var(--space-md, 16px);
+  margin: var(--space-lg, 24px) var(--space-xs, 4px);
+
+  .pager-btn {
+    min-width: 130px;
+    color: var(--link-color, #5F9999);
+    border-color: var(--border-color, #e0e0e0);
+
+    &:hover {
+      border-color: var(--link-color, #5F9999);
+    }
+  }
+
+  .pager-up {
+    color: var(--text-secondary, #666);
+
+    &:hover {
+      color: var(--link-color, #5F9999);
+    }
+  }
+
+  // Keeps prev/next anchored to their sides when one of them is absent
+  // (first/last chapter), so "Next" doesn't drift to the left edge.
+  .pager-spacer {
+    min-width: 130px;
+  }
+}
+
+@media (max-width: 600px) {
+  .chapter-nav-pager {
+    .pager-btn,
+    .pager-spacer {
+      min-width: 0;
+      flex: 1 1 0;
+    }
+  }
+}
+
+// Directional chevrons must flip in RTL locales.
+:host-context([dir="rtl"]) .mirror-rtl {
+  transform: scaleX(-1);
+}

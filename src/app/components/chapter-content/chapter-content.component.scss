@@ -18,6 +18,9 @@
 }
 
 .jump-to-verse-inline {
+  // Nav buttons sit at the start of the toolbar; jump-to-verse hugs the end.
+  margin-inline-start: auto;
+
   .jump-input {
     width: 160px;
 

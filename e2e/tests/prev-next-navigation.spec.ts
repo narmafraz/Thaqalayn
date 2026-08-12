@@ -5,13 +5,23 @@ test.describe('Prev/Next Navigation', () => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Settings bar with navigation buttons should be visible
-    const settings = page.locator('.settings');
-    await expect(settings.first()).toBeVisible();
+    // Sticky chapter toolbar with compact navigation buttons should be visible
+    const toolbar = page.locator('.chapter-toolbar');
+    await expect(toolbar.first()).toBeVisible();
 
-    // Should have nav buttons container
-    const navButtons = page.locator('.nav-buttons');
-    await expect(navButtons.first()).toBeVisible();
+    const compactNav = page.locator('.chapter-nav-compact');
+    await expect(compactNav.first()).toBeVisible();
+  });
+
+  test('should show labeled pager at the end of the chapter', async ({ page }) => {
+    await page.goto('/books/quran:1?lang=en');
+    await page.waitForLoadState('networkidle');
+
+    const pager = page.locator('.chapter-nav-pager');
+    await expect(pager).toHaveCount(1);
+    // Surah 1 has a next chapter but no previous one
+    await expect(pager.locator('.pager-next')).toBeVisible();
+    await expect(pager.locator('.pager-prev')).toHaveCount(0);
   });
 
   test('should navigate to next surah with next button', async ({ page }) => {

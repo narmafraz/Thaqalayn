@@ -1,21 +1,37 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, Page } from '@playwright/test';
+
+// The translation selector lives in the Settings reading sheet (opened from
+// the top app bar), not inline on chapter pages.
+async function openReadingSheet(page: Page): Promise<void> {
+  await page.locator('button.reading-sheet-trigger').click();
+  await expect(page.locator('.reading-sheet-panel')).toHaveClass(/open/);
+}
+
+async function closeReadingSheet(page: Page): Promise<void> {
+  await page.locator('.reading-sheet-close').click();
+  await expect(page.locator('.reading-sheet-panel')).not.toHaveClass(/open/);
+}
 
 test.describe('Translation Switching', () => {
-  test('should display translation selector on chapter pages', async ({ page }) => {
+  test('translation selector lives in the settings sheet, not inline on the page', async ({ page }) => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Translation selection component should be visible
-    const translationSelect = page.locator('mat-form-field', { hasText: 'Select Translation' });
-    await expect(translationSelect.first()).toBeVisible();
+    // No inline translation dropdown on the chapter page itself
+    await expect(page.locator('app-chapter-content app-translation-selection')).toHaveCount(0);
+
+    // The settings sheet hosts the selector
+    await openReadingSheet(page);
+    const translationSelect = page.locator('.reading-sheet-panel mat-select[name="translation"]');
+    await expect(translationSelect).toBeVisible();
   });
 
   test('should show available translations in dropdown', async ({ page }) => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Click the translation dropdown to open it
-    const selectTrigger = page.locator('mat-select[name="translation"]').first();
+    await openReadingSheet(page);
+    const selectTrigger = page.locator('.reading-sheet-panel mat-select[name="translation"]');
     await selectTrigger.click();
 
     // Options panel should appear
@@ -37,13 +53,11 @@ test.describe('Translation Switching', () => {
     // Get current translation text
     const translation = page.locator('.translation').first();
     await expect(translation).toBeVisible();
-    const originalText = await translation.textContent();
 
-    // Open the translation dropdown
-    const selectTrigger = page.locator('mat-select[name="translation"]').first();
+    await openReadingSheet(page);
+    const selectTrigger = page.locator('.reading-sheet-panel mat-select[name="translation"]');
     await selectTrigger.click();
 
-    // Get all options
     const options = page.locator('mat-option');
     const optionCount = await options.count();
 
@@ -51,6 +65,7 @@ test.describe('Translation Switching', () => {
       // Click the second option (different from current)
       await options.nth(1).click();
       await page.waitForLoadState('networkidle');
+      await closeReadingSheet(page);
 
       // Translation text may or may not change (depends on available translations)
       // Just verify the page still renders without errors
@@ -65,8 +80,8 @@ test.describe('Translation Switching', () => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Open translation dropdown and select a specific option
-    const selectTrigger = page.locator('mat-select[name="translation"]').first();
+    await openReadingSheet(page);
+    const selectTrigger = page.locator('.reading-sheet-panel mat-select[name="translation"]');
     await selectTrigger.click();
 
     const options = page.locator('mat-option');
@@ -77,6 +92,7 @@ test.describe('Translation Switching', () => {
       // Click second option
       await options.nth(1).click();
       await page.waitForLoadState('networkidle');
+      await closeReadingSheet(page);
 
       // Navigate to next surah
       const nextButton = page.locator('a[aria-label="Navigate to the next chapter"]').first();
@@ -84,9 +100,10 @@ test.describe('Translation Switching', () => {
         await nextButton.click();
         await page.waitForLoadState('networkidle');
 
-        // Translation selector should still be visible on the new page
-        const newSelect = page.locator('mat-form-field', { hasText: 'Select Translation' });
-        await expect(newSelect.first()).toBeVisible();
+        // Translation selector should still be available on the new page
+        await openReadingSheet(page);
+        const newSelect = page.locator('.reading-sheet-panel mat-select[name="translation"]');
+        await expect(newSelect).toBeVisible();
       }
     } else {
       await page.keyboard.press('Escape');

@@ -295,12 +295,12 @@ test.describe('ExpandLanguagePipe', () => {
     await page.waitForLoadState('networkidle');
     await page.locator('mat-card').first().waitFor({ state: 'visible', timeout: 10000 });
 
-    // The translation selector should show language names
-    const translationSelector = page.locator('app-translation-selection').first();
-    if (await translationSelector.isVisible()) {
-      const text = await translationSelector.textContent();
-      // Should show "English" instead of just "en"
-      expect(text).toContain('English');
-    }
+    // The translation selector lives in the settings reading sheet
+    await page.locator('button.reading-sheet-trigger').click();
+    const translationSelector = page.locator('.reading-sheet-panel app-translation-selection').first();
+    await translationSelector.waitFor({ state: 'visible', timeout: 10000 });
+    const text = await translationSelector.textContent();
+    // Should show "English" instead of just "en"
+    expect(text).toContain('English');
   });
 });

@@ -33,7 +33,7 @@ import { VerseContentComponent } from './components/verse-content/verse-content.
 import { VerseDetailComponent } from './components/verse-detail/verse-detail.component';
 import { BookTreeComponent } from './components/book-tree/book-tree.component';
 import { TranslationSelectionComponent } from './components/translation-selection/translation-selection.component';
-import { SettingsComponent } from './components/settings/settings.component';
+import { ChapterNavComponent } from './components/chapter-nav/chapter-nav.component';
 import { ReadingSheetComponent } from './components/reading-sheet/reading-sheet.component';
 import { ReadingToolbarComponent } from './components/reading-toolbar/reading-toolbar.component';
 import { InstallPromptComponent } from './components/install-prompt/install-prompt.component';
@@ -58,7 +58,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     VerseDetailComponent,
     BookTreeComponent,
     TranslationSelectionComponent,
-    SettingsComponent,
+    ChapterNavComponent,
     ReadingSheetComponent,
     ReadingToolbarComponent,
     InstallPromptComponent,

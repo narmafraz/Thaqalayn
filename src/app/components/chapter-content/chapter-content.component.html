@@ -1,8 +1,8 @@
 @if ((book$ | async); as book) {
-  <app-settings></app-settings>
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author"></app-book-titles>
-  @if (getVerseCount(book) >= 10) {
-    <div class="chapter-toolbar">
+  <div class="chapter-toolbar">
+    <app-chapter-nav variant="compact"></app-chapter-nav>
+    @if (getVerseCount(book) >= 10) {
       <div class="jump-to-verse-inline">
         <mat-form-field appearance="outline" class="jump-input">
           <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
@@ -29,8 +29,8 @@
           </mat-select>
         </mat-form-field>
       </div>
-    </div>
-  }
+    }
+  </div>
   @if (getVerseCount(book) >= 2) {
     <app-narrator-insights [index]="book.index"></app-narrator-insights>
   }
@@ -428,7 +428,9 @@
       </div>
     </section>
   }
-  <app-settings></app-settings>
+  <!-- End-of-chapter pager: finishing the chapter naturally continues to
+  the next one, so prev/next get labeled buttons here. -->
+  <app-chapter-nav variant="pager"></app-chapter-nav>
 
   <!-- RE-17: jump to the first unread hadith/verse (shown only when the
   chapter is partially read; stacks above the global back-to-top FAB). -->

@@ -1,6 +1,7 @@
 @if ((book$ | async); as book) {
   <div class="verse-detail-container">
-    <!-- Chapter context link and translation selector -->
+    <!-- Chapter context link (translation switching lives in the Settings
+    sheet, opened from the top app bar) -->
     <div class="verse-detail-header">
       <div class="chapter-context">
         <a [routerLink]="['/books', getChapterRouterLink(book.data.chapter_path)]"
@@ -12,7 +13,6 @@
           }
         </a>
       </div>
-      <app-translation-selection></app-translation-selection>
     </div>
     <!-- Main hadith card -->
     <mat-card appearance="outlined" class="hadith-card">

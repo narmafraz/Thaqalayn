@@ -15,6 +15,26 @@
   flex-direction: column;
 }
 
+// Title-specific overrides of the global .textrow/.titlerow rules (which
+// chapter-list table rows still rely on for edge-to-edge alignment).
+// Centering with a bounded gap makes the Arabic/English pair read as one
+// bilingual lockup instead of two labels at opposite page edges — and a
+// lone title (chapter with no Arabic name) centers instead of landing at
+// the right edge, which was a row-reverse flexbox accident.
+.titlerow {
+  justify-content: center;
+  column-gap: clamp(16px, 6vw, 96px);
+
+  > * {
+    text-align: center;
+  }
+
+  h1,
+  h2 {
+    color: var(--text-primary, #333);
+  }
+}
+
 .author-line {
   font-size: 14px;
   color: var(--text-muted, #999);

@@ -1,6 +1,9 @@
 @if ((nav$ | async); as nav) {
-  @if (nav.prev || nav.up || nav.next) {
-    @if (variant === 'compact') {
+  @if (variant === 'compact') {
+    <!-- Compact variant is prev/next only: "up" is already served by the
+    breadcrumbs directly above, and a lone up-chevron next to the
+    collapsible insights panel read as a collapse control. -->
+    @if (nav.prev || nav.next) {
       <nav class="chapter-nav-compact" [attr.aria-label]="'nav.hadithNavigation' | translate">
         @if (nav.prev) {
           <a mat-icon-button
@@ -8,14 +11,6 @@
             [matTooltip]="'nav.navigatePrevious' | translate"
             [routerLink]="nav.prev" queryParamsHandling="preserve">
             <mat-icon class="mirror-rtl">navigate_before</mat-icon>
-          </a>
-        }
-        @if (nav.up) {
-          <a mat-icon-button
-            [attr.aria-label]="'nav.navigateParent' | translate"
-            [matTooltip]="'nav.navigateParent' | translate"
-            [routerLink]="nav.up" queryParamsHandling="preserve">
-            <mat-icon>keyboard_arrow_up</mat-icon>
           </a>
         }
         @if (nav.next) {
@@ -27,7 +22,9 @@
           </a>
         }
       </nav>
-    } @else {
+    }
+  } @else {
+    @if (nav.prev || nav.up || nav.next) {
       <nav class="chapter-nav-pager" [attr.aria-label]="'nav.hadithNavigation' | translate">
         @if (nav.prev) {
           <a mat-stroked-button class="pager-btn pager-prev"

@@ -1,15 +1,13 @@
-// Merged toolbar: jump-to-verse + view mode
+// Chapter toolbar: compact prev/next nav + jump-to-verse. Not sticky: the
+// sticky app header (z-index 100, ~100px tall) covered it anyway, and
+// mid-scroll continuation is served by the bottom pager and FABs.
 .chapter-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
   display: flex;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   background: var(--card-bg, rgba(255, 255, 255, 0.95));
   border-bottom: 1px solid var(--border-color, #e0e0e0);
-  backdrop-filter: blur(8px);
   flex-wrap: wrap;
 }
 

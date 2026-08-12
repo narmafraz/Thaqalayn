@@ -1,9 +1,12 @@
 @if ((book$ | async); as book) {
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author"></app-book-titles>
-  <div class="chapter-toolbar">
-    <app-chapter-nav variant="compact"></app-chapter-nav>
-    @if (getVerseCount(book) >= 10) {
-      <div class="jump-to-verse-inline">
+  <!-- Toolbar renders only when it has content: prev/next nav, or the
+  jump dropdown for long chapters. Up-navigation is the breadcrumbs' job. -->
+  @if (book.data.nav?.prev || book.data.nav?.next || getVerseCount(book) >= 10) {
+    <div class="chapter-toolbar">
+      <app-chapter-nav variant="compact"></app-chapter-nav>
+      @if (getVerseCount(book) >= 10) {
+        <div class="jump-to-verse-inline">
         <mat-form-field appearance="outline" class="jump-input">
           <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
           <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
@@ -28,9 +31,10 @@
             }
           </mat-select>
         </mat-form-field>
-      </div>
-    }
-  </div>
+        </div>
+      }
+    </div>
+  }
   @if (getVerseCount(book) >= 2) {
     <app-narrator-insights [index]="book.index"></app-narrator-insights>
   }

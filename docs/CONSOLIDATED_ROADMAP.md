@@ -13,6 +13,12 @@
 
 ---
 
+> **See also:** [`SPARK_AI_CONTENT_ROADMAP.md`](SPARK_AI_CONTENT_ROADMAP.md) (2026-08-12) — idea
+> collection for Spark-enabled ($0) AI content workloads: translation gap fill, word-by-word
+> accuracy review, narrator canonicalisation v2, book/narrator research enrichment, chapter-name
+> completeness (subsumes P1.4's cost model), chapter point-summaries, content-aware narrator
+> insights, and cross-corpus similar-narration detection.
+
 ## Priority 1: AI Content Pipeline — Complete Corpus Generation
 
 **Goal:** Generate AI content for all ~58,000 hadith (currently ~3,686 done, ~6.4%).

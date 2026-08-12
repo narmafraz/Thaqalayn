@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-08-12 (added SPARK_AI_CONTENT_ROADMAP)
+> **Last updated:** 2026-08-12 (added SPARK_AI_CONTENT_ROADMAP; backfilled SHIA_TAFSIR_PLAN + SPARK_OPTIMIZATION_LOG)
 
 ## Status Legend
 
@@ -104,6 +104,12 @@
 |----------|--------|---------|
 | [BIHAR_MIRAT_SCRAPING_PLAN.md](BIHAR_MIRAT_SCRAPING_PLAN.md) | **ACTIVE** | Scraping plan for Bihar al-Anwar (110 vols) and Mir'at al-Uqul (26 vols) from rafed.net Word API. Includes cross-referencing strategy. |
 
+### 2026-03-31
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [SHIA_TAFSIR_PLAN.md](SHIA_TAFSIR_PLAN.md) | **COMPLETE** (core scope shipped 2026-04-23/24; P3 sources deferred) | Replace the 3 Sunni-only CDN tafsirs with self-hosted Shia tafsirs. Shipped beyond plan: **15 editions** (ar/fa/en — Al-Mizan, Nemooneh, Noor, as-Safi, plus scraped al-Tibyan, Majma' al-Bayan, al-Qummi, al-Burhan, al-Saadah, Sadra) live in dedicated `ThaqalaynTafsirData` repo at `thaqalayntafsir.netlify.app`; `TafsirService` loads `editions.json` dynamically. Deferred: hubeali.com (P3) and geo-restricted `*.ir` sources. |
+
 ### 2026-04-24
 
 | Document | Status | Summary |
@@ -121,6 +127,7 @@
 | Document | Status | Summary |
 |----------|--------|---------|
 | [PHASE4_OPENWEIGHT_BENCHMARK.md](PHASE4_OPENWEIGHT_BENCHMARK.md) | **COMPLETE** | First Phase 4-specific quality benchmark. 30 verses × 3 models (gpt-4.1-mini, gpt-5.4-mini, qwen36-fast). Verdict: Qwen 3.6-35B on DGX Spark **not ready** for production (88.6% parse rate, ~62 s/verse, factual errors). **Side finding**: gpt-5.4-mini provides no measurable Phase 4 quality lift over gpt-4.1-mini at 5× the output cost — recommend flipping the `--phase4-model` default. |
+| [SPARK_OPTIMIZATION_LOG.md](SPARK_OPTIMIZATION_LOG.md) | **COMPLETE** (2026-05-12/13 autonomous run; integration committed) | Running log of the Spark/Qwen optimisation rounds that reversed the benchmark's "not ready" verdict. Rounds 2-4 + B-G: strict JSON-schema decode, per-(chunk, language) Phase 4 calls, few-shot Phase 1 chunk examples, max_tokens tightening, real-book al-tawhid trial. Final: **99.5-99.75% Phase 4 parse, 100% Phase 1 parse, ~80-85% first-pass / ~95% after salvage, $0 API cost** (~$30 electricity for the 48K-verse remainder vs ~$1,330 OpenAI). Production integration committed (`is_spark_model` auto-routing, `--backend spark`). Known floor: Phase 1 chunk parity 67% vs gpt-5.4 (D060 accepts it; hybrid `--phase1-model gpt-5.4` preserves granularity). Deferred: two-pass chunking, oracle few-shot, prefix-cache diagnosis. |
 
 ### 2026-05-16
 

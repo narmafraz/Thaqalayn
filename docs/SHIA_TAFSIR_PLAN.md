@@ -1,6 +1,8 @@
 # Shia Tafsir Integration Plan
 
-> **Status:** ACTIVE
+> **Status:** COMPLETE (core scope) — shipped 2026-04-23/24: 15 editions live in the dedicated
+> `ThaqalaynTafsirData` repo at `thaqalayntafsir.netlify.app` (all P1 + P2 targets plus
+> al-Burhan, al-Saadah, Sadra). Phases 3-4 (hubeali.com, `*.ir` sources) remain deferred.
 > **Created:** 2026-03-31
 > **Goal:** Replace the 3 Sunni-only English tafsirs with a comprehensive collection of Shia tafsirs in Arabic, Farsi, and English
 

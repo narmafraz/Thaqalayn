@@ -1,7 +1,8 @@
 # Spark AI Content Roadmap
 
 > **Created:** 2026-08-12
-> **Status:** IDEA COLLECTION — items captured for future planning, none scheduled yet.
+> **Status:** IDEA COLLECTION — items 1-8 captured for future planning, none scheduled yet.
+> Items 9-10 are IN PROGRESS with uncommitted working-tree changes (see their sections).
 > **Purpose:** Track candidate AI-content workloads for the DGX Spark (Qwen 3.6-35B, $0 marginal cost).
 > The Spark changes the economics of everything below: work previously priced in hundreds/thousands of
 > dollars of API spend (see `PIPELINE_OPTIMIZATION_PLAN.md`) becomes compute-time-only. See
@@ -23,6 +24,8 @@
 | 6 | Chapter summaries with point-level dedup | New content | — (new) | IDEA |
 | 7 | Narrator insights: same-topic clustering + independent-chain analysis | Analysis | Narrator insights panel (chapter sidecars) | IDEA |
 | 8 | Cross-corpus similar-narration detection ("plagiarism"-style matching) | Analysis | — (new; feeds #6 and #7) | IDEA |
+| 9 | Chunk-align existing scraped translations to AI chunks | Alignment | `align-scraped` pipeline command (built; pilot-verified) | IN PROGRESS |
+| 10 | Word regen determinism + surface translation quality | Stability + QA | `WORDS_PROJECT_PLAN.md`, item #2; fixes in working tree | IN PROGRESS |
 
 **Shared foundation:** items 6, 7, and 8 all depend on the same primitive — deciding when two
 narrations are "talking about the same thing." Whatever similarity/clustering machinery gets built
@@ -163,10 +166,73 @@ different words).
 - Note: the existing narrator-chain data gives a strong prior — near-identical chains across
   books are high-probability duplicates and can seed the candidate set cheaply.
 
+## 9. Chunk-align existing scraped translations to AI chunks
+
+Scraped human translations (HubeAli, Sarwar, Qarai, …) are flat whole-verse blocks; AI content
+is chunked (isnad / body / quran_quote / closing). Aligning the scraped text to the AI chunks
+gives every translation the interleaved "Arabic segment ↔ its translation" reading view, not
+just the AI ones.
+
+**Already built** (pilot-verified end-to-end on al-amali-mufid + al-kafi incl. HubeAli and
+Sarwar):
+
+- Generator: `align-scraped` pipeline command — extractive re-segmentation on Spark/Qwen at $0,
+  reusing the durable harness (resumable per-verse artifacts, strict JSON schema, quarantine).
+  Anchors on the AI's own English per-chunk translation as a same-language reference
+  (commits `e938070` → `dd486b7`, quality fix `f45e24d`).
+- Storage: aligned parts land in the per-language sister file (`{path}.en.json` →
+  `chunk_translations`) and the flat text is removed from base — no duplication.
+  `align_status` tool wired into `add_data`.
+- Frontend: `Verse.chunk_translations` model, interleaved rendering for scraped IDs, HubeAli
+  `<sup>` markup, sister-file fetch per selected translation incl. compare mode
+  (commits `663ca71` → `1fcdaef`, `f62fe55`).
+
+**Remaining:**
+
+1. **Strict validation** (decided, not yet applied): tighten `validate_alignment` from 90%
+   fuzzy token overlap (`MIN_RECALL = 0.90`, `chunk_alignment_phase.py:56`) to an exact check —
+   `join(parts)` must equal the original modulo whitespace, else quarantine and keep the base
+   block text. Critical because the sister parts are the *sole* copy of the scraped text:
+   a dropped word is lost data.
+2. **Full-corpus Spark run** — only pilot samples aligned so far.
+3. **Future phase**: complete "all translations in language files, none in base" migration
+   (current state is the alignment-scoped hybrid). Related: `PER_LANGUAGE_VERSE_SPLIT.md`.
+
+## 10. Word regen stability + surface translations that make sense
+
+The 2026-07-05 word regen attempt produced a ~114K-file diff with **zero input changes** —
+pure non-determinism (~84% of surfaces just re-stamped `generated_date`; ~12K lemmas had
+paradigm arrays reshuffled; ~600 lemma slugs flipped identity, e.g. singular → dual, breaking
+page URLs and re-pointing ~16K surface links). The regen was discarded and root causes fixed.
+
+**Fixed in working tree (uncommitted as of 2026-08-12):** deterministic logprob tiebreak in
+`get_best_analysis` + total-order paradigm sort (`morphology.py`), sorted-candidate pick in
+`canonical_diacritized_lemma` (`builders.py`), `PYTHONHASHSEED=0` in `regen_words.ps1`,
+per-file `generated_date` replaced with a single `index/words_version.json`. Validated:
+identical output across two hash seeds; 240 word tests pass.
+
+**Remaining:**
+
+1. **Principled tiebreak** (recommended option from the diagnosis session): the lexicographic
+   backstop currently *decides* which lemma ~6.4% of surfaces link to (~6,500 words) and the
+   slug for ~5% of lemma pages. Replace with: exact-diacritization match → `pos_lex_logprob`
+   → POS priority → shortest lemma → lexicographic backstop.
+2. **Full-rebuild validation** — determinism proven on a sample, not a complete
+   `regen_words.ps1` run; then commit the whole change coherently.
+3. **Surface translations that make sense** — a pre-existing lemmatization-quality bug class,
+   independent of determinism: surfaces linked to the wrong lemma (e.g. أَخَّرَهُ "he delayed
+   it" → آخَر "other") inherit nonsensical glosses. Audit wrong-lemma links (CAMeL analysis
+   ranking, possibly Spark LLM adjudication on ambiguous cases) and re-gloss affected
+   surfaces. Overlaps the accuracy half of item #2 — run them together.
+
 ---
 
 ## Sequencing sketch (not committed)
 
+0. **#9 + #10 first — both are in-flight with uncommitted work.** #9 needs the strict
+   validation edit, then a full-corpus Spark run; #10 needs the principled tiebreak +
+   full-rebuild validation, then a commit. Finishing these unblocks clean word/data regens
+   for everything below.
 1. **#5 chapter names** — smallest, bounded, unblocks P1.4. Good Spark warm-up batch.
 2. **#1 translation gap fill** — mechanical, pipeline already supports it.
 3. **#2 word-by-word gaps + accuracy** — bounded follow-up to Path B.

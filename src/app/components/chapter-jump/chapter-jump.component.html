@@ -1,0 +1,12 @@
+@if ((jump$ | async); as jump) {
+  <select class="chapter-jump-select"
+    [attr.aria-label]="(jump.labelKey | translate) + ' (' + jump.options.length + ')'"
+    (change)="onJump($any($event.target).value); $any($event.target).value = ''">
+    <!-- Placeholder doubles as the label; value resets after each jump so
+    picking the same verse again still fires a change event. -->
+    <option value="" selected>{{ jump.labelKey | translate }} ({{ jump.options.length }})</option>
+    @for (o of jump.options; track o.index) {
+      <option [value]="o.index">{{ translatedPartType(o.partType) }} {{ o.index }}</option>
+    }
+  </select>
+}

@@ -1,0 +1,32 @@
+// Slim native select sized to sit inside the 32px reading toolbar —
+// deliberately not a mat-form-field, whose 56px outline made the old
+// chapter toolbar the tallest band on the page.
+.chapter-jump-select {
+  max-width: 180px;
+  padding: 4px 6px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 6px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-secondary, #666);
+  font-size: 12px;
+  font-family: var(--font-family-latin);
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    color: var(--text-primary, #333);
+    border-color: var(--accent-color, #673ab7);
+  }
+}
+
+@media (max-width: 600px) {
+  .chapter-jump-select {
+    max-width: 34vw;
+    font-size: 11px;
+  }
+}
+
+:host-context(body.dark-theme) .chapter-jump-select {
+  background: var(--bg-primary, #242424);
+  border-color: rgba(255, 255, 255, 0.15);
+}

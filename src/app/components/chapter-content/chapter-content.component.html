@@ -1,40 +1,7 @@
 @if ((book$ | async); as book) {
   <app-book-titles [titles]="book.data.titles" [descriptions]="book.data.descriptions" [author]="author"></app-book-titles>
-  <!-- Toolbar renders only when it has content: prev/next nav, or the
-  jump dropdown for long chapters. Up-navigation is the breadcrumbs' job. -->
-  @if (book.data.nav?.prev || book.data.nav?.next || getVerseCount(book) >= 10) {
-    <div class="chapter-toolbar">
-      <app-chapter-nav variant="compact"></app-chapter-nav>
-      @if (getVerseCount(book) >= 10) {
-        <div class="jump-to-verse-inline">
-        <mat-form-field appearance="outline" class="jump-input">
-          <mat-label>{{ getJumpLabel(book.index) | translate }} ({{ getVerseCount(book) }})</mat-label>
-          <mat-select [(ngModel)]="jumpTarget" (selectionChange)="jumpToVerse()">
-            @if (isShellFormat) {
-              @for (ref of verseRefs; track ref) {
-                @if (ref.part_type === 'Hadith' || ref.part_type === 'Verse') {
-                  <mat-option
-                    [value]="ref.local_index">
-                    {{ translatedPartType(ref.part_type) }} {{ ref.local_index }}
-                  </mat-option>
-                }
-              }
-            } @else {
-              @for (verse of book.data.verses; track verse; let i = $index) {
-                @if (verse.part_type === 'Hadith' || verse.part_type === 'Verse') {
-                  <mat-option
-                    [value]="verse.local_index">
-                    {{ translatedPartType(verse.part_type) }} {{ verse.local_index }}
-                  </mat-option>
-                }
-              }
-            }
-          </mat-select>
-        </mat-form-field>
-        </div>
-      }
-    </div>
-  }
+  <!-- Chapter prev/next + jump-to-verse live in the sticky reading toolbar
+  at the app shell (reading-toolbar + chapter-jump components). -->
   @if (getVerseCount(book) >= 2) {
     <app-narrator-insights [index]="book.index"></app-narrator-insights>
   }

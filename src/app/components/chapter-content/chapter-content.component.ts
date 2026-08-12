@@ -54,8 +54,6 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
   private touchStartY = 0;
   private currentNav: { prev: string | null; next: string | null } = { prev: null, next: null };
 
-  // Jump to verse state
-  jumpTarget: number | null = null;
 
   /**
    * RE-17: local_index of the first unread Hadith/Verse in this chapter, or
@@ -432,10 +430,6 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  translatedPartType(partType: string | undefined | null): string {
-    return this.i18nService.translatePartType(partType);
-  }
-
   isVerseBookmarked(bookIndex: string, verse: Verse): boolean {
     const path = '/books/' + bookIndex + ':' + verse.local_index;
     return this.bookmarkedPaths.has(path);
@@ -451,11 +445,6 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
       this.bookmarkedPaths.delete(path);
     }
     this.cdr.markForCheck();
-  }
-
-  jumpToVerse(): void {
-    if (!this.jumpTarget) return;
-    this.scrollToHadith(this.jumpTarget);
   }
 
   /**
@@ -641,10 +630,6 @@ export class ChapterContentComponent implements OnInit, OnDestroy {
 
   isQuranBook(bookIndex: string): boolean {
     return bookIndex.startsWith('quran:');
-  }
-
-  getJumpLabel(bookIndex: string): string {
-    return this.isQuranBook(bookIndex) ? 'book.jumpToAyah' : 'book.jumpToHadith';
   }
 
   getVerseCount(book: any): number {

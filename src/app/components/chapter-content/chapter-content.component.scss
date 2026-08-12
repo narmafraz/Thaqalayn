@@ -1,32 +1,6 @@
-// Chapter toolbar: compact prev/next nav + jump-to-verse. Not sticky: the
-// sticky app header (z-index 100, ~100px tall) covered it anyway, and
-// mid-scroll continuation is served by the bottom pager and FABs.
-.chapter-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-md);
-  background: var(--card-bg, rgba(255, 255, 255, 0.95));
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
-  flex-wrap: wrap;
-}
-
-:host-context(body.dark-theme) .chapter-toolbar {
-  background: var(--card-bg, rgba(48, 48, 48, 0.95));
-}
-
-.jump-to-verse-inline {
-  // Nav buttons sit at the start of the toolbar; jump-to-verse hugs the end.
-  margin-inline-start: auto;
-
-  .jump-input {
-    width: 160px;
-
-    ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-      display: none;
-    }
-  }
-}
+// Chapter prev/next + jump-to-verse moved to the app-shell reading toolbar
+// (reading-toolbar + chapter-jump components), which sticks correctly below
+// the app header and hides/reveals on scroll.
 
 .word-by-word-toggle {
   display: inline-flex;
@@ -67,15 +41,6 @@
 }
 
 @media (max-width: 600px) {
-  .chapter-toolbar {
-    padding: 6px 8px;
-    gap: 6px;
-  }
-  .jump-to-verse-inline .jump-input {
-    width: auto;
-    min-width: 100px;
-    max-width: 50vw;
-  }
   .word-by-word-toggle .toggle-label { display: none; }
 }
 

@@ -10,8 +10,8 @@
   display: flex;
 	border-radius: 5px;
 	color: var(--text-secondary, #666);
-	margin-top: 15px;
-  padding: 10px;
+	margin-top: 8px;
+  padding: 4px 12px;
   flex-direction: column;
 }
 
@@ -29,9 +29,20 @@
     text-align: center;
   }
 
+  // Compact heading scale: the browser-default 2em h1 with 0.67em margins
+  // made the title card the tallest band on the page.
   h1,
   h2 {
     color: var(--text-primary, #333);
+    margin: 0.25em 0;
+  }
+
+  h1 {
+    font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  }
+
+  h2 {
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
   }
 }
 

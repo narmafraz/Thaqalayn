@@ -9,9 +9,11 @@ test.describe('Phase 6: Content Parity & Terminology', () => {
       await page.goto(`${BASE}/#/books/al-kafi:1:1:1`, { waitUntil: 'networkidle' });
       await page.waitForTimeout(2000);
 
-      // Check that "Jump to hadith" appears (not "Jump to verse") for hadith books
-      const jumpLabel = page.locator('.jump-to-verse mat-label, .jump-input mat-label');
-      // The label may not be visible if < 20 hadiths, so check only if present
+      // Check that "Jump to hadith" appears (not "Jump to verse") for hadith
+      // books. The label is the placeholder option of the toolbar's native
+      // select (app-chapter-jump).
+      const jumpLabel = page.locator('.chapter-jump-select option[value=""]');
+      // The label may not be present if the chapter is short, so check only if present
       const count = await jumpLabel.count();
       if (count > 0) {
         const text = await jumpLabel.first().textContent();
@@ -24,7 +26,7 @@ test.describe('Phase 6: Content Parity & Terminology', () => {
       await page.waitForTimeout(2000);
 
       // Al-Baqarah has 286 ayahs, so jump-to should be visible
-      const jumpLabel = page.locator('.jump-to-verse mat-label, .jump-input mat-label');
+      const jumpLabel = page.locator('.chapter-jump-select option[value=""]');
       const count = await jumpLabel.count();
       if (count > 0) {
         const text = await jumpLabel.first().textContent();

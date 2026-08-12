@@ -3,16 +3,34 @@
 // Height-offset matches #header on both desktop (100px) and the
 // mobile compact header (60px) so the toolbar sits flush below it.
 
-.reading-toolbar {
+// Sticky lives on the HOST, not the inner div: a sticky element can only
+// travel within its parent's box, and the inner div's parent is this host —
+// exactly one toolbar tall, i.e. zero travel. The host's own parent is
+// #site (full page height, overflow-x: clip so it isn't a scroll
+// container), which gives the toolbar the whole page to stick through.
+:host {
+  display: block;
   position: sticky;
   top: 100px;
   // Below header (z-index 100), above page content (0). Stays under
   // the reading-sheet backdrop (1250) and mobile menu (1100/1200)
   // when those are open.
   z-index: 90;
+}
+
+@media (max-width: 768px) {
+  :host {
+    // Header is 100px by default but flips to 60px when scrolled
+    // (.header-compact) — anchor to the compact height; at page top the
+    // toolbar is in the always-visible band anyway.
+    top: 60px;
+  }
+}
+
+.reading-toolbar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   gap: 8px;
   padding: 6px 12px;
   background: var(--bg-primary, #fff);
@@ -32,14 +50,30 @@
   border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
+// Three-zone layout: chapter prev/next | view toggles | jump-to-verse.
+// The equal-flex side zones keep the toggles visually centered even when
+// one side is empty (short chapters, non-chapter routes).
+.rt-zone {
+  display: flex;
+  align-items: center;
+}
+
+.rt-start {
+  flex: 1 1 0;
+  justify-content: flex-start;
+}
+
+.rt-center {
+  gap: 8px;
+}
+
+.rt-end {
+  flex: 1 1 0;
+  justify-content: flex-end;
+}
+
 @media (max-width: 768px) {
   .reading-toolbar {
-    // Header is 100px by default but flips to 60px when scrolled
-    // (.header-compact). We anchor to 60 so the toolbar sits flush
-    // below the compact header; when the page is at top the
-    // toolbar is in the TOP_AREA_PX always-visible band anyway
-    // (handled by the hide-on-scroll dead zone in the component).
-    top: 60px;
     padding: 4px 8px;
     gap: 6px;
   }

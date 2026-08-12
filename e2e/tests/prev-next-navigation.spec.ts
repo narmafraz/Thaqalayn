@@ -5,11 +5,8 @@ test.describe('Prev/Next Navigation', () => {
     await page.goto('/books/quran:1?lang=en');
     await page.waitForLoadState('networkidle');
 
-    // Sticky chapter toolbar with compact navigation buttons should be visible
-    const toolbar = page.locator('.chapter-toolbar');
-    await expect(toolbar.first()).toBeVisible();
-
-    const compactNav = page.locator('.chapter-nav-compact');
+    // Compact navigation buttons live in the sticky reading toolbar
+    const compactNav = page.locator('.reading-toolbar .chapter-nav-compact');
     await expect(compactNav.first()).toBeVisible();
   });
 

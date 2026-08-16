@@ -1,7 +1,7 @@
 # Document Index
 
 > Chronological listing of all documents in `docs/` with current status.
-> **Last updated:** 2026-08-12 (added SPARK_AI_CONTENT_ROADMAP; backfilled SHIA_TAFSIR_PLAN + SPARK_OPTIMIZATION_LOG)
+> **Last updated:** 2026-08-16 (roadmap-refresh audit: SEARCH_OVERHAUL_PLAN, PER_LANGUAGE_VERSE_SPLIT, CACHE_FRESHNESS_PLAN marked COMPLETE — all three shipped in June; PIPELINE_OPTIMIZATION_PLAN and UX_REVIEW_2026_03_10 statuses corrected; CONSOLIDATED_ROADMAP entry added)
 
 ## Status Legend
 
@@ -89,14 +89,20 @@
 | [OPENAI_PIPELINE_OPTIMIZATION.md](OPENAI_PIPELINE_OPTIMIZATION.md) | **PARTIAL** | 10 code optimizations for OpenAI pipeline. Some implemented (chunk boundary fix, pricing fix, timeout). Benchmarks partially completed. |
 | [BENCHMARK_SAMPLE.md](BENCHMARK_SAMPLE.md) | **PARTIAL** | 15-verse benchmark sample. GPT-5.4 benchmarked (85% pass). GPT-5.2, GPT-5, GPT-5-mini re-test pending. |
 | [BENCHMARK_INSTRUCTIONS.md](BENCHMARK_INSTRUCTIONS.md) | **PARTIAL** | Benchmark run instructions. Code changes DONE. GPT-5.4 run DONE. Other models pending. |
-| [CHAPTER_TRANSLATION_GAP.md](CHAPTER_TRANSLATION_GAP.md) | **ACTIVE** | Gap analysis: 62,400 chapter title translations needed. Not started. ~$6-31 cost. |
-| [UX_REVIEW_2026_03_10.md](UX_REVIEW_2026_03_10.md) | **ACTIVE** | Codebase-level UX review. 15 issues across i18n, mobile, accessibility. Most not yet fixed. |
+| [CHAPTER_TRANSLATION_GAP.md](CHAPTER_TRANSLATION_GAP.md) | **ACTIVE** (cost model superseded) | Gap analysis: 62,400 chapter title translations needed. Not started. Was ~$6-31 via OpenAI batch — now $0 as `SPARK_AI_CONTENT_ROADMAP.md` item 5; execute there. |
+| [UX_REVIEW_2026_03_10.md](UX_REVIEW_2026_03_10.md) | **COMPLETE** (nearly — verified 2026-08-16) | Codebase-level UX review. 15 issues across i18n, mobile, accessibility. Almost all since fixed (see CONSOLIDATED_ROADMAP P2 — i18n D-01..D-05/D-08 done, a11y A-01..A-05 done, mobile M-01/M-02/M-04/M-05 done); only M-03 mobile-menu AI settings remains, likely moot post-D060. |
 
 ### 2026-03-13
 
 | Document | Status | Summary |
 |----------|--------|---------|
-| [PIPELINE_OPTIMIZATION_PLAN.md](PIPELINE_OPTIMIZATION_PLAN.md) | **ACTIVE** | Most recent AI pipeline plan. Multi-phase architecture (GPT-5.4 + programmatic + Claude + GPT-5-mini). Not yet implemented. |
+| [PIPELINE_OPTIMIZATION_PLAN.md](PIPELINE_OPTIMIZATION_PLAN.md) | **COMPLETE** (architecture; cost model superseded — corrected 2026-08-16) | Multi-phase pipeline architecture (structure → programmatic → scholarly → translation). Implemented as the production `--phased` pipeline and used for the Spark corpus run. Its OpenAI dollar estimates are superseded by $0 Spark compute (`SPARK_OPTIMIZATION_LOG.md`); Phase 3 scholarly remains skipped (no Anthropic API key). |
+
+### 2026-03-15
+
+| Document | Status | Summary |
+|----------|--------|---------|
+| [CONSOLIDATED_ROADMAP.md](CONSOLIDATED_ROADMAP.md) | **ACTIVE** (refreshed 2026-08-16) | **Single source of truth for all outstanding work.** Start here. Refreshed 2026-08-16: June–August shipped work recorded in a Status Snapshot, superseded sections banner-marked (P1 benchmarks/costs, P4 Orama search), newly captured loose ends (N1–N6), and a one-stop index of the 10 `SPARK_AI_CONTENT_ROADMAP.md` items. |
 
 ### 2026-03-22
 
@@ -152,14 +158,14 @@
 
 | Document | Status | Summary |
 |----------|--------|---------|
-| [PER_LANGUAGE_VERSE_SPLIT.md](PER_LANGUAGE_VERSE_SPLIT.md) | **ACTIVE** (proposed; not yet implemented) | Symmetric per-language verse-detail file split: `1.json` (base, language-agnostic) + `1.{lang}.json` sister per language. Cuts per-user fetch bandwidth ~60% by serving only the active-language sister instead of all 11 langs. Side effects: per-language cache invalidation isolation + uniform loader code. Includes concrete before/after JSON schemas, generator merger changes, and UI `loadVerseDetail(path, lang)` migration. |
+| [PER_LANGUAGE_VERSE_SPLIT.md](PER_LANGUAGE_VERSE_SPLIT.md) | **COMPLETE** (implemented 2026-06-27 — ThaqalaynData `00dbb92` rewrote `books/` in split shape; frontend loads `{lang}` sisters; corrected 2026-08-16) | Symmetric per-language verse-detail file split: `1.json` (base, language-agnostic) + `1.{lang}.json` sister per language. Cuts per-user fetch bandwidth ~60% by serving only the active-language sister instead of all 11 langs. Side effects: per-language cache invalidation isolation + uniform loader code. Includes concrete before/after JSON schemas, generator merger changes, and UI `loadVerseDetail(path, lang)` migration. |
 
 ### 2026-06-14
 
 | Document | Status | Summary |
 |----------|--------|---------|
-| [CACHE_FRESHNESS_PLAN.md](CACHE_FRESHNESS_PLAN.md) | **ACTIVE** (proposed; not yet implemented) | Diagnoses two mobile caching bugs and lays out zero-cost fixes. (A) Raw i18n keys after a deploy: i18n JSON lives in an SW `dataGroup` that isn't versioned with the hashed JS bundle, so it drifts stale → fix is moving `assets/i18n/*.json` into a versioned `assetGroup`. (B) Stale AI content on revisited books: `BooksService.getPart` is cache-first and the only invalidator (`data_version.json`) is stale (stamped May 19, never bumped by incremental AI merges) → fix is auto-bumping `data_version.json` on data deploys. Also proposes a safe "Refresh app data" button that clears server caches + `thaqalayn-offline` IDB but preserves `thaqalayn-bookmarks` + localStorage (vs the existing nuclear reset). |
-| [SEARCH_OVERHAUL_PLAN.md](SEARCH_OVERHAUL_PLAN.md) | **ACTIVE** (proposed; not yet implemented) | Bandwidth-first search rebuild. Fixes the stale full-text index (builder must read `verse_detail`, not the dead `verses` array) and the ~2.2 MB-per-visit eager title load. Three tiers: in-memory titles from already-loaded nav data (zero fetch; delete `titles.json`), topics/tags/phrases as Pagefind facets (delete `topics.json`), and a **Pagefind term-sharded** full-text index (Arabic + 11 langs + AI summaries/key-terms/phrases) fetching only per-query fragments. Nothing downloads until search is used. Pagefind bundle lives in a dedicated repo + Netlify site. Adds AI summaries (snippet), topic/tag facets, `phrase:` + `ref:` operators, full UI redesign, IndexedDB/SW offline caching. Root/morphological search deferred. |
+| [CACHE_FRESHNESS_PLAN.md](CACHE_FRESHNESS_PLAN.md) | **COMPLETE** (implemented 2026-06-30 — i18n JSON in a versioned SW assetGroup, `data_version.json` fetched no-store, revalidating cache windows across Data/Words/TafsirData; corrected 2026-08-16) | Diagnoses two mobile caching bugs and lays out zero-cost fixes. (A) Raw i18n keys after a deploy: i18n JSON lives in an SW `dataGroup` that isn't versioned with the hashed JS bundle, so it drifts stale → fix is moving `assets/i18n/*.json` into a versioned `assetGroup`. (B) Stale AI content on revisited books: `BooksService.getPart` is cache-first and the only invalidator (`data_version.json`) is stale (stamped May 19, never bumped by incremental AI merges) → fix is auto-bumping `data_version.json` on data deploys. Also proposes a safe "Refresh app data" button that clears server caches + `thaqalayn-offline` IDB but preserves `thaqalayn-bookmarks` + localStorage (vs the existing nuclear reset). |
+| [SEARCH_OVERHAUL_PLAN.md](SEARCH_OVERHAUL_PLAN.md) | **COMPLETE** (implemented + deployed 2026-06-27/28 — Pagefind per-language sites via the `ThaqalaynSearch` repo; frontend facets/operators/sort; Orama retained only for the in-memory titles tier; corrected 2026-08-16) | Bandwidth-first search rebuild. Fixes the stale full-text index (builder must read `verse_detail`, not the dead `verses` array) and the ~2.2 MB-per-visit eager title load. Three tiers: in-memory titles from already-loaded nav data (zero fetch; delete `titles.json`), topics/tags/phrases as Pagefind facets (delete `topics.json`), and a **Pagefind term-sharded** full-text index (Arabic + 11 langs + AI summaries/key-terms/phrases) fetching only per-query fragments. Nothing downloads until search is used. Pagefind bundle lives in a dedicated repo + Netlify site. Adds AI summaries (snippet), topic/tag facets, `phrase:` + `ref:` operators, full UI redesign, IndexedDB/SW offline caching. Root/morphological search deferred. |
 
 ### 2026-08-12
 

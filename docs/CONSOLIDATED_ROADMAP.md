@@ -1,8 +1,11 @@
 # Consolidated Roadmap
 
 > **Created:** 2026-03-15
-> **Last updated:** 2026-05-19 (reading-engagement waves RE-01..RE-18 all complete — see `READING_ENGAGEMENT_PROPOSAL.md`; SEO state below unchanged since 2026-05-01)
-> **Last verified against source code:** 2026-05-19
+> **Last updated:** 2026-08-16 (full refresh — every section re-verified against git history and working
+> trees across all repos; June–August shipped work recorded; superseded sections banner-marked, not
+> deleted; newly discovered loose ends captured in the Status Snapshot below)
+> **Previous update:** 2026-05-19 (reading-engagement waves RE-01..RE-18 all complete — see `READING_ENGAGEMENT_PROPOSAL.md`)
+> **Last verified against source code:** 2026-08-16
 > **Purpose:** Single source of truth for all outstanding work across the Thaqalayn ecosystem.
 > Collates unfinished items from all prior roadmaps and proposals into one prioritized list.
 > All status assessments verified against actual source code, not documentation.
@@ -13,19 +16,79 @@
 
 ---
 
-> **See also:** [`SPARK_AI_CONTENT_ROADMAP.md`](SPARK_AI_CONTENT_ROADMAP.md) (2026-08-12) — idea
-> collection for Spark-enabled ($0) AI content workloads: translation gap fill, word-by-word
-> accuracy review, narrator canonicalisation v2, book/narrator research enrichment, chapter-name
-> completeness (subsumes P1.4's cost model), chapter point-summaries, content-aware narrator
-> insights, and cross-corpus similar-narration detection.
+> **See also:** [`SPARK_AI_CONTENT_ROADMAP.md`](SPARK_AI_CONTENT_ROADMAP.md) (2026-08-12) — the
+> execution annex for Spark-enabled ($0) AI content workloads. **This file is the single place to
+> check for all remaining work** — the Spark items are indexed with statuses in the Status Snapshot
+> below; open the annex only when actually executing one of them.
+
+---
+
+## Status Snapshot — 2026-08-16
+
+### Shipped since the previous update (2026-05-19 → 2026-08-16)
+
+All verified against git history, not doc claims:
+
+| Shipped work | Evidence |
+|---|---|
+| **Corpus AI generation on DGX Spark** — coverage went from ~17% (stat'd 2026-05-03) to **~90%+ on most books** (2026-06-14 per-book scan; laggards: uyun 47%, sifat-al-shia 40%, kitab-al-duafa 34%). Generated at $0 on Spark/Qwen, not via the OpenAI cost plan in P1 below. | `ThaqalaynDataSources` `9ccce7561` (corpus sync); coverage scan in `SEARCH_OVERHAUL_PLAN.md` prep |
+| **Search overhaul** (`SEARCH_OVERHAUL_PLAN.md`) — Pagefind term-sharded per-language full-text in the dedicated `ThaqalaynSearch` repo + per-language Netlify sites; frontend `pagefind.service.ts`, facet sidebar (book/tag/content-type), `book:`/`tag:`/`type:` operators, result-sort control; in-memory titles tier; nothing downloads until search is used. Orama retained **only** for the in-memory title tier. | Frontend commits `886aab1`…`09d7bcf` (06-28); `ThaqalaynSearch` `7ba57db`…`9012827` (06-14…06-27) |
+| **Per-language verse split** (`PER_LANGUAGE_VERSE_SPLIT.md`) — `books/` rewritten as base + `{lang}` sister files; frontend loads sisters per selected language. | `ThaqalaynData` `00dbb9207fb` (06-27); frontend `1fcdaef` |
+| **Cache freshness** (`CACHE_FRESHNESS_PLAN.md`) — i18n JSON moved into a versioned SW assetGroup; `data_version.json` fetched no-store with cache-busting; immutable caching replaced with revalidating windows across Data/Words/TafsirData. | `3e575e93b7e` / `b41691b833` / `b221114` (06-30); `ngsw-config.json` |
+| **Deep-link CSR fallback fix** — `/* /index.csr.html 200`; cold deep-links (first-time visitors, shared links, incognito) now resolve instead of redirecting to `/books`. | `8beef4b` (06-29) |
+| **Angular 21 security wave** — all 39 Dependabot alerts fixed (Angular 21.2.19 + override refresh), 0 open; alerts enabled on 6 further repos. | `0c679c5` (08-06) |
+| **E2E suite green** — 299/299 against localhost after test-drift triage + the 3 follow-up fix waves (a11y `e070282`, touch-targets `138decb`, loading-skeletons `42b2be0`). Suite defaults to `localhost:4200`. | commits 06-29/30 |
+| **Narrator insights panel** — 8,608 precomputed `{chapter}.narrators.json` sidecars + opt-in Angular panel (clusters, spine, sources, histogram, corroboration, SVG graph), then per-hadith full-isnad chains inside transmission clusters with shared/source/placeholder styling. | `3dd0acd`/`96f91dee` (06-30/07-01); `bc71eb3`+`84daa57`+`85f7654` (07-24) |
+| **Chunk-aware word-by-word mode** + RTL column-flip fix. | `f62fe55` (08-12; feature built 07-05) |
+| **Chapter-page chrome redesign** — inline translation dropdown removed (reading sheet owns translation switching); `ChapterNavComponent` compact/pager variants; chapter-jump select merged into the sticky reading toolbar; slim centered bilingual title lockup. Live in production. | `1d16192`→`3042705` (08-12) |
+| **Chunk-align scraped translations — infrastructure + pilot** (`align-scraped` Spark command, sister-file storage, interleaved frontend rendering). Finishing work outstanding — see N1 below / Spark item 9. | generator `e938070`/`f45e24d`/`dd486b7`; frontend `663ca71`/`2950895`/`1fcdaef` (07-05) |
+
+### Newly captured outstanding items (were in session transcripts/memory only, previously in no roadmap)
+
+| # | Item | Detail |
+|---|------|--------|
+| **N1** | **Finish Spark item 9 — chunk-align scraped translations** | ⚠️ **The generator working tree is currently broken**: an interrupted edit (2026-07-24) removed the `Counter` import from `app/pipeline_cli/chunk_alignment_phase.py` while `validate_alignment` still uses `Counter` (lines 82-83) — running alignment now raises `NameError`. Complete the intended strict exact-match validation (replace the `MIN_RECALL = 0.90` fuzzy check) or restore the import. Then: full-corpus Spark run; eventual "all translations in language files" migration. Also decide the fate of the **uncommitted July pilot data**: 29 modified verse files in `ThaqalaynData` + untracked `ai-content/corpus/chunk_alignment/` artifacts in `ThaqalaynDataSources`. |
+| **N2** | **Finish Spark item 10 — word regen determinism** | The 6 determinism fixes are still **uncommitted** in `ThaqalaynDataGenerator` (`morphology.py`, `builders.py`, `regen_words.ps1`, `build_word_indexes.py`, `merge_translations_into_pages.py`, test). Open decision: principled tiebreaks A (lemma link for ~6,500 surfaces) and C (slug for ~5% of lemma pages). Then full `regen_words.ps1` validation and a coherent commit. |
+| **N3** | **Push Thaqalayn docs commit `0829f3f`** | The repo is 1 commit ahead of origin (the SPARK roadmap items 9-10 doc update). Everything else in every repo is pushed. |
+| **N4** | **ThaqalaynApi repo decision** | Dependabot alerts were enabled 2026-08-11 but the initial scan was never re-checked; its 2020-era pins almost certainly carry CVEs. Recommendation from that session: **archive** the superseded repo rather than patch it. |
+| **N5** | **Bandwidth/prerender next lever** | After the May/June bandwidth incidents: disable the Netlify Prerender extension or move to full build-time SSG for the ~70K chapter/verse pages (robots.txt + sitemap trim already shipped as mitigations; Cloudflare/custom-domain route declined). Zero-recurring-cost constraint applies. Related: SEO P6.5 custom-domain decision (M7). |
+| **N6** | **Working-tree hygiene** | Untracked scratch files to delete or ignore: `Thaqalayn/poll-deploy-tmp.mjs`, `Thaqalayn/verify-prod-tmp.mjs`, `ThaqalaynSearch/thaqalaynapi-req.txt`, generator `benchmark/`+`benchmarks/`+`path_b_continue.*`+`alfeker_urls.json`. |
+
+### Spark AI-content items — one-stop index (details in [`SPARK_AI_CONTENT_ROADMAP.md`](SPARK_AI_CONTENT_ROADMAP.md))
+
+| # | Item | Status |
+|---|------|--------|
+| 1 | Fill 10-language AI translation gaps (incl. laggard books) | IDEA — pipeline ready, needs gap-audit script + run |
+| 2 | Word-by-word translation gaps (101 lemmas / ~1,328 surfaces) + accuracy review | IDEA |
+| 3 | Robust narrator canonicalisation (stable IDs; resolve "his father" etc.) | IDEA — highest leverage |
+| 4 | Book + narrator research enrichment, 10 languages (subsumes §3.5 below) | IDEA — depends on 3 |
+| 5 | Chapter names in 10 languages (subsumes §1.4 / `CHAPTER_TRANSLATION_GAP.md` at $0) | IDEA — good first batch |
+| 6 | Chapter summaries with point-level dedup | IDEA |
+| 7 | Content-aware narrator-insight corroboration (same-topic × disjoint chains) | IDEA — depends on 3 |
+| 8 | Cross-corpus similar-narration detection | IDEA — candidate-gen stage can start anytime |
+| 9 | Chunk-align scraped translations to AI chunks | **IN PROGRESS** — see N1 |
+| 10 | Word regen determinism + surface gloss quality | **IN PROGRESS** — see N2 |
 
 ## Priority 1: AI Content Pipeline — Complete Corpus Generation
 
-**Goal:** Generate AI content for all ~58,000 hadith (currently ~3,686 done, ~6.4%).
+> **⚠️ 2026-08-16 STATUS: LARGELY SUPERSEDED IN PRACTICE.** The corpus was generated on the DGX
+> Spark (Qwen 3.6, $0 marginal cost) rather than via the OpenAI-priced plan below — coverage is
+> **~90%+ on most books** per the 2026-06-14 per-book scan (laggards: uyun 47%, sifat-al-shia 40%,
+> kitab-al-duafa 34%). The "~6.4% done" figure below reflects the 2026-03 state. What remains of
+> P1 is the **gap fill** (Spark item 1) and **chapter names** (Spark item 5) — see the Status
+> Snapshot index above. Subsections retained unedited for history, each with its own status note.
+
+**Goal:** Generate AI content for all ~58,000 hadith (currently ~3,686 done, ~6.4% — *stale, see banner above*).
 
 **Source docs:** `PIPELINE_OPTIMIZATION_PLAN.md` (2026-03-13, primary), `AI_PIPELINE_V3_PLAN.md`, `BENCHMARK_SAMPLE.md`, `BENCHMARK_INSTRUCTIONS.md`
 
 ### 1.1 Complete OpenAI Benchmarks
+
+> **2026-08-16: SUPERSEDED — no longer applies.** The remaining OpenAI cross-model benchmarks
+> became moot when `PHASE4_OPENWEIGHT_BENCHMARK.md` + `SPARK_OPTIMIZATION_LOG.md` (2026-05-12/13)
+> settled the model question: production runs on Spark/Qwen (`--phase4-model qwen36-fast`,
+> optional `--phase1-model gpt-5.4` hybrid for chunk granularity). There is no decision left that
+> a GPT-5.2/GPT-5/GPT-5-mini benchmark would inform.
 
 | Item | Status | Source |
 |------|--------|--------|
@@ -39,6 +102,11 @@
 ### 1.2 Implement Multi-Phase Pipeline Architecture
 
 From `PIPELINE_OPTIMIZATION_PLAN.md` — the recommended approach based on benchmark data.
+
+> **2026-08-16: IMPLEMENTED (architecture) / SUPERSEDED (costs).** The phased pipeline has been
+> the production path since March 2026 and ran the Spark corpus generation. The dollar estimates
+> below are superseded by $0 Spark compute. Phase 0 narrator bios → Spark items 3/4. Phase 3
+> (scholarly, Claude) remains **skipped** — no Anthropic API key; revisit only if that changes.
 
 **Code verified (2026-03-15):** Phased pipeline modules already exist in `app/pipeline_cli/`:
 - `phased_prompts.py` — Phase-specific prompts
@@ -60,6 +128,12 @@ From `PIPELINE_OPTIMIZATION_PLAN.md` — the recommended approach based on bench
 
 ### 1.3 Pipeline Technical Debt
 
+> **2026-08-16: NEEDS RE-AUDIT before acting.** These statuses date from 2026-03 and at least
+> some items have since landed in other forms (a structured event log exists as
+> `logs/pipeline.jsonl` in ThaqalaynDataSources; `pipeline_status` provides cumulative cost/token
+> tracking; per-verse resumability + the phased split reduced the urgency of chunked processing).
+> Re-verify each row against the current pipeline before scheduling work.
+
 From `AI_PIPELINE_V3_PLAN.md`:
 
 | Item | Status | Notes |
@@ -71,6 +145,9 @@ From `AI_PIPELINE_V3_PLAN.md`:
 | `reprocess` command | NOT DONE | Re-run postprocessing on raw responses |
 
 ### 1.4 Chapter Name Translations
+
+> **2026-08-16: SUPERSEDED BY SPARK ITEM 5** (`SPARK_AI_CONTENT_ROADMAP.md`). Same scope, but at
+> $0 on Spark instead of the ~$6-31 OpenAI batch below. Execute it there.
 
 From `CHAPTER_TRANSLATION_GAP.md`:
 
@@ -92,7 +169,7 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 | Item | Severity | Source | Status |
 |------|----------|--------|--------|
 | `?lang=` URL parameter ignored on fresh sessions — breaks link sharing | CRITICAL | UX_REVIEW_REPORTS §3 | **DONE** (verified 2026-05-01) — fresh-session e2e tests for fa/ar/fr all pass against production. URL param honored on first visit with no localStorage |
-| Missing `books.{lang}.json` for 10 languages — was causing "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 | **PARTIALLY DONE** — race-safe English fallback in `IndexState.loadIndex` (commit `8570ba6`) prevents "undefined undefined" rendering. Generating actual translated index files still blocked on P1.4 (chapter title AI batch, ~$6 GPT-5-mini) |
+| Missing `books.{lang}.json` for 10 languages — was causing "undefined undefined" | CRITICAL | UX_REVIEW_REPORTS §3 | **PARTIALLY DONE** — race-safe English fallback in `IndexState.loadIndex` (commit `8570ba6`) prevents "undefined undefined" rendering. Generating actual translated index files still blocked on the chapter-title batch — now **Spark item 5** at $0 (was P1.4, ~$6 GPT-5-mini) |
 | About + Support pages entirely hardcoded in English | HIGH | UX_REVIEW_2026_03_10 D-01 | **DONE** — `about.component.html` and `support.component.html` use `about.*` / `support.*` keys; all 12 locales populated |
 | AI Settings panel labels hardcoded in English (7 strings) | HIGH | UX_REVIEW_2026_03_10 D-02 | **DONE** — `settings.component.html` uses `settings.ai.*` keys (lines 28, 38, 43, 48, 53, 56) |
 | Verse-detail section headers hardcoded ("Quran References", etc.) | HIGH | UX_REVIEW_2026_03_10 D-03 | **DONE** — `verse-detail.component.html` lines 148, 202, 218, 232 use `book.crossReferences`, `book.quranReferences`, `book.keyPhrases`, `book.relatedNarrations` |
@@ -114,14 +191,14 @@ From `CHAPTER_TRANSLATION_GAP.md`:
 | Discussion section toggle lacks ARIA attributes | MEDIUM | UX_REVIEW_2026_03_10 A-03 | **DONE** — `verse-detail.component.html:295-301` has `role="button"`, `tabindex="0"`, `aria-expanded`, keyboard handlers |
 | Embed verse component lacks dynamic lang attributes | MEDIUM | UX_REVIEW_2026_03_10 A-04 | **DONE** (commit `4eff213`) — dynamic lang attributes added |
 | Search dropdown missing ARIA selected state / keyboard nav | MEDIUM | UX_REVIEW_2026_03_10 A-05 | **DONE** — `search-bar.component.html` has `role="combobox"`, `aria-activedescendant`, `aria-selected`, `role="listbox"`, `role="option"`; ArrowUp/Down/Enter/Escape implemented in `search-bar.component.ts:99-130` |
-| Narrator sort headers lack accessible names (known issue) | LOW | QA_REPORT.md | **OUTSTANDING** |
+| Narrator sort headers lack accessible names (known issue) | LOW | QA_REPORT.md | **DONE** (verified 2026-08-16) — `[attr.aria-label]` added to the `mat-sort-header` th elements in `people-list.component.html`; the axe `aria-command-name` rule was removed from `KNOWN_ISSUE_RULES_TO_SKIP` (now empty) so E2E enforces it |
 
 ### 2.3 Mobile Issues
 
 | Item | Severity | Source | Status |
 |------|----------|--------|--------|
 | Word-analysis popup may overflow viewport on mobile | HIGH | UX_REVIEW_2026_03_10 M-02 | **DONE** — `verse-text.component.ts:137-149` clamps x/y with `Math.max`/`Math.min` against container and viewport bounds |
-| Mobile menu lacks AI settings | MEDIUM | UX_REVIEW_2026_03_10 M-03 | **PARTIAL** — `app.component.html:111-131` has 3 of 4 AI toggles; `showAiTranslationDisclaimer` still missing |
+| Mobile menu lacks AI settings | MEDIUM | UX_REVIEW_2026_03_10 M-03 | **PARTIAL — likely moot since READING_CONTROLS_REDESIGN (D060, 2026-05-16)**: AI view toggles + reading prefs moved to the sticky reading toolbar + side sheet, available on all viewports. Re-audit whether the mobile-menu copy and `showAiTranslationDisclaimer` still matter before doing anything |
 | ~~Bottom navigation missing Narrators link~~ | ~~MEDIUM~~ | ~~UX_REVIEW_2026_03_10 M-04~~ | **DONE** — code shows 5 nav items including Narrators |
 | Compact header breadcrumb text 9px — illegible | MEDIUM | UX_REVIEW_2026_03_10 M-05 | **DONE** (commit `4eff213`) — minimum increased to 11px |
 
@@ -175,6 +252,10 @@ From `USER_STORIES.md` and `UX_REVIEW_REPORTS.md` §6:
 
 ### 3.5 Narrator Registry Enrichment (Spark-enabled, 2026-05-13)
 
+> **2026-08-16: NOW TRACKED AS SPARK ITEMS 3 + 4** (`SPARK_AI_CONTENT_ROADMAP.md`) — item 3
+> (robust canonicalisation / stable IDs / relative-reference resolution) should precede this
+> enrichment so the IDs being enriched are stable. Execute there; detail below retained.
+
 Originally planned in `PIPELINE_OPTIMIZATION_PLAN.md` Step 4 ("Phase 0 narrator bio batch", ~$750 Claude) and deferred indefinitely due to cost. With Spark/Qwen the marginal cost is $0 — feasible now.
 
 The `canonical_narrators.json` registry has 4,544 entries today with only `canonical_name_ar`, `canonical_name_en`, `role`, `variants_ar`, `disambiguation_context`. The fields below are **all missing**. Spark batch would fill them once and the result lands in every verse via the existing `NarratorRegistry` lookup.
@@ -197,6 +278,14 @@ The `canonical_narrators.json` registry has 4,544 entries today with only `canon
 ---
 
 ## Priority 4: Frontend — Search & Discovery Improvements
+
+> **⚠️ 2026-08-16 STATUS: SUPERSEDED — search was rebuilt on Pagefind** (`SEARCH_OVERHAUL_PLAN.md`,
+> shipped 2026-06-27/28; index in the dedicated `ThaqalaynSearch` repo + per-language Netlify
+> sites). The goals below were either **delivered by Pagefind** — book/tag/content-type facets
+> and filters (4.2), pre-built per-language indexes fetching only per-query fragments (4.3) — or
+> **made moot**: Orama full-text no longer exists, so Orama schema enrichment, `@orama/stemmers`
+> and `@orama/stopwords` no longer apply. Orama survives only as the in-memory **title** search
+> tier built from already-loaded nav data. Tables retained unedited for history.
 
 **Goal:** Optimize Orama search and add structured browsing features.
 
@@ -294,7 +383,7 @@ The `canonical_narrators.json` registry has 4,544 entries today with only `canon
 |------|--------|--------|
 | Reduce verse metadata visual weight / collapse by default | UX_REVIEW_REPORTS §1 | **OUTSTANDING** |
 | Increase Arabic/English gap from 8px to 16px | UX_REVIEW_REPORTS §4 | **OUTSTANDING** |
-| Add "jump to verse" for long surahs | UX_REVIEW_REPORTS §1 | **OUTSTANDING** |
+| Add "jump to verse" for long surahs | UX_REVIEW_REPORTS §1 | **DONE** (2026-08-12) — `app-chapter-jump` slim native select in the sticky reading toolbar, jumps via `#hN` fragment (commit `3042705`) |
 | Add tooltips to 26 icons missing them | UI_REVIEW_DETAILS | **PARTIALLY DONE** (commits `ce3cbb6`, `e0ca470`) — settings + book-tree tooltips done; ~20 remaining (verse footer, bookmark page, search/filter) |
 
 ### 6.3 Remaining Feature Proposals

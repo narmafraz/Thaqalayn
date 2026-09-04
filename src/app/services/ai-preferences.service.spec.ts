@@ -1,3 +1,7 @@
+import { TestBed } from '@angular/core/testing';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
+
 import { AiPreferencesService } from './ai-preferences.service';
 
 const STORAGE_KEY = 'thaqalayn_ai_preferences';
@@ -5,10 +9,23 @@ const STORAGE_KEY = 'thaqalayn_ai_preferences';
 describe('AiPreferencesService', () => {
   let service: AiPreferencesService;
 
+  /**
+   * Rebuilds the injector so `SettingsState` re-hydrates from whatever is in
+   * localStorage right now. Preferences are read once at store bootstrap, so
+   * this is how a test observes "what a fresh visit would load".
+   */
+  function createService(): AiPreferencesService {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ imports: [NgxsModule.forRoot([SettingsState])] });
+    return TestBed.inject(AiPreferencesService);
+  }
+
   beforeEach(() => {
     localStorage.clear();
-    service = new AiPreferencesService();
+    service = createService();
   });
+
+  afterEach(() => localStorage.clear());
 
   it('should be created with defaults', () => {
     expect(service).toBeTruthy();
@@ -26,8 +43,7 @@ describe('AiPreferencesService', () => {
 
   it('persists muteReadVerses across instances', () => {
     service.set('muteReadVerses', false);
-    const service2 = new AiPreferencesService();
-    expect(service2.get('muteReadVerses')).toBe(false);
+    expect(createService().get('muteReadVerses')).toBe(false);
   });
 
   it('defaults muteReadVerses to true when missing from stored prefs (migration)', () => {
@@ -43,17 +59,15 @@ describe('AiPreferencesService', () => {
       wordByWordDefaultLang: 'en',
       viewMode: 'plain',
     }));
-    const fresh = new AiPreferencesService();
+    const fresh = createService();
     expect(fresh.get('muteReadVerses')).toBe(true);
     // ...and that explicit prefs survive the merge
     expect(fresh.get('showDiacritizedByDefault')).toBe(false);
   });
 
   it('should persist preferences to localStorage', () => {
-    service.set('showDiacritizedByDefault', true);
-    // Create new instance to verify persistence
-    const service2 = new AiPreferencesService();
-    expect(service2.get('showDiacritizedByDefault')).toBe(true);
+    service.set('showDiacritizedByDefault', false);
+    expect(createService().get('showDiacritizedByDefault')).toBe(false);
   });
 
   it('should update individual preferences', () => {
@@ -80,8 +94,7 @@ describe('AiPreferencesService', () => {
 
   it('should handle corrupt localStorage data', () => {
     localStorage.setItem(STORAGE_KEY, 'invalid json');
-    const s = new AiPreferencesService();
-    expect(s.get('showContentTypeBadges')).toBe(true);
+    expect(createService().get('showContentTypeBadges')).toBe(true);
   });
 
   it('setting showWordByWord syncs viewMode and emits on viewMode$', (done) => {
@@ -113,7 +126,7 @@ describe('AiPreferencesService', () => {
       showDiacritizedByDefault: true,
       viewMode: 'word-by-word',
     }));
-    const s = new AiPreferencesService();
+    const s = createService();
     expect(s.get('showWordByWord')).toBe(true);
     expect(s.get('viewMode')).toBe('word-by-word');
   });
@@ -124,7 +137,7 @@ describe('AiPreferencesService', () => {
       showWordByWord: false,
       viewMode: 'word-by-word',
     }));
-    const s = new AiPreferencesService();
+    const s = createService();
     expect(s.get('viewMode')).toBe('plain');
     expect(s.get('showWordByWord')).toBe(false);
   });
@@ -134,7 +147,7 @@ describe('AiPreferencesService', () => {
       showIsnadSeparation: true,
       showDiacritizedByDefault: false,
     }));
-    const s = new AiPreferencesService();
+    const s = createService();
     expect((s.preferences as unknown as Record<string, unknown>)['showIsnadSeparation']).toBeUndefined();
     expect(s.get('showDiacritizedByDefault')).toBe(false);
   });

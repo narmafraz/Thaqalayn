@@ -11,6 +11,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Verse } from '@app/models';
 import { AiContent } from '@app/models/ai-content';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('VerseTextComponent', () => {
   let component: VerseTextComponent;
@@ -93,7 +94,7 @@ describe('VerseTextComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [VerseTextComponent, TranslatePipe],
       imports: [
-        NgxsModule.forRoot([]),
+        NgxsModule.forRoot([SettingsState]),
         RouterTestingModule,
         FormsModule,
         MatTooltipModule,

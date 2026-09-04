@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
+import { AiLanguage } from '@app/models/ai-content';
 import { SettingsStorageService } from '@app/services/settings-storage.service';
 import { RouterNavigation } from '@ngxs/router-plugin';
 import { Action, NgxsOnInit, Selector, State, StateContext } from '@ngxs/store';
 import {
-  DecreaseFontSize, HydrateSettings, IncreaseFontSize, ResetFontSize,
-  SetFontSize, SetLanguage, SetTheme, ToggleTheme,
+  DecreaseFontSize, HydrateSettings, IncreaseFontSize, ResetAiPreferences,
+  ResetFontSize, SetAiPreference, SetFontSize, SetLanguage, SetTheme, ToggleTheme,
 } from './settings.actions';
 import {
-  clampFontSize, DEFAULT_FONT_SIZE, DEFAULT_LANGUAGE, DEFAULT_THEME, FONT_STEP,
-  RTL_LANGUAGES, SETTINGS_DEFAULTS, SUPPORTED_UI_LANGUAGES, SettingsStateModel, ThemeMode,
+  AI_PREFERENCES_DEFAULTS, AiPreferences, clampFontSize,
+  DEFAULT_FONT_SIZE, DEFAULT_LANGUAGE, DEFAULT_THEME, FONT_STEP, RTL_LANGUAGES,
+  SETTINGS_DEFAULTS, SUPPORTED_UI_LANGUAGES, SettingsStateModel, ThemeMode,
+  ViewMode, withAiPreference,
 } from './settings.model';
 
 /**
@@ -61,6 +64,22 @@ export class SettingsState implements NgxsOnInit {
     return state?.fontSize ?? DEFAULT_FONT_SIZE;
   }
 
+  @Selector()
+  static getAiPreferences(state: SettingsStateModel): AiPreferences {
+    return state?.aiPreferences ?? AI_PREFERENCES_DEFAULTS;
+  }
+
+  @Selector([SettingsState.getAiPreferences])
+  static getViewMode(prefs: AiPreferences): ViewMode {
+    return prefs.viewMode;
+  }
+
+  /** Language the word-by-word cards are rendered in. */
+  @Selector([SettingsState.getAiPreferences])
+  static getWordByWordLang(prefs: AiPreferences): AiLanguage {
+    return prefs.wordByWordDefaultLang;
+  }
+
   // ─── Actions ───────────────────────────────────────────────────────────
 
   @Action(HydrateSettings)
@@ -108,6 +127,21 @@ export class SettingsState implements NgxsOnInit {
   @Action(ResetFontSize)
   resetFontSize(ctx: StateContext<SettingsStateModel>): void {
     ctx.dispatch(new SetFontSize(DEFAULT_FONT_SIZE));
+  }
+
+  @Action(SetAiPreference)
+  setAiPreference(ctx: StateContext<SettingsStateModel>, action: SetAiPreference): void {
+    const aiPreferences = withAiPreference(
+      ctx.getState().aiPreferences, action.key, action.value);
+    ctx.patchState({ aiPreferences });
+    this.storage.saveAiPreferences(aiPreferences);
+  }
+
+  @Action(ResetAiPreferences)
+  resetAiPreferences(ctx: StateContext<SettingsStateModel>): void {
+    const aiPreferences = { ...AI_PREFERENCES_DEFAULTS };
+    ctx.patchState({ aiPreferences });
+    this.storage.saveAiPreferences(aiPreferences);
   }
 
   /**

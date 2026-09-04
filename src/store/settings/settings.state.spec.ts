@@ -4,21 +4,25 @@ import { RouterNavigation } from '@ngxs/router-plugin';
 import { NgxsModule, Store } from '@ngxs/store';
 
 import {
-  DecreaseFontSize, HydrateSettings, IncreaseFontSize, ResetFontSize,
-  SetFontSize, SetLanguage, SetTheme, ToggleTheme,
+  DecreaseFontSize, HydrateSettings, IncreaseFontSize, ResetAiPreferences,
+  ResetFontSize, SetAiPreference, SetFontSize, SetLanguage, SetTheme, ToggleTheme,
 } from './settings.actions';
-import { SettingsStateModel } from './settings.model';
+import { AI_PREFERENCES_DEFAULTS, AiPreferences, SettingsStateModel } from './settings.model';
 import { SettingsState } from './settings.state';
 
 /** Stands in for localStorage so hydration is deterministic per test. */
 class StubStorage {
-  initial: SettingsStateModel = { lang: 'en', theme: 'light', fontSize: 100 };
-  saved: Partial<Record<'lang' | 'theme' | 'fontSize', unknown>> = {};
+  initial: SettingsStateModel = {
+    lang: 'en', theme: 'light', fontSize: 100,
+    aiPreferences: { ...AI_PREFERENCES_DEFAULTS },
+  };
+  saved: Partial<Record<'lang' | 'theme' | 'fontSize' | 'aiPreferences', unknown>> = {};
 
   resolveInitial(): SettingsStateModel { return { ...this.initial }; }
   saveLanguage(lang: string): void { this.saved.lang = lang; }
   saveTheme(theme: string): void { this.saved.theme = theme; }
   saveFontSize(size: number): void { this.saved.fontSize = size; }
+  saveAiPreferences(prefs: unknown): void { this.saved.aiPreferences = prefs; }
 }
 
 /** Minimal RouterNavigation carrying just the query params we care about. */
@@ -52,7 +56,7 @@ describe('SettingsState', () => {
   describe('hydration', () => {
     it('loads the persisted settings at bootstrap', () => {
       boot({ lang: 'fa', theme: 'dark', fontSize: 120 });
-      expect(snapshot()).toEqual({ lang: 'fa', theme: 'dark', fontSize: 120 });
+      expect(snapshot()).toEqual(jasmine.objectContaining({ lang: 'fa', theme: 'dark', fontSize: 120 }));
     });
 
     it('exposes the hydrated language through the selector, not the default', () => {
@@ -131,6 +135,40 @@ describe('SettingsState', () => {
       store.dispatch(new ResetFontSize());
       expect(store.selectSnapshot(SettingsState.getFontSize)).toBe(100);
       expect(storage.saved.fontSize).toBe(100);
+    });
+  });
+
+  describe('AI / reading preferences', () => {
+    it('sets one preference and persists the whole blob', () => {
+      store.dispatch(new SetAiPreference('showTopicTags', false));
+      expect(store.selectSnapshot(SettingsState.getAiPreferences).showTopicTags).toBe(false);
+      expect((storage.saved.aiPreferences as AiPreferences).showTopicTags).toBe(false);
+    });
+
+    it('keeps the deprecated viewMode mirror in step with showWordByWord', () => {
+      store.dispatch(new SetAiPreference('showWordByWord', true));
+      expect(store.selectSnapshot(SettingsState.getViewMode)).toBe('word-by-word');
+
+      store.dispatch(new SetAiPreference('viewMode', 'plain'));
+      expect(store.selectSnapshot(SettingsState.getAiPreferences).showWordByWord).toBe(false);
+    });
+
+    it('exposes the word-by-word language as its own selector', () => {
+      store.dispatch(new SetAiPreference('wordByWordDefaultLang', 'fa'));
+      expect(store.selectSnapshot(SettingsState.getWordByWordLang)).toBe('fa');
+    });
+
+    it('resets every preference at once', () => {
+      store.dispatch(new SetAiPreference('showChainDiagram', true));
+      store.dispatch(new SetAiPreference('muteReadVerses', false));
+      store.dispatch(new ResetAiPreferences());
+      expect(store.selectSnapshot(SettingsState.getAiPreferences))
+        .toEqual(AI_PREFERENCES_DEFAULTS);
+    });
+
+    it('hydrates saved preferences at bootstrap', () => {
+      boot({ aiPreferences: { ...AI_PREFERENCES_DEFAULTS, showTopicTags: false } });
+      expect(store.selectSnapshot(SettingsState.getAiPreferences).showTopicTags).toBe(false);
     });
   });
 

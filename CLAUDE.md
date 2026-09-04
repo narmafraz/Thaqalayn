@@ -61,7 +61,7 @@ ng generate service service-name      # Generate new service
 ### State Management (NGXS)
 The application uses NGXS for centralized state management. All state is defined in `src/store/`:
 
-- **SettingsState** (`src/store/settings/`): Site language, theme and font scale — the single source of truth for the UI settings, including their persistence
+- **SettingsState** (`src/store/settings/`): Site language, theme, font scale and the AI/reading preferences — the single source of truth for the UI settings, including their persistence
 - **RouterState** (`src/store/router/`): Custom router state with index, fragment, sort and translation params
 - **BooksState** (`src/store/books/`): Manages book parts, chapters, and verse data
 - **IndexState** (`src/store/index/`): Per-language book title indexes + the central translations index
@@ -74,7 +74,7 @@ State modules are configured in `src/store/store.config.ts` and imported via `Ng
 
 #### Settings: one source of truth, services as adapters
 
-`SettingsState` owns `lang` / `theme` / `fontSize`. `SettingsStorageService`
+`SettingsState` owns `lang` / `theme` / `fontSize` / `aiPreferences`. `SettingsStorageService`
 (`src/app/services/settings-storage.service.ts`) is the only code that reads or
 writes them, and the only place the cold-start priority lives:
 
@@ -86,6 +86,11 @@ The two services that used to own this state are now thin adapters:
 
 - `I18nService` — owns the string bundles and `get()`. `currentLang$` / `currentLang` read the store; `setLanguage()` dispatches `SetLanguage`.
 - `ThemeService` — owns the DOM side effects (`dark-theme` body class, `--font-scale`, the `theme-color` meta). `theme$` / `fontSize$` read the store; every setter dispatches.
+- `AiPreferencesService` — `get` / `set` / `preferences$` / `viewMode$` over the `aiPreferences` slice. The load-time migrations live in `normalizeAiPreferences()` in `settings.model.ts`.
+
+Transient UI state that is never persisted (`ReadingSheetService`,
+`KeyboardShortcutService`) stays in its service — there is nothing to restore,
+so there is nothing to disagree about.
 
 `SettingsState` also reacts to `RouterNavigation`, so `?lang=` applies on any
 in-app navigation, not only on a cold load.
@@ -212,7 +217,7 @@ NGXS selectors fire immediately on subscription, before API data is loaded. This
 ### Unit Test Patterns
 When writing Karma/Jasmine specs for components that use NGXS:
 - Always add `NgxsModule.forRoot([])` to the test module imports
-- If the component graph reaches `I18nService` or `ThemeService` (the `translate` pipe alone is enough), register the settings slice: `NgxsModule.forRoot([SettingsState])`. Without it you get `NG0201: No provider found for InjectionToken NGXS_OPTIONS` via `I18nService -> Store`
+- If the component graph reaches `I18nService`, `ThemeService` or `AiPreferencesService` (the `translate` pipe alone is enough), register the settings slice: `NgxsModule.forRoot([SettingsState])`. Without it you get `NG0201: No provider found for InjectionToken NGXS_OPTIONS` via `I18nService -> Store` — and, more quietly, any `dispatch` for an unregistered slice is a silent no-op, so a spec that writes a setting and reads it back will just see the default
 - Components using `HttpClient` (or services that do) need `HttpClientTestingModule`
 - Components with child custom elements need `CUSTOM_ELEMENTS_SCHEMA`
 - Components with `@Input()` observables (like `book$`) must set the input before `fixture.detectChanges()` to prevent `undefined.pipe()` errors

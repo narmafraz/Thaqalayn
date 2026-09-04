@@ -1,9 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import {
+  AI_PREFERENCES_DEFAULTS, AI_PREFERENCES_STORAGE_KEY, AiPreferences,
   DEFAULT_FONT_SIZE, DEFAULT_LANGUAGE, DEFAULT_THEME, FONT_SIZE_STORAGE_KEY,
   LANG_STORAGE_KEY, MAX_FONT_SIZE, MIN_FONT_SIZE, SUPPORTED_UI_LANGUAGES,
-  SettingsStateModel, THEME_STORAGE_KEY, ThemeMode,
+  SettingsStateModel, THEME_STORAGE_KEY, ThemeMode, normalizeAiPreferences,
 } from '@store/settings/settings.model';
 
 /**
@@ -32,6 +33,7 @@ export class SettingsStorageService {
       lang: this.resolveLanguage(),
       theme: this.resolveTheme(),
       fontSize: this.resolveFontSize(),
+      aiPreferences: this.resolveAiPreferences(),
     };
   }
 
@@ -45,6 +47,10 @@ export class SettingsStorageService {
 
   saveFontSize(size: number): void {
     this.write(FONT_SIZE_STORAGE_KEY, String(size));
+  }
+
+  saveAiPreferences(prefs: AiPreferences): void {
+    this.write(AI_PREFERENCES_STORAGE_KEY, JSON.stringify(prefs));
   }
 
   // ─── Resolution ────────────────────────────────────────────────────────
@@ -117,6 +123,16 @@ export class SettingsStorageService {
     // Out-of-range values are rejected rather than clamped: they mean the
     // stored value predates the current range and is not a real choice.
     return size >= MIN_FONT_SIZE && size <= MAX_FONT_SIZE ? size : DEFAULT_FONT_SIZE;
+  }
+
+  private resolveAiPreferences(): AiPreferences {
+    const stored = this.read(AI_PREFERENCES_STORAGE_KEY);
+    if (!stored) { return { ...AI_PREFERENCES_DEFAULTS }; }
+    try {
+      return normalizeAiPreferences(JSON.parse(stored));
+    } catch {
+      return { ...AI_PREFERENCES_DEFAULTS }; // corrupt blob -> start clean
+    }
   }
 
   // ─── localStorage plumbing ─────────────────────────────────────────────

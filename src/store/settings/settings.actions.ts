@@ -1,4 +1,4 @@
-import { SettingsStateModel, ThemeMode } from './settings.model';
+import { AiPreferences, SettingsStateModel, ThemeMode } from './settings.model';
 
 /**
  * Loads the persisted settings into the store. Dispatched once during NGXS
@@ -39,4 +39,14 @@ export class DecreaseFontSize {
 
 export class ResetFontSize {
   static readonly type = '[Settings] Reset font size';
+}
+
+/** Changes one AI/reading display preference (Settings sheet + reading toolbar). */
+export class SetAiPreference<K extends keyof AiPreferences = keyof AiPreferences> {
+  static readonly type = '[Settings] Set AI preference';
+  constructor(public key: K, public value: AiPreferences[K]) {}
+}
+
+export class ResetAiPreferences {
+  static readonly type = '[Settings] Reset AI preferences';
 }

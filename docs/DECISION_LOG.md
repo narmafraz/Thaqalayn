@@ -1277,13 +1277,29 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 - `I18nService` keeps the string bundles and `get()`; the language itself is read from the store and `setLanguage()` is a dispatch. `ThemeService` keeps the DOM side effects (`dark-theme` class, `--font-scale`, `theme-color` meta) and dispatches for writes. `IndexState` and `SearchState` no longer inject `I18nService` just to ask what the language is.
 - `SettingsState` also reacts to `RouterNavigation`, so `?lang=` works on any in-app navigation, not only a cold load.
 
+**Also folded in: the AI / reading preferences.** `AiPreferencesService` held the
+same shape of state — eleven persisted toggles, a `BehaviorSubject`, its own
+localStorage load with migration logic — and drives the same Settings sheet.
+Its values now live in `SettingsState.aiPreferences`; the service keeps its
+exact public API (`get` / `set` / `preferences` / `preferences$` / `viewMode$` /
+`reset`) and is a facade like the other two. The load-time migrations
+(pre-`showWordByWord` prefs, the `viewMode` mirror, the dead
+`showIsnadSeparation` key) moved into `normalizeAiPreferences()` in the model,
+where they are unit-testable without a service instance.
+
+**Left alone deliberately:** `ReadingSheetService` (is the sheet open) and
+`KeyboardShortcutService` (is the shortcut overlay open). Neither is persisted
+and neither has a restore path, so neither can exhibit the
+control-disagrees-with-state bug; moving a transient boolean into the store
+would add an action and a selector for no correctness gain.
+
 **Trade-offs:**
-- Every spec whose component graph reaches `I18nService` or `ThemeService` now needs `NgxsModule.forRoot([SettingsState])` (11 specs updated). That is the documented convention for this repo already.
+- Every spec whose component graph reaches `I18nService`, `ThemeService` or `AiPreferencesService` now needs `NgxsModule.forRoot([SettingsState])` (13 specs updated). That is the documented convention for this repo already. Note that an unregistered slice fails quietly for writes — `dispatch` of an action with no handler is a no-op — so a spec that sets a preference and reads it back is how this surfaces.
 - Store selectors dedupe, so a setter that writes the value already in the store no longer re-emits. One theme spec asserted the old duplicate emission and was updated.
-- `AiPreferencesService`, `ReadingSheetService` and `KeyboardShortcutService` still hold their own subjects. They are the next candidates for the same treatment; nothing about them is load-bearing for this fix.
+- `BooksState` still injects `AiPreferencesService` rather than selecting from the store. Moving it would mean moving its constructor subscription to `ngxsOnInit` (states are all constructed before any hydration runs), and the `skip(1)` in that listener is sensitive to exactly when it subscribes. Not worth destabilising for this change — the service it reads is store-backed either way.
 
 **Files / artefacts:**
 - `src/store/settings/*`, `src/app/services/settings-storage.service.ts`
-- `src/app/services/{i18n,theme}.service.ts`, `src/store/{index,search,store.config}`
+- `src/app/services/{i18n,theme,ai-preferences}.service.ts`, `src/store/{index,search,store.config}`
 - `reading-sheet` + `search-results` templates (`[value]` -> `[ngModel]` on native `<select>`s)
 - `e2e/tests/settings-persistence.spec.ts`, `src/store/settings/settings.state.spec.ts`, `src/app/services/settings-storage.service.spec.ts`

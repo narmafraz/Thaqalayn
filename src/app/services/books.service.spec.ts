@@ -1,6 +1,7 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { NgxsModule, Store } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 import { BooksService } from './books.service';
 import { OfflineStorageService } from './offline-storage.service';
 import { AiPreferencesService, AiPreferences } from './ai-preferences.service';
@@ -42,7 +43,7 @@ describe('BooksService', () => {
     const mockStore = { select: () => translationSubject.asObservable() };
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgxsModule.forRoot([])],
+      imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])],
       providers: [
         { provide: OfflineStorageService, useValue: mockOfflineStorage },
         { provide: AiPreferencesService, useValue: { preferences$: prefsSubject.asObservable() } },

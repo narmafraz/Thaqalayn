@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 import { firstValueFrom } from 'rxjs';
 
 import { MilestoneToastService } from './milestone-toast.service';
@@ -19,7 +21,7 @@ describe('MilestoneToastService', () => {
   let http: HttpTestingController;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
+    TestBed.configureTestingModule({ imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])] });
     svc = TestBed.inject(MilestoneToastService);
     bookmarks = TestBed.inject(BookmarkService);
     counts = TestBed.inject(VerseCountsService);

@@ -5,6 +5,8 @@ import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { SupportComponent } from './support.component';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('SupportComponent', () => {
   let component: SupportComponent;
@@ -12,7 +14,7 @@ describe('SupportComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, ServiceWorkerModule.register('', { enabled: false })],
+      imports: [NgxsModule.forRoot([SettingsState]), HttpClientTestingModule, ServiceWorkerModule.register('', { enabled: false })],
       declarations: [ SupportComponent, TranslatePipe ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })

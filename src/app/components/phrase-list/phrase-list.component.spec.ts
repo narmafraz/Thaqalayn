@@ -8,6 +8,8 @@ import { of } from 'rxjs';
 import { PhraseListComponent } from './phrase-list.component';
 import { AiContentService, PhraseIndex } from '@app/services/ai-content.service';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('PhraseListComponent', () => {
   let component: PhraseListComponent;
@@ -40,7 +42,7 @@ describe('PhraseListComponent', () => {
 
     await TestBed.configureTestingModule({
       declarations: [PhraseListComponent, TranslatePipe],
-      imports: [FormsModule, RouterTestingModule, HttpClientTestingModule],
+      imports: [NgxsModule.forRoot([SettingsState]), FormsModule, RouterTestingModule, HttpClientTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: AiContentService, useValue: aiContentSpy },
@@ -100,7 +102,7 @@ describe('PhraseListComponent (no data)', () => {
 
     await TestBed.configureTestingModule({
       declarations: [PhraseListComponent, TranslatePipe],
-      imports: [FormsModule, RouterTestingModule, HttpClientTestingModule],
+      imports: [NgxsModule.forRoot([SettingsState]), FormsModule, RouterTestingModule, HttpClientTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       providers: [
         { provide: AiContentService, useValue: aiContentSpy },

@@ -42,7 +42,10 @@
     @if ((mode$ | async) === 'fulltext' && availableLangs.length) {
       <label class="search-lang-picker">
         <mat-icon>translate</mat-icon>
-        <select [value]="(searchLang$ | async)" (change)="setLanguage($any($event.target).value)"
+        <!-- ngModel, not [value]: [value] on a <select> is applied before
+        @for has created the <option>s, so a language restored from the URL
+        would not show up as selected. -->
+        <select [ngModel]="(searchLang$ | async)" (ngModelChange)="setLanguage($event)"
           [attr.aria-label]="'search.searchLanguage' | translate">
           <option value="both">{{ 'search.langBoth' | translate }}</option>
           @for (l of availableLangs; track l) {
@@ -158,7 +161,7 @@
             @if (!pathOnlyMode) {
               <label class="sort-control">
                 <mat-icon>sort</mat-icon>
-                <select [value]="sortMode" (change)="setSort($any($event.target).value)"
+                <select [ngModel]="sortMode" (ngModelChange)="setSort($event)"
                   [attr.aria-label]="'search.sortBy' | translate">
                   <option value="relevance">{{ 'search.sortRelevance' | translate }}</option>
                   <option value="book">{{ 'search.sortBook' | translate }}</option>

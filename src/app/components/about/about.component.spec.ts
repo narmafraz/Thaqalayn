@@ -4,6 +4,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { AboutComponent } from './about.component';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('AboutComponent', () => {
   let component: AboutComponent;
@@ -11,7 +13,7 @@ describe('AboutComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [NgxsModule.forRoot([SettingsState]), HttpClientTestingModule],
       declarations: [ AboutComponent, TranslatePipe ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })

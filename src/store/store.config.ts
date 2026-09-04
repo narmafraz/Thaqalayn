@@ -7,8 +7,12 @@ import { BooksState } from './books/books.state';
 import { PeopleState } from './people/people.state';
 import { RouterState } from './router/router.state';
 import { SearchState } from './search/search.state';
+import { SettingsState } from './settings/settings.state';
 
-export const STATES_MODULES = [RouterState, BooksState, IndexState, PeopleState, SearchState];
+// SettingsState first: its ngxsOnInit hydrates the saved UI settings
+// (language / theme / font size) before any other state or service reads
+// them, so nothing has to correct itself a tick later.
+export const STATES_MODULES = [SettingsState, RouterState, BooksState, IndexState, PeopleState, SearchState];
 
 export const OPTIONS_CONFIG: Partial<NgxsConfig> = {
   /**

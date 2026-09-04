@@ -10,6 +10,9 @@ import { ReadingSheetService } from '@app/services/reading-sheet.service';
 import { Store } from '@ngxs/store';
 import { BooksState } from '@store/books/books.state';
 import { LoadNarrator } from '@store/people/people.actions';
+import { SetLanguage } from '@store/settings/settings.actions';
+import { SettingsState } from '@store/settings/settings.state';
+import { UI_LANGUAGES } from '@store/settings/settings.model';
 import { PeopleState } from '@store/people/people.state';
 import { Observable, Subscription } from 'rxjs';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs/operators';
@@ -26,20 +29,8 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'Thaqalayn';
   private subscriptions: Subscription[] = [];
 
-  languages = [
-    { code: 'en', name: 'English' },
-    { code: 'ar', name: 'العربية' },
-    { code: 'fa', name: 'فارسی' },
-    { code: 'fr', name: 'Français' },
-    { code: 'ur', name: 'اردو' },
-    { code: 'tr', name: 'Türkçe' },
-    { code: 'id', name: 'Bahasa Indonesia' },
-    { code: 'bn', name: 'বাংলা' },
-    { code: 'es', name: 'Español' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'ru', name: 'Русский' },
-    { code: 'zh', name: '中文' },
-  ];
+  /** Shared with the Settings sheet — see @store/settings/settings.model. */
+  readonly languages = UI_LANGUAGES;
 
   currentLang$: Observable<string>;
   theme$: Observable<ThemeMode>;
@@ -81,7 +72,7 @@ export class AppComponent implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) platformId: object,
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-    this.currentLang$ = this.i18n.currentLang$;
+    this.currentLang$ = this.store.select(SettingsState.getLanguage);
     this.readingSheetOpen$ = this.readingSheet.open$;
     this.theme$ = this.themeService.theme$;
     this.fontSize$ = this.themeService.fontSize$;
@@ -118,7 +109,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onLanguageChange(lang: string): void {
-    this.i18n.setLanguage(lang);
+    this.store.dispatch(new SetLanguage(lang));
     // Update ?lang= query param so URL is shareable with language preference
     this.router.navigate([], {
       queryParams: { lang },
@@ -194,13 +185,13 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.isBrowser) {
       this.webVitals.start();
       this.subscriptions.push(
-        this.i18n.isRtl$.subscribe(isRtl => {
+        this.store.select(SettingsState.isRtl).subscribe(isRtl => {
           document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
         })
       );
 
       this.subscriptions.push(
-        this.i18n.currentLang$.subscribe(lang => {
+        this.currentLang$.subscribe(lang => {
           document.documentElement.lang = lang;
           // Sync word-by-word language to the site language when there's
           // an AI-translation equivalent (every site lang except `ar`,

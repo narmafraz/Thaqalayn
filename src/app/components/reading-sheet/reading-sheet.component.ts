@@ -8,6 +8,10 @@ import { BookmarkService } from '@app/services/bookmark.service';
 import { ReadingSheetService } from '@app/services/reading-sheet.service';
 import { I18nService, ThemeService } from '@app/services';
 import { ThemeMode } from '@app/services/theme.service';
+import { Store } from '@ngxs/store';
+import { SetLanguage } from '@store/settings/settings.actions';
+import { UI_LANGUAGES } from '@store/settings/settings.model';
+import { SettingsState } from '@store/settings/settings.state';
 
 /**
  * Global Settings sheet — slide-out panel hosted at the app shell.
@@ -38,27 +42,16 @@ export class ReadingSheetComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly bookmarks = inject(BookmarkService);
   private readonly host = inject(ElementRef<HTMLElement>);
+  private readonly store = inject(Store);
 
   readonly open$: Observable<boolean> = this.sheet.open$;
   readonly preferences$: Observable<AiPreferences> = this.aiPrefs.preferences$;
   readonly theme$: Observable<ThemeMode> = this.themeService.theme$;
   readonly fontSize$: Observable<number> = this.themeService.fontSize$;
-  readonly currentLang$: Observable<string> = this.i18n.currentLang$;
+  readonly currentLang$: Observable<string> = this.store.select(SettingsState.getLanguage);
 
-  readonly uiLanguages = [
-    { code: 'en', name: 'English' },
-    { code: 'ar', name: 'العربية' },
-    { code: 'fa', name: 'فارسی' },
-    { code: 'fr', name: 'Français' },
-    { code: 'ur', name: 'اردو' },
-    { code: 'tr', name: 'Türkçe' },
-    { code: 'id', name: 'Bahasa Indonesia' },
-    { code: 'bn', name: 'বাংলা' },
-    { code: 'es', name: 'Español' },
-    { code: 'de', name: 'Deutsch' },
-    { code: 'ru', name: 'Русский' },
-    { code: 'zh', name: '中文' },
-  ];
+  /** Shared with the header picker — see @store/settings/settings.model. */
+  readonly uiLanguages = UI_LANGUAGES;
 
   readonly navLinks = [
     { route: '/books', icon: 'menu_book', labelKey: 'nav.books' },
@@ -113,7 +106,7 @@ export class ReadingSheetComponent implements OnInit, OnDestroy {
 
   // --- Language ---
   onUiLanguageChange(lang: string): void {
-    this.i18n.setLanguage(lang);
+    this.store.dispatch(new SetLanguage(lang));
     this.router.navigate([], {
       queryParams: { lang },
       queryParamsHandling: 'merge',

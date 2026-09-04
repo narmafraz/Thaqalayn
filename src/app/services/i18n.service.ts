@@ -1,12 +1,19 @@
-import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
-import { BehaviorSubject, Observable, Subject, forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
+import { SetLanguage } from '@store/settings/settings.actions';
+import { SettingsState } from '@store/settings/settings.state';
+import { Observable, Subject, forkJoin, of } from 'rxjs';
+import { catchError, distinctUntilChanged, skip } from 'rxjs/operators';
 
-const STORAGE_KEY = 'thaqalayn-ui-lang';
-const RTL_LANGUAGES = ['ar', 'fa', 'ur'];
-
+/**
+ * Loads and serves the UI string bundles for the current site language.
+ *
+ * The language itself is *not* owned here — `SettingsState` is the single
+ * source of truth (see `@store/settings`). This service reads it from the
+ * store and reacts to it; `setLanguage()` is a thin dispatch so that every
+ * caller, and every control bound to the store, stays in step.
+ */
 @Injectable({
   providedIn: 'root'
 })
@@ -14,9 +21,7 @@ export class I18nService {
 
   private strings: Record<string, unknown> = {};
   private enStringsCache: Record<string, unknown> | null = null;
-  private langSubject: BehaviorSubject<string>;
   private stringsChangedSubject = new Subject<void>();
-  private isBrowser: boolean;
 
   currentLang$: Observable<string>;
   isRtl$: Observable<boolean>;
@@ -24,18 +29,18 @@ export class I18nService {
 
   /** Synchronous accessor for the current language code. */
   get currentLang(): string {
-    return this.langSubject.value;
+    return this.store.selectSnapshot(SettingsState.getLanguage);
   }
 
-  constructor(private http: HttpClient, @Inject(PLATFORM_ID) platformId: object) {
-    this.isBrowser = isPlatformBrowser(platformId);
-    const initialLang = this.detectLanguage();
-    this.langSubject = new BehaviorSubject<string>(initialLang);
-    this.currentLang$ = this.langSubject.asObservable();
-    this.isRtl$ = this.currentLang$.pipe(
-      map(lang => RTL_LANGUAGES.includes(lang))
-    );
-    this.loadStrings(initialLang);
+  constructor(private http: HttpClient, private store: Store) {
+    this.currentLang$ = this.store.select(SettingsState.getLanguage);
+    this.isRtl$ = this.store.select(SettingsState.isRtl);
+
+    // The store is hydrated before any service resolves, so the first load
+    // goes straight to the user's language — no English flash, no wasted
+    // fetch. `skip(1)` drops the replayed current value we just handled.
+    this.loadStrings(this.currentLang);
+    this.currentLang$.pipe(skip(1), distinctUntilChanged()).subscribe(lang => this.loadStrings(lang));
   }
 
   get(key: string, params?: Record<string, string | number>): string {
@@ -71,67 +76,7 @@ export class I18nService {
   }
 
   setLanguage(lang: string): void {
-    if (this.isBrowser) {
-      localStorage.setItem(STORAGE_KEY, lang);
-    }
-    this.loadStrings(lang);
-    this.langSubject.next(lang);
-  }
-
-  private detectLanguage(): string {
-    if (!this.isBrowser) {
-      return 'en';
-    }
-
-    // Check window.location.search for path-based routing (e.g., /books?lang=fa)
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlLang = urlParams.get('lang');
-    if (urlLang) {
-      localStorage.setItem(STORAGE_KEY, urlLang);
-      return urlLang;
-    }
-
-    // Also check the hash fragment for hash-based URLs (e.g., /#/books?lang=fa)
-    const hash = window.location.hash;
-    if (hash) {
-      const hashQueryIndex = hash.indexOf('?');
-      if (hashQueryIndex !== -1) {
-        const hashParams = new URLSearchParams(hash.substring(hashQueryIndex));
-        const hashLang = hashParams.get('lang');
-        if (hashLang) {
-          localStorage.setItem(STORAGE_KEY, hashLang);
-          return hashLang;
-        }
-      }
-    }
-
-    const storedLang = localStorage.getItem(STORAGE_KEY);
-    if (storedLang) {
-      return storedLang;
-    }
-
-    // Auto-detect from browser language
-    const browserLang = this.detectBrowserLanguage();
-    if (browserLang) {
-      return browserLang;
-    }
-
-    return 'en';
-  }
-
-  private detectBrowserLanguage(): string | null {
-    if (!this.isBrowser) {
-      return null;
-    }
-    const supported = ['en', 'ar', 'fa', 'fr', 'ur', 'tr', 'id', 'bn', 'es', 'de', 'ru', 'zh'];
-    const navLangs = navigator.languages || [navigator.language];
-    for (const lang of navLangs) {
-      const code = lang.split('-')[0].toLowerCase();
-      if (supported.includes(code)) {
-        return code;
-      }
-    }
-    return null;
+    this.store.dispatch(new SetLanguage(lang));
   }
 
   /**

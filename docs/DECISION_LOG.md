@@ -1254,3 +1254,36 @@ Verified: قَالَ/قُلْتُ/يَقُولُ/قِيلَ/وَقَالَ now a
 - `docs/CACHE_FRESHNESS_PLAN.md` (full diagnosis + option matrix)
 
 ---
+
+### D064: UI settings moved into an NGXS `SettingsState` (2026-09-04)
+
+**Context:** A user reported that after picking Farsi and closing the site, the next visit rendered in Farsi but the Settings-sheet language dropdown read "English" — so getting back to English meant selecting Farsi first, to force a change event. The immediate cause was `<select [value]="currentLang$ | async">`: Angular applies the host element's property bindings *before* the `@for` block creates the `<option>`s, so assigning `select.value = 'fa'` hit an empty select, was discarded, and the browser then auto-selected the first option. The binding never re-ran (the value hadn't changed), so the control stayed wrong for the rest of the session. The underlying cause was structural: language, theme and font size lived in per-service `BehaviorSubject`s that each did their own localStorage + URL detection, so "the setting that was applied" and "what the control shows" were two separate truths.
+
+**Options considered:**
+1. **Point fix only** — swap `[value]` for `[ngModel]` on the one dropdown.
+2. **Introduce NgRx** alongside NGXS for settings, as the user suggested.
+3. **Add an NGXS `SettingsState`** as the single source of truth and make the services thin adapters over it.
+
+**Decision:** Option 3, plus the binding fix from option 1 everywhere the pattern appears.
+
+**Rationale:**
+- NGXS is already this app's state library (books, index, people, router, search). Adding NgRx would mean two stores, two devtools timelines and two idioms — the opposite of the uniformity that was asked for. NGXS *is* the standard here; the ask was "one mechanism", not that specific library.
+- With one slice owning `lang` / `theme` / `fontSize`, a value restored from localStorage, lifted off `?lang=`, or sniffed from `navigator.languages` reaches the controls by the same path as a value the user just picked. The class of bug disappears rather than being patched per control.
+- `SettingsState` is registered **first** in `STATES_MODULES` so its `ngxsOnInit` hydration lands before any other state or service reads a setting. That ordering is what lets `I18nService` fetch the right bundle on its first call instead of loading English and correcting itself.
+
+**Shape:**
+- `store/settings/` — `settings.model.ts` (types, storage keys, `UI_LANGUAGES`, ranges), `settings.actions.ts`, `settings.state.ts`.
+- `services/settings-storage.service.ts` — the only reader/writer of the persisted values, and the only place the `?lang=` > localStorage > browser-language > default priority is expressed. SSR-safe.
+- `I18nService` keeps the string bundles and `get()`; the language itself is read from the store and `setLanguage()` is a dispatch. `ThemeService` keeps the DOM side effects (`dark-theme` class, `--font-scale`, `theme-color` meta) and dispatches for writes. `IndexState` and `SearchState` no longer inject `I18nService` just to ask what the language is.
+- `SettingsState` also reacts to `RouterNavigation`, so `?lang=` works on any in-app navigation, not only a cold load.
+
+**Trade-offs:**
+- Every spec whose component graph reaches `I18nService` or `ThemeService` now needs `NgxsModule.forRoot([SettingsState])` (11 specs updated). That is the documented convention for this repo already.
+- Store selectors dedupe, so a setter that writes the value already in the store no longer re-emits. One theme spec asserted the old duplicate emission and was updated.
+- `AiPreferencesService`, `ReadingSheetService` and `KeyboardShortcutService` still hold their own subjects. They are the next candidates for the same treatment; nothing about them is load-bearing for this fix.
+
+**Files / artefacts:**
+- `src/store/settings/*`, `src/app/services/settings-storage.service.ts`
+- `src/app/services/{i18n,theme}.service.ts`, `src/store/{index,search,store.config}`
+- `reading-sheet` + `search-results` templates (`[value]` -> `[ngModel]` on native `<select>`s)
+- `e2e/tests/settings-persistence.spec.ts`, `src/store/settings/settings.state.spec.ts`, `src/app/services/settings-storage.service.spec.ts`

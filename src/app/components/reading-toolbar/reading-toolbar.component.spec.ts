@@ -6,6 +6,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ReadingToolbarComponent } from './reading-toolbar.component';
 import { AiPreferencesService } from '@app/services/ai-preferences.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('ReadingToolbarComponent', () => {
   let component: ReadingToolbarComponent;
@@ -16,7 +18,7 @@ describe('ReadingToolbarComponent', () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       declarations: [ReadingToolbarComponent, TranslatePipe],
-      imports: [MatTooltipModule, HttpClientTestingModule],
+      imports: [NgxsModule.forRoot([SettingsState]), MatTooltipModule, HttpClientTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 

@@ -4,6 +4,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 import { DownloadComponent } from './download.component';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('DownloadComponent', () => {
   let component: DownloadComponent;
@@ -11,7 +13,7 @@ describe('DownloadComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [NgxsModule.forRoot([SettingsState]), HttpClientTestingModule],
       declarations: [DownloadComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })

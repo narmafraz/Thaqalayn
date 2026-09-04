@@ -8,6 +8,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { ChapterListComponent } from './chapter-list.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('ChapterListComponent', () => {
   let component: ChapterListComponent;
@@ -15,7 +17,7 @@ describe('ChapterListComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
+      imports: [NgxsModule.forRoot([SettingsState]), 
         MatSortModule,
         MatTableModule,
         NoopAnimationsModule,

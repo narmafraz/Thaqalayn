@@ -50,9 +50,13 @@
       <h3 class="reading-sheet-section-title">{{ 'settings.language' | translate }}</h3>
       <div class="reading-sheet-row">
         <span class="reading-sheet-row-label">{{ 'language.picker' | translate }}</span>
+        <!-- ngModel, not [value]: a plain [value] binding on a <select> is
+        applied before @for has created the <option>s, so a restored
+        non-default language was silently dropped and the control fell back
+        to showing the first option. -->
         <select class="reading-sheet-select"
-          [value]="currentLang$ | async"
-          (change)="onUiLanguageChange($any($event.target).value)"
+          [ngModel]="currentLang$ | async"
+          (ngModelChange)="onUiLanguageChange($event)"
           [attr.aria-label]="'language.picker' | translate">
           @for (lang of uiLanguages; track lang) {
             <option [value]="lang.code">{{ lang.name }}</option>

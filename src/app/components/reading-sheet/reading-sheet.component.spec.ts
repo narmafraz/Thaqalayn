@@ -4,6 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NgxsModule, Store } from '@ngxs/store';
+import { SetLanguage } from '@store/settings/settings.actions';
+import { SUPPORTED_UI_LANGUAGES } from '@store/settings/settings.model';
+import { SettingsState } from '@store/settings/settings.state';
 
 import { ReadingSheetComponent } from './reading-sheet.component';
 import { ReadingSheetService } from '@app/services/reading-sheet.service';
@@ -22,7 +26,7 @@ describe('ReadingSheetComponent', () => {
     localStorage.clear();
     await TestBed.configureTestingModule({
       declarations: [ReadingSheetComponent, TranslatePipe],
-      imports: [FormsModule, MatTooltipModule, HttpClientTestingModule, RouterTestingModule],
+      imports: [FormsModule, MatTooltipModule, HttpClientTestingModule, RouterTestingModule, NgxsModule.forRoot([SettingsState])],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
 
@@ -98,13 +102,49 @@ describe('ReadingSheetComponent', () => {
   });
 
   describe('language section', () => {
-    it('onUiLanguageChange sets i18n language', () => {
+    it('onUiLanguageChange sets the site language', () => {
       component.onUiLanguageChange('fa');
-      // I18nService persists to localStorage; verify via the sheet's
-      // currentLang$ which mirrors i18n.currentLang$.
       component.currentLang$.subscribe(l => {
         expect(l).toBe('fa');
       }).unsubscribe();
+    });
+
+    it('the picker shows the language currently in effect, not the first option', async () => {
+      // REGRESSION: with a plain [value] binding the assignment ran before
+      // @for had created the <option>s, so a language restored from
+      // localStorage (or ?lang=) was dropped and the control showed
+      // English — while the rest of the page was in the real language.
+      TestBed.inject(Store).dispatch(new SetLanguage('fa'));
+      sheet.open();
+      fixture.detectChanges();
+      await fixture.whenStable(); // ngModel writes the value on a microtask
+
+      const select: HTMLSelectElement =
+        fixture.nativeElement.querySelector('select.reading-sheet-select');
+      expect(select.value).toBe('fa');
+      expect(select.options[select.selectedIndex].value).toBe('fa');
+    });
+
+    it('the picker follows a later language change', async () => {
+      sheet.open();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const select: HTMLSelectElement =
+        fixture.nativeElement.querySelector('select.reading-sheet-select');
+      expect(select.value).toBe('en');
+
+      TestBed.inject(Store).dispatch(new SetLanguage('tr'));
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(select.value).toBe('tr');
+    });
+
+    it('offers every supported UI language', () => {
+      sheet.open();
+      fixture.detectChanges();
+      const select: HTMLSelectElement =
+        fixture.nativeElement.querySelector('select.reading-sheet-select');
+      expect(Array.from(select.options).map(o => o.value)).toEqual([...SUPPORTED_UI_LANGUAGES]);
     });
   });
 

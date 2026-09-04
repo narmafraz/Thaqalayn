@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 import { I18nService } from './i18n.service';
 
 describe('I18nService', () => {
@@ -136,7 +138,9 @@ describe('I18nService', () => {
     });
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      // The language now lives in SettingsState; the service reads it from
+      // the store, which hydrates from the mocked localStorage/URL below.
+      imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])],
     });
   });
 
@@ -279,7 +283,7 @@ describe('I18nService', () => {
       (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => localStorageStore[key] ?? null);
       (localStorage.setItem as jasmine.Spy).and.callFake((key: string, value: string) => { localStorageStore[key] = value; });
 
-      TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
+      TestBed.configureTestingModule({ imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])] });
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
@@ -310,7 +314,7 @@ describe('I18nService', () => {
       (localStorage.getItem as jasmine.Spy).and.callFake((key: string) => localStorageStore[key] ?? null);
       (localStorage.setItem as jasmine.Spy).and.callFake((key: string, value: string) => { localStorageStore[key] = value; });
 
-      TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
+      TestBed.configureTestingModule({ imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])] });
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
@@ -615,7 +619,7 @@ describe('I18nService', () => {
         configurable: true,
       });
 
-      TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
+      TestBed.configureTestingModule({ imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])] });
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
@@ -655,7 +659,7 @@ describe('I18nService', () => {
         configurable: true,
       });
 
-      TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
+      TestBed.configureTestingModule({ imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])] });
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 
@@ -694,7 +698,7 @@ describe('I18nService', () => {
         configurable: true,
       });
 
-      TestBed.configureTestingModule({ imports: [HttpClientTestingModule] });
+      TestBed.configureTestingModule({ imports: [HttpClientTestingModule, NgxsModule.forRoot([SettingsState])] });
       service = TestBed.inject(I18nService);
       httpMock = TestBed.inject(HttpTestingController);
 

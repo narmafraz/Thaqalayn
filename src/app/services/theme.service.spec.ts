@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 import { ThemeService, ThemeMode } from './theme.service';
 
 describe('ThemeService', () => {
@@ -32,9 +34,21 @@ describe('ThemeService', () => {
       document.head.appendChild(meta);
     }
 
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({ imports: [NgxsModule.forRoot([SettingsState])] });
     service = TestBed.inject(ThemeService);
   });
+
+  /**
+   * Rebuilds the injector so `SettingsState` re-hydrates from whatever the
+   * localStorage mock currently holds. The saved theme/font size is read
+   * once at store bootstrap, so "detection on construction" is really
+   * "detection on store hydration".
+   */
+  function recreateService(): ThemeService {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ imports: [NgxsModule.forRoot([SettingsState])] });
+    return TestBed.inject(ThemeService);
+  }
 
   afterEach(() => {
     // Clean up after each test
@@ -61,14 +75,14 @@ describe('ThemeService', () => {
       localStorageStore['thaqalayn-theme'] = 'dark';
 
       // Recreate the service
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentTheme).toBe('dark');
     });
 
     it('should use light theme from localStorage when saved', () => {
       localStorageStore['thaqalayn-theme'] = 'light';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentTheme).toBe('light');
     });
 
@@ -78,7 +92,7 @@ describe('ThemeService', () => {
         return { matches: true } as MediaQueryList;
       });
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentTheme).toBe('light');
     });
 
@@ -89,14 +103,14 @@ describe('ThemeService', () => {
         return { matches: true } as MediaQueryList;
       });
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentTheme).toBe('light');
     });
 
     it('should default to light when localStorage is invalid', () => {
       localStorageStore['thaqalayn-theme'] = 'invalid';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentTheme).toBe('light');
     });
   });
@@ -382,42 +396,42 @@ describe('ThemeService', () => {
     it('should load saved font size from localStorage on creation', () => {
       localStorageStore['thaqalayn-font-size'] = '120';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentFontSize).toBe(120);
     });
 
     it('should default to 100 when localStorage font size is invalid', () => {
       localStorageStore['thaqalayn-font-size'] = 'abc';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentFontSize).toBe(100);
     });
 
     it('should default to 100 when localStorage font size is below minimum', () => {
       localStorageStore['thaqalayn-font-size'] = '50';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentFontSize).toBe(100);
     });
 
     it('should default to 100 when localStorage font size exceeds maximum', () => {
       localStorageStore['thaqalayn-font-size'] = '200';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentFontSize).toBe(100);
     });
 
     it('should accept font size at exact minimum boundary (75)', () => {
       localStorageStore['thaqalayn-font-size'] = '75';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentFontSize).toBe(75);
     });
 
     it('should accept font size at exact maximum boundary (150)', () => {
       localStorageStore['thaqalayn-font-size'] = '150';
 
-      const freshService = new ThemeService('browser' as unknown as object);
+      const freshService = recreateService();
       expect(freshService.currentFontSize).toBe(150);
     });
   });
@@ -443,9 +457,11 @@ describe('ThemeService', () => {
 
       service.increaseFontSize();
       service.decreaseFontSize();
-      service.resetFontSize();
+      service.resetFontSize(); // already back at 100 -> no further emission
 
-      expect(sizes).toEqual([100, 110, 100, 100]);
+      // The stream is a store selector, so it only emits on an actual
+      // change (the old BehaviorSubject re-emitted the same value).
+      expect(sizes).toEqual([100, 110, 100]);
       sub.unsubscribe();
     });
 

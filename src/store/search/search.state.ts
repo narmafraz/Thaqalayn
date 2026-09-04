@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { SearchMode, SearchResult, SearchService, SortMode } from '@app/services/search.service';
 import { PagefindFilterCounts } from '@app/services/pagefind.service';
-import { I18nService } from '@app/services/i18n.service';
-import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 import {
   ClearFacets, ClearSearch, HydrateSearch, InitSearchIndex, SearchQuery,
   SetFacet, SetSearchLanguage, SetSearchMode, SetSort,
@@ -42,7 +42,7 @@ export interface SearchStateModel {
 })
 @Injectable()
 export class SearchState {
-  constructor(private searchService: SearchService, private i18n: I18nService) {}
+  constructor(private searchService: SearchService, private store: Store) {}
 
   @Selector([SearchState])
   public static getQuery(state: SearchStateModel): string { return state.query; }
@@ -147,7 +147,7 @@ export class SearchState {
     // results. A specific picked language narrows to just that index. (fa/ur are
     // themselves Arabic-script and are searched as their own index.)
     const langs = state.searchLang === 'both'
-      ? [...new Set([this.i18n.currentLang, 'ar'])]
+      ? [...new Set([this.store.selectSnapshot(SettingsState.getLanguage), 'ar'])]
       : [state.searchLang];
 
     ctx.patchState({

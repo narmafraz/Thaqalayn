@@ -8,6 +8,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { VerseActionsComponent } from './verse-actions.component';
 import { TranslatePipe } from '@app/pipes/translate.pipe';
 import { Verse } from '@app/models';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('VerseActionsComponent', () => {
   let component: VerseActionsComponent;
@@ -32,6 +34,7 @@ describe('VerseActionsComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [VerseActionsComponent, TranslatePipe],
       imports: [
+        NgxsModule.forRoot([SettingsState]),
         RouterTestingModule,
         HttpClientTestingModule,
         MatIconModule,

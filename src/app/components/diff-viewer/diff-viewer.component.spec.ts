@@ -4,6 +4,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { DiffViewerComponent } from './diff-viewer.component';
 import { SharedModule } from '../../shared/shared.module';
 import { TextDiff, DiffSegment } from '@app/models';
+import { NgxsModule } from '@ngxs/store';
+import { SettingsState } from '@store/settings/settings.state';
 
 describe('DiffViewerComponent', () => {
   let component: DiffViewerComponent;
@@ -12,7 +14,7 @@ describe('DiffViewerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [DiffViewerComponent],
-      imports: [SharedModule, HttpClientTestingModule],
+      imports: [NgxsModule.forRoot([SettingsState]), SharedModule, HttpClientTestingModule],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .overrideComponent(DiffViewerComponent, {

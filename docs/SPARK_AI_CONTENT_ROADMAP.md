@@ -2,7 +2,8 @@
 
 > **Created:** 2026-08-12
 > **Status:** IDEA COLLECTION — items 1-8 captured for future planning, none scheduled yet.
-> Items 9-10 are IN PROGRESS with uncommitted working-tree changes (see their sections).
+> Item 9 is **COMPLETE (core)** as of 2026-09-06 (residuals: CONSOLIDATED_ROADMAP N7-N10);
+> item 10 is IN PROGRESS with uncommitted working-tree changes (see its section).
 > **Purpose:** Track candidate AI-content workloads for the DGX Spark (Qwen 3.6-35B, $0 marginal cost).
 > The Spark changes the economics of everything below: work previously priced in hundreds/thousands of
 > dollars of API spend (see `PIPELINE_OPTIMIZATION_PLAN.md`) becomes compute-time-only. See
@@ -24,7 +25,7 @@
 | 6 | Chapter summaries with point-level dedup | New content | — (new) | IDEA |
 | 7 | Narrator insights: same-topic clustering + independent-chain analysis | Analysis | Narrator insights panel (chapter sidecars) | IDEA |
 | 8 | Cross-corpus similar-narration detection ("plagiarism"-style matching) | Analysis | — (new; feeds #6 and #7) | IDEA |
-| 9 | Chunk-align existing scraped translations to AI chunks | Alignment | `align-scraped` pipeline command (built; pilot-verified) | IN PROGRESS |
+| 9 | Chunk-align existing scraped translations to AI chunks | Alignment | `align-scraped` pipeline command | **✅ COMPLETE (core) 2026-09-06** — 41,057/41,155 ids (99.8%) aligned + merged; residuals in CONSOLIDATED_ROADMAP N7-N10 |
 | 10 | Word regen determinism + surface translation quality | Stability + QA | `WORDS_PROJECT_PLAN.md`, item #2; fixes in working tree | IN PROGRESS |
 
 **Shared foundation:** items 6, 7, and 8 all depend on the same primitive — deciding when two
@@ -187,16 +188,24 @@ Sarwar):
   `<sup>` markup, sister-file fetch per selected translation incl. compare mode
   (commits `663ca71` → `1fcdaef`, `f62fe55`).
 
+**✅ COMPLETED 2026-08-16 → 2026-09-06** (validation hardening + two pilot rounds over all 19
+translator styles at 99.5-99.6%, then the full-corpus Spark run): **41,057 of 41,155
+translation-ids aligned (99.8%)** across 21 books, merged into ThaqalaynData (integrity sweep
+41,155/41,155 OK). The 98 quarantined ids keep the flat block view BY DESIGN: abridged Sarwar
+summaries with no faithful chunk mapping, wrong-verse attachments (Sarwar numbering offset —
+CONSOLIDATED_ROADMAP N8), and title stubs. Validation stack shipped along the way: strict
+NFC/whitespace-exact verbatim check, deterministic hadith-number-prefix handling, cut-point
+reslice salvage, placement accuracy gate, best-effort sentence-DP for abridged translations
+(generator `0485f1b`…`ff54c8a`); ThaqalaynSearch reads sister `chunk_translations` (`e907a97`).
+Operational handoff + reports: `scripture/handoff/ALIGN_SCRAPED_HANDOFF.md`.
+
 **Remaining:**
 
-1. **Strict validation** (decided, not yet applied): tighten `validate_alignment` from 90%
-   fuzzy token overlap (`MIN_RECALL = 0.90`, `chunk_alignment_phase.py:56`) to an exact check —
-   `join(parts)` must equal the original modulo whitespace, else quarantine and keep the base
-   block text. Critical because the sister parts are the *sole* copy of the scraped text:
-   a dropped word is lost data.
-2. **Full-corpus Spark run** — only pilot samples aligned so far.
-3. **Future phase**: complete "all translations in language files, none in base" migration
+1. **Tail**: thawab-al-amal + uyun (~1,000 ids) — run stopped at 98.5% for a Spark vLLM restart;
+   resume `bash ~/align_full.sh` (CONSOLIDATED_ROADMAP N7).
+2. **Future phase**: complete "all translations in language files, none in base" migration
    (current state is the alignment-scoped hybrid). Related: `PER_LANGUAGE_VERSE_SPLIT.md`.
+3. **Persian quran translations** (11 `fa.*` ids): separate cross-lingual pilot — N10.
 
 ## 10. Word regen stability + surface translations that make sense
 

@@ -22,6 +22,7 @@ const BLOCK_PATTERNS: RegExp[] = [
   /meta-webindexer/i,        // Meta/Facebook web indexer (the June 2026 attacker)
   /meta-externalagent/i,     // Meta AI training crawler (blocked in robots.txt too)
   /meta-externalfetcher/i,   // Meta AI link-preview fetcher
+  /applebot/i,
 ];
 
 export default async (request: Request, context: { ip?: string }) => {
